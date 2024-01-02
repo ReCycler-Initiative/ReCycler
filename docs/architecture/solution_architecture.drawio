@@ -1,99 +1,102 @@
-<mxfile host="app.diagrams.net" modified="2023-12-21T11:55:36.063Z" agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.1 Safari/605.1.15" etag="dXdIBTpQNftj17Xb44q2" version="22.1.11" type="github">
+<mxfile host="app.diagrams.net" modified="2024-01-02T09:52:56.962Z" agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.1 Safari/605.1.15" etag="1iCE89DZ1D-8ZxHBk8d4" version="22.1.16" type="github">
   <diagram name="High-level architecture" id="9zcz33UXx225ZlQHVHOC">
-    <mxGraphModel dx="930" dy="611" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+    <mxGraphModel dx="1930" dy="1019" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
-        <mxCell id="fm4_85k55z0bOuFMnIiU-6" value="" style="rounded=0;whiteSpace=wrap;html=1;align=center;" vertex="1" parent="1">
+        <mxCell id="fm4_85k55z0bOuFMnIiU-6" value="" style="rounded=0;whiteSpace=wrap;html=1;align=center;" parent="1" vertex="1">
           <mxGeometry x="130" y="260" width="590" height="250" as="geometry" />
         </mxCell>
-        <mxCell id="fm4_85k55z0bOuFMnIiU-30" value="" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+        <mxCell id="fm4_85k55z0bOuFMnIiU-30" value="" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
           <mxGeometry x="470" y="280" width="230" height="90" as="geometry" />
         </mxCell>
-        <mxCell id="fm4_85k55z0bOuFMnIiU-1" value="" style="rounded=0;whiteSpace=wrap;html=1;align=center;" vertex="1" parent="1">
+        <mxCell id="fm4_85k55z0bOuFMnIiU-1" value="" style="rounded=0;whiteSpace=wrap;html=1;align=center;" parent="1" vertex="1">
           <mxGeometry x="130" y="120" width="590" height="120" as="geometry" />
         </mxCell>
-        <mxCell id="fm4_85k55z0bOuFMnIiU-2" value="OpenAI&lt;br&gt;GPT-4 API" style="rounded=0;whiteSpace=wrap;html=1;align=center;" vertex="1" parent="1">
+        <mxCell id="fm4_85k55z0bOuFMnIiU-2" value="OpenAI&lt;br&gt;GPT-4 API" style="rounded=0;whiteSpace=wrap;html=1;align=center;" parent="1" vertex="1">
           <mxGeometry x="150" y="150" width="120" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="fm4_85k55z0bOuFMnIiU-3" value="&amp;nbsp;openrouteservice API v2" style="rounded=0;whiteSpace=wrap;html=1;align=center;" vertex="1" parent="1">
+        <mxCell id="fm4_85k55z0bOuFMnIiU-3" value="&amp;nbsp;openrouteservice API v2" style="rounded=0;whiteSpace=wrap;html=1;align=center;" parent="1" vertex="1">
           <mxGeometry x="290" y="150" width="120" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="fm4_85k55z0bOuFMnIiU-4" value="Kierrätys.info (v3.0) API" style="rounded=0;whiteSpace=wrap;html=1;align=center;" vertex="1" parent="1">
+        <mxCell id="fm4_85k55z0bOuFMnIiU-4" value="Kierrätys.info (v3.0) API" style="rounded=0;whiteSpace=wrap;html=1;align=center;" parent="1" vertex="1">
           <mxGeometry x="570" y="150" width="120" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="fm4_85k55z0bOuFMnIiU-5" value="Mapbox&lt;br&gt;API" style="rounded=0;whiteSpace=wrap;html=1;align=center;" vertex="1" parent="1">
+        <mxCell id="fm4_85k55z0bOuFMnIiU-5" value="Mapbox&lt;br&gt;API" style="rounded=0;whiteSpace=wrap;html=1;align=center;" parent="1" vertex="1">
           <mxGeometry x="440" y="150" width="120" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="fm4_85k55z0bOuFMnIiU-7" value="External APIs&amp;nbsp;" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+        <mxCell id="fm4_85k55z0bOuFMnIiU-7" value="External APIs&amp;nbsp;" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
           <mxGeometry x="340" y="210" width="170" height="30" as="geometry" />
         </mxCell>
-        <mxCell id="fm4_85k55z0bOuFMnIiU-8" value="ReCycler application" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+        <mxCell id="fm4_85k55z0bOuFMnIiU-8" value="ReCycler application" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
           <mxGeometry x="340" y="470" width="170" height="30" as="geometry" />
         </mxCell>
-        <mxCell id="fm4_85k55z0bOuFMnIiU-13" value="" style="rounded=0;whiteSpace=wrap;html=1;align=center;" vertex="1" parent="1">
+        <mxCell id="fm4_85k55z0bOuFMnIiU-13" value="" style="rounded=0;whiteSpace=wrap;html=1;align=center;" parent="1" vertex="1">
           <mxGeometry x="170" y="280" width="210" height="180" as="geometry" />
         </mxCell>
-        <mxCell id="fm4_85k55z0bOuFMnIiU-9" value="PostgreSQL / PostGIS" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;align=center;" vertex="1" parent="1">
+        <mxCell id="fm4_85k55z0bOuFMnIiU-9" value="PostgreSQL / PostGIS" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;align=center;" parent="1" vertex="1">
           <mxGeometry x="500" y="400" width="170" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="fm4_85k55z0bOuFMnIiU-11" value="React" style="whiteSpace=wrap;html=1;aspect=fixed;align=center;" vertex="1" parent="1">
+        <mxCell id="fm4_85k55z0bOuFMnIiU-11" value="React" style="whiteSpace=wrap;html=1;aspect=fixed;align=center;" parent="1" vertex="1">
           <mxGeometry x="240" y="330" width="80" height="80" as="geometry" />
         </mxCell>
-        <mxCell id="fm4_85k55z0bOuFMnIiU-14" value="Python" style="rounded=0;whiteSpace=wrap;html=1;align=center;" vertex="1" parent="1">
+        <mxCell id="fm4_85k55z0bOuFMnIiU-14" value="Python" style="rounded=0;whiteSpace=wrap;html=1;align=center;" parent="1" vertex="1">
           <mxGeometry x="500" y="295" width="170" height="35" as="geometry" />
         </mxCell>
-        <mxCell id="fm4_85k55z0bOuFMnIiU-16" value="" style="endArrow=classic;startArrow=classic;html=1;rounded=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;exitX=0.25;exitY=0;exitDx=0;exitDy=0;align=center;" edge="1" parent="1" source="fm4_85k55z0bOuFMnIiU-11" target="fm4_85k55z0bOuFMnIiU-2">
+        <mxCell id="fm4_85k55z0bOuFMnIiU-16" value="" style="endArrow=classic;startArrow=classic;html=1;rounded=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;exitX=0.25;exitY=0;exitDx=0;exitDy=0;align=center;" parent="1" source="fm4_85k55z0bOuFMnIiU-11" target="fm4_85k55z0bOuFMnIiU-2" edge="1">
           <mxGeometry width="50" height="50" relative="1" as="geometry">
             <mxPoint x="390" y="420" as="sourcePoint" />
             <mxPoint x="440" y="370" as="targetPoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="fm4_85k55z0bOuFMnIiU-17" value="" style="endArrow=classic;startArrow=classic;html=1;rounded=0;entryX=0.041;entryY=-0.067;entryDx=0;entryDy=0;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryPerimeter=0;align=center;" edge="1" parent="1" source="fm4_85k55z0bOuFMnIiU-11" target="fm4_85k55z0bOuFMnIiU-7">
+        <mxCell id="fm4_85k55z0bOuFMnIiU-17" value="" style="endArrow=classic;startArrow=classic;html=1;rounded=0;entryX=0.041;entryY=-0.067;entryDx=0;entryDy=0;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryPerimeter=0;align=center;" parent="1" source="fm4_85k55z0bOuFMnIiU-11" target="fm4_85k55z0bOuFMnIiU-7" edge="1">
           <mxGeometry width="50" height="50" relative="1" as="geometry">
             <mxPoint x="390" y="420" as="sourcePoint" />
             <mxPoint x="440" y="370" as="targetPoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="fm4_85k55z0bOuFMnIiU-18" value="" style="endArrow=classic;startArrow=classic;html=1;rounded=0;entryX=0.941;entryY=0.033;entryDx=0;entryDy=0;entryPerimeter=0;exitX=0.75;exitY=0;exitDx=0;exitDy=0;align=center;" edge="1" parent="1" source="fm4_85k55z0bOuFMnIiU-11" target="fm4_85k55z0bOuFMnIiU-7">
+        <mxCell id="fm4_85k55z0bOuFMnIiU-18" value="" style="endArrow=classic;startArrow=classic;html=1;rounded=0;entryX=0.941;entryY=0.033;entryDx=0;entryDy=0;entryPerimeter=0;exitX=0.75;exitY=0;exitDx=0;exitDy=0;align=center;" parent="1" source="fm4_85k55z0bOuFMnIiU-11" target="fm4_85k55z0bOuFMnIiU-7" edge="1">
           <mxGeometry width="50" height="50" relative="1" as="geometry">
             <mxPoint x="350" y="350" as="sourcePoint" />
             <mxPoint x="440" y="370" as="targetPoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="fm4_85k55z0bOuFMnIiU-21" value="" style="endArrow=classic;startArrow=classic;html=1;rounded=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;exitX=0.5;exitY=0;exitDx=0;exitDy=0;align=center;" edge="1" parent="1" source="fm4_85k55z0bOuFMnIiU-14" target="fm4_85k55z0bOuFMnIiU-4">
+        <mxCell id="fm4_85k55z0bOuFMnIiU-21" value="" style="endArrow=classic;startArrow=classic;html=1;rounded=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;exitX=0.5;exitY=0;exitDx=0;exitDy=0;align=center;" parent="1" source="fm4_85k55z0bOuFMnIiU-14" target="fm4_85k55z0bOuFMnIiU-4" edge="1">
           <mxGeometry width="50" height="50" relative="1" as="geometry">
             <mxPoint x="400" y="360" as="sourcePoint" />
             <mxPoint x="450" y="310" as="targetPoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="fm4_85k55z0bOuFMnIiU-34" value="Batch processing" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="fm4_85k55z0bOuFMnIiU-21">
+        <mxCell id="fm4_85k55z0bOuFMnIiU-34" value="Batch processing" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" parent="fm4_85k55z0bOuFMnIiU-21" vertex="1" connectable="0">
           <mxGeometry x="-0.0141" relative="1" as="geometry">
             <mxPoint y="-3" as="offset" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="fm4_85k55z0bOuFMnIiU-22" value="" style="endArrow=classic;startArrow=classic;html=1;rounded=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;exitX=0.5;exitY=0;exitDx=0;exitDy=0;exitPerimeter=0;align=center;" edge="1" parent="1" source="fm4_85k55z0bOuFMnIiU-9" target="fm4_85k55z0bOuFMnIiU-14">
+        <mxCell id="fm4_85k55z0bOuFMnIiU-22" value="" style="endArrow=classic;startArrow=classic;html=1;rounded=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;exitX=0.5;exitY=0;exitDx=0;exitDy=0;exitPerimeter=0;align=center;" parent="1" source="fm4_85k55z0bOuFMnIiU-9" target="fm4_85k55z0bOuFMnIiU-14" edge="1">
           <mxGeometry width="50" height="50" relative="1" as="geometry">
             <mxPoint x="400" y="350" as="sourcePoint" />
             <mxPoint x="450" y="300" as="targetPoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="fm4_85k55z0bOuFMnIiU-24" value="NodeJS Container" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+        <mxCell id="fm4_85k55z0bOuFMnIiU-24" value="UI Container" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
           <mxGeometry x="180" y="430" width="170" height="30" as="geometry" />
         </mxCell>
-        <mxCell id="fm4_85k55z0bOuFMnIiU-25" value="" style="endArrow=classic;startArrow=classic;html=1;rounded=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="fm4_85k55z0bOuFMnIiU-11" target="fm4_85k55z0bOuFMnIiU-14">
+        <mxCell id="fm4_85k55z0bOuFMnIiU-25" value="" style="endArrow=classic;startArrow=classic;html=1;rounded=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="fm4_85k55z0bOuFMnIiU-11" target="fm4_85k55z0bOuFMnIiU-14" edge="1">
           <mxGeometry width="50" height="50" relative="1" as="geometry">
             <mxPoint x="400" y="350" as="sourcePoint" />
             <mxPoint x="450" y="300" as="targetPoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="fm4_85k55z0bOuFMnIiU-33" value="API" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="fm4_85k55z0bOuFMnIiU-25">
+        <mxCell id="fm4_85k55z0bOuFMnIiU-33" value="API" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" parent="fm4_85k55z0bOuFMnIiU-25" vertex="1" connectable="0">
           <mxGeometry x="0.0544" relative="1" as="geometry">
             <mxPoint as="offset" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="fm4_85k55z0bOuFMnIiU-31" value="Data Processing Container" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+        <mxCell id="fm4_85k55z0bOuFMnIiU-31" value="Data Processing Container" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
           <mxGeometry x="510" y="340" width="170" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="CHO3YG6BR_KFlLe8QAzr-1" value="&lt;h1&gt;Libraries&lt;/h1&gt;&lt;p style=&quot;margin: 0px 0px 12px; font-style: normal; font-variant-caps: normal; font-stretch: normal; line-height: normal; font-size-adjust: none; font-kerning: auto; font-variant-alternates: normal; font-variant-ligatures: normal; font-variant-numeric: normal; font-variant-east-asian: normal; font-variant-position: normal; font-feature-settings: normal; font-optical-sizing: auto; font-variation-settings: normal;&quot;&gt;&lt;b&gt;Data Processing Container&lt;/b&gt;&lt;/p&gt;&lt;b style=&quot;border-color: var(--border-color);&quot;&gt;&amp;nbsp; &amp;nbsp; Python&lt;/b&gt;&lt;br&gt;&lt;p style=&quot;margin: 0px 0px 12px; font-style: normal; font-variant-caps: normal; font-stretch: normal; line-height: normal; font-size-adjust: none; font-kerning: auto; font-variant-alternates: normal; font-variant-ligatures: normal; font-variant-numeric: normal; font-variant-east-asian: normal; font-variant-position: normal; font-feature-settings: normal; font-optical-sizing: auto; font-variation-settings: normal;&quot;&gt;&lt;span style=&quot;border-color: var(--border-color);&quot;&gt;&amp;nbsp; &amp;nbsp; Psycopg2&lt;/span&gt;&lt;/p&gt;&lt;p style=&quot;margin: 0px 0px 12px; font-style: normal; font-variant-caps: normal; font-stretch: normal; line-height: normal; font-size-adjust: none; font-kerning: auto; font-variant-alternates: normal; font-variant-ligatures: normal; font-variant-numeric: normal; font-variant-east-asian: normal; font-variant-position: normal; font-feature-settings: normal; font-optical-sizing: auto; font-variation-settings: normal;&quot;&gt;&lt;b&gt;UI Container&lt;/b&gt;&lt;/p&gt;&lt;p style=&quot;margin: 0px; font-style: normal; font-variant-caps: normal; font-stretch: normal; line-height: normal; font-size-adjust: none; font-kerning: auto; font-variant-alternates: normal; font-variant-ligatures: normal; font-variant-numeric: normal; font-variant-east-asian: normal; font-variant-position: normal; font-feature-settings: normal; font-optical-sizing: auto; font-variation-settings: normal;&quot;&gt;&lt;span style=&quot;font-kerning: none&quot;&gt;&lt;b&gt;&lt;span style=&quot;&quot;&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&lt;/span&gt;NodeJS&lt;/b&gt;&lt;/span&gt;&lt;/p&gt;&lt;p style=&quot;margin: 0px; font-style: normal; font-variant-caps: normal; font-stretch: normal; line-height: normal; font-size-adjust: none; font-kerning: auto; font-variant-alternates: normal; font-variant-ligatures: normal; font-variant-numeric: normal; font-variant-east-asian: normal; font-variant-position: normal; font-feature-settings: normal; font-optical-sizing: auto; font-variation-settings: normal;&quot;&gt;&lt;span style=&quot;font-kerning: none;&quot;&gt;&lt;b&gt;&lt;span style=&quot;&quot;&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&lt;/span&gt;React&lt;/b&gt;&lt;/span&gt;&lt;/p&gt;&lt;p style=&quot;margin: 0px; font-style: normal; font-variant-caps: normal; font-stretch: normal; line-height: normal; font-size-adjust: none; font-kerning: auto; font-variant-alternates: normal; font-variant-ligatures: normal; font-variant-numeric: normal; font-variant-east-asian: normal; font-variant-position: normal; font-feature-settings: normal; font-optical-sizing: auto; font-variation-settings: normal;&quot;&gt;&lt;span style=&quot;font-kerning: none&quot;&gt;&lt;span style=&quot;&quot;&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&lt;/span&gt;Next.js&lt;/span&gt;&lt;/p&gt;&lt;p style=&quot;margin: 0px; font-style: normal; font-variant-caps: normal; font-stretch: normal; line-height: normal; font-size-adjust: none; font-kerning: auto; font-variant-alternates: normal; font-variant-ligatures: normal; font-variant-numeric: normal; font-variant-east-asian: normal; font-variant-position: normal; font-feature-settings: normal; font-optical-sizing: auto; font-variation-settings: normal;&quot;&gt;&lt;span style=&quot;font-kerning: none;&quot;&gt;&lt;span style=&quot;&quot;&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&lt;/span&gt;Mapbox GL JS&lt;/span&gt;&lt;/p&gt;&lt;p style=&quot;margin: 0px; font-style: normal; font-variant-caps: normal; font-stretch: normal; line-height: normal; font-size-adjust: none; font-kerning: auto; font-variant-alternates: normal; font-variant-ligatures: normal; font-variant-numeric: normal; font-variant-east-asian: normal; font-variant-position: normal; font-feature-settings: normal; font-optical-sizing: auto; font-variation-settings: normal; min-height: 14px;&quot;&gt;&lt;span style=&quot;font-kerning: none&quot;&gt;&lt;/span&gt;&lt;br&gt;&lt;/p&gt;&lt;p style=&quot;margin: 0px; font-style: normal; font-variant-caps: normal; font-stretch: normal; line-height: normal; font-size-adjust: none; font-kerning: auto; font-variant-alternates: normal; font-variant-ligatures: normal; font-variant-numeric: normal; font-variant-east-asian: normal; font-variant-position: normal; font-feature-settings: normal; font-optical-sizing: auto; font-variation-settings: normal;&quot;&gt;&lt;span style=&quot;font-kerning: none;&quot;&gt;&lt;b&gt;&lt;span style=&quot;&quot;&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&lt;/span&gt;Styles&lt;/b&gt;&lt;/span&gt;&lt;/p&gt;&lt;p style=&quot;margin: 0px; font-style: normal; font-variant-caps: normal; font-stretch: normal; line-height: normal; font-size-adjust: none; font-kerning: auto; font-variant-alternates: normal; font-variant-ligatures: normal; font-variant-numeric: normal; font-variant-east-asian: normal; font-variant-position: normal; font-feature-settings: normal; font-optical-sizing: auto; font-variation-settings: normal;&quot;&gt;&lt;span style=&quot;font-kerning: none&quot;&gt;&lt;span style=&quot;&quot;&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&lt;/span&gt;Tailwind CSS&lt;/span&gt;&lt;/p&gt;&lt;p style=&quot;margin: 0px; font-style: normal; font-variant-caps: normal; font-stretch: normal; line-height: normal; font-size-adjust: none; font-kerning: auto; font-variant-alternates: normal; font-variant-ligatures: normal; font-variant-numeric: normal; font-variant-east-asian: normal; font-variant-position: normal; font-feature-settings: normal; font-optical-sizing: auto; font-variation-settings: normal; min-height: 14px;&quot;&gt;&lt;span style=&quot;font-kerning: none&quot;&gt;&lt;/span&gt;&lt;br&gt;&lt;/p&gt;&lt;p style=&quot;margin: 0px; font-style: normal; font-variant-caps: normal; font-stretch: normal; line-height: normal; font-size-adjust: none; font-kerning: auto; font-variant-alternates: normal; font-variant-ligatures: normal; font-variant-numeric: normal; font-variant-east-asian: normal; font-variant-position: normal; font-feature-settings: normal; font-optical-sizing: auto; font-variation-settings: normal;&quot;&gt;&lt;span style=&quot;font-kerning: none;&quot;&gt;&lt;b&gt;&lt;span style=&quot;&quot;&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&lt;/span&gt;UI Components&lt;/b&gt;&lt;/span&gt;&lt;/p&gt;&lt;p style=&quot;margin: 0px; font-style: normal; font-variant-caps: normal; font-stretch: normal; line-height: normal; font-size-adjust: none; font-kerning: auto; font-variant-alternates: normal; font-variant-ligatures: normal; font-variant-numeric: normal; font-variant-east-asian: normal; font-variant-position: normal; font-feature-settings: normal; font-optical-sizing: auto; font-variation-settings: normal;&quot;&gt;&lt;span style=&quot;font-kerning: none;&quot;&gt;&lt;span style=&quot;&quot;&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&lt;/span&gt;Shadcn&lt;/span&gt;&lt;/p&gt;&lt;p style=&quot;margin: 0px; font-style: normal; font-variant-caps: normal; font-stretch: normal; line-height: normal; font-size-adjust: none; font-kerning: auto; font-variant-alternates: normal; font-variant-ligatures: normal; font-variant-numeric: normal; font-variant-east-asian: normal; font-variant-position: normal; font-feature-settings: normal; font-optical-sizing: auto; font-variation-settings: normal; min-height: 14px;&quot;&gt;&lt;span style=&quot;font-kerning: none&quot;&gt;&lt;/span&gt;&lt;br&gt;&lt;/p&gt;&lt;p style=&quot;margin: 0px; font-style: normal; font-variant-caps: normal; font-stretch: normal; line-height: normal; font-size-adjust: none; font-kerning: auto; font-variant-alternates: normal; font-variant-ligatures: normal; font-variant-numeric: normal; font-variant-east-asian: normal; font-variant-position: normal; font-feature-settings: normal; font-optical-sizing: auto; font-variation-settings: normal;&quot;&gt;&lt;span style=&quot;font-kerning: none;&quot;&gt;&lt;b&gt;&lt;span style=&quot;&quot;&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&lt;/span&gt;HTTP Requests&lt;/b&gt;&lt;/span&gt;&lt;/p&gt;&lt;p style=&quot;margin: 0px; font-style: normal; font-variant-caps: normal; font-stretch: normal; line-height: normal; font-size-adjust: none; font-kerning: auto; font-variant-alternates: normal; font-variant-ligatures: normal; font-variant-numeric: normal; font-variant-east-asian: normal; font-variant-position: normal; font-feature-settings: normal; font-optical-sizing: auto; font-variation-settings: normal;&quot;&gt;&lt;span style=&quot;font-kerning: none;&quot;&gt;&lt;span style=&quot;&quot;&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&lt;/span&gt;React Query&lt;/span&gt;&lt;/p&gt;&lt;p style=&quot;margin: 0px; font-style: normal; font-variant-caps: normal; font-stretch: normal; line-height: normal; font-size-adjust: none; font-kerning: auto; font-variant-alternates: normal; font-variant-ligatures: normal; font-variant-numeric: normal; font-variant-east-asian: normal; font-variant-position: normal; font-feature-settings: normal; font-optical-sizing: auto; font-variation-settings: normal;&quot;&gt;&lt;span style=&quot;font-kerning: none&quot;&gt;&lt;span style=&quot;&quot;&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&lt;/span&gt;&lt;/span&gt;&lt;span style=&quot;font-kerning: none;&quot;&gt;React Hook Form&lt;/span&gt;&lt;/p&gt;" style="text;html=1;strokeColor=none;fillColor=none;spacing=5;spacingTop=-20;whiteSpace=wrap;overflow=hidden;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="130" y="540" width="590" height="380" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>
