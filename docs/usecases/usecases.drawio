@@ -1,9 +1,15 @@
-<mxfile host="app.diagrams.net" modified="2024-01-02T14:32:01.831Z" agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.1 Safari/605.1.15" etag="5tnRF8zL8AMY9FMROOP1" version="22.1.16" type="github">
+<mxfile host="app.diagrams.net" modified="2024-01-02T14:40:13.234Z" agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.1 Safari/605.1.15" etag="4C1tBOGZ4zdeTSeBXKk_" version="22.1.16" type="github">
   <diagram name="Page-1" id="KqT4ygK-pLhFqNeephAf">
     <mxGraphModel dx="1710" dy="1018" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1654" pageHeight="1169" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
+        <mxCell id="ee45y4G0gzjRnPrVUwhJ-22" value="" style="endArrow=none;dashed=1;html=1;rounded=0;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="77" y="215" as="sourcePoint" />
+            <mxPoint x="1577" y="225" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
         <mxCell id="ee45y4G0gzjRnPrVUwhJ-1" value="Unauthenticated user" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;" vertex="1" parent="1">
           <mxGeometry x="80" y="80" width="30" height="60" as="geometry" />
         </mxCell>
@@ -14,25 +20,49 @@
           <mxGeometry x="190" y="190" width="120" height="60" as="geometry" />
         </mxCell>
         <mxCell id="ee45y4G0gzjRnPrVUwhJ-7" value="See previous routes by default" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
-          <mxGeometry x="320" y="300" width="120" height="60" as="geometry" />
+          <mxGeometry x="260" y="300" width="120" height="60" as="geometry" />
         </mxCell>
         <mxCell id="ee45y4G0gzjRnPrVUwhJ-9" value="Lists / describes recyclable materials" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
-          <mxGeometry x="460" y="300" width="120" height="60" as="geometry" />
+          <mxGeometry x="400" y="300" width="120" height="60" as="geometry" />
         </mxCell>
         <mxCell id="ee45y4G0gzjRnPrVUwhJ-10" value="Lists / describes recyclable materials" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
-          <mxGeometry x="460" y="100" width="120" height="60" as="geometry" />
+          <mxGeometry x="400" y="100" width="120" height="60" as="geometry" />
         </mxCell>
         <mxCell id="ee45y4G0gzjRnPrVUwhJ-12" value="States where going or if they will separately take materials for disposal" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
-          <mxGeometry x="600" y="300" width="120" height="60" as="geometry" />
+          <mxGeometry x="540" y="300" width="120" height="60" as="geometry" />
         </mxCell>
         <mxCell id="ee45y4G0gzjRnPrVUwhJ-13" value="States where going or if they will separately take materials for disposal" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
-          <mxGeometry x="600" y="100" width="120" height="60" as="geometry" />
+          <mxGeometry x="540" y="100" width="120" height="60" as="geometry" />
         </mxCell>
         <mxCell id="ee45y4G0gzjRnPrVUwhJ-15" value="New route directions in map or text format" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
-          <mxGeometry x="740" y="100" width="120" height="60" as="geometry" />
+          <mxGeometry x="680" y="100" width="120" height="60" as="geometry" />
         </mxCell>
         <mxCell id="ee45y4G0gzjRnPrVUwhJ-16" value="New route directions in map or text format" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
-          <mxGeometry x="740" y="300" width="120" height="60" as="geometry" />
+          <mxGeometry x="680" y="300" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="ee45y4G0gzjRnPrVUwhJ-17" value="Sets off according to the route directions" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="820" y="100" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="ee45y4G0gzjRnPrVUwhJ-18" value="Sets off according to the route directions" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="820" y="300" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="ee45y4G0gzjRnPrVUwhJ-20" value="Places materials into the correct bins, if necessary, at different points" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="960" y="100" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="ee45y4G0gzjRnPrVUwhJ-21" value="Places materials into the correct bins, if necessary, at different points" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="960" y="300" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="ee45y4G0gzjRnPrVUwhJ-24" value="Confirms the actions in ReCycler as completed" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="1100" y="300" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="ee45y4G0gzjRnPrVUwhJ-26" value="Receives a report/reward for recycling/actions are logged for statistics" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="1240" y="300" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="ee45y4G0gzjRnPrVUwhJ-29" value="Goes to review the recycling diary" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="1380" y="300" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="ee45y4G0gzjRnPrVUwhJ-30" value="&#39;User-added personal locations (e.g., recycling point in an apartment building)" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="1520" y="300" width="120" height="60" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>
