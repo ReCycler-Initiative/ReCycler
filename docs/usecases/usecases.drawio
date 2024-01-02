@@ -1,9 +1,12 @@
-<mxfile host="app.diagrams.net" modified="2024-01-02T14:40:13.234Z" agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.1 Safari/605.1.15" etag="4C1tBOGZ4zdeTSeBXKk_" version="22.1.16" type="github">
+<mxfile host="app.diagrams.net" modified="2024-01-02T14:50:46.938Z" agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.1 Safari/605.1.15" etag="ScaW6Md1uHyGenauqdFJ" version="22.1.16" type="github">
   <diagram name="Page-1" id="KqT4ygK-pLhFqNeephAf">
     <mxGraphModel dx="1710" dy="1018" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1654" pageHeight="1169" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
+        <mxCell id="ee45y4G0gzjRnPrVUwhJ-45" value="" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="55" y="600" width="390" height="310" as="geometry" />
+        </mxCell>
         <mxCell id="ee45y4G0gzjRnPrVUwhJ-22" value="" style="endArrow=none;dashed=1;html=1;rounded=0;" edge="1" parent="1">
           <mxGeometry width="50" height="50" relative="1" as="geometry">
             <mxPoint x="77" y="215" as="sourcePoint" />
@@ -63,6 +66,72 @@
         </mxCell>
         <mxCell id="ee45y4G0gzjRnPrVUwhJ-30" value="&#39;User-added personal locations (e.g., recycling point in an apartment building)" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
           <mxGeometry x="1520" y="300" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="ee45y4G0gzjRnPrVUwhJ-34" value="" style="endArrow=classic;html=1;rounded=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" target="ee45y4G0gzjRnPrVUwhJ-5">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="160" y="130" as="sourcePoint" />
+            <mxPoint x="950" y="440" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="ee45y4G0gzjRnPrVUwhJ-35" value="" style="endArrow=classic;html=1;rounded=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="1" target="ee45y4G0gzjRnPrVUwhJ-5">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="160" y="300" as="sourcePoint" />
+            <mxPoint x="260" y="200" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="ee45y4G0gzjRnPrVUwhJ-36" value="" style="endArrow=classic;html=1;rounded=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;exitX=0.5;exitY=0;exitDx=0;exitDy=0;" edge="1" parent="1" source="ee45y4G0gzjRnPrVUwhJ-5" target="ee45y4G0gzjRnPrVUwhJ-10">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="170" y="140" as="sourcePoint" />
+            <mxPoint x="260" y="200" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="ee45y4G0gzjRnPrVUwhJ-37" value="" style="endArrow=classic;html=1;rounded=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" edge="1" parent="1" source="ee45y4G0gzjRnPrVUwhJ-5" target="ee45y4G0gzjRnPrVUwhJ-7">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="320" y="230" as="sourcePoint" />
+            <mxPoint x="410" y="140" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="ee45y4G0gzjRnPrVUwhJ-38" value="Bio waste" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="80" y="650" width="90" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="ee45y4G0gzjRnPrVUwhJ-39" value="Mixed waste" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="185" y="650" width="90" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="ee45y4G0gzjRnPrVUwhJ-42" value="Cardboard" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="80" y="730" width="90" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="ee45y4G0gzjRnPrVUwhJ-43" value="Metal" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="295" y="650" width="90" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="ee45y4G0gzjRnPrVUwhJ-44" value="Plastic" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="185" y="730" width="90" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="ee45y4G0gzjRnPrVUwhJ-46" value="Shared recycling, for example, apartment and townhouse residents." style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="135" y="610" width="220" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="ee45y4G0gzjRnPrVUwhJ-47" value="Paper" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="295" y="730" width="90" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="ee45y4G0gzjRnPrVUwhJ-48" value="Glass" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="80" y="810" width="90" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="ee45y4G0gzjRnPrVUwhJ-50" value="" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="60" y="400" width="390" height="160" as="geometry" />
+        </mxCell>
+        <mxCell id="ee45y4G0gzjRnPrVUwhJ-51" value="Bio waste" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="85" y="450" width="90" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="ee45y4G0gzjRnPrVUwhJ-52" value="Mixed waste" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="190" y="450" width="90" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="ee45y4G0gzjRnPrVUwhJ-56" value="Personal recycling (property owners, single-family home)" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="140" y="410" width="220" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="ee45y4G0gzjRnPrVUwhJ-59" value="" style="endArrow=classic;html=1;rounded=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="1" target="ee45y4G0gzjRnPrVUwhJ-30">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="450" y="750" as="sourcePoint" />
+            <mxPoint x="810" y="780" as="targetPoint" />
+          </mxGeometry>
         </mxCell>
       </root>
     </mxGraphModel>
