@@ -17,7 +17,7 @@ We welcome contributions from developers, designers, and anyone passionate about
 ## Installation:
 To set up ReCycler locally, refer to our [INSTALLATION.md](link-to-installation-md) for detailed instructions.
 ## License:
-ReCycler is open-source and distributed under the [MIT License](link-to-license). Please feel free to use, modify, and distribute the software according to the terms of the license.
+ReCycler is open-source and distributed under the [MIT License](licence.md). Please feel free to use, modify, and distribute the software according to the terms of the license.
 ## Contact:
 For any inquiries or suggestions, please reach out to us through GitHub. You can contact us by creating an issue in the repository, participating in discussions, or submitting pull requests. We value and welcome your contributions and feedback on our GitHub platform.
 Let's collaborate to create a more sustainable future with ReCycler! :seedling::recycle:
