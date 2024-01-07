@@ -15,7 +15,7 @@ While initially a web-based service, Recycler plans to develop a mobile applicat
 ## How to Contribute:
 We welcome contributions from developers, designers, and anyone passionate about sustainable practices. To contribute, please follow the guidelines outlined in our [contributing.md](contributing.md) file.
 ## Installation:
-To set up ReCycler locally, refer to our [installation.md](installition.md) for detailed instructions.
+To set up ReCycler locally, refer to our [installation.md](installation.md) for detailed instructions.
 ## License:
 ReCycler is open-source and distributed under the [MIT License](licence.md). Please feel free to use, modify, and distribute the software according to the terms of the license.
 ## Contact:
