@@ -1,4 +1,5 @@
-# ReCycler
+![Projektin logo](images/recycler_logo.png)
+
 ## Overview:
 ReCycler is an open-source software project aimed at creating a more modern and user-centric recycling service, building upon the foundation of the existing [kierrätys.info](https://kierratys.info/). ReCycler service leverages the kierrätys.info API (https://api.kierratys.info/) to obtain basic information about recycling points. Additionally, the service utilizes Mapbox's mapping and location-based services.
 ## Features:
