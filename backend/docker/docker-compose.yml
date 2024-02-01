@@ -1,0 +1,9 @@
+version: "3.9"
+
+services:
+  posgres:
+    image: postgis/postgis
+    environment:
+      POSTGRES_PASSWORD: foobar
+    ports:
+      - 5432:5432
