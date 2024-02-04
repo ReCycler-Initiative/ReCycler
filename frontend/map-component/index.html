@@ -38,9 +38,10 @@
         container: 'map', // Container ID
         style: 'mapbox://styles/mapbox/streets-v12', // Map style to use
         center: [26.28, 65.088], // Starting position [lng, lat]
-        zoom: 3 // Starting zoom level
+        zoom: 4 // Starting zoom level
       });
-      map.addControl(new mapboxgl.NavigationControl());
+      //map.addControl(new mapboxgl.NavigationControl());
+
       //const marker = new mapboxgl.Marker() // Initialize a new marker
         //.setLngLat([-122.25948, 37.87221]) // Marker [lng, lat] coordinates
         //.addTo(map); // Add the marker to the map
@@ -65,6 +66,22 @@
         geocoder.on('result', (event) => {
    
         });
+        map.addControl(
+new mapboxgl.GeolocateControl({
+positionOptions: {
+enableHighAccuracy: true
+},
+// When active the map will receive updates to the device's location as it changes.
+trackUserLocation: true,
+// Draw an arrow next to the location dot to indicate which direction the device is heading.
+showUserHeading: true
+})
+);
+// disable map rotation using right click + drag
+map.dragRotate.disable();
+ 
+// disable map rotation using touch rotation gesture
+map.touchZoomRotate.disableRotation();
     </script>
   </body>
 </html>
