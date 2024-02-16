@@ -17,3 +17,9 @@ python3 -m venv .venv
 ```bash
 python3 -m flask --app hello run
 ```
+
+# Run ETL
+
+```bash
+KIERRATYS_API_KEY=<YOUR_API_KEY_HERE> pyhton3 etl.py
+```

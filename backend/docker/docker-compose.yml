@@ -6,4 +6,4 @@ services:
     environment:
       POSTGRES_PASSWORD: foobar
     ports:
-      - 5432:5432
+      - 5434:5432
