@@ -7,3 +7,5 @@ Jinja2==3.1.3
 MarkupSafe==2.1.4
 packaging @ file:///private/tmp/python-packaging-20231211-10905-adsfgp/packaging-23.2
 Werkzeug==3.0.1
+psycopg2-binary==2.9.9
+requests==2.31.0
