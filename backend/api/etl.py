@@ -56,10 +56,8 @@ try:
         for item in data["results"]:
             name = item["name"]
             address = item["address"]
-            c.execute(
-                "INSERT INTO recycler.collection_spots (name, address) VALUES (%s, %s)",
-                (name, address),
-            )
+      c.execute("INSERT INTO collection_spots (name, address, geom) VALUES (%s, %s, ST_GeomFromText(%s, 4326))", (name, address, point_text))
+    
 
         # Update the offset for the next page
         offset += limit
