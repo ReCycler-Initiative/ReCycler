@@ -1,3 +1,12 @@
+# This script connects to a PostgreSQL database, retrieves data from an API endpoint,
+# and inserts the retrieved data into the 'collection_spots' table in the database.
+# The data is fetched from the 'https://api.kierratys.info/collectionspots/' API endpoint,
+# using an API key for authentication. The script iterates through all the pages of results,
+# extracts relevant information such as name, address, and coordinates of collection spots,
+# converts the coordinates into a PostGIS point geometry format, and inserts this information
+# into the 'collection_spots' table in the PostgreSQL database. If the retrieved data does not
+# contain coordinates or if they are not in the expected format, it skips inserting that specific record.
+
 import requests
 import psycopg2
 
@@ -8,6 +17,8 @@ cur = conn.cursor()
 # Base URL of the API
 base_url = "https://api.kierratys.info/collectionspots/"
 # API key (Please replace this with your actual API key)
+# Request your API key from https://api.kierratys.info/get_apikey/
+
 api_key = "YOUR_API_KEY_HERE"
 
 # Fetch data from the first page and set total_items
