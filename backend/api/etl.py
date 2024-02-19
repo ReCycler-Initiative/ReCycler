@@ -1,17 +1,6 @@
-<<<<<<< HEAD
 # This script retrieves data from the kierratys.info API about collection spots for recycling and saves it into a PostgreSQL database.
 # If location information is available, it is stored in PostGIS format.
 # Request Kierrätys Info API key: https://api.kierratys.info/get_apikey/
-=======
-# This script connects to a PostgreSQL database, retrieves data from an API endpoint,
-# and inserts the retrieved data into the 'collection_spots' table in the database.
-# The data is fetched from the 'https://api.kierratys.info/collectionspots/' API endpoint,
-# using an API key for authentication. The script iterates through all the pages of results,
-# extracts relevant information such as name, address, and coordinates of collection spots,
-# converts the coordinates into a PostGIS point geometry format, and inserts this information
-# into the 'collection_spots' table in the PostgreSQL database. If the retrieved data does not
-# contain coordinates or if they are not in the expected format, it skips inserting that specific record.
->>>>>>> f6b0cc26fa318b749c185830669a8ab5b816ff4c
 
 import os
 import psycopg2
