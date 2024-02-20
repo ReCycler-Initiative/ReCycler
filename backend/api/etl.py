@@ -36,6 +36,7 @@ try:
                 name TEXT,
                 address TEXT,
                 postal_code TEXT,
+                municipality TEXT,
                 geom GEOMETRY(Point, 4326))"""
     )
 
@@ -71,13 +72,14 @@ try:
             name = item["name"]
             address = item["address"]
             postal_code = item["postal_code"]
+            municipality = item["municipality"]
             geometry = item.get('geometry')  # Get geometry if it exists
             if geometry is not None:
                 coordinates = geometry.get('coordinates')  # Get coordinates if they exist
                 if coordinates is not None and len(coordinates) == 2:  # Ensure coordinates are in the correct format
                     # Convert coordinates to PostGIS point geometry and insert into the database
                     point_text = f"POINT({coordinates[0]} {coordinates[1]})"
-                    c.execute("INSERT INTO recycler.collection_spots (name, address, postal_code, geom) VALUES (%s, %s, %s, ST_GeomFromText(%s, 4326))", (name, address, postal_code, point_text))
+                    c.execute("INSERT INTO recycler.collection_spots (name, address, postal_code, municipality, geom) VALUES (%s, %s, %s, %s, ST_GeomFromText(%s, 4326))", (name, address, postal_code, municipality, point_text))
 
         # Update the offset for the next page
         offset += limit
