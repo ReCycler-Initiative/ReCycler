@@ -1,6 +1,14 @@
 # This script retrieves data from the kierratys.info API about collection spots for recycling and saves it into a PostgreSQL database.
 # If location information is available, it is stored in PostGIS format.
 # Request Kierrätys Info API key: https://api.kierratys.info/get_apikey/
+# This script connects to a PostgreSQL database, retrieves data from an API endpoint,
+# and inserts the retrieved data into the 'collection_spots' table in the database.
+# The data is fetched from the 'https://api.kierratys.info/collectionspots/' API endpoint,
+# using an API key for authentication. The script iterates through all the pages of results,
+# extracts relevant information and coordinates of collection spots,
+# converts the coordinates into a PostGIS point geometry format, and inserts this information
+# into the 'collection_spots' table in the PostgreSQL database. If the retrieved data does not
+# contain coordinates or if they are not in the expected format, it skips inserting that specific record.
 
 import os
 import psycopg2
@@ -27,6 +35,7 @@ try:
                 (id SERIAL PRIMARY KEY,
                 name TEXT,
                 address TEXT,
+                postal_code TEXT,
                 geom GEOMETRY(Point, 4326))"""
     )
 
@@ -61,13 +70,14 @@ try:
         for item in data["results"]:
             name = item["name"]
             address = item["address"]
+            postal_code = item["postal_code"]
             geometry = item.get('geometry')  # Get geometry if it exists
             if geometry is not None:
                 coordinates = geometry.get('coordinates')  # Get coordinates if they exist
                 if coordinates is not None and len(coordinates) == 2:  # Ensure coordinates are in the correct format
                     # Convert coordinates to PostGIS point geometry and insert into the database
                     point_text = f"POINT({coordinates[0]} {coordinates[1]})"
-                    c.execute("INSERT INTO recycler.collection_spots (name, address, geom) VALUES (%s, %s, ST_GeomFromText(%s, 4326))", (name, address, point_text))
+                    c.execute("INSERT INTO recycler.collection_spots (name, address, postal_code, geom) VALUES (%s, %s, %s, ST_GeomFromText(%s, 4326))", (name, address, postal_code, point_text))
 
         # Update the offset for the next page
         offset += limit
