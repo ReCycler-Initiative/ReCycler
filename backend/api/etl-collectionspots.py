@@ -13,6 +13,8 @@
 import os
 import psycopg2
 import requests
+from bs4 import BeautifulSoup
+
 
 # Config
 base_url = "https://api.kierratys.info/collectionspots/"
@@ -86,13 +88,13 @@ try:
             address = item["address"]
             postal_code = item["postal_code"]
             post_office = item["post_office"]
-            municipality= item["municipality"]
+            municipality = item["municipality"]
             opening_hours_en = item.get("opening_hours_en", "")
             opening_hours_fi = item.get("opening_hours_fi", "")
             opening_hours_sv = item.get("opening_hours_sv", "")
-            description_en = item.get("description_en", "")
-            description_fi = item.get("description_fi", "")
-            description_sv = item.get("description_sv", "")
+            description_en = BeautifulSoup(item.get("description_en", ""), "html.parser").get_text()
+            description_fi = BeautifulSoup(item.get("description_fi", ""), "html.parser").get_text()
+            description_sv = BeautifulSoup(item.get("description_sv", ""), "html.parser").get_text()
             occupied = item.get("occupied", "")
             additional_details = item.get("additional_details", "")
             materials = [material["name"] for material in item.get("materials", [])]
