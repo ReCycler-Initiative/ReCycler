@@ -18,8 +18,9 @@ python3 -m venv .venv
 python3 -m flask --app hello run
 ```
 
-# Run ETL
+# Run ETLs
 
 ```bash
-KIERRATYS_API_KEY=<YOUR_API_KEY_HERE> pyhton3 etl.py
+export api_key=kierratys_api_key && python3 etl-collectionspots.py
 ```
+

@@ -1,12 +1,12 @@
 import psycopg2
 import requests
 
-# API-avain
-api_key = "04acd2662d9ed17046ec0dcf23d09e3ed2f1b3a3"
+# config
+api_key = "kierratysinfo_api_key"
 base_url = f"https://api.kierratys.info/materialtypes/?api_key={api_key}"
 
 try:
-    # Yhdistetään tietokantaan
+    # Connect to the database
     conn = psycopg2.connect(
         dbname="postgres",
         user="postgres",
@@ -16,33 +16,33 @@ try:
     )
     c = conn.cursor()
 
-    # Luodaan materials-taulu
+    # Create materials table
     c.execute(
         """CREATE TABLE IF NOT EXISTS recycler.materials
                 (id SERIAL PRIMARY KEY,
                 material_name TEXT UNIQUE)"""
     )
 
-    # Poistetaan vanhat tiedot
+    # Clear old data
     c.execute("DELETE FROM recycler.materials")
 
-    # Haetaan materiaalit API:sta
+    # Fetch materials from the API
     response = requests.get(base_url)
     if response.status_code == 200:
         data = response.json()
         materials = [(material["name"],) for material in data["results"]]
 
-        # Lisätään materiaalit tauluun
+        # Insert materials into the table
         c.executemany("INSERT INTO recycler.materials (material_name) VALUES (%s)", materials)
 
-        # Tallennetaan muutokset
+        # Save changes
         conn.commit()
-        print("Materiaalit lisätty onnistuneesti omaan tauluun.")
+        print("Materials successfully added to their own table.")
     else:
-        print("Virhe haettaessa materiaaleja API:sta.")
+        print("Error fetching materials from the API.")
 except Exception as e:
-    print(f"Virhe: {e}")
+    print(f"Error: {e}")
 finally:
-    # Suljetaan tietokantayhteys
+    # Close the database connection
     if conn:
         conn.close()
