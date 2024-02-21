@@ -9,3 +9,5 @@ packaging @ file:///private/tmp/python-packaging-20231211-10905-adsfgp/packaging
 Werkzeug==3.0.1
 psycopg2-binary==2.9.9
 requests==2.31.0
+beautifulsoup4==4.10.0
+
