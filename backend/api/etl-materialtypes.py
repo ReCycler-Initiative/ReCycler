@@ -1,3 +1,10 @@
+# This script retrieves data from the kierratys.info API about recycling materials and saves it into a PostgreSQL database.
+# Request Kierrätys Info API key: https://api.kierratys.info/get_apikey/
+# This script connects to a PostgreSQL database, retrieves data from an API endpoint,
+# and inserts the retrieved data into the 'materials' table in the database.
+# The data is fetched from the 'https://api.kierratys.info/materialtypes/' API endpoint,
+# using an API key for authentication.
+
 import psycopg2
 import requests
 
