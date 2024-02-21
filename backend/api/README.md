@@ -21,6 +21,6 @@ python3 -m flask --app hello run
 # Run ETLs
 
 ```bash
-KIERRATYS_API_KEY=<YOUR_API_KEY_HERE> python3 etl-collectionspots.py && python3 etl-materials.py
+export api_key=kierratys_api_key && python3 etl-collectionspots.py
 ```
 
