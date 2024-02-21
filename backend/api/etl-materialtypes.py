@@ -23,24 +23,25 @@ try:
     )
     c = conn.cursor()
 
-    # Create materials table
+    # Drop and create materials table with code and material_name columns
     c.execute(
-        """CREATE TABLE IF NOT EXISTS recycler.materials
+        """DROP TABLE IF EXISTS recycler.materials"""
+    )
+    c.execute(
+        """CREATE TABLE recycler.materials
                 (id SERIAL PRIMARY KEY,
+                code INTEGER UNIQUE,
                 material_name TEXT UNIQUE)"""
     )
-
-    # Clear old data
-    c.execute("DELETE FROM recycler.materials")
 
     # Fetch materials from the API
     response = requests.get(base_url)
     if response.status_code == 200:
         data = response.json()
-        materials = [(material["name"],) for material in data["results"]]
+        materials = [(material["code"], material["name"]) for material in data["results"]]
 
         # Insert materials into the table
-        c.executemany("INSERT INTO recycler.materials (material_name) VALUES (%s)", materials)
+        c.executemany("INSERT INTO recycler.materials (code, material_name) VALUES (%s, %s)", materials)
 
         # Save changes
         conn.commit()
