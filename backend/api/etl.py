@@ -33,11 +33,23 @@ try:
     c.execute(
         """CREATE TABLE IF NOT EXISTS recycler.collection_spots
                 (id SERIAL PRIMARY KEY,
+                spot_id TEXT,
                 name TEXT,
                 address TEXT,
                 postal_code TEXT,
+                post_office TEXT,
+                materials TEXT,
                 municipality TEXT,
-                geom GEOMETRY(Point, 4326))"""
+                geom GEOMETRY(Point, 4326),
+                opening_hours_en TEXT,
+                opening_hours_fi TEXT,
+                opening_hours_sv TEXT,
+                description_en TEXT,
+                description_fi TEXT,
+                description_sv TEXT,
+                occupied TEXT,
+                additional_details TEXT
+                )"""
     )
 
     # Clear the table
@@ -69,18 +81,28 @@ try:
 
         # Iterate through the search results and save them to the database
         for item in data["results"]:
+            spot_id = item["spot_id"]
             name = item["name"]
             address = item["address"]
             postal_code = item["postal_code"]
-            municipality = item["municipality"]
+            post_office = item["post_office"]
+            municipality= item["municipality"]
+            opening_hours_en = item.get("opening_hours_en", "")
+            opening_hours_fi = item.get("opening_hours_fi", "")
+            opening_hours_sv = item.get("opening_hours_sv", "")
+            description_en = item.get("description_en", "")
+            description_fi = item.get("description_fi", "")
+            description_sv = item.get("description_sv", "")
+            occupied = item.get("occupied", "")
+            additional_details = item.get("additional_details", "")
+            materials = [material["name"] for material in item.get("materials", [])]
             geometry = item.get('geometry')  # Get geometry if it exists
             if geometry is not None:
                 coordinates = geometry.get('coordinates')  # Get coordinates if they exist
                 if coordinates is not None and len(coordinates) == 2:  # Ensure coordinates are in the correct format
                     # Convert coordinates to PostGIS point geometry and insert into the database
                     point_text = f"POINT({coordinates[0]} {coordinates[1]})"
-                    c.execute("INSERT INTO recycler.collection_spots (name, address, postal_code, municipality, geom) VALUES (%s, %s, %s, %s, ST_GeomFromText(%s, 4326))", (name, address, postal_code, municipality, point_text))
-
+                    c.execute("INSERT INTO recycler.collection_spots (spot_id, name, address, postal_code, post_office, municipality, materials, opening_hours_fi, opening_hours_sv, description_en, opening_hours_en, description_fi, description_sv, occupied, additional_details, geom) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, ST_GeomFromText(%s, 4326))", (spot_id, name, address, postal_code, post_office, municipality, materials, opening_hours_en, opening_hours_fi, opening_hours_sv, description_en, description_fi, description_sv, occupied, additional_details, point_text))
         # Update the offset for the next page
         offset += limit
 
