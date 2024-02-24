@@ -16,7 +16,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={inter.className}>{children}</body>
+      <body className={inter.className}>
+        <header className="fixed px-6 py-4 w-full top-0 z-50 flex items-center text-2xl text-black uppercase">
+          <p>Recycler</p>
+        </header>
+        {children}
+      </body>
     </html>
   );
 }
