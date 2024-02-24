@@ -12,8 +12,8 @@ export const Map = ({ onLoad }: MapProps) => (
   <MapboxMap
     mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_TOKEN}
     initialViewState={{
-      longitude: 25.08992,
-      latitude: 60.47369,
+      longitude: 27.678117958246627,
+      latitude: 62.892607388617456, 
       zoom: 14,
     }}
     onLoad={onLoad}

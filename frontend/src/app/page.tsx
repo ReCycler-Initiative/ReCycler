@@ -23,7 +23,7 @@ export default function Home() {
         {!mapLoaded && (
           <div className="fixed flex inset-0 items-center justify-center flex-col gap-6 text-white">
             <Loader2Icon className="animate-spin" />
-            Ladataan Recycler...
+            Ladataan Recycler
           </div>
         )}
       </main>
