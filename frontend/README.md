@@ -1,5 +1,13 @@
 # Recycler frontend
 
+## Tech stack used
+
+- TypeScript
+- React
+- Next.js
+- Tailwind CSS
+- Mapbox
+
 ## Getting Started
 
 Create .env from .env.example and insert the variables there
