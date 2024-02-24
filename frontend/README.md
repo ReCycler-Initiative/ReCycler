@@ -16,6 +16,12 @@ Create .env from .env.example and insert the variables there
 touch .env.example .env
 ```
 
+Install dependencies
+
+```bash
+npm install
+```
+
 Run the development server:
 
 ```bash
