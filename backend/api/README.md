@@ -6,23 +6,22 @@
 python3 -m venv .venv
 ```
 
-## Install dependencies
-
-
-```bash
-pip3 install -r requirements.txt
-```
-
 ## Load environment
 
 ```bash
 . .venv/bin/activate
 ```
 
+## Install dependencies
+
+```bash
+pip3 install -r requirements.txt
+```
+
 ## Run API
 
 ```bash
-python3 -m flask --app hello run
+python3 -m flask --app app run
 ```
 
 # Run ETLs
@@ -30,4 +29,3 @@ python3 -m flask --app hello run
 ```bash
 export api_key=kierratys_api_key && python3 etl-collectionspots.py
 ```
-
