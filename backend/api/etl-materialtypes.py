@@ -9,7 +9,7 @@ import psycopg2
 import requests
 
 # config
-api_key = "kierratysinfo_api_key"
+api_key = os.getenv("KIERRATYS_API_KEY")
 base_url = f"https://api.kierratys.info/materialtypes/?api_key={api_key}"
 
 try:
@@ -19,7 +19,7 @@ try:
         user="postgres",
         password="foobar",
         host="localhost",
-        port="5432",
+        port="5434",
     )
     c = conn.cursor()
 

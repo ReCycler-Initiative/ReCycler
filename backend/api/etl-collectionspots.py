@@ -18,7 +18,7 @@ from bs4 import BeautifulSoup
 
 # Config
 base_url = "https://api.kierratys.info/collectionspots/"
-api_key = "kierratysinfo_api_key"
+api_key = os.getenv("KIERRATYS_API_KEY")
 
 try:
     conn = psycopg2.connect(
@@ -26,7 +26,7 @@ try:
         user="postgres",
         password="foobar",
         host="localhost",
-        port="5432",
+        port="5434",
     )
     c = conn.cursor()
 
