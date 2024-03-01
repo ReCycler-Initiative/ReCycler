@@ -5,6 +5,7 @@
 # The data is fetched from the 'https://api.kierratys.info/materialtypes/' API endpoint,
 # using an API key for authentication.
 
+import os
 import psycopg2
 import requests
 
