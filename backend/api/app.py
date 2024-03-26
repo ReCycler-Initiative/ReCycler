@@ -1,7 +1,9 @@
 from flask import Flask, jsonify, request
 import psycopg2
+from flask_cors import CORS
 
 app = Flask(__name__)
+CORS(app)
 
 crs = 4326
 
@@ -19,16 +21,38 @@ def get_db_connection():
 @app.route("/api/collection_spots", methods=["GET"])
 def get_collection_spots():
     try:
-        xmin = request.args.get("xmin", type=float)
-        ymin = request.args.get("ymin", type=float)
-        xmax = request.args.get("xmax", type=float)
-        ymax = request.args.get("ymax", type=float)
+        # xmin = request.args.get("xmin", type=float)
+        # ymin = request.args.get("ymin", type=float)
+        # xmax = request.args.get("xmax", type=float)
+        # ymax = request.args.get("ymax", type=float)
 
-        if xmin is None or ymin is None or xmax is None or ymax is None:
-            return jsonify({"error": "Koordinaatit puuttuvat"}), 400
+        # if xmin is None or ymin is None or xmax is None or ymax is None:
+        #     return jsonify({"error": "Koordinaatit puuttuvat"}), 400
 
         connection = get_db_connection()
         cursor = connection.cursor()
+
+        # cursor.execute(
+        #     """
+        #     SELECT jsonb_build_object(
+        #         'type', 'FeatureCollection',
+        #         'features', jsonb_agg(features.feature)
+        #     ) AS geojson
+        #     FROM (
+        #         SELECT jsonb_build_object(
+        #             'type', 'Feature',
+        #             'geometry', ST_AsGeoJSON(geom)::jsonb,
+        #             'properties', jsonb_build_object(
+        #                 'id', id,
+        #                 'name', name
+        #             )
+        #         ) AS feature
+        #         FROM recycler.collection_spots
+        #         WHERE ST_Intersects(geom, ST_MakeEnvelope(%s, %s, %s, %s, %s))
+        #     ) AS features;
+        # """,
+        #     (xmin, ymin, xmax, ymax, crs),
+        # )
 
         cursor.execute(
             """
@@ -46,10 +70,8 @@ def get_collection_spots():
                     )
                 ) AS feature
                 FROM recycler.collection_spots
-                WHERE ST_Intersects(geom, ST_MakeEnvelope(%s, %s, %s, %s, %s))
             ) AS features;
-        """,
-            (xmin, ymin, xmax, ymax, crs),
+        """
         )
 
         result = cursor.fetchone()
