@@ -4,8 +4,18 @@ import { getCollectionSpots } from "@/services/api";
 import { cn } from "@/utils/shadcn";
 import { Loader2Icon } from "lucide-react";
 import "mapbox-gl/dist/mapbox-gl.css";
+import Image from "next/image";
 import { useEffect, useState } from "react";
-import Map, { CircleLayer, Layer, Source, SymbolLayer } from "react-map-gl";
+import Map, {
+  CircleLayer,
+  GeolocateControl,
+  Layer,
+  Source,
+  SymbolLayer,
+} from "react-map-gl";
+import logo from "./recycler-logo.png";
+import MapboxGeocoder from "@mapbox/mapbox-gl-geocoder";
+import GeocoderControl from "@/components/geocoder-control";
 
 const layerStyle: CircleLayer = {
   id: "point",
@@ -77,11 +87,11 @@ export default function Home() {
     <>
       <header
         className={cn(
-          "hidden fixed px-4 py-4 w-full top-0 z-50 items-center text-2xl text-black uppercase",
+          "hidden fixed px-4 py-2 w-full top-0 z-50 items-center text-2xl text-black uppercase",
           { flex: mapLoaded }
         )}
       >
-        <p>Recycler</p>
+        <Image src={logo} alt="Recycler logo" width={150} />
       </header>
       <main>
         <Map
@@ -109,6 +119,11 @@ export default function Home() {
               <Layer {...clusters} />
               <Layer {...clusterCount} />
               <Layer {...unclustered} />
+              <GeolocateControl />
+              <GeocoderControl
+                mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_TOKEN!}
+                position="top-right"
+              />
             </>
           )}
         </Map>
