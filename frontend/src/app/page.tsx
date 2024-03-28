@@ -6,8 +6,16 @@ import { Loader2Icon } from "lucide-react";
 import "mapbox-gl/dist/mapbox-gl.css";
 import Image from "next/image";
 import { useEffect, useState } from "react";
-import Map, { CircleLayer, Layer, Source, SymbolLayer } from "react-map-gl";
+import Map, {
+  CircleLayer,
+  GeolocateControl,
+  Layer,
+  Source,
+  SymbolLayer,
+} from "react-map-gl";
 import logo from "./recycler-logo.png";
+import MapboxGeocoder from "@mapbox/mapbox-gl-geocoder";
+import GeocoderControl from "@/components/geocoder-control";
 
 const layerStyle: CircleLayer = {
   id: "point",
@@ -111,6 +119,11 @@ export default function Home() {
               <Layer {...clusters} />
               <Layer {...clusterCount} />
               <Layer {...unclustered} />
+              <GeolocateControl />
+              <GeocoderControl
+                mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_TOKEN!}
+                position="top-right"
+              />
             </>
           )}
         </Map>
