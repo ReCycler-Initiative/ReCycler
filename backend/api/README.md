@@ -29,3 +29,8 @@ python3 -m flask --app app run
 ```bash
 export KIERRATYS_API_KEY=kierratys_api_key && python3 etl-collectionspots.py && python3 etl-materialtypes.py
 ```
+
+## Test API
+```bash
+http://127.0.0.1:5000/api/collection_spots
+```

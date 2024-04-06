@@ -10,10 +10,10 @@
 
 ## Getting Started
 
-Create .env from .env.example and insert the variables there
+Create .env from .env.example and insert the variables there (e.g. NEXT_PUBLIC_MAPBOX_TOKEN=)
 
 ```bash
-touch .env.example .env
+cp .env.example .env
 ```
 
 Install dependencies
