@@ -1,5 +1,6 @@
 "use client";
 
+import GeocoderControl from "@/components/geocoder-control";
 import { getCollectionSpots } from "@/services/api";
 import { cn } from "@/utils/shadcn";
 import { Loader2Icon } from "lucide-react";
@@ -8,6 +9,7 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 import Map, {
   CircleLayer,
+  FullscreenControl,
   GeolocateControl,
   //Marker,
   //Popup,
@@ -15,6 +17,7 @@ import Map, {
   FullscreenControl,
   ScaleControl,
   Layer,
+  NavigationControl,
   Source,
   SymbolLayer,
 } from "react-map-gl";
@@ -122,10 +125,13 @@ export default function Home() {
               <Layer {...clusters} />
               <Layer {...clusterCount} />
               <Layer {...unclustered} />
-
               <GeolocateControl position="bottom-right" />
-              <FullscreenControl position="top-right"/>
+              <FullscreenControl position="top-right" />
               <NavigationControl position="top-right" />
+              <GeocoderControl
+                mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_TOKEN!}
+                position="top-right"
+              />
             </>
           )}
         </Map>
