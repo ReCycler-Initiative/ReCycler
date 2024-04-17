@@ -15,8 +15,10 @@ import Map, {
   NavigationControl,
   Source,
   SymbolLayer,
+  useControl,
 } from "react-map-gl";
 import logo from "./recycler-logo.png";
+import { ControlScaffold } from "@/components/control-scaffolding";
 
 const layerStyle: CircleLayer = {
   id: "point",
@@ -127,6 +129,7 @@ export default function Home() {
                 mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_TOKEN!}
                 position="top-right"
               />
+              <ControlScaffold />
             </>
           )}
         </Map>
