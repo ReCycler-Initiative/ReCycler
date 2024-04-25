@@ -6,7 +6,7 @@ import { cn } from "@/utils/shadcn";
 import { Loader2Icon } from "lucide-react";
 import "mapbox-gl/dist/mapbox-gl.css";
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Map, {
   CircleLayer,
   FullscreenControl,
@@ -18,6 +18,7 @@ import Map, {
   SymbolLayer,
   useControl,
   Popup,
+  MapRef,
 } from "react-map-gl";
 import logo from "./recycler-logo.png";
 import { ControlScaffold } from "@/components/control-scaffolding";
@@ -79,6 +80,7 @@ export default function Home() {
   const [mapLoaded, setMapLoaded] = useState(false);
   const [geojson, setGeojson] = useState<any>(null);
   const [details, setDetails] = useState<any>(null);
+  const mapRef = useRef<MapRef>(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -89,7 +91,26 @@ export default function Home() {
     fetchData();
   }, []);
 
-  console.log(details?.geometry?.coordinates);
+  useEffect(() => {
+    const map = mapRef.current;
+    if (map) {
+      const showPointer = () => {
+        map.getCanvas().style.cursor = "pointer";
+      };
+
+      const hidePointer = () => {
+        map.getCanvas().style.cursor = "";
+      };
+
+      map.on("mouseenter", "point", showPointer);
+      map.on("mouseleave", "point", hidePointer);
+
+      return () => {
+        map.off("mouseenter", "point", showPointer);
+        map.off("mouseleave", "point", hidePointer);
+      };
+    }
+  }, [mapLoaded]);
 
   return (
     <div className="flex flex-col h-screen">
@@ -117,6 +138,7 @@ export default function Home() {
       </header>
       <main className="h-full">
         <Map
+          ref={mapRef}
           mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_TOKEN}
           initialViewState={{
             longitude: 27.678117958246627,
@@ -124,6 +146,7 @@ export default function Home() {
             zoom: 14,
           }}
           onLoad={() => setMapLoaded(true)}
+          onMouseEnter={() => console.log("Mouse enter")}
           style={{ background: "#424bb3ff" }}
           mapStyle="mapbox://styles/mapbox/streets-v9"
           interactiveLayerIds={["point"]}
