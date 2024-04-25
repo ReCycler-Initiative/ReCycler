@@ -129,7 +129,10 @@ export default function Home() {
           interactiveLayerIds={["point"]}
           onClick={(e) => {
             if (e.features) {
-              setDetails(e.features[0]);
+              const feature = e.features[0];
+              if (!feature?.properties?.cluster) {
+                setDetails(e.features[0]);
+              }
             }
           }}
         >
