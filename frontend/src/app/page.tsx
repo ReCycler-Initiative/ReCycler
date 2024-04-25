@@ -90,8 +90,8 @@ export default function Home() {
     <>
       <header
         className={cn(
-          "hidden fixed px-4 py-2 w-full top-0 z-50 items-center text-2xl text-black uppercase",
-          { flex: mapLoaded }
+          "hidden pb-2 pl-1 border-b border-gray-400",
+          { block: mapLoaded }
         )}
       >
         <Image src={logo} alt="Recycler logo" width={150} />
@@ -127,7 +127,7 @@ export default function Home() {
               <NavigationControl position="top-right" />
               <GeocoderControl
                 mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_TOKEN!}
-                position="top-right"
+                position="top-left"
               />
               <ControlScaffold />
             </>
