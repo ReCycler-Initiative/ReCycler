@@ -166,7 +166,7 @@ export default function Home() {
                   latitude={details.geometry.coordinates[1]}
                   onClose={() => setDetails(null)}
                   anchor="bottom"
-                  maxWidth="300px"
+                  maxWidth="max-content"
                   className="[&_.mapboxgl-popup-content]:px-4 [&_.mapboxgl-popup-content]:py-2 [&_.mapboxgl-popup-close-button]:right-1.5"
                 >
                   <h2 className="text-base font-bold">
