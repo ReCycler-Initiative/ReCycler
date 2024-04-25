@@ -11,6 +11,7 @@ import Map, {
   CircleLayer,
   FullscreenControl,
   GeolocateControl,
+  ScaleControl,
   Layer,
   NavigationControl,
   Source,
@@ -124,6 +125,7 @@ export default function Home() {
               <GeolocateControl position="bottom-right" />
               <FullscreenControl position="top-right" />
               <NavigationControl position="top-right" />
+              <ScaleControl position="bottom-left" />
               <GeocoderControl
                 mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_TOKEN!}
                 position="top-left"
