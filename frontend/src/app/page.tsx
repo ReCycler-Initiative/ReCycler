@@ -17,6 +17,7 @@ import Map, {
   Source,
   SymbolLayer,
   useControl,
+  Popup,
 } from "react-map-gl";
 import logo from "./recycler-logo.png";
 import { ControlScaffold } from "@/components/control-scaffolding";
@@ -76,7 +77,8 @@ const unclustered: CircleLayer = {
 
 export default function Home() {
   const [mapLoaded, setMapLoaded] = useState(false);
-  const [geojson, setGeojson] = useState(null);
+  const [geojson, setGeojson] = useState<any>(null);
+  const [details, setDetails] = useState<any>(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -87,6 +89,8 @@ export default function Home() {
     fetchData();
   }, []);
 
+  console.log(details?.geometry?.coordinates);
+
   return (
     <div className="flex flex-col h-screen">
       <header
@@ -95,6 +99,21 @@ export default function Home() {
         })}
       >
         <Image src={logo} alt="Recycler logo" width={150} />
+        {/* <button
+          onClick={() => {
+            if (geojson) {
+              setGeojson({
+                ...geojson,
+                features: geojson.features.filter(
+                  (g: any) => g.properties.name === "Aluejätepiste"
+                ),
+              });
+            }
+          }}
+          type="button"
+        >
+          Näytä pahavi
+        </button> */}
       </header>
       <main className="h-full">
         <Map
@@ -107,6 +126,12 @@ export default function Home() {
           onLoad={() => setMapLoaded(true)}
           style={{ background: "#424bb3ff" }}
           mapStyle="mapbox://styles/mapbox/streets-v9"
+          interactiveLayerIds={["point"]}
+          onClick={(e) => {
+            if (e.features) {
+              setDetails(e.features[0]);
+            }
+          }}
         >
           {geojson && (
             <>
@@ -131,6 +156,21 @@ export default function Home() {
                 position="top-left"
               />
               <ControlScaffold />
+              {details && (
+                <Popup
+                  key={new Date().getTime()}
+                  longitude={details.geometry.coordinates[0]}
+                  latitude={details.geometry.coordinates[1]}
+                  onClose={() => setDetails(null)}
+                  anchor="bottom"
+                  maxWidth="300px"
+                  className="[&_.mapboxgl-popup-content]:px-4 [&_.mapboxgl-popup-content]:py-2 [&_.mapboxgl-popup-close-button]:right-1.5"
+                >
+                  <h2 className="text-base font-bold">
+                    {details.properties.name}
+                  </h2>
+                </Popup>
+              )}
             </>
           )}
         </Map>
