@@ -87,16 +87,15 @@ export default function Home() {
   }, []);
 
   return (
-    <>
+    <div className="flex flex-col h-screen">
       <header
-        className={cn(
-          "hidden pb-2 pl-1 border-b border-gray-400",
-          { block: mapLoaded }
-        )}
+        className={cn("hidden pb-2 pl-1 border-b border-gray-400", {
+          block: mapLoaded,
+        })}
       >
         <Image src={logo} alt="Recycler logo" width={150} />
       </header>
-      <main>
+      <main className="h-full">
         <Map
           mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_TOKEN}
           initialViewState={{
@@ -105,7 +104,7 @@ export default function Home() {
             zoom: 14,
           }}
           onLoad={() => setMapLoaded(true)}
-          style={{ background: "#424bb3ff", width: "100vw", height: "100vh" }}
+          style={{ background: "#424bb3ff" }}
           mapStyle="mapbox://styles/mapbox/streets-v9"
         >
           {geojson && (
@@ -140,6 +139,6 @@ export default function Home() {
           </div>
         )}
       </main>
-    </>
+    </div>
   );
 }
