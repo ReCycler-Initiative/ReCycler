@@ -28,7 +28,7 @@ const layerStyle: SymbolLayer = {
   source: "collection_spots",
   layout: {
     "icon-image": "collection-point",
-    "icon-size": 0.04,
+    "icon-size": 0.1,
   },
 };
 
@@ -192,6 +192,9 @@ export default function Home() {
                   <h2 className="text-base font-bold">
                     {details.properties.name}
                   </h2>
+                  <adress>
+                  {details.properties.address}
+                  </adress>
                 </Popup>
               )}
             </>

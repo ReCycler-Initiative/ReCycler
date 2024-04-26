@@ -66,7 +66,8 @@ def get_collection_spots():
                     'geometry', ST_AsGeoJSON(geom)::jsonb,
                     'properties', jsonb_build_object(
                         'id', id,
-                        'name', name
+                        'name', name,
+                        'address', address
                     )
                 ) AS feature
                 FROM recycler.collection_spots
