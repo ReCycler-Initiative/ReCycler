@@ -28,7 +28,7 @@ const layerStyle: SymbolLayer = {
   source: "collection_spots",
   layout: {
     "icon-image": "collection-point",
-    "icon-size": 0.1,
+    "icon-size": 0.08,
   },
 };
 
