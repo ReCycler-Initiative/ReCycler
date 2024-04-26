@@ -16,20 +16,19 @@ import Map, {
   NavigationControl,
   Source,
   SymbolLayer,
-  useControl,
   Popup,
   MapRef,
 } from "react-map-gl";
 import logo from "./recycler-logo.png";
 import { ControlScaffold } from "@/components/control-scaffolding";
 
-const layerStyle: CircleLayer = {
+const layerStyle: SymbolLayer = {
   id: "point",
-  type: "circle",
+  type: "symbol",
   source: "collection_spots",
-  paint: {
-    "circle-radius": 10,
-    "circle-color": "#007cbf",
+  layout: {
+    "icon-image": "collection-point",
+    "icon-size": 0.09,
   },
 };
 
@@ -63,18 +62,18 @@ const clusterCount: SymbolLayer = {
   },
 };
 
-const unclustered: CircleLayer = {
-  id: "unclustered-point",
-  type: "circle",
-  source: "collection_spots",
-  filter: ["!", ["has", "point_count"]],
-  paint: {
-    "circle-color": "#11b4da",
-    "circle-radius": 4,
-    "circle-stroke-width": 1,
-    "circle-stroke-color": "#fff",
-  },
-};
+// const unclustered: CircleLayer = {
+//   id: "unclustered-point",
+//   type: "circle",
+//   source: "collection_spots",
+//   filter: ["!", ["has", "point_count"]],
+//   paint: {
+//     "circle-color": "#11b4da",
+//     "circle-radius": 4,
+//     "circle-stroke-width": 1,
+//     "circle-stroke-color": "#fff",
+//   },
+// };
 
 export default function Home() {
   const [mapLoaded, setMapLoaded] = useState(false);
@@ -112,6 +111,19 @@ export default function Home() {
     }
   }, [mapLoaded]);
 
+  useEffect(() => {
+    const map = mapRef.current;
+    if (mapLoaded && map) {
+      map.loadImage("collection-point.png", (error, image) => {
+        if (error) throw error;
+
+        if (image) {
+          map.addImage("collection-point", image);
+        }
+      });
+    }
+  }, [mapLoaded]);
+
   return (
     <div className="flex flex-col h-screen">
       <header
@@ -120,21 +132,6 @@ export default function Home() {
         })}
       >
         <Image src={logo} alt="Recycler logo" width={150} />
-        {/* <button
-          onClick={() => {
-            if (geojson) {
-              setGeojson({
-                ...geojson,
-                features: geojson.features.filter(
-                  (g: any) => g.properties.name === "Aluejätepiste"
-                ),
-              });
-            }
-          }}
-          type="button"
-        >
-          Näytä pahavi
-        </button> */}
       </header>
       <main className="h-full">
         <Map
@@ -172,7 +169,7 @@ export default function Home() {
               <Layer {...layerStyle} />
               <Layer {...clusters} />
               <Layer {...clusterCount} />
-              <Layer {...unclustered} />
+              {/* <Layer {...unclustered} /> */}
               <GeolocateControl position="bottom-right" />
               <FullscreenControl position="top-right" />
               <NavigationControl position="top-right" />
@@ -189,7 +186,7 @@ export default function Home() {
                   latitude={details.geometry.coordinates[1]}
                   onClose={() => setDetails(null)}
                   anchor="bottom"
-                  maxWidth="max-content"
+                  maxWidth="300px"
                   className="[&_.mapboxgl-popup-content]:px-4 [&_.mapboxgl-popup-content]:py-2 [&_.mapboxgl-popup-close-button]:right-1.5"
                 >
                   <h2 className="text-base font-bold">
