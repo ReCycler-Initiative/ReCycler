@@ -28,7 +28,7 @@ const layerStyle: SymbolLayer = {
   source: "collection_spots",
   layout: {
     "icon-image": "collection-point",
-    "icon-size": 0.09,
+    "icon-size": 0.04,
   },
 };
 
@@ -145,7 +145,7 @@ export default function Home() {
           onLoad={() => setMapLoaded(true)}
           onMouseEnter={() => console.log("Mouse enter")}
           style={{ background: "#424bb3ff" }}
-          mapStyle="mapbox://styles/mapbox/streets-v9"
+          mapStyle={process.env.NEXT_PUBLIC_MAPBOX_STYLE}
           interactiveLayerIds={["point"]}
           onClick={(e) => {
             if (e.features) {
