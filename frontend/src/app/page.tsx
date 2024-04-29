@@ -192,9 +192,7 @@ export default function Home() {
                   <h2 className="text-base font-bold">
                     {details.properties.name}
                   </h2>
-                  <adress>
-                  {details.properties.address}
-                  </adress>
+                  <address>{details.properties.address}</address>
                 </Popup>
               )}
             </>
