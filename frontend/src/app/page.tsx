@@ -28,7 +28,7 @@ const layerStyle: SymbolLayer = {
   source: "collection_spots",
   layout: {
     "icon-image": "collection-point",
-    "icon-size": 0.08,
+    "icon-size": 0.10,
   },
 };
 
@@ -41,13 +41,16 @@ const clusters: CircleLayer = {
     "circle-color": [
       "step",
       ["get", "point_count"],
-      "#51bbd6",
+      "#73cff4",
       100,
       "#f1f075",
       750,
       "#f28cb1",
     ],
     "circle-radius": ["step", ["get", "point_count"], 20, 100, 30, 750, 40],
+    "circle-stroke-width": 2,
+    "circle-stroke-color": "#ffffff",
+    "circle-stroke-opacity": 0.5
   },
 };
 
