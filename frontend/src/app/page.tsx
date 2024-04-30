@@ -1,5 +1,6 @@
 "use client";
 
+import { MapStyleControl } from "@/components/control-button";
 import GeocoderControl from "@/components/geocoder-control";
 import { getCollectionSpots } from "@/services/api";
 import { cn } from "@/utils/shadcn";
@@ -11,16 +12,48 @@ import Map, {
   CircleLayer,
   FullscreenControl,
   GeolocateControl,
-  ScaleControl,
   Layer,
+  MapRef,
   NavigationControl,
+  Popup,
+  ScaleControl,
   Source,
   SymbolLayer,
-  Popup,
-  MapRef,
+  useMap,
 } from "react-map-gl";
 import logo from "./recycler-logo.png";
-import { ControlScaffold } from "@/components/control-scaffolding";
+
+const CollectionPointIcon = () => {
+  const { current: map } = useMap();
+
+  useEffect(() => {
+    if (map) {
+      const loadIcon = () => {
+        map.loadImage("collection-point.png", (error, image) => {
+          if (error) throw error;
+
+          if (map.hasImage("collection-point")) {
+            return;
+          }
+
+          if (image) {
+            map.addImage("collection-point", image);
+          }
+        });
+      };
+
+      map.on("styleimagemissing", () => {
+        loadIcon();
+      });
+
+      return () => {
+        map.off("styleimagemissing", loadIcon);
+      };
+    }
+  }, [map]);
+
+  return null;
+};
 
 const layerStyle: SymbolLayer = {
   id: "point",
@@ -28,7 +61,7 @@ const layerStyle: SymbolLayer = {
   source: "collection_spots",
   layout: {
     "icon-image": "collection-point",
-    "icon-size": 0.10,
+    "icon-size": 0.1,
   },
 };
 
@@ -50,7 +83,7 @@ const clusters: CircleLayer = {
     "circle-radius": ["step", ["get", "point_count"], 20, 100, 30, 750, 40],
     "circle-stroke-width": 2,
     "circle-stroke-color": "#ffffff",
-    "circle-stroke-opacity": 0.5
+    "circle-stroke-opacity": 0.5,
   },
 };
 
@@ -82,6 +115,7 @@ export default function Home() {
   const [mapLoaded, setMapLoaded] = useState(false);
   const [geojson, setGeojson] = useState<any>(null);
   const [details, setDetails] = useState<any>(null);
+  const [mapStyle, setStyle] = useState<"detail" | "satellite">("detail");
   const mapRef = useRef<MapRef>(null);
 
   useEffect(() => {
@@ -106,26 +140,12 @@ export default function Home() {
 
       map.on("mouseenter", "point", showPointer);
       map.on("mouseleave", "point", hidePointer);
-
       return () => {
         map.off("mouseenter", "point", showPointer);
         map.off("mouseleave", "point", hidePointer);
       };
     }
-  }, [mapLoaded]);
-
-  useEffect(() => {
-    const map = mapRef.current;
-    if (mapLoaded && map) {
-      map.loadImage("collection-point.png", (error, image) => {
-        if (error) throw error;
-
-        if (image) {
-          map.addImage("collection-point", image);
-        }
-      });
-    }
-  }, [mapLoaded]);
+  }, [mapLoaded, geojson]);
 
   return (
     <div className="flex flex-col h-screen">
@@ -146,9 +166,12 @@ export default function Home() {
             zoom: 14,
           }}
           onLoad={() => setMapLoaded(true)}
-          onMouseEnter={() => console.log("Mouse enter")}
           style={{ background: "#424bb3ff" }}
-          mapStyle={process.env.NEXT_PUBLIC_MAPBOX_STYLE}
+          mapStyle={
+            mapStyle === "detail"
+              ? process.env.NEXT_PUBLIC_MAPBOX_STYLE
+              : "mapbox://styles/niilahti/clmt6xzzj00kq01qnb79e9a2l"
+          }
           interactiveLayerIds={["point"]}
           onClick={(e) => {
             if (e.features) {
@@ -168,20 +191,27 @@ export default function Home() {
                 cluster
                 clusterMaxZoom={14}
                 clusterRadius={50}
-              />
-              <Layer {...layerStyle} />
-              <Layer {...clusters} />
-              <Layer {...clusterCount} />
+              >
+                <Layer {...layerStyle} />
+                <Layer {...clusters} />
+                <Layer {...clusterCount} />
+              </Source>
+              <CollectionPointIcon />
               {/* <Layer {...unclustered} /> */}
+              <MapStyleControl
+                onToggle={(selected) => {
+                  setStyle(selected ? "satellite" : "detail");
+                }}
+                selected={mapStyle === "satellite"}
+              />
               <GeolocateControl position="bottom-right" />
-              <FullscreenControl position="top-right" />
               <NavigationControl position="top-right" />
+              <FullscreenControl position="top-right" />
               <ScaleControl position="bottom-left" />
               <GeocoderControl
                 mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_TOKEN!}
                 position="top-left"
               />
-              <ControlScaffold />
               {details && (
                 <Popup
                   key={new Date().getTime()}
