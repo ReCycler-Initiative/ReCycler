@@ -6,7 +6,7 @@ _With ReCycler, it’s easier than you think!_
 
 ReCycler is an open-source platform aimed at creating a more modern and user-centric recycling service, building upon the foundation of the existing kierrätys.info. ReCycler platform leverages the kierrätys.info API (https://api.kierratys.info/) to obtain basic information about recycling collection spots. Additionally, the service utilizes Mapbox's mapping and location-based APIs. The idea of the platform is to provide solutions to various use cases efficiently and seamlessly.
 ## Features
-### User-friendly interface for smart recycling guidance:
+### User-friendly interface for smart recycling guidance
 ReCycler offers an intuitive interface with a map view to visualize the locations of suitable/recommended recycling points, their directions, accessibility, and other relevant details. The service is also possible to use without a map through a menu-based solution. For example, a user can inquire about the proper disposal method for items like car batteries, metal, cardboard or glass.
 ## Future possible enhancements
 ### Mobile Application
