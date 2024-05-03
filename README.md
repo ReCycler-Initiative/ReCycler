@@ -27,4 +27,4 @@ For any inquiries or suggestions, please reach out to us through GitHub. You can
 Let's collaborate to create a more sustainable future with ReCycler! :seedling::recycle:
 ## Screenshots 3.5.2024
 ![recycler-screenshot](images/recycler-gui-may2024-finland.png)
-![recycler-screenshot](images/recycler-gui-may2024-detail.png)
+![recycler-screenshot](images/recycler-gui-may2024-detailed.png)
