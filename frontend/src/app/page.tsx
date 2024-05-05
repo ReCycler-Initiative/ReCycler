@@ -226,9 +226,12 @@ export default function Home() {
                     {details.properties.name}
                   </h2>
                   <address>{details.properties.address}</address>
-                  <materials style={{ fontStyle: 'italic' }}>
-                  {details.properties.materials.replace("{", "").replace("}", "").replace(/"/g, "")}
-                  </materials>
+                  <p style={{ fontStyle: "italic" }}>
+                    {details.properties.materials
+                      .replace("{", "")
+                      .replace("}", "")
+                      .replace(/"/g, "")}
+                  </p>
                 </Popup>
               )}
             </>
