@@ -144,17 +144,48 @@ export default function Home() {
     }
   }, [mapLoaded, geojson]);
 
+  const geolocateControlRef = useRef<any>();
+
+  useEffect(() => {
+    console.log(geolocateControlRef.current);
+    if (geolocateControlRef.current) {
+      geolocateControlRef.current?.trigger();
+    }
+  }, [geolocateControlRef.current]);
+
   return (
-    <>
+    <div className="flex h-full">
+      {/* <div className="w-96 h-full bg-white overflow-hidden">
+        <h2 className="p-4 text-sm border-b bg-gray-100">
+          10 kierrätyspistettä
+        </h2>
+        <div className="h-full overflow-y-auto">
+          {geojson &&
+            geojson.features.map((feature: any, i: number) => (
+              <div key={i} className="border-b p-4">
+                <p className="font-bold">{feature.properties.name}</p>
+                <address>{feature.properties.address}</address>
+                <p style={{ fontStyle: "italic" }}>
+                  {feature.properties.materials
+                    .replace("{", "")
+                    .replace("}", "")
+                    .replace(/"/g, "")}
+                </p>
+              </div>
+            ))}
+        </div>
+      </div> */}
       <Map
         ref={mapRef}
         mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_TOKEN}
         initialViewState={{
-          longitude: 27.678117958246627,
-          latitude: 62.892607388617456,
-          zoom: 14,
+          longitude: 25.748151,
+          latitude: 61.92411,
+          zoom: 5,
         }}
-        onLoad={() => setMapLoaded(true)}
+        onLoad={() => {
+          setMapLoaded(true);
+        }}
         mapStyle={
           mapStyle === "detail"
             ? process.env.NEXT_PUBLIC_MAPBOX_STYLE
@@ -192,7 +223,10 @@ export default function Home() {
               }}
               selected={mapStyle === "satellite"}
             />
-            <GeolocateControl position="bottom-right" />
+            <GeolocateControl
+              ref={geolocateControlRef}
+              position="bottom-right"
+            />
             <NavigationControl position="top-right" />
             <FullscreenControl position="top-right" />
             <ScaleControl position="bottom-left" />
@@ -231,6 +265,6 @@ export default function Home() {
           Haetaan kierrätyspisteitä
         </div>
       )}
-    </>
+    </div>
   );
 }

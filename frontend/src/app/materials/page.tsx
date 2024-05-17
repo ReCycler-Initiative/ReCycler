@@ -40,13 +40,13 @@ const HomePage = () => {
   const [showMore, setShowMore] = useState(false);
   return (
     <>
-      <div className="h-48 bg-gray-400 w-full border-b border-b-gray-400">
+      {/* <div className="h-48 bg-gray-400 w-full border-b border-b-gray-400">
         <Image
           alt=""
           className="object-cover w-full h-full object-center"
           src={hero}
         />
-      </div>
+      </div> */}
       <Container>
         {step === 0 && (
           <>
@@ -98,19 +98,17 @@ const HomePage = () => {
       <div className="fixed bottom-0 bg-white border p-4 left-0 right-0 border-gray-400">
         {step === 0 && (
           <>
-            <Button className="w-full" onClick={() => setStep(1)} size="lg">
+            {/* <Button className="w-full" onClick={() => setStep(1)} size="lg">
               Materiaalit valittu
+            </Button> */}
+            <Button asChild className="w-full" size="lg">
+              <Link href="results">Etsi kierrätyspisteet</Link>
             </Button>
           </>
         )}
         {step === 1 && (
           <div className="flex flex-col gap-4">
-            <Button
-              asChild
-              className="w-full"
-              onClick={() => setStep(1)}
-              size="lg"
-            >
+            <Button asChild className="w-full" size="lg">
               <Link href="results">Näytä lähimmät kierrätyspisteet</Link>
             </Button>
             <Button

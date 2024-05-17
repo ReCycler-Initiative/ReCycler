@@ -33,7 +33,6 @@ const moreWasteTypes: string[] = [
 ];
 
 const HomePage = () => {
-  const [showMore, setShowMore] = useState(false);
   return (
     <>
       <div className="h-48 bg-gray-400 w-full border-b border-b-gray-400">
@@ -49,9 +48,14 @@ const HomePage = () => {
           Avustan sinua kierrättämään jätteesi täsmällisesti, jotta voit
           keskittyä nauttimaan elämästäsi ja samoin tulevat sukupolvet.
         </p>
-        <Button className="w-full" asChild>
-          <Link href="/materials">Ponkaise kierrättämään</Link>
-        </Button>
+        <div className="flex flex-col gap-4">
+          <Button className="w-full" asChild>
+            <Link href="/materials">Lähde kierrättämään</Link>
+          </Button>
+          <Button className="w-full" asChild variant="secondary">
+            <Link href="/results">Näytä lähimmät kierrätyspisteet</Link>
+          </Button>
+        </div>
       </Container>
     </>
   );
