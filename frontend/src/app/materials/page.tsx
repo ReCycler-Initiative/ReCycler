@@ -9,6 +9,29 @@ import { RecycleIcon } from "lucide-react";
 import Link from "next/link";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useForm, useFormContext } from "react-hook-form";
+import { Form, useFormField } from "@/components/ui/form";
+
+const CustomCheckbox = ({ label, name }: { label: string; name: string }) => {
+  const { register, watch } = useFormContext();
+  const checked: boolean = watch(name);
+
+  return (
+    <label
+      data-checked={checked}
+      className="border border-gray-700 py-2 px-2 text-center h-16 flex justify-center items-center bg-white rounded-sm data-[checked=true]:bg-gray-700 data-[checked=true]:text-white"
+    >
+      <input
+        {...register(name)}
+        checked={checked || false}
+        className="hidden"
+        type="checkbox"
+      />
+      <span className="checkbox-mark"></span>
+      {label}
+    </label>
+  );
+};
 
 const wasteTypes: string[] = [
   "Energiajätettä",
@@ -35,18 +58,13 @@ const moreWasteTypes: string[] = [
   "Vaarallinen jäte",
 ];
 
-const HomePage = () => {
+const MaterialsPage = () => {
   const [step, setStep] = useState(0);
   const [showMore, setShowMore] = useState(false);
+  const form = useForm();
+
   return (
-    <>
-      {/* <div className="h-48 bg-gray-400 w-full border-b border-b-gray-400">
-        <Image
-          alt=""
-          className="object-cover w-full h-full object-center"
-          src={hero}
-        />
-      </div> */}
+    <Form {...form}>
       <Container>
         {step === 0 && (
           <>
@@ -55,21 +73,11 @@ const HomePage = () => {
             </h1>
             <div className="grid grid-cols-2 gap-3 mb-8">
               {wasteTypes.map((type, i) => (
-                <div
-                  key={i}
-                  className="border border-gray-700 py-2 px-2 text-center h-16 flex justify-center items-center bg-white rounded-sm"
-                >
-                  {type}
-                </div>
+                <CustomCheckbox key={i} label={type} name={type} />
               ))}
               {showMore &&
                 moreWasteTypes.map((type, i) => (
-                  <div
-                    key={i}
-                    className="border border-gray-700 py-2 px-2 text-center h-16 flex justify-center items-center bg-white rounded-sm"
-                  >
-                    {type}
-                  </div>
+                  <CustomCheckbox key={i} label={type} name={type} />
                 ))}
             </div>
             <div className="flex justify-center mb-20">
@@ -122,8 +130,8 @@ const HomePage = () => {
           </div>
         )}
       </div>
-    </>
+    </Form>
   );
 };
 
-export default HomePage;
+export default MaterialsPage;
