@@ -115,7 +115,7 @@ export default function Home() {
   const mapRef = useRef<MapRef>(null);
   const router = useRouter();
   const searchParams = useSearchParams();
-  const selectedMaterials = searchParams.get("materials")?.split(",") || [];
+  const selectedMaterials = searchParams.get("materials")?.split(",").filter(Boolean) || [];
   const [showMaterials, setShowMaterials] = useState(false);
   const form = useForm({
     defaultValues: {
