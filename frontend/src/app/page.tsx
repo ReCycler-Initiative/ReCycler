@@ -2,35 +2,9 @@
 
 import Container from "@/components/container";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
-import hero from "./recycle.png";
 import Image from "next/image";
 import Link from "next/link";
-
-const wasteTypes: string[] = [
-  "Energiajätettä",
-  "Kartonkia",
-  "Lamppuja",
-  "Lasia",
-  "Muovia",
-  "Paperia",
-  "Pienmetallia",
-  "Puuta",
-  "Sekajätettä",
-  "Tekstiiliä",
-];
-
-const moreWasteTypes: string[] = [
-  "Ajoneuvoakut (lyijy)",
-  "Kannettavat akut ja paristot",
-  "Kyllästetty puu",
-  "Muu jäte",
-  "Poistotekstiiliä",
-  "Puutarhajätettä",
-  "Rakennus- ja purkujätettä",
-  "Sähkölaitteita",
-  "Vaarallinen jäte",
-];
+import hero from "./recycle.png";
 
 const HomePage = () => {
   return (

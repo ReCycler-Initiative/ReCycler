@@ -29,17 +29,42 @@ const CustomCheckbox = ({ label, name }: { label: string; name: string }) => {
   );
 };
 
+// const wasteTypes: string[] = [
+//   "Energiajätettä",
+//   "Kartonkia",
+//   "Lamppuja",
+//   "Lasia",
+//   "Muovia",
+//   "Paperia",
+//   "Pienmetallia",
+//   "Puuta",
+//   "Sekajätettä",
+//   "Tekstiiliä",
+// ];
+
+// const moreWasteTypes: string[] = [
+//   "Ajoneuvoakut (lyijy)",
+//   "Kannettavat akut ja paristot",
+//   "Kyllästetty puu",
+//   "Muu jäte",
+//   "Poistotekstiiliä",
+//   "Puutarhajätettä",
+//   "Rakennus- ja purkujätettä",
+//   "Sähkölaitteita",
+//   "Vaarallinen jäte",
+// ];
+
 const wasteTypes: string[] = [
-  "Energiajätettä",
-  "Kartonkia",
-  "Lamppuja",
-  "Lasia",
-  "Muovia",
-  "Paperia",
-  "Pienmetallia",
-  "Puuta",
-  "Sekajätettä",
-  "Tekstiiliä",
+  "Energiajäte",
+  "Kartonki",
+  "Lamppu",
+  "Lasi",
+  "Muovi",
+  "Paperi",
+  "Pienmetalli",
+  "Puu",
+  "Sekajäte",
+  "Tekstiili",
 ];
 
 const moreWasteTypes: string[] = [
@@ -47,18 +72,20 @@ const moreWasteTypes: string[] = [
   "Kannettavat akut ja paristot",
   "Kyllästetty puu",
   "Muu jäte",
-  "Poistotekstiiliä",
-  "Puutarhajätettä",
-  "Rakennus- ja purkujätettä",
-  "Sähkölaitteita",
+  "Poistotekstiili",
+  "Puutarhajäte",
+  "Rakennus- ja purkujäte",
+  "Sähkölaite",
   "Vaarallinen jäte",
 ];
 
 const MaterialsPage = () => {
   const [showMore, setShowMore] = useState(false);
   const form = useForm();
-  const materials = form.watch("materials", []);
-  const selectedMaterials = Object.values(materials).filter(Boolean).length;
+  const materials: [string, boolean][] = Object.entries(
+    form.watch("materials", [])
+  );
+  const selectedMaterials = materials.filter(([, value]) => value);
 
   return (
     <Form {...form}>
@@ -94,9 +121,13 @@ const MaterialsPage = () => {
         </div>
       </Container>
       <div className="fixed bottom-0 bg-white border p-4 left-0 right-0 border-gray-400 flex flex-col items-center gap-y-4">
-        Materiaaleja valittu {selectedMaterials} kpl
+        Materiaaleja valittu {selectedMaterials.length} kpl
         <Button asChild className="w-full" size="lg">
-          <Link href="results">Etsi kierrätyspisteet</Link>
+          <Link
+            href={`results?materials=${selectedMaterials.map(([key]) => key)}`}
+          >
+            Etsi kierrätyspisteet
+          </Link>
         </Button>
       </div>
     </Form>

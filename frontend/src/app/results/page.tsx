@@ -5,6 +5,7 @@ import GeocoderControl from "@/components/geocoder-control";
 import { getCollectionSpots } from "@/services/api";
 import { Loader2Icon } from "lucide-react";
 import "mapbox-gl/dist/mapbox-gl.css";
+import { useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import Map, {
   CircleLayer,
@@ -95,30 +96,39 @@ const clusterCount: SymbolLayer = {
   },
 };
 
-// const unclustered: CircleLayer = {
-//   id: "unclustered-point",
-//   type: "circle",
-//   source: "collection_spots",
-//   filter: ["!", ["has", "point_count"]],
-//   paint: {
-//     "circle-color": "#11b4da",
-//     "circle-radius": 4,
-//     "circle-stroke-width": 1,
-//     "circle-stroke-color": "#fff",
-//   },
-// };
-
 export default function Home() {
   const [mapLoaded, setMapLoaded] = useState(false);
   const [geojson, setGeojson] = useState<any>(null);
   const [details, setDetails] = useState<any>(null);
   const [mapStyle, setStyle] = useState<"detail" | "satellite">("detail");
   const mapRef = useRef<MapRef>(null);
+  const searchParams = useSearchParams();
+  const materials = searchParams.get("materials")?.split(",") || [];
+
+  console.log(materials);
 
   useEffect(() => {
     const fetchData = async () => {
-      const response = await getCollectionSpots();
-      setGeojson(response);
+      let response = await getCollectionSpots();
+      let features = response.features.filter((feature: any) => {
+        if (materials.length === 0) {
+          return true;
+        }
+
+        const featureMaterials: string[] = feature.properties.materials
+          .replace("{", "")
+          .replace("}", "")
+          .replace(/"/g, "")
+          .split(",");
+
+        return featureMaterials.some((material) =>
+          materials.includes(material)
+        );
+      });
+      setGeojson({
+        ...response,
+        features,
+      });
     };
 
     fetchData();
@@ -155,26 +165,6 @@ export default function Home() {
 
   return (
     <div className="flex h-full">
-      {/* <div className="w-96 h-full bg-white overflow-hidden">
-        <h2 className="p-4 text-sm border-b bg-gray-100">
-          10 kierrätyspistettä
-        </h2>
-        <div className="h-full overflow-y-auto">
-          {geojson &&
-            geojson.features.map((feature: any, i: number) => (
-              <div key={i} className="border-b p-4">
-                <p className="font-bold">{feature.properties.name}</p>
-                <address>{feature.properties.address}</address>
-                <p style={{ fontStyle: "italic" }}>
-                  {feature.properties.materials
-                    .replace("{", "")
-                    .replace("}", "")
-                    .replace(/"/g, "")}
-                </p>
-              </div>
-            ))}
-        </div>
-      </div> */}
       <Map
         ref={mapRef}
         mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_TOKEN}
