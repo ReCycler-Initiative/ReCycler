@@ -1,12 +1,23 @@
 "use client";
 
-import { MapStyleControl } from "@/components/control-button";
+import Container from "@/components/container";
 import GeocoderControl from "@/components/geocoder-control";
+import { MapStyleControl } from "@/components/map-style-control";
+import { Materials } from "@/components/materials";
+import { SelectedMaterialsControl } from "@/components/selected-materials-control";
+import {
+  Drawer,
+  DrawerContent,
+  DrawerHeader,
+  DrawerTitle,
+} from "@/components/ui/drawer";
+import { Form } from "@/components/ui/form";
 import { getCollectionSpots } from "@/services/api";
 import { Loader2Icon } from "lucide-react";
 import "mapbox-gl/dist/mapbox-gl.css";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import { useForm } from "react-hook-form";
 import Map, {
   CircleLayer,
   FullscreenControl,
@@ -102,16 +113,42 @@ export default function Home() {
   const [details, setDetails] = useState<any>(null);
   const [mapStyle, setStyle] = useState<"detail" | "satellite">("detail");
   const mapRef = useRef<MapRef>(null);
+  const router = useRouter();
   const searchParams = useSearchParams();
-  const materials = searchParams.get("materials")?.split(",") || [];
+  const selectedMaterials = searchParams.get("materials")?.split(",") || [];
+  const [showMaterials, setShowMaterials] = useState(false);
+  const form = useForm({
+    defaultValues: {
+      materials: selectedMaterials.reduce(
+        (acc, material) => {
+          acc[material] = true;
+          return acc;
+        },
+        {} as Record<string, boolean>
+      ),
+    },
+  });
 
-  console.log(materials);
+  const formMaterials = form.watch("materials", {});
+
+  useEffect(() => {
+    const current = new URLSearchParams(Array.from(searchParams.entries()));
+    current.set(
+      "materials",
+      Object.entries(formMaterials)
+        .filter(([, value]) => value)
+        .map(([key]) => key)
+        .join(",")
+    );
+    const search = current.toString();
+    const query = search ? `?${search}` : "";
+  }, [formMaterials, router, searchParams]);
 
   useEffect(() => {
     const fetchData = async () => {
       let response = await getCollectionSpots();
       let features = response.features.filter((feature: any) => {
-        if (materials.length === 0) {
+        if (selectedMaterials.length === 0) {
           return true;
         }
 
@@ -122,7 +159,7 @@ export default function Home() {
           .split(",");
 
         return featureMaterials.some((material) =>
-          materials.includes(material)
+          selectedMaterials.includes(material)
         );
       });
       setGeojson({
@@ -206,7 +243,6 @@ export default function Home() {
               <Layer {...clusterCount} />
             </Source>
             <CollectionPointIcon />
-            {/* <Layer {...unclustered} /> */}
             <MapStyleControl
               onToggle={(selected) => {
                 setStyle(selected ? "satellite" : "detail");
@@ -216,6 +252,10 @@ export default function Home() {
             <GeolocateControl
               ref={geolocateControlRef}
               position="bottom-right"
+            />
+            <SelectedMaterialsControl
+              amount={selectedMaterials.length}
+              onClick={() => setShowMaterials(true)}
             />
             <NavigationControl position="top-right" />
             <FullscreenControl position="top-right" />
@@ -255,6 +295,18 @@ export default function Home() {
           Haetaan kierrätyspisteitä
         </div>
       )}
+      <Drawer open={showMaterials} onOpenChange={setShowMaterials}>
+        <DrawerContent>
+          <DrawerHeader>
+            <DrawerTitle>Valitut materiaalit</DrawerTitle>
+          </DrawerHeader>
+          <Form {...form}>
+            <Container>
+              <Materials />
+            </Container>
+          </Form>
+        </DrawerContent>
+      </Drawer>
     </div>
   );
 }
