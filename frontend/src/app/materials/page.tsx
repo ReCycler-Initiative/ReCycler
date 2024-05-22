@@ -2,15 +2,11 @@
 
 import Container from "@/components/container";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
-import hero from "./recycle.png";
-import Image from "next/image";
-import { RecycleIcon } from "lucide-react";
+import { Form } from "@/components/ui/form";
+import { ChevronDownIcon, ChevronUpIcon } from "lucide-react";
 import Link from "next/link";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { useState } from "react";
 import { useForm, useFormContext } from "react-hook-form";
-import { Form, useFormField } from "@/components/ui/form";
 
 const CustomCheckbox = ({ label, name }: { label: string; name: string }) => {
   const { register, watch } = useFormContext();
@@ -23,7 +19,7 @@ const CustomCheckbox = ({ label, name }: { label: string; name: string }) => {
     >
       <input
         {...register(name)}
-        checked={checked || false}
+        checked={checked || false}
         className="hidden"
         type="checkbox"
       />
@@ -59,76 +55,49 @@ const moreWasteTypes: string[] = [
 ];
 
 const MaterialsPage = () => {
-  const [step, setStep] = useState(0);
   const [showMore, setShowMore] = useState(false);
   const form = useForm();
+  const materials = form.watch("materials", []);
+  const selectedMaterials = Object.values(materials).filter(Boolean).length;
 
   return (
     <Form {...form}>
       <Container>
-        {step === 0 && (
-          <>
-            <h1 className="text-xl font-bold mb-6">
-              Mitäs tänään kierrätetään?
-            </h1>
-            <div className="grid grid-cols-2 gap-3 mb-8">
-              {wasteTypes.map((type, i) => (
-                <CustomCheckbox key={i} label={type} name={type} />
-              ))}
-              {showMore &&
-                moreWasteTypes.map((type, i) => (
-                  <CustomCheckbox key={i} label={type} name={type} />
-                ))}
-            </div>
-            <div className="flex justify-center mb-20">
-              <Button
-                onClick={() => setShowMore(!showMore)}
-                variant="secondary"
-              >
-                {showMore ? "Vähemmän materiaaleja" : "Lisää materiaaleja"}
-              </Button>
-            </div>
-          </>
-        )}
-        {step === 1 && (
-          <div className="flex flex-col gap-4">
-            <h1 className="text-xl font-bold">Mihinä meet?</h1>
-            <div className="space-y-2">
-              <Label htmlFor="location">Sijaintisi</Label>
-              <Input id="location" />
-            </div>
-            <div className="bg-gray-300 flex justify-center items-center h-[300px]">
-              Karttaa tähän?
-            </div>
-          </div>
-        )}
+        <h1 className="text-xl font-bold mb-6">Mitäs tänään kierrätetään?</h1>
+        <div className="grid grid-cols-2 gap-3 mb-8">
+          {wasteTypes.map((type, i) => (
+            <CustomCheckbox key={i} label={type} name={`materials.${type}`} />
+          ))}
+          {showMore &&
+            moreWasteTypes.map((type, i) => (
+              <CustomCheckbox key={i} label={type} name={`materials.${type}`} />
+            ))}
+        </div>
+        <div className="flex justify-center mb-28">
+          <Button
+            className="flex flex-col"
+            onClick={() => setShowMore(!showMore)}
+            variant="secondary"
+          >
+            {showMore && (
+              <span>
+                <ChevronUpIcon />
+              </span>
+            )}
+            {showMore ? "Vähemmän materiaaleja" : "Lisää materiaaleja"}
+            {!showMore && (
+              <span>
+                <ChevronDownIcon />
+              </span>
+            )}
+          </Button>
+        </div>
       </Container>
-      <div className="fixed bottom-0 bg-white border p-4 left-0 right-0 border-gray-400">
-        {step === 0 && (
-          <>
-            {/* <Button className="w-full" onClick={() => setStep(1)} size="lg">
-              Materiaalit valittu
-            </Button> */}
-            <Button asChild className="w-full" size="lg">
-              <Link href="results">Etsi kierrätyspisteet</Link>
-            </Button>
-          </>
-        )}
-        {step === 1 && (
-          <div className="flex flex-col gap-4">
-            <Button asChild className="w-full" size="lg">
-              <Link href="results">Näytä lähimmät kierrätyspisteet</Link>
-            </Button>
-            <Button
-              className="w-full"
-              onClick={() => setStep(0)}
-              size="lg"
-              variant="secondary"
-            >
-              Takaisin
-            </Button>
-          </div>
-        )}
+      <div className="fixed bottom-0 bg-white border p-4 left-0 right-0 border-gray-400 flex flex-col items-center gap-y-4">
+        Materiaaleja valittu {selectedMaterials} kpl
+        <Button asChild className="w-full" size="lg">
+          <Link href="results">Etsi kierrätyspisteet</Link>
+        </Button>
       </div>
     </Form>
   );
