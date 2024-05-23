@@ -63,6 +63,11 @@ const CollectionPointIcon = () => {
 
   return null;
 };
+const finlandBounds = [
+  [19.0, 59.0],  // Southwest
+  [32.0, 71.0]   // Northeast
+];
+
 
 const layerStyle: SymbolLayer = {
   id: "point",
@@ -206,9 +211,9 @@ export default function Home() {
         ref={mapRef}
         mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_TOKEN}
         initialViewState={{
-          longitude: 25.748151,
-          latitude: 61.92411,
-          zoom: 5,
+          longitude: 25.68,
+          latitude: 62.89,
+          zoom: 3,
         }}
         onLoad={() => {
           setMapLoaded(true);
@@ -227,6 +232,7 @@ export default function Home() {
             }
           }
         }}
+        maxBounds={finlandBounds}
       >
         {geojson && (
           <>
