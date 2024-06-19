@@ -1,20 +1,27 @@
 from flask import Flask, jsonify, request
 import psycopg2
 from flask_cors import CORS
+import os
 
 app = Flask(__name__)
 CORS(app)
 
 crs = 4326
 
+dbname = os.getenv("POSTGRES_PASSWORD")
+user = os.getenv("POSTGRES_USER")
+password = os.getenv("POSTGRES_DB")
+host = os.getenv("POSTGRES_DB")
+port = os.getenv("POSTGRES_PORT")
+
 
 def get_db_connection():
     return psycopg2.connect(
-        dbname="postgres",
-        user="postgres",
-        password="foobar",
-        host="localhost",
-        port="5434",
+        dbname="postgres" if dbname is None else dbname,
+        user="postgres" if user is None else user,
+        password="foobar" if password is None else password,
+        host="localhost" if host is None else host,
+        port="5434" if port is None else port,
     )
 
 

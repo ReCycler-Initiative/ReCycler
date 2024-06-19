@@ -20,13 +20,19 @@ from bs4 import BeautifulSoup
 base_url = "https://api.kierratys.info/collectionspots/"
 api_key = os.getenv("KIERRATYS_API_KEY")
 
+dbname = os.getenv("POSTGRES_PASSWORD")
+user = os.getenv("POSTGRES_USER")
+password = os.getenv("POSTGRES_DB")
+host = os.getenv("POSTGRES_DB")
+port = os.getenv("POSTGRES_PORT")
+
 try:
     conn = psycopg2.connect(
-        dbname="postgres",
-        user="postgres",
-        password="foobar",
-        host="localhost",
-        port="5434",
+        dbname="postgres" if dbname is None else dbname,
+        user="postgres" if user is None else user,
+        password="foobar" if password is None else password,
+        host="localhost" if host is None else host,
+        port="5434" if port is None else port,
     )
     c = conn.cursor()
 
@@ -92,19 +98,49 @@ try:
             opening_hours_en = item.get("opening_hours_en", "")
             opening_hours_fi = item.get("opening_hours_fi", "")
             opening_hours_sv = item.get("opening_hours_sv", "")
-            description_en = BeautifulSoup(item.get("description_en", ""), "html.parser").get_text()
-            description_fi = BeautifulSoup(item.get("description_fi", ""), "html.parser").get_text()
-            description_sv = BeautifulSoup(item.get("description_sv", ""), "html.parser").get_text()
+            description_en = BeautifulSoup(
+                item.get("description_en", ""), "html.parser"
+            ).get_text()
+            description_fi = BeautifulSoup(
+                item.get("description_fi", ""), "html.parser"
+            ).get_text()
+            description_sv = BeautifulSoup(
+                item.get("description_sv", ""), "html.parser"
+            ).get_text()
             occupied = item.get("occupied", "")
             additional_details = item.get("additional_details", "")
             materials = [material["name"] for material in item.get("materials", [])]
-            geometry = item.get('geometry')  # Get geometry if it exists
+            geometry = item.get("geometry")  # Get geometry if it exists
             if geometry is not None:
-                coordinates = geometry.get('coordinates')  # Get coordinates if they exist
-                if coordinates is not None and len(coordinates) == 2:  # Ensure coordinates are in the correct format
+                coordinates = geometry.get(
+                    "coordinates"
+                )  # Get coordinates if they exist
+                if (
+                    coordinates is not None and len(coordinates) == 2
+                ):  # Ensure coordinates are in the correct format
                     # Convert coordinates to PostGIS point geometry and insert into the database
                     point_text = f"POINT({coordinates[0]} {coordinates[1]})"
-                    c.execute("INSERT INTO recycler.collection_spots (spot_id, name, address, postal_code, post_office, municipality, materials, opening_hours_fi, opening_hours_sv, description_en, opening_hours_en, description_fi, description_sv, occupied, additional_details, geom) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, ST_GeomFromText(%s, 4326))", (spot_id, name, address, postal_code, post_office, municipality, materials, opening_hours_en, opening_hours_fi, opening_hours_sv, description_en, description_fi, description_sv, occupied, additional_details, point_text))
+                    c.execute(
+                        "INSERT INTO recycler.collection_spots (spot_id, name, address, postal_code, post_office, municipality, materials, opening_hours_fi, opening_hours_sv, description_en, opening_hours_en, description_fi, description_sv, occupied, additional_details, geom) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, ST_GeomFromText(%s, 4326))",
+                        (
+                            spot_id,
+                            name,
+                            address,
+                            postal_code,
+                            post_office,
+                            municipality,
+                            materials,
+                            opening_hours_en,
+                            opening_hours_fi,
+                            opening_hours_sv,
+                            description_en,
+                            description_fi,
+                            description_sv,
+                            occupied,
+                            additional_details,
+                            point_text,
+                        ),
+                    )
         # Update the offset for the next page
         offset += limit
 
