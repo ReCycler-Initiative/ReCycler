@@ -28,3 +28,7 @@ Let's collaborate to create a more sustainable future with ReCycler! :seedling::
 ## GUI screenshots 3.5.2024
 ![recycler-screenshot](images/recycler-gui-may2024-finland.png)
 ![recycler-screenshot](images/recycler-gui-may2024-detailed.png)
+
+## Production demo
+API:
+https://recycler-glll.onrender.com/api/collection_spots
