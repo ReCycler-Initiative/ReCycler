@@ -1,4 +1,3 @@
-import { cn } from "@/utils/shadcn";
 import { useControl } from "react-map-gl";
 
 class MapStyleControlClass {
