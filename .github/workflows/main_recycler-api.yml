@@ -43,8 +43,8 @@ jobs:
         with:
           name: python-app
           path: |
-            ././backend/api/release.zip
-            ././backend/api/!venv/
+            backend/api/release.zip
+            backend/api/!venv/
 
   deploy:
     runs-on: ubuntu-latest
