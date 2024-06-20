@@ -23,7 +23,7 @@ api_key = os.getenv("KIERRATYS_API_KEY")
 dbname = os.getenv("POSTGRES_PASSWORD")
 user = os.getenv("POSTGRES_USER")
 password = os.getenv("POSTGRES_DB")
-host = os.getenv("POSTGRES_DB")
+host = os.getenv("POSTGRES_HOST")
 port = os.getenv("POSTGRES_PORT")
 
 try:
