@@ -48,9 +48,6 @@ jobs:
 
   deploy:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: backend/api
     needs: build
     environment:
       name: "Production"
