@@ -50,7 +50,7 @@ jobs:
         run: |
           aws s3 cp recycler-app-api.zip s3://recycler-app/recycler-app-api-${{ github.sha }}.zip
           aws elasticbeanstalk create-application-version --application-name recycler-app-api --version-label ${{ github.sha }} --source-bundle S3Bucket=recycler-app,S3Key=recycler-app-api-${{ github.sha }}.zip
-          aws elasticbeanstalk update-environment --application-name recycler-app-api --environment-name my-env --version-label ${{ github.sha }}
+          aws elasticbeanstalk update-environment --application-name recycler-app-api --environment-name recyler-api-env --version-label ${{ github.sha }}
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
