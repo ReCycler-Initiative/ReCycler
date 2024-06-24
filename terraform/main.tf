@@ -22,11 +22,6 @@ resource "aws_iam_role_policy_attachment" "beanstalk_role_policy" {
   policy_arn = "arn:aws:iam::aws:policy/AWSElasticBeanstalkWebTier"
 }
 
-resource "aws_iam_role_policy_attachment" "ec2_instance_connect_policy" {
-  role       = aws_iam_role.beanstalk_role.name
-  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
-}
-
 resource "aws_iam_instance_profile" "beanstalk_profile" {
   name = "beanstalk-profile"
   role = aws_iam_role.beanstalk_role.name
