@@ -25,6 +25,11 @@ def get_db_connection():
     )
 
 
+@app.route("/", methods=["GET"])
+def health_check():
+    return jsonify({"message": "OK"})
+
+
 @app.route("/api/collection_spots", methods=["GET"])
 def get_collection_spots():
     try:
