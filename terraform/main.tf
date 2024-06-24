@@ -27,6 +27,10 @@ resource "aws_iam_instance_profile" "beanstalk_profile" {
   role = aws_iam_role.beanstalk_role.name
 }
 
+resource "aws_s3_bucket" "recycler_app" {
+  bucket = "recycler-app"
+}
+
 resource "aws_elastic_beanstalk_application" "app" {
   name        = "recycler-app-api"
   description = "Recycler API"
