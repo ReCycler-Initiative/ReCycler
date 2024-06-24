@@ -3,7 +3,7 @@ provider "aws" {
 }
 
 resource "aws_iam_role" "beanstalk_role" {
-  name = "example-beanstalk-role"
+  name = "beanstalk-role"
   assume_role_policy = jsonencode({
     Version = "2012-10-17",
     Statement = [{
@@ -22,8 +22,13 @@ resource "aws_iam_role_policy_attachment" "beanstalk_role_policy" {
   policy_arn = "arn:aws:iam::aws:policy/AWSElasticBeanstalkWebTier"
 }
 
+resource "aws_iam_role_policy_attachment" "ec2_instance_connect_policy" {
+  role       = aws_iam_role.beanstalk_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+}
+
 resource "aws_iam_instance_profile" "beanstalk_profile" {
-  name = "example-beanstalk-profile"
+  name = "beanstalk-profile"
   role = aws_iam_role.beanstalk_role.name
 }
 
