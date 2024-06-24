@@ -1,29 +1,25 @@
-# Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
-# More GitHub Actions for Azure: https://github.com/Azure/actions
-# More info on Python, GitHub Actions, and Azure App Service: https://aka.ms/python-webapps-actions
-
-name: Build and deploy Python app to Azure Web App - recycler-api
+name: Build and Deploy to AWS Elastic Beanstalk
 
 on:
   push:
     branches:
       - main
-  workflow_dispatch:
 
 jobs:
-  build:
+  build-and-deploy:
     runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: backend/api
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-      - name: Set up Python version
-        uses: actions/setup-python@v1
+      - name: Set up Python
+        uses: actions/setup-python@v2
         with:
-          python-version: "3.12"
+          python-version: "3.11"
 
       - name: Create and start virtual environment
         run: |
@@ -33,39 +29,31 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
-      # Optional: Add step to run tests here (PyTest, Django test suites, etc.)
+      - name: Archive the build files
+        run: zip -r recycler-app-api.zip . -x "*.git*" "*.github*" "*.pytest_cache*" "*.venv*" "*.idea*" "*.vscode*" "__pycache__/*" "*.pytest_cache/*" "*.mypy_cache/*" "*.coverage*"
 
-      - name: Zip artifact for deployment
-        run: zip release.zip ./* -r && ls -la
-
-      - name: Upload artifact for deployment jobs
-        uses: actions/upload-artifact@v3
+      - name: Install AWS CLI
+        id: install-aws-cli
+        uses: unfor19/install-aws-cli-action@v1
         with:
-          name: python-app
-          path: |
-            backend/api/release.zip
-            backend/api/!venv/
+          version: 2
+          verbose: false
+          arch: amd64
 
-  deploy:
-    runs-on: ubuntu-latest
-    needs: build
-    environment:
-      name: "Production"
-      url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
+      - name: Configure AWS credentials
+        run: |
+          aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws configure set default.region eu-central-1
 
-    steps:
-      - name: Download artifact from build job
-        uses: actions/download-artifact@v3
-        with:
-          name: python-app
+      - name: Deploy to Elastic Beanstalk
+        run: |
+          aws s3 cp recycler-app-api.zip s3://recycler-app-api/recycler-app-api-${{ github.sha }}.zip
+          aws elasticbeanstalk create-application-version --application-name recycler-app-api --version-label ${{ github.sha }} --source-bundle S3Bucket=recycler-app-api,S3Key=recycler-app-api-${{ github.sha }}.zip
+          aws elasticbeanstalk update-environment --application-name recycler-app-api --environment-name my-env --version-label ${{ github.sha }}
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
-      - name: Unzip artifact for deployment
-        run: unzip release.zip
-
-      - name: "Deploy to Azure Web App"
-        uses: azure/webapps-deploy@v2
-        id: deploy-to-webapp
-        with:
-          app-name: "recycler-api"
-          slot-name: "Production"
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_B3A659D8A5324BD29D5851BA6D33D331 }}
+      - name: Clean up
+        run: rm recycler-app-api.zip
