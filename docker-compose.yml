@@ -3,3 +3,4 @@ services:
     build: ./backend/api/.
     ports:
       - "8000:5000"
+    image: recycler-api:latest
