@@ -1,6 +1,0 @@
-services:
-  recycler-api:
-    build: ./backend/api/.
-    ports:
-      - "5000:5000"
-    image: 954340646910.dkr.ecr.eu-central-1.amazonaws.com/recycler-api:latest
