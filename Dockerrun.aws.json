@@ -1,15 +1,37 @@
 {
   "AWSEBDockerrunVersion": 2,
+  "volumes": [
+    {
+      "name": "nginx-proxy-conf",
+      "host": {
+        "sourcePath": "/var/app/current/proxy/conf.d"
+      }
+    }
+  ],
   "containerDefinitions": [
     {
       "name": "recycler-api",
       "image": "954340646910.dkr.ecr.eu-central-1.amazonaws.com/recycler-api:latest",
       "essential": true,
+      "memory": 128
+    },
+    {
+      "name": "nginx-proxy",
+      "image": "nginx",
+      "essential": true,
       "memory": 128,
       "portMappings": [
         {
           "hostPort": 80,
-          "containerPort": 5000
+          "containerPort": 80
+        }
+      ],
+      "links": ["recycler-api"],
+      "mountPoints": [
+        {
+          "sourceVolume": "nginx-proxy-conf",
+          "containerPath": "/etc/nginx/conf.d",
+          "readOnly": true
         }
       ]
     }
