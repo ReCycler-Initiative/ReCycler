@@ -27,7 +27,7 @@ resource "aws_iam_instance_profile" "beanstalk_profile" {
   role = aws_iam_role.beanstalk_role.name
 }
 
-resource "aws_ecr_repository" "my_ecr_repository" {
+resource "aws_ecr_repository" "recycler_api_ecr_repository" {
   name                 = "recycler-api"
   image_tag_mutability = "MUTABLE"
   image_scanning_configuration {
@@ -35,11 +35,49 @@ resource "aws_ecr_repository" "my_ecr_repository" {
   }
 }
 
-output "repository_url" {
-  description = "The URL of the ECR repository"
-  value       = aws_ecr_repository.my_ecr_repository.repository_url
+resource "aws_iam_role_policy" "ecr_policy" {
+  name = "ecr-policy"
+  role = aws_iam_role.beanstalk_role.id
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Sid    = "ListImagesInRepository",
+        Effect = "Allow",
+        Action = [
+          "ecr:ListImages"
+        ],
+        Resource = aws_ecr_repository.recycler_api_ecr_repository.arn
+      },
+      {
+        Sid    = "GetAuthorizationToken",
+        Effect = "Allow",
+        Action = [
+          "ecr:GetAuthorizationToken"
+        ],
+        Resource = "*"
+      },
+      {
+        Sid    = "ManageRepositoryContents",
+        Effect = "Allow",
+        Action = [
+          "ecr:BatchCheckLayerAvailability",
+          "ecr:GetDownloadUrlForLayer",
+          "ecr:GetRepositoryPolicy",
+          "ecr:DescribeRepositories",
+          "ecr:ListImages",
+          "ecr:DescribeImages",
+          "ecr:BatchGetImage",
+          "ecr:InitiateLayerUpload",
+          "ecr:UploadLayerPart",
+          "ecr:CompleteLayerUpload",
+          "ecr:PutImage"
+        ],
+        Resource = aws_ecr_repository.recycler_api_ecr_repository.arn
+      }
+    ]
+  })
 }
-
 resource "aws_elastic_beanstalk_application" "app" {
   name        = "recycler-app"
   description = "Recycler App"
@@ -113,3 +151,8 @@ resource "aws_elastic_beanstalk_environment" "env" {
 #     Name = "RecyclerDbInstance"
 #   }
 # }
+
+output "repository_url" {
+  description = "The URL of the ECR repository"
+  value       = aws_ecr_repository.recycler_api_ecr_repository.repository_url
+}
