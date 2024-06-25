@@ -1,4 +1,4 @@
-name: Build and Deploy to AWS Elastic Beanstalk
+name: Deploy to Elastic Beanstalk
 
 on:
   push:
@@ -6,54 +6,33 @@ on:
       - main
 
 jobs:
-  build-and-deploy:
+  deploy:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: backend/api
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v2
 
-      - name: Set up Python
-        uses: actions/setup-python@v2
-        with:
-          python-version: "3.11"
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
 
-      - name: Create and start virtual environment
+      - name: Log in to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build and push Docker image
         run: |
-          python -m venv venv
-          source venv/bin/activate
-
-      - name: Install dependencies
-        run: pip install -r requirements.txt
-
-      - name: Archive the build files
-        run: zip -r recycler-app-api.zip . -x "*.git*" "*.github*" "*.pytest_cache*" "*.venv*" "*.idea*" "*.vscode*" "__pycache__/*" "*.pytest_cache/*" "*.mypy_cache/*" "*.coverage*"
-
-      - name: Install AWS CLI
-        id: install-aws-cli
-        uses: unfor19/install-aws-cli-action@v1
-        with:
-          version: 2
-          verbose: false
-          arch: amd64
-
-      - name: Configure AWS credentials
-        run: |
-          aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws configure set default.region eu-central-1
+          docker compose -f docker-compose.yml build
+          docker tag recycler-api:latest ${{ steps.login-ecr.outputs.registry }}/recycler-api:latest
+          docker push ${{ steps.login-ecr.outputs.registry }}/recycler-api:latest
 
       - name: Deploy to Elastic Beanstalk
-        run: |
-          aws s3 cp recycler-app-api.zip s3://recycler-app/recycler-app-api-${{ github.sha }}.zip
-          aws elasticbeanstalk create-application-version --application-name recycler-app-api --version-label ${{ github.sha }} --source-bundle S3Bucket=recycler-app,S3Key=recycler-app-api-${{ github.sha }}.zip
-          aws elasticbeanstalk update-environment --application-name recycler-app-api --environment-name recyler-api-env --version-label ${{ github.sha }}
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-
-      - name: Clean up
-        run: rm recycler-app-api.zip
+          AWS_REGION: eu-central-1
+        run: |
+          pip install awsebcli
+          eb init -p docker recycler-app --region $AWS_REGION
+          eb use recycler-app-env
+          eb deploy
