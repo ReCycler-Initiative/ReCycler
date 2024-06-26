@@ -35,6 +35,22 @@ resource "aws_ecr_repository" "recycler_api_ecr_repository" {
   }
 }
 
+resource "aws_ecr_repository" "recycler_etl_ecr_repository" {
+  name                 = "recycler-etl"
+  image_tag_mutability = "MUTABLE"
+  image_scanning_configuration {
+    scan_on_push = true
+  }
+}
+
+resource "aws_ecr_repository" "recycler_ui_ecr_repository" {
+  name                 = "recycler-ui"
+  image_tag_mutability = "MUTABLE"
+  image_scanning_configuration {
+    scan_on_push = true
+  }
+}
+
 resource "aws_iam_role_policy" "ecr_policy" {
   name = "ecr-policy"
   role = aws_iam_role.beanstalk_role.id
@@ -47,7 +63,7 @@ resource "aws_iam_role_policy" "ecr_policy" {
         Action = [
           "ecr:ListImages"
         ],
-        Resource = aws_ecr_repository.recycler_api_ecr_repository.arn
+        Resource = [aws_ecr_repository.recycler_api_ecr_repository.arn, aws_ecr_repository.recycler_etl_ecr_repository.arn, aws_ecr_repository.recycler_ui_ecr_repository.arn]
       },
       {
         Sid    = "GetAuthorizationToken",
@@ -73,11 +89,58 @@ resource "aws_iam_role_policy" "ecr_policy" {
           "ecr:CompleteLayerUpload",
           "ecr:PutImage"
         ],
-        Resource = aws_ecr_repository.recycler_api_ecr_repository.arn
+        Resource = [aws_ecr_repository.recycler_api_ecr_repository.arn, aws_ecr_repository.recycler_etl_ecr_repository.arn, aws_ecr_repository.recycler_ui_ecr_repository.arn]
       }
     ]
   })
 }
+
+resource "aws_security_group" "rds_sg" {
+  vpc_id      = var.vpc_id
+  name        = "rds_sg"
+  description = "Allow access to RDS"
+
+  ingress {
+    from_port   = 5432
+    to_port     = 5432
+    protocol    = "tcp"
+    cidr_blocks = ["172.31.0.0/16"]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
+resource "aws_security_group" "eb_sg" {
+  vpc_id      = var.vpc_id
+  name        = "eb_sg"
+  description = "Allow access to Elastic Beanstalk"
+
+  ingress {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
+resource "aws_db_subnet_group" "main" {
+  name        = "main"
+  subnet_ids  = var.subnet_ids
+  description = "Main RDS subnet group"
+}
+
 resource "aws_elastic_beanstalk_application" "app" {
   name        = "recycler-app"
   description = "Recycler App"
@@ -87,6 +150,18 @@ resource "aws_elastic_beanstalk_environment" "env" {
   name                = "recycler-app-env"
   application         = aws_elastic_beanstalk_application.app.name
   solution_stack_name = "64bit Amazon Linux 2023 v4.0.9 running ECS"
+
+  setting {
+    namespace = "aws:ec2:vpc"
+    name      = "VPCId"
+    value     = var.vpc_id
+  }
+
+  setting {
+    namespace = "aws:ec2:vpc"
+    name      = "Subnets"
+    value     = join(",", var.subnet_ids)
+  }
 
   setting {
     namespace = "aws:autoscaling:launchconfiguration"
@@ -106,53 +181,58 @@ resource "aws_elastic_beanstalk_environment" "env" {
     value     = "/"
   }
 
-  # Pass RDS connection information as environment variables
-  # setting {
-  #   namespace = "aws:elasticbeanstalk:application:environment"
-  #   name      = "POSTGRES_HOST"
-  #   value     = aws_db_instance.default.address
-  # }
+  setting {
+    namespace = "aws:elasticbeanstalk:application:environment"
+    name      = "POSTGRES_HOST"
+    value     = aws_db_instance.default.address
+  }
 
-  # setting {
-  #   namespace = "aws:elasticbeanstalk:application:environment"
-  #   name      = "POSTGRES_PORT"
-  #   value     = "5432"
-  # }
+  setting {
+    namespace = "aws:elasticbeanstalk:application:environment"
+    name      = "POSTGRES_PORT"
+    value     = "5432"
+  }
 
-  # setting {
-  #   namespace = "aws:elasticbeanstalk:application:environment"
-  #   name      = "POSTGRES_DB"
-  #   value     = aws_db_instance.default.db_name
-  # }
+  setting {
+    namespace = "aws:elasticbeanstalk:application:environment"
+    name      = "POSTGRES_DB"
+    value     = aws_db_instance.default.db_name
+  }
 
-  # setting {
-  #   namespace = "aws:elasticbeanstalk:application:environment"
-  #   name      = "POSTGRES_USER"
-  #   value     = aws_db_instance.default.username
-  # }
+  setting {
+    namespace = "aws:elasticbeanstalk:application:environment"
+    name      = "POSTGRES_USER"
+    value     = aws_db_instance.default.username
+  }
 
-  # setting {
-  #   namespace = "aws:elasticbeanstalk:application:environment"
-  #   name      = "POSTGRES_PASSWORD"
-  #   value     = aws_db_instance.default.password
-  # }
+  setting {
+    namespace = "aws:elasticbeanstalk:application:environment"
+    name      = "POSTGRES_PASSWORD"
+    value     = aws_db_instance.default.password
+  }
+
+  setting {
+    namespace = "aws:elasticbeanstalk:application:environment"
+    name      = "KIERRATYS_API_KEY"
+    value     = var.kierratys_api_key
+  }
 }
 
-# resource "aws_db_instance" "default" {
-#   allocated_storage   = 20
-#   db_name             = "recyclerdb"
-#   engine              = "postgres"
-#   instance_class      = "db.t3.micro"
-#   publicly_accessible = true
-#   username            = "recycler_user"
-#   skip_final_snapshot = true
+resource "aws_db_instance" "default" {
+  allocated_storage   = 20
+  db_name             = "recyclerdb"
+  engine              = "postgres"
+  instance_class      = "db.t3.micro"
+  publicly_accessible = false
+  username            = "recycler_user"
+  password            = var.rds_password
+  skip_final_snapshot = true
 
-#   tags = {
-#     Name = "RecyclerDbInstance"
-#   }
-# }
+  vpc_security_group_ids = [aws_security_group.rds_sg.id]
+  db_subnet_group_name   = aws_db_subnet_group.main.name
 
-output "repository_url" {
-  description = "The URL of the ECR repository"
-  value       = aws_ecr_repository.recycler_api_ecr_repository.repository_url
+  tags = {
+    Name = "RecyclerDbInstance"
+  }
 }
+

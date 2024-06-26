@@ -10,6 +10,24 @@
   ],
   "containerDefinitions": [
     {
+      "name": "recycler-ui",
+      "image": "954340646910.dkr.ecr.eu-central-1.amazonaws.com/recycler-ui:latest",
+      "essential": true,
+      "memory": 128,
+      "portMappings": [
+        {
+          "hostPort": 3000,
+          "containerPort": 3000
+        }
+      ],
+      "mountPoints": [
+        {
+          "sourceVolume": "awseb-logs-recycler-ui",
+          "containerPath": "/var/log/recycler-ui"
+        }
+      ]
+    },
+    {
       "name": "recycler-api",
       "image": "954340646910.dkr.ecr.eu-central-1.amazonaws.com/recycler-api:latest",
       "essential": true,
@@ -18,6 +36,24 @@
         {
           "hostPort": 5000,
           "containerPort": 5000
+        }
+      ],
+      "mountPoints": [
+        {
+          "sourceVolume": "awseb-logs-recycler-api",
+          "containerPath": "/var/log/recycler-api"
+        }
+      ]
+    },
+    {
+      "name": "recycler-etl",
+      "image": "954340646910.dkr.ecr.eu-central-1.amazonaws.com/recycler-etl:latest",
+      "essential": false,
+      "memory": 128,
+      "mountPoints": [
+        {
+          "sourceVolume": "awseb-logs-recycler-etl",
+          "containerPath": "/var/log/recycler-etl"
         }
       ]
     },
@@ -38,6 +74,10 @@
           "sourceVolume": "nginx-proxy-conf",
           "containerPath": "/etc/nginx/conf.d",
           "readOnly": true
+        },
+        {
+          "sourceVolume": "awseb-logs-nginx-proxy",
+          "containerPath": "/var/log/nginx"
         }
       ]
     }
