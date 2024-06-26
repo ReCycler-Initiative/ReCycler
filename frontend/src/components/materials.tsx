@@ -76,7 +76,7 @@ export const Materials = () => {
               <ChevronUpIcon />
             </span>
           )}
-          {showMore ? "Vähemmän materiaaleja" : "Lisää materiaaleja"}
+          {showMore ? "Näytä vähemmän materiaaleja" : "Näytä lisää materiaaleja"}
           {!showMore && (
             <span>
               <ChevronDownIcon />
