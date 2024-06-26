@@ -11,38 +11,18 @@
 # contain coordinates or if they are not in the expected format, it skips inserting that specific record.
 
 import os
-import psycopg2
 import requests
 from bs4 import BeautifulSoup
+from db import connect_to_db
 
 
 # Config
 base_url = "https://api.kierratys.info/collectionspots/"
 api_key = os.getenv("KIERRATYS_API_KEY")
 
-dbname = os.getenv("POSTGRES_DB")
-user = os.getenv("POSTGRES_USER")
-password = os.getenv("POSTGRES_PASSWORD")
-host = os.getenv("POSTGRES_HOST")
-port = os.getenv("POSTGRES_PORT")
-
 try:
-    conn = psycopg2.connect(
-        dbname="postgres" if dbname is None else dbname,
-        user="postgres" if user is None else user,
-        password="foobar" if password is None else password,
-        host="localhost" if host is None else host,
-        port="5434" if port is None else port,
-    )
+    conn = connect_to_db()
     c = conn.cursor()
-
-    c.execute(
-        """CREATE EXTENSION IF NOT EXISTS postgis;"""
-    )
-
-    c.execute(
-        """CREATE SCHEMA IF NOT EXISTS recycler;"""
-    )
 
     c.execute("DROP TABLE IF EXISTS recycler.collection_spots")
 

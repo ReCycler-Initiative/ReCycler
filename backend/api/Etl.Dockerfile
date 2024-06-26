@@ -20,4 +20,4 @@ EXPOSE 5000
 ENV FLASK_APP=app.py
 
 # Run the application
-CMD ["python3", "etl-collectionspots.py", "&&", "python3", "etl-materialtypes.py"]
+CMD [["python3", "init_db.py", "&&", "python3", "etl-collectionspots.py", "&&", "python3", "etl-materialtypes.py"]

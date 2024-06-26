@@ -1,28 +1,12 @@
 from flask import Flask, jsonify, request
 import psycopg2
 from flask_cors import CORS
-import os
+from db import connect_to_db
 
 app = Flask(__name__)
 CORS(app)
 
 crs = 4326
-
-dbname = os.getenv("POSTGRES_DB")
-user = os.getenv("POSTGRES_USER")
-password = os.getenv("POSTGRES_PASSWORD")
-host = os.getenv("POSTGRES_HOST")
-port = os.getenv("POSTGRES_PORT")
-
-
-def get_db_connection():
-    return psycopg2.connect(
-        dbname="postgres" if dbname is None else dbname,
-        user="postgres" if user is None else user,
-        password="foobar" if password is None else password,
-        host="localhost" if host is None else host,
-        port="5434" if port is None else port,
-    )
 
 
 @app.route("/", methods=["GET"])
@@ -33,7 +17,7 @@ def health_check():
 @app.route("/api/collection_spots", methods=["GET"])
 def get_collection_spots():
     try:
-        connection = get_db_connection()
+        connection = connect_to_db()
         cursor = connection.cursor()
 
         cursor.execute(
@@ -73,7 +57,7 @@ def get_collection_spots():
 @app.route("/api/collection_spots/<int:feature_id>", methods=["GET"])
 def get_collection_spot(collection_spot_id):
     try:
-        connection = get_db_connection()
+        connection = connect_to_db()
         cursor = connection.cursor()
 
         cursor.execute(
