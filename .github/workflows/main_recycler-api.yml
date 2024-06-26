@@ -33,6 +33,8 @@ jobs:
           docker push ${{ steps.login-ecr.outputs.registry }}/recycler-api:latest
           docker build -t ${{ steps.login-ecr.outputs.registry }}/recycler-etl:latest -f ./backend/api/Etl.Dockerfile ./backend/api
           docker push ${{ steps.login-ecr.outputs.registry }}/recycler-etl:latest
+          docker build -t ${{ steps.login-ecr.outputs.registry }}/recycler-ui:latest -f ./frontend/.Dockerfile ./frontend
+          docker push ${{ steps.login-ecr.outputs.registry }}/recycler-ui:latest
 
       - name: Deploy to Elastic Beanstalk
         run: |

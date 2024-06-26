@@ -43,6 +43,14 @@ resource "aws_ecr_repository" "recycler_etl_ecr_repository" {
   }
 }
 
+resource "aws_ecr_repository" "recycler_ui_ecr_repository" {
+  name                 = "recycler-ui"
+  image_tag_mutability = "MUTABLE"
+  image_scanning_configuration {
+    scan_on_push = true
+  }
+}
+
 resource "aws_iam_role_policy" "ecr_policy" {
   name = "ecr-policy"
   role = aws_iam_role.beanstalk_role.id
@@ -55,7 +63,7 @@ resource "aws_iam_role_policy" "ecr_policy" {
         Action = [
           "ecr:ListImages"
         ],
-        Resource = [aws_ecr_repository.recycler_api_ecr_repository.arn, aws_ecr_repository.recycler_etl_ecr_repository.arn]
+        Resource = [aws_ecr_repository.recycler_api_ecr_repository.arn, aws_ecr_repository.recycler_etl_ecr_repository.arn, aws_ecr_repository.recycler_ui_ecr_repository.arn]
       },
       {
         Sid    = "GetAuthorizationToken",
@@ -81,7 +89,7 @@ resource "aws_iam_role_policy" "ecr_policy" {
           "ecr:CompleteLayerUpload",
           "ecr:PutImage"
         ],
-        Resource = [aws_ecr_repository.recycler_api_ecr_repository.arn, aws_ecr_repository.recycler_etl_ecr_repository.arn]
+        Resource = [aws_ecr_repository.recycler_api_ecr_repository.arn, aws_ecr_repository.recycler_etl_ecr_repository.arn, aws_ecr_repository.recycler_ui_ecr_repository.arn]
       }
     ]
   })
