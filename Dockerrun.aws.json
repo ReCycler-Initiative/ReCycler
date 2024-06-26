@@ -19,29 +19,13 @@
           "hostPort": 5000,
           "containerPort": 5000
         }
-      ],
-      "environment": [
-        {
-          "name": "POSTGRES_HOST",
-          "value": "${RDS_HOSTNAME}"
-        },
-        {
-          "name": "POSTGRES_PORT",
-          "value": "${RDS_PORT}"
-        },
-        {
-          "name": "POSTGRES_DB",
-          "value": "${RDS_DB_NAME}"
-        },
-        {
-          "name": "POSTGRES_USER",
-          "value": "${RDS_USERNAME}"
-        },
-        {
-          "name": "POSTGRES_PASSWORD",
-          "value": "${RDS_PASSWORD}"
-        }
       ]
+    },
+    {
+      "name": "recycler-etl",
+      "image": "954340646910.dkr.ecr.eu-central-1.amazonaws.com/recycler-etl:latest",
+      "essential": false,
+      "memory": 128
     },
     {
       "name": "nginx-proxy",

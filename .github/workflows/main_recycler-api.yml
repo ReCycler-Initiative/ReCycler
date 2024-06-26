@@ -29,8 +29,10 @@ jobs:
 
       - name: Build and push Docker image
         run: |
-          docker build -t ${{ steps.login-ecr.outputs.registry }}/recycler-api:latest ./backend/api
+          docker build -t ${{ steps.login-ecr.outputs.registry }}/recycler-api:latest -f ./backend/api/Api.Dockerfile ./backend/api
           docker push ${{ steps.login-ecr.outputs.registry }}/recycler-api:latest
+          docker build -t ${{ steps.login-ecr.outputs.registry }}/recycler-etl:latest -f ./backend/api/Etl.Dockerfile ./backend/api
+          docker push ${{ steps.login-ecr.outputs.registry }}/recycler-etl:latest
 
       - name: Deploy to Elastic Beanstalk
         run: |

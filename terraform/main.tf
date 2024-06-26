@@ -167,32 +167,38 @@ resource "aws_elastic_beanstalk_environment" "env" {
 
   setting {
     namespace = "aws:elasticbeanstalk:application:environment"
-    name      = "RDS_HOSTNAME"
+    name      = "POSTGRES_HOST"
     value     = aws_db_instance.default.address
   }
 
   setting {
     namespace = "aws:elasticbeanstalk:application:environment"
-    name      = "RDS_PORT"
+    name      = "POSTGRES_PORT"
     value     = "5432"
   }
 
   setting {
     namespace = "aws:elasticbeanstalk:application:environment"
-    name      = "RDS_DB_NAME"
+    name      = "POSTGRES_DB"
     value     = aws_db_instance.default.db_name
   }
 
   setting {
     namespace = "aws:elasticbeanstalk:application:environment"
-    name      = "RDS_USERNAME"
+    name      = "POSTGRES_USER"
     value     = aws_db_instance.default.username
   }
 
   setting {
     namespace = "aws:elasticbeanstalk:application:environment"
-    name      = "RDS_PASSWORD"
+    name      = "POSTGRES_PASSWORD"
     value     = aws_db_instance.default.password
+  }
+
+  setting {
+    namespace = "aws:elasticbeanstalk:application:environment"
+    name      = "KIERRATYS_API_KEY"
+    value     = vars.kierraty_api_key
   }
 }
 
