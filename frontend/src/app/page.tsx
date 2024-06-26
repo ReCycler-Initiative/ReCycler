@@ -17,8 +17,8 @@ const HomePage = () => {
         />
       </div>
       <Container>
-        <h1 className="text-xl font-bold mb-4">Tervetuloa Recycleriin</h1>
-        <p className="mb-8">
+        <h1 className="text-xl font-medium mb-4 font-sans">Tervetuloa Recycleriin</h1>
+        <p className="mb-8 font-sans">
           Avustan sinua kierrättämään jätteesi täsmällisesti, jotta voit
           keskittyä nauttimaan elämästäsi ja samoin tulevat sukupolvet.
         </p>
