@@ -232,7 +232,7 @@ export default function Home() {
             }
           }
         }}
-        maxBounds={finlandBounds}
+        maxBounds={finlandBounds as any}
       >
         {geojson && (
           <>
