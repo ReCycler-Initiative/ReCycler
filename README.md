@@ -26,6 +26,6 @@ ReCycler is open-source and distributed under the [Apache-2.0 license](licence.m
 For any inquiries or suggestions, please reach out to us through GitHub. You can contact us by creating an issue in the repository, participating in discussions, or submitting pull requests. We value and welcome your contributions and feedback.
 Let's collaborate to create a more sustainable future with ReCycler! :seedling::recycle:
 ## GUI screenshots 26.6.2024
-[recycler-screenshot](images/rrecycler-gui-june2024-intro.png)
-[recycler-screenshot](images/recycler-gui-june2024-finland.png)
-[recycler-screenshot](images/recycler-gui-june2024-detailed.png)
+![recycler-screenshot](images/recycler-gui-june2024-intro.png)
+![recycler-screenshot](images/recycler-gui-june2024-finland.png)
+![recycler-screenshot](images/recycler-gui-june2024-detailed.png)
