@@ -96,7 +96,7 @@ resource "aws_security_group" "rds_sg" {
     from_port   = 5432
     to_port     = 5432
     protocol    = "tcp"
-    cidr_blocks = ["10.0.0.0/16"] # Adjust this based on your VPC CIDR
+    cidr_blocks = ["172.31.0.0/16"]
   }
 
   egress {

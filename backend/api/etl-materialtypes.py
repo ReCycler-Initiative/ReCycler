@@ -30,10 +30,15 @@ try:
     )
     c = conn.cursor()
 
+    c.execute(
+        """CREATE SCHEMA [IF NOT EXISTS] recycler;"""
+    )
+
     # Drop and create materials table with code and material_name columns
     c.execute(
         """DROP TABLE IF EXISTS recycler.materials"""
     )
+
     c.execute(
         """CREATE TABLE recycler.materials
                 (id SERIAL PRIMARY KEY,

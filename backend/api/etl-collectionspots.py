@@ -36,6 +36,10 @@ try:
     )
     c = conn.cursor()
 
+    c.execute(
+        """CREATE SCHEMA [IF NOT EXISTS] recycler;"""
+    )
+
     c.execute("DROP TABLE IF EXISTS recycler.collection_spots")
 
     c.execute(
