@@ -10,7 +10,7 @@
   ],
   "containerDefinitions": [
     {
-      "name": "recycler-api",
+      "name": "recycler-ui",
       "image": "954340646910.dkr.ecr.eu-central-1.amazonaws.com/recycler-ui:latest",
       "essential": true,
       "memory": 128,
