@@ -64,8 +64,8 @@ const CollectionPointIcon = () => {
   return null;
 };
 const finlandBounds = [
-  [19.0, 59.0],  // Southwest
-  [32.0, 71.0]   // Northeast
+  [10.0, 54.0],  // Southwest
+  [40.0, 75.0]   // Northeast
 ];
 
 
@@ -210,11 +210,11 @@ export default function Home() {
       <Map
         ref={mapRef}
         mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_TOKEN}
-        initialViewState={{
-          longitude: 25.68,
-          latitude: 62.89,
-          zoom: 3,
-        }}
+       initialViewState={{
+        longitude: 24.94, // Suomen keskelle hieman länteen
+        latitude: 64.00,  // Suomen keskelle hieman etelään
+        zoom: 4,          // Sopiva zoom-taso kattamaan laaja alue
+      }}
         onLoad={() => {
           setMapLoaded(true);
         }}
