@@ -31,7 +31,7 @@ try:
     c = conn.cursor()
 
     c.execute(
-        """CREATE SCHEMA [IF NOT EXISTS] recycler;"""
+        """CREATE SCHEMA IF NOT EXISTS recycler;"""
     )
 
     # Drop and create materials table with code and material_name columns
