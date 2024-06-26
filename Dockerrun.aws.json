@@ -22,7 +22,7 @@
       ],
       "mountPoints": [
         {
-          "sourceVolume": "awseb-logs-nginx-proxy",
+          "sourceVolume": "awseb-logs-recycler-api",
           "containerPath": "/var/log/recycler-api"
         }
       ]
@@ -34,7 +34,7 @@
       "memory": 128,
       "mountPoints": [
         {
-          "sourceVolume": "awseb-logs-nginx-proxy",
+          "sourceVolume": "awseb-logs-recycler-etl",
           "containerPath": "/var/log/recycler-etl"
         }
       ]
