@@ -14,7 +14,7 @@ variable "rds_password" {
   sensitive   = true
 }
 
-variable "kierraty_api_key" {
+variable "kierratys_api_key" {
   description = "Kierratys API key"
   type        = string
   sensitive   = true
