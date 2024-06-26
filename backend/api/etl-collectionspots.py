@@ -37,6 +37,10 @@ try:
     c = conn.cursor()
 
     c.execute(
+        """CREATE EXTENSION IF NOT EXISTS postgis;"""
+    )
+
+    c.execute(
         """CREATE SCHEMA IF NOT EXISTS recycler;"""
     )
 
