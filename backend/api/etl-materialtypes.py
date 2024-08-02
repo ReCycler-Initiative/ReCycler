@@ -8,6 +8,10 @@
 import os
 import requests
 from db import connect_to_db
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 # config
 api_key = os.getenv("KIERRATYS_API_KEY")
