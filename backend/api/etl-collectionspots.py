@@ -14,6 +14,10 @@ import os
 import requests
 from bs4 import BeautifulSoup
 from db import connect_to_db
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 
 # Config
