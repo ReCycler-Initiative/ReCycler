@@ -11,7 +11,7 @@ ReCycler provides an intuitive interface featuring a map view that visualizes th
 ## How to contribute
 We welcome contributions from developers, designers, and anyone passionate about sustainable practices. To contribute, please follow the guidelines outlined in our [contributing.md](contributing.md) file.
 ## Installation
-To set up ReCycler locally, refer to our [installation.md](installation.md) for detailed instructions.
+To install the ReCycler application, please refer to the detailed instructions in the [backend/api](/backend/api/README.md) and [frontend](/frontend/README.md) folders.
 ## License
 ReCycler is open-source and distributed under the [Apache-2.0 license](licence.md). Please feel free to use, modify, and distribute the software according to the terms of the license.
 ## Contact
