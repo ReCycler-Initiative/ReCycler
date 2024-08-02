@@ -1,36 +1,51 @@
 # Recycler API
 
-## Create environment
+## How to get started
+
+### Create environment
+
+**_NOTE: Only needed on the initial run_**
 
 ```bash
 python3 -m venv .venv
 ```
 
-## Load environment
+### Load environment
 
 ```bash
 . .venv/bin/activate
 ```
 
-## Install dependencies
+### Install dependencies
 
 ```bash
-pip3 install -r requirements.txt
+./install.sh
 ```
 
-## Run API
+### Initialize database and install PostGIS
+
+**_NOTE: Only needed on the initial run_**
 
 ```bash
-python3 -m flask --app app run
+./init_db.sh
 ```
 
-# Run ETLs
+## Run ETLs
+
+Populate the database with Kierratys.info data
 
 ```bash
-export KIERRATYS_API_KEY=kierratys_api_key && python3 etl-collectionspots.py && python3 etl-materialtypes.py
+./etl.sh
+```
+
+## Start API
+
+```bash
+./start.sh
 ```
 
 ## Test API
+
 ```bash
 http://127.0.0.1:5000/api/collection_spots
 ```
