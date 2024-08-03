@@ -152,7 +152,7 @@ export default function Result() {
   useEffect(() => {
     const fetchData = async () => {
       let response = await getCollectionSpots();
-      let features = response.features.filter((feature: any) => {
+      let features = response.features?.filter((feature: any) => {
         if (selectedMaterials.length === 0) {
           return true;
         }
