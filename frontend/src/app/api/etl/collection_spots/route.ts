@@ -46,6 +46,7 @@ export async function POST(request: NextRequest) {
         const page = Math.ceil(offset / limit) + 1;
 
         console.log(`Loading page ${page} of ${totalPages}`);
+        console.log(url);
 
         response = await axios.get(url);
         data = response.data;
