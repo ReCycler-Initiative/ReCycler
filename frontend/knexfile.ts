@@ -1,7 +1,7 @@
 import type { Knex } from "knex";
 
 const {
-  POSTGRES_DB = "postgres",
+  POSTGRES_DATABASE = "postgres",
   POSTGRES_USER = "postgres",
   POSTGRES_PASSWORD = "foobar",
   POSTGRES_HOST = "localhost",
@@ -11,7 +11,7 @@ const {
 const config: Knex.Config = {
   client: "postgresql",
   connection: {
-    database: POSTGRES_DB,
+    database: POSTGRES_DATABASE,
     user: POSTGRES_USER,
     password: POSTGRES_PASSWORD,
     host: POSTGRES_HOST,
