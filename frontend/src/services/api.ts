@@ -1,4 +1,4 @@
-export const getCollectionSpots = async () => {
-  const response = await fetch("http://127.0.0.1:5000/api/collection_spots");
-  return response.json();
-};
+import axios from "axios";
+
+export const getCollectionSpots = async () =>
+  axios.get("api/collection_spots").then((response) => response.data);
