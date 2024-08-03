@@ -1,6 +1,7 @@
 import db from "@/services/db";
 import axios from "axios";
 import { Knex } from "knex";
+import { NextRequest } from "next/server";
 
 export const dynamic = "force-dynamic"; // static by default, unless reading the request
 
@@ -8,28 +9,36 @@ export const dynamic = "force-dynamic"; // static by default, unless reading the
 const baseUrl = "https://api.kierratys.info/collectionspots/";
 const apiKey = process.env.KIERRATYS_API_KEY;
 
-export function GET(request: Request) {
+export function GET() {
   return new Response(`Hello from collection spots etl`);
 }
 
-export async function POST() {
+export async function DELETE() {
+  // Clear all data from the collection_spots table
+  await db("recycler.collection_spots").truncate();
+
+  return new Response("OK");
+}
+
+export async function POST(request: NextRequest) {
   try {
     await db.transaction(async (trx: Knex.Transaction) => {
-      // Clear all data from the collection_spots table
-      await db("recycler.collection_spots").truncate();
-
       // Initialize total_items
       let totalItems: number;
 
       // Get the details of the first page and set total_items
-      const firstPageUrl = `${baseUrl}?api_key=${apiKey}&format=json&limit=1000&offset=0`;
+      const limit = 100;
+      const from = +(request.nextUrl.searchParams.get("from") ?? 1);
+      const to = request.nextUrl.searchParams.get("to");
+
+      const firstPageUrl = `${baseUrl}?api_key=${apiKey}&format=json&limit=${limit}&offset=0`;
       let response = await axios.get(firstPageUrl);
       let data = response.data;
-      totalItems = data.count;
+      totalItems = to ? +to * limit : data.count;
 
       // Iterate through all pages and save the data to the database
-      const limit = 1000;
-      let offset = 0;
+      let offset = (from - 1) * limit;
+
       const totalPages = Math.ceil(totalItems / limit);
 
       while (offset < totalItems) {
