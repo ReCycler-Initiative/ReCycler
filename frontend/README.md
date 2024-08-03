@@ -28,4 +28,10 @@ Run the development server:
 npm run dev
 ```
 
+## Database migrations
+
+```bash
+npm run migrate
+```
+
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
