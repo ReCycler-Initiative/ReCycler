@@ -20,7 +20,9 @@ const MaterialsPage = () => {
         <h1 className="text-xl font-medium mb-4 font-sans">
           Mitäs tänään kierrätetään?
         </h1>
-        <Materials />
+        <div className="mb-28">
+          <Materials />
+        </div>
       </Container>
       <div className="fixed bottom-0 bg-white border p-4 left-0 right-0 border-gray-400 flex flex-col items-center gap-y-4">
         Materiaaleja valittu {selectedMaterials.length} kpl
