@@ -9,7 +9,7 @@ const apiKey = process.env.KIERRATYS_API_KEY;
 const baseUrl = `https://api.kierratys.info/materialtypes/?api_key=${apiKey}`;
 
 export function GET(request: Request) {
-  return new Response(`Hello from collection spots etl`);
+  return new Response(`Hello from materials etl`);
 }
 
 export async function POST() {
@@ -26,7 +26,7 @@ export async function POST() {
         const materials = data.results.map(
           (material: { code: number; name: string }) => ({
             code: material.code,
-            material_name: material.name,
+            name: material.name,
           })
         );
 
@@ -40,6 +40,7 @@ export async function POST() {
     });
   } catch (error) {
     console.error("Error:", error);
+    return new Response("Error", { status: 500 });
   }
 
   return new Response("OK");
