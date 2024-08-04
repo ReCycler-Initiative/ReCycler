@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "react";
 import { useControl } from "react-map-gl";
 
 class SelectedMaterialsControlClass {
@@ -25,7 +26,6 @@ class SelectedMaterialsControlClass {
       this._selected = !this._selected;
       this._props.onClick();
     };
-    
 
     const span = document.createElement("span");
     span.style.position = "absolute";
@@ -53,6 +53,13 @@ class SelectedMaterialsControlClass {
     this._container.parentNode.removeChild(this._container);
     this._map = undefined;
   }
+
+  onUpdate(props: SelectedMaterialsControlProps) {
+    if (this._props.amount !== props.amount && this._container) {
+      this._container.querySelector("span").innerHTML = props.amount.toString();
+    }
+    this._props = props;
+  }
 }
 
 type SelectedMaterialsControlProps = {
@@ -61,9 +68,24 @@ type SelectedMaterialsControlProps = {
 };
 
 export function SelectedMaterialsControl(props: SelectedMaterialsControlProps) {
-  useControl(() => new SelectedMaterialsControlClass(props) as any, {
-    position: "bottom-right"
-  });
+  const controlRef = useRef<SelectedMaterialsControlClass | null>(null);
+  useControl(
+    () => {
+      const control = new SelectedMaterialsControlClass(props) as any;
+      controlRef.current = control;
+      return control;
+    },
+    {
+      position: "bottom-right",
+    }
+  );
+
+  useEffect(() => {
+    if (controlRef.current) {
+      const doUpdate = controlRef.current.onUpdate.bind(controlRef.current);
+      doUpdate(props);
+    }
+  }, [props]);
 
   return null;
 }

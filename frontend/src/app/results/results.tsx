@@ -16,7 +16,7 @@ import { getCollectionSpots } from "@/services/api";
 import { Material } from "@/types";
 import { Loader2Icon } from "lucide-react";
 import "mapbox-gl/dist/mapbox-gl.css";
-import { useRouter, useSearchParams } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import Map, {
@@ -113,6 +113,29 @@ const clusterCount: SymbolLayer = {
   },
 };
 
+const filterFeaturesBySelectedMaterials = (
+  materials: number[],
+  collectionSpots: GeoJSON.FeatureCollection<GeoJSON.Geometry>
+): GeoJSON.FeatureCollection<GeoJSON.Geometry> => {
+  if (materials.length === 0) {
+    return collectionSpots;
+  }
+
+  let features = collectionSpots.features?.filter((feature: any) => {
+    const featureMaterials = JSON.parse(
+      feature.properties.materials
+    ) as Material[];
+    return featureMaterials.some((material) =>
+      materials.includes(material.code)
+    );
+  });
+
+  return {
+    ...collectionSpots,
+    features,
+  };
+};
+
 export default function Result() {
   const [mapLoaded, setMapLoaded] = useState(false);
   const [geojson, setGeojson] =
@@ -121,6 +144,7 @@ export default function Result() {
   const [mapStyle, setStyle] = useState<"detail" | "satellite">("detail");
   const mapRef = useRef<MapRef>(null);
   const router = useRouter();
+  const pathname = usePathname();
   const searchParams = useSearchParams();
   const selectedMaterials =
     searchParams
@@ -144,37 +168,9 @@ export default function Result() {
   const formMaterials = form.watch("materials", {});
 
   useEffect(() => {
-    const current = new URLSearchParams(Array.from(searchParams.entries()));
-    current.set(
-      "materials",
-      Object.entries(formMaterials)
-        .filter(([, value]) => value)
-        .map(([key]) => key)
-        .join(",")
-    );
-    const search = current.toString();
-    const query = search ? `?${search}` : "";
-  }, [formMaterials, router, searchParams]);
-
-  useEffect(() => {
     const fetchData = async () => {
       let response = await getCollectionSpots();
-      let features = response.features?.filter((feature: any) => {
-        if (selectedMaterials.length === 0) {
-          return true;
-        }
-
-        const featureMaterials = JSON.parse(
-          feature.properties.materials
-        ) as Material[];
-        return featureMaterials.some((material) =>
-          selectedMaterials.includes(material.code)
-        );
-      });
-      setGeojson({
-        ...response,
-        features,
-      });
+      setGeojson(response);
     };
 
     fetchData();
@@ -248,7 +244,10 @@ export default function Result() {
               <Source
                 id="collection_spots"
                 type="geojson"
-                data={geojson}
+                data={filterFeaturesBySelectedMaterials(
+                  selectedMaterials,
+                  geojson
+                )}
                 cluster
                 clusterMaxZoom={14}
                 clusterRadius={50}
@@ -311,7 +310,28 @@ export default function Result() {
             Haetaan kierrätyspisteitä
           </div>
         )}
-        <Drawer open={showMaterials} onOpenChange={setShowMaterials}>
+        <Drawer
+          open={showMaterials}
+          onOpenChange={(open) => {
+            if (!open) {
+              const current = new URLSearchParams(
+                Array.from(searchParams.entries())
+              );
+              current.set(
+                "materials",
+                Object.entries(formMaterials)
+                  .filter(([, value]) => value)
+                  .map(([key]) => key)
+                  .join(",")
+              );
+              const search = current.toString();
+              const query = search ? `?${search}` : "";
+
+              router.push(pathname + query);
+            }
+            setShowMaterials(open);
+          }}
+        >
           <DrawerContent>
             <DrawerHeader>
               <DrawerTitle>Valitut materiaalit</DrawerTitle>
