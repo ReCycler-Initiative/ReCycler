@@ -336,11 +336,13 @@ export default function Result() {
             <DrawerHeader>
               <DrawerTitle>Valitut materiaalit</DrawerTitle>
             </DrawerHeader>
-            <Form {...form}>
-              <Container>
-                <Materials />
-              </Container>
-            </Form>
+            <div className="max-h-[500px] overflow-y-scroll">
+              <Form {...form}>
+                <Container>
+                  <Materials />
+                </Container>
+              </Form>
+            </div>
           </DrawerContent>
         </Drawer>
       </div>
