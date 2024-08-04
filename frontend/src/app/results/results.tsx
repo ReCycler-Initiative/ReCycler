@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/drawer";
 import { Form } from "@/components/ui/form";
 import { getCollectionSpots } from "@/services/api";
+import { Material } from "@/types";
 import { Loader2Icon } from "lucide-react";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -23,6 +24,7 @@ import Map, {
   FullscreenControl,
   GeolocateControl,
   Layer,
+  MapboxGeoJSONFeature,
   MapRef,
   NavigationControl,
   Popup,
@@ -113,14 +115,19 @@ const clusterCount: SymbolLayer = {
 
 export default function Result() {
   const [mapLoaded, setMapLoaded] = useState(false);
-  const [geojson, setGeojson] = useState<any>(null);
-  const [details, setDetails] = useState<any>(null);
+  const [geojson, setGeojson] =
+    useState<GeoJSON.FeatureCollection<GeoJSON.Geometry> | null>(null);
+  const [details, setDetails] = useState<MapboxGeoJSONFeature | null>(null);
   const [mapStyle, setStyle] = useState<"detail" | "satellite">("detail");
   const mapRef = useRef<MapRef>(null);
   const router = useRouter();
   const searchParams = useSearchParams();
   const selectedMaterials =
-    searchParams.get("materials")?.split(",").filter(Boolean) || [];
+    searchParams
+      .get("materials")
+      ?.split(",")
+      .filter(Boolean)
+      .map((code) => +code) || [];
   const [showMaterials, setShowMaterials] = useState(false);
   const form = useForm({
     defaultValues: {
@@ -157,14 +164,11 @@ export default function Result() {
           return true;
         }
 
-        const featureMaterials: string[] = feature.properties.materials
-          .replace("{", "")
-          .replace("}", "")
-          .replace(/"/g, "")
-          .split(",");
-
+        const featureMaterials = JSON.parse(
+          feature.properties.materials
+        ) as Material[];
         return featureMaterials.some((material) =>
-          selectedMaterials.includes(material)
+          selectedMaterials.includes(material.code)
         );
       });
       setGeojson({
@@ -228,8 +232,11 @@ export default function Result() {
           onClick={(e) => {
             if (e.features) {
               const feature = e.features[0];
-              if (!feature?.properties?.cluster) {
-                setDetails(e.features[0]);
+              if (
+                !feature?.properties?.cluster &&
+                feature.geometry.type === "Point"
+              ) {
+                setDetails(feature);
               }
             }
           }}
@@ -275,22 +282,22 @@ export default function Result() {
               {details && (
                 <Popup
                   key={new Date().getTime()}
-                  longitude={details.geometry.coordinates[0]}
-                  latitude={details.geometry.coordinates[1]}
+                  longitude={(details.geometry as GeoJSON.Point).coordinates[0]}
+                  latitude={(details.geometry as GeoJSON.Point).coordinates[1]}
                   onClose={() => setDetails(null)}
                   anchor="bottom"
                   maxWidth="300px"
                   className="[&_.mapboxgl-popup-content]:px-4 [&_.mapboxgl-popup-content]:py-2 [&_.mapboxgl-popup-close-button]:right-1.5"
                 >
                   <h2 className="text-base font-bold">
-                    {details.properties.name}
+                    {details.properties?.name}
                   </h2>
-                  <address>{details.properties.address}</address>
+                  <address>{details.properties?.address}</address>
                   <p style={{ fontStyle: "italic" }}>
-                    {details.properties.materials
-                      .replace("{", "")
-                      .replace("}", "")
-                      .replace(/"/g, "")}
+                    {details.properties &&
+                      JSON.parse(details.properties.materials)
+                        .map((material: Material) => material.material_name)
+                        .join(", ")}
                   </p>
                 </Popup>
               )}
