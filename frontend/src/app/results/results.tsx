@@ -296,7 +296,7 @@ export default function Result() {
                   <p style={{ fontStyle: "italic" }}>
                     {details.properties &&
                       JSON.parse(details.properties.materials)
-                        .map((material: Material) => material.material_name)
+                        .map((material: Material) => material.name)
                         .join(", ")}
                   </p>
                 </Popup>
