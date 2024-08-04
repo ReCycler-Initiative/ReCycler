@@ -1,9 +1,8 @@
 import db from "@/services/db";
 import { NextResponse } from "next/server";
 
-export async function GET(request: Request) {
-  const result = await db.raw(
-    `
+export async function GET() {
+  const result = await db.raw(`
         SELECT jsonb_build_object(
             'type', 'FeatureCollection',
             'features', jsonb_agg(features.feature)
@@ -21,8 +20,7 @@ export async function GET(request: Request) {
             ) AS feature
             FROM recycler.collection_spots
         ) AS features;
-    `
-  );
+    `);
 
   return NextResponse.json(result.rows[0].geojson);
 }

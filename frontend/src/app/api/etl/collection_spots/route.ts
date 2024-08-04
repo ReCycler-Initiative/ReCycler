@@ -67,9 +67,7 @@ export async function POST(request: NextRequest) {
           const descriptionSv = item.description_sv;
           const occupied = item.occupied || "";
           const additionalDetails = item.additional_details;
-          const materials = item.materials
-            ? item.materials.map((material: { name: string }) => material.name)
-            : [];
+          const materials = item.materials && JSON.stringify(item.materials);
           const geometry = item.geometry;
           let pointText = null;
 

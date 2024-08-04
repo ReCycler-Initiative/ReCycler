@@ -1,9 +1,7 @@
-import { ChevronDownIcon, ChevronUpIcon } from "lucide-react";
-import Link from "next/link";
+import { getMaterials } from "@/services/api";
 import { useState } from "react";
 import { useFormContext } from "react-hook-form";
-import Container from "./container";
-import { Button } from "./ui/button";
+import { useQuery } from "@tanstack/react-query";
 
 const CustomCheckbox = ({ label, name }: { label: string; name: string }) => {
   const { register, watch } = useFormContext();
@@ -26,46 +24,30 @@ const CustomCheckbox = ({ label, name }: { label: string; name: string }) => {
   );
 };
 
-const wasteTypes: string[] = [
-  "Energiajäte",
-  "Kartonki",
-  "Lamppu",
-  "Lasi",
-  "Muovi",
-  "Paperi",
-  "Pienmetalli",
-  "Puu",
-  "Sekajäte",
-  "Tekstiili",
-];
-
-const moreWasteTypes: string[] = [
-  "Ajoneuvoakut (lyijy)",
-  "Kannettavat akut ja paristot",
-  "Kyllästetty puu",
-  "Muu jäte",
-  "Poistotekstiili",
-  "Puutarhajäte",
-  "Rakennus- ja purkujäte",
-  "Sähkölaite",
-  "Vaarallinen jäte",
-];
-
 export const Materials = () => {
+  const { data: materials } = useQuery({
+    queryKey: ["materials"],
+    queryFn: getMaterials,
+  });
+
   const [showMore, setShowMore] = useState(false);
 
   return (
     <>
       <div className="grid grid-cols-2 gap-3 mb-8">
-        {wasteTypes.map((type, i) => (
-          <CustomCheckbox key={i} label={type} name={`materials.${type}`} />
+        {materials?.map((material) => (
+          <CustomCheckbox
+            key={material.code}
+            label={material.material_name}
+            name={`materials.${material.code}`}
+          />
         ))}
-        {showMore &&
+        {/* {showMore &&
           moreWasteTypes.map((type, i) => (
             <CustomCheckbox key={i} label={type} name={`materials.${type}`} />
-          ))}
+          ))} */}
       </div>
-      <div className="flex justify-center mb-28">
+      {/* <div className="flex justify-center mb-28">
         <Button
           className="flex flex-col p-4 h-auto"
           onClick={() => setShowMore(!showMore)}
@@ -76,14 +58,16 @@ export const Materials = () => {
               <ChevronUpIcon />
             </span>
           )}
-          {showMore ? "Näytä vähemmän materiaaleja" : "Näytä lisää materiaaleja"}
+          {showMore
+            ? "Näytä vähemmän materiaaleja"
+            : "Näytä lisää materiaaleja"}
           {!showMore && (
             <span>
               <ChevronDownIcon />
             </span>
           )}
-        </Button>
-      </div>
+        </Button> 
+      </div>*/}
     </>
   );
 };
