@@ -28,6 +28,7 @@ export const Materials = () => {
   const { data: materials } = useQuery({
     queryKey: ["materials"],
     queryFn: getMaterials,
+    staleTime: Infinity,
   });
 
   const [showMore, setShowMore] = useState(false);
