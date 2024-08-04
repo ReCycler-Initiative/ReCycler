@@ -7,7 +7,7 @@ export type CollectionSpot = {
 
 export type Material = {
   code: number;
-  material_name: string;
+  name: string;
 };
 
 export type Modify<T, R> = Omit<T, keyof R> & R;

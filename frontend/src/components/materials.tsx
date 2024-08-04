@@ -38,7 +38,7 @@ export const Materials = () => {
         {materials?.map((material) => (
           <CustomCheckbox
             key={material.code}
-            label={material.material_name}
+            label={material.name}
             name={`materials.${material.code}`}
           />
         ))}
