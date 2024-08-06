@@ -89,7 +89,7 @@ const clusters: CircleLayer = {
     "circle-color": [
       "step",
       ["get", "point_count"],
-      "#73cff4",
+      "#f28cb1",
       100,
       "#f1f075",
       750,
