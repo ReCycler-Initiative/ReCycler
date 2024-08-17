@@ -8,6 +8,7 @@
 - Tailwind CSS
 - Mapbox
 - Docker
+- Postgres
 
 ## Getting Started
 
