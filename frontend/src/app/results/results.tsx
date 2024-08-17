@@ -286,7 +286,7 @@ export default function Result() {
                   latitude={(details.geometry as GeoJSON.Point).coordinates[1]}
                   onClose={() => setDetails(null)}
                   anchor="bottom"
-                  maxWidth="300px"
+                  maxWidth="320px"
                   className="[&_.mapboxgl-popup-content]:min-w-52 [&_.mapboxgl-popup-content]:px-0 [&_.mapboxgl-popup-content]:py-0 [&_.mapboxgl-popup-close-button]:right-1.5"
                 >
                   <div className="px-5 py-4 border-b">
@@ -297,7 +297,7 @@ export default function Result() {
                       {details.properties?.address}
                     </address>
                   </div>
-                  <ul className="text-sm px-5 py-4 leading-6 list-disc">
+                  <ul className="text-sm px-5 py-4 leading-6 list-disc grid grid-cols-2 gap-x-2">
                     {details.properties &&
                       JSON.parse(details.properties.materials)
                         .sort((a: Material, b: Material) =>
