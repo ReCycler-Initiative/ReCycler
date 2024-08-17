@@ -287,18 +287,26 @@ export default function Result() {
                   onClose={() => setDetails(null)}
                   anchor="bottom"
                   maxWidth="300px"
-                  className="[&_.mapboxgl-popup-content]:px-4 [&_.mapboxgl-popup-content]:py-2 [&_.mapboxgl-popup-close-button]:right-1.5"
+                  className="[&_.mapboxgl-popup-content]:min-w-52 [&_.mapboxgl-popup-content]:px-0 [&_.mapboxgl-popup-content]:py-0 [&_.mapboxgl-popup-close-button]:right-1.5"
                 >
-                  <h2 className="text-base font-bold">
-                    {details.properties?.name}
-                  </h2>
-                  <address>{details.properties?.address}</address>
-                  <p style={{ fontStyle: "italic" }}>
+                  <div className="px-5 py-4 border-b">
+                    <h2 className="text-base font-semibold mb-1">
+                      {details.properties?.name}
+                    </h2>
+                    <address className="text-sm not-italic">
+                      {details.properties?.address}
+                    </address>
+                  </div>
+                  <ul className="text-sm px-5 py-4 leading-6 list-disc">
                     {details.properties &&
                       JSON.parse(details.properties.materials)
-                        .map((material: Material) => material.name)
-                        .join(", ")}
-                  </p>
+                        .sort((a: Material, b: Material) =>
+                          a.name.localeCompare(b.name)
+                        )
+                        .map((material: Material) => (
+                          <li key={material.code} className="ml-4">{material.name}</li>
+                        ))}
+                  </ul>
                 </Popup>
               )}
             </>
