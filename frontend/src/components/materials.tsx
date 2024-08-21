@@ -35,7 +35,7 @@ export const Materials = () => {
 
   return (
     <>
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
         {materials?.map((material) => (
           <CustomCheckbox
             key={material.code}

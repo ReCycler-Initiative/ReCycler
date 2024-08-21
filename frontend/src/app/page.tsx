@@ -17,16 +17,19 @@ const HomePage = () => {
       </div>
          */}
       <Container>
-        <h1 className="text-xl font-medium mb-4 font-sans">Tervetuloa Recycleriin</h1>
-        <p className="mb-8 font-sans">
-          Avustan sinua kierrättämään jätteesi täsmällisesti, jotta voit
-          keskittyä nauttimaan elämästäsi ja samoin tulevat sukupolvet.
+        <h1 className="text-2xl font-medium mb-4 font-sans">
+          Tervetuloa Recycleriin
+        </h1>
+        <p className="mb-16 font-sans">
+          ReCyclerin avulla voit hakea kotitalouksien jätteille tarkoitettujen,
+          alueellisten keräyspisteiden ja kiertävien keräysten tietoja
+          kaikkialla Suomessa.
         </p>
-        <div className="flex flex-col gap-4">
-          <Button className="w-full" asChild>
+        <div className="flex flex-col gap-4 items-center">
+          <Button className="w-full max-w-96" asChild size="lg">
             <Link href="/materials">Lähde kierrättämään</Link>
           </Button>
-          <Button className="w-full" asChild variant="secondary">
+          <Button className="w-full max-w-96" asChild variant="secondary">
             <Link href="/results">Näytä lähimmät kierrätyspisteet</Link>
           </Button>
         </div>
