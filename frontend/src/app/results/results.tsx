@@ -327,7 +327,7 @@ export default function Result() {
                         target="_blank"
                       >
                         <span>Avaa Google Maps</span>
-                        <MapPinned className="ml-2" />
+                        <MapPinned className="ml-2" size={18} />
                       </a>
                     </Button>
                   </div>
