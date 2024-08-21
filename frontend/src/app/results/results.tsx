@@ -302,20 +302,6 @@ export default function Result() {
                           {details.properties?.post_office}
                         </span>
                       </address>
-
-                      <Button
-                        className="px-2 -mr-3 text-[#ff1312]"
-                        variant="ghost"
-                        asChild
-                      >
-                        <a
-                          href={`https://www.google.com/maps/search/?api=1&query=${(details.geometry as GeoJSON.Point).coordinates[1]},${(details.geometry as GeoJSON.Point).coordinates[0]}`}
-                          target="_blank"
-                        >
-                          <MapPinned />
-                          <span className="sr-only">Avaa Google Maps</span>
-                        </a>
-                      </Button>
                     </div>
                   </div>
                   <ul className="text-base px-5 py-4 leading-6 list-disc grid grid-cols-2 gap-x-2">
@@ -330,6 +316,21 @@ export default function Result() {
                           </li>
                         ))}
                   </ul>
+                  <div className="text-center border-t">
+                    <Button
+                      className="text-[#ff1312] text-sm w-full"
+                      variant="ghost"
+                      asChild
+                    >
+                      <a
+                        href={`https://www.google.com/maps/search/?api=1&query=${(details.geometry as GeoJSON.Point).coordinates[1]},${(details.geometry as GeoJSON.Point).coordinates[0]}`}
+                        target="_blank"
+                      >
+                        <span>Avaa Google Maps</span>
+                        <MapPinned className="ml-2" />
+                      </a>
+                    </Button>
+                  </div>
                 </Popup>
               )}
             </>
