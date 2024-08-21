@@ -5,6 +5,7 @@ import GeocoderControl from "@/components/geocoder-control";
 import { MapStyleControl } from "@/components/map-style-control";
 import { Materials } from "@/components/materials";
 import { SelectedMaterialsControl } from "@/components/selected-materials-control";
+import { Button } from "@/components/ui/button";
 import {
   Drawer,
   DrawerContent,
@@ -14,7 +15,7 @@ import {
 import { Form } from "@/components/ui/form";
 import { getCollectionSpots } from "@/services/api";
 import { Material } from "@/types";
-import { Loader2Icon } from "lucide-react";
+import { Loader2Icon, MapPinned } from "lucide-react";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useRef, useState } from "react";
@@ -293,18 +294,40 @@ export default function Result() {
                     <h2 className="text-base font-semibold mb-1">
                       {details.properties?.name}
                     </h2>
-                    <address className="text-sm not-italic">
-                      {details.properties?.address}
-                    </address>
+                    <div className="flex gap-2 justify-between">
+                      <address className="text-sm text-gray-900 not-italic flex flex-col leading-5 ">
+                        {details.properties?.address}
+                        <span>
+                          {details.properties?.postal_code}{" "}
+                          {details.properties?.post_office}
+                        </span>
+                      </address>
+
+                      <Button
+                        className="px-2 -mr-3 text-[#ff1312]"
+                        variant="ghost"
+                        asChild
+                      >
+                        <a
+                          href={`https://www.google.com/maps/search/?api=1&query=${(details.geometry as GeoJSON.Point).coordinates[1]},${(details.geometry as GeoJSON.Point).coordinates[0]}`}
+                          target="_blank"
+                        >
+                          <MapPinned />
+                          <span className="sr-only">Avaa Google Maps</span>
+                        </a>
+                      </Button>
+                    </div>
                   </div>
-                  <ul className="text-sm px-5 py-4 leading-6 list-disc grid grid-cols-2 gap-x-2">
+                  <ul className="text-base px-5 py-4 leading-6 list-disc grid grid-cols-2 gap-x-2">
                     {details.properties &&
                       JSON.parse(details.properties.materials)
                         .sort((a: Material, b: Material) =>
                           a.name.localeCompare(b.name)
                         )
                         .map((material: Material) => (
-                          <li key={material.code} className="ml-4">{material.name}</li>
+                          <li key={material.code} className="ml-4">
+                            {material.name}
+                          </li>
                         ))}
                   </ul>
                 </Popup>
