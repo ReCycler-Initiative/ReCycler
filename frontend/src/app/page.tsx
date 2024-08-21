@@ -21,9 +21,10 @@ const HomePage = () => {
           Tervetuloa Recycleriin
         </h1>
         <p className="mb-16 font-sans">
-          ReCyclerin avulla voit hakea kotitalouksien jätteille tarkoitettujen,
-          alueellisten keräyspisteiden ja kiertävien keräysten tietoja
-          kaikkialla Suomessa.
+          Tervetuloa ReCycler-sovellukseen! ReCycler auttaa sinua löytämään
+          helposti lähimmät kierrätyspisteet kotitalousjätteillesi kaikkialla
+          Suomessa. Olipa kyseessä mikä tahansa jäte, ReCycler opastaa sinut
+          oikeaan paikkaan. Aloita ympäristöystävällinen valinta jo tänään!
         </p>
         <div className="flex flex-col gap-4 items-center">
           <Button className="w-full max-w-96" asChild size="lg">
