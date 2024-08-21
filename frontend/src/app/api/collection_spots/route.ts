@@ -15,6 +15,8 @@ export async function GET() {
                     'id', id,
                     'name', name,
                     'address', address,
+                    'postal_code', postal_code,
+                    'post_office', post_office,
                     'materials', materials
                 )
             ) AS feature
