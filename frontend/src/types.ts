@@ -2,6 +2,7 @@ export type CollectionSpot = {
   id: number;
   name: string;
   address: string;
+  opening_hours_fi: string;
   postal_code: string;
   post_office: string;
   materials: string;
