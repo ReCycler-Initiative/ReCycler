@@ -304,6 +304,16 @@ export default function Result() {
                       </address>
                     </div>
                   </div>
+                  {details.properties?.opening_hours_fi && (
+                    <div className="px-5 py-4 border-b">
+                      <h3 className="sr-only">Aukioloajat</h3>
+                      <div
+                        dangerouslySetInnerHTML={{
+                          __html: details.properties?.opening_hours_fi,
+                        }}
+                      />
+                    </div>
+                  )}
                   <ul className="text-sm px-5 py-4 leading-6 list-disc columns-2">
                     {details.properties &&
                       JSON.parse(details.properties.materials)

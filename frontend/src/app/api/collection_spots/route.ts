@@ -17,7 +17,9 @@ export async function GET() {
                     'address', address,
                     'postal_code', postal_code,
                     'post_office', post_office,
-                    'materials', materials
+                    'materials', materials,
+                    'opening_hours_fi', opening_hours_fi,
+                    'description_fi', description_fi
                 )
             ) AS feature
             FROM recycler.collection_spots
