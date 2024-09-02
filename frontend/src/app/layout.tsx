@@ -5,6 +5,7 @@ import Link from "next/link";
 import "./globals.css";
 import Providers from "./providers";
 import logo from "./recycler-logo.png";
+import { Analytics } from "@vercel/analytics/react";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -21,6 +22,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
+        <Analytics />
         <Providers>
           <div className="flex flex-col h-screen">
             <header className="pb-2 pl-1 border-b border-gray-400 sticky top-0 bg-white shadow-md">
