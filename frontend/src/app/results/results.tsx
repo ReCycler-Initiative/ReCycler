@@ -18,7 +18,7 @@ import { Material } from "@/types";
 import { Loader2Icon, MapPinned } from "lucide-react";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { Suspense, useEffect, useRef, useState } from "react";
+import { Suspense, useCallback, useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import Map, {
   CircleLayer,
@@ -198,6 +198,15 @@ export default function Result() {
   }, [mapLoaded, geojson]);
 
   const geolocateControlRef = useRef<any>();
+  const initialGeolocate = useRef(true);
+
+  const handleGeolocateChange = useCallback((position: GeolocationPosition) => {
+    mapRef.current?.flyTo({
+      center: [position.coords.longitude, position.coords.latitude],
+      zoom: initialGeolocate ? 15 : mapRef.current?.getZoom(),
+    });
+    initialGeolocate.current = false;
+  }, []);
 
   useEffect(() => {
     console.log(geolocateControlRef.current);
@@ -266,6 +275,7 @@ export default function Result() {
               />
               <GeolocateControl
                 ref={geolocateControlRef}
+                onGeolocate={handleGeolocateChange}
                 position="bottom-right"
                 trackUserLocation
               />
