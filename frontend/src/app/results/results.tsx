@@ -267,6 +267,7 @@ export default function Result() {
               <GeolocateControl
                 ref={geolocateControlRef}
                 position="bottom-right"
+                trackUserLocation
               />
               <SelectedMaterialsControl
                 amount={selectedMaterials.length}
