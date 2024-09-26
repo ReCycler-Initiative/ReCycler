@@ -16,7 +16,7 @@ const HomePage = () => {
           src={hero}
       </div>
          */}
-      <Container>
+      <Container className="flex-1">
         <h1 className="text-2xl font-medium mb-4 font-sans">
           Tervetuloa Recycleriin
         </h1>
@@ -36,20 +36,20 @@ const HomePage = () => {
         </div>
       </Container>
       {/* Footer */}
-<footer className="w-full mt-16 bg-gray-200 py-4 text-center">
-  <p className="text-sm">
-    ReCycler on Github-projekti. Lähdekoodi löytyy{" "}
-    <a
-      href="https://github.com/ReCycler-Initiative/ReCycler"
-      className="text-blue-500 underline"
-      target="_blank"
-      rel="noopener noreferrer"
-    >
-      täältä
-    </a>
-    . Projekti on lisensoitu Apache 2.0 -lisenssillä.
-  </p>
-</footer>
+      <footer className="w-full mt-16 bg-gray-200 py-4 text-center">
+        <p className="text-sm">
+          ReCycler on Github-projekti. Lähdekoodi löytyy{" "}
+          <a
+            href="https://github.com/ReCycler-Initiative/ReCycler"
+            className="text-blue-500 underline"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            täältä
+          </a>
+          . Projekti on lisensoitu Apache 2.0 -lisenssillä.
+        </p>
+      </footer>
     </>
   );
 };
