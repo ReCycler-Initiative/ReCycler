@@ -282,6 +282,7 @@ export default function Result() {
                 onGeolocate={handleGeolocateChange}
                 onTrackUserLocationEnd={() => setTracking(false)}
                 onTrackUserLocationStart={() => setTracking(true)}
+                positionOptions={{ enableHighAccuracy: true }}
                 position="bottom-right"
                 trackUserLocation
               />
