@@ -20,11 +20,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className={inter.className}>
+    <html lang="en" className="h-full">
+      <body className={`${inter.className} h-full`}>
         <Analytics />
         <Providers>
-          <div className="flex flex-col h-screen">
+          <div className="flex flex-col h-full">
             <header className="pb-2 pl-1 border-b border-gray-400 sticky top-0 bg-white shadow-md">
               <Link href="/">
                 <Image src={logo} alt="Recycler logo" width={150} />
