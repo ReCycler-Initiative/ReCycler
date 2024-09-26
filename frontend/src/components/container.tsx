@@ -1,9 +1,12 @@
+import { cn } from "@/utils/shadcn";
+
 type ContainerProps = {
   children: React.ReactNode;
+  className?: string;
 };
 
-const Container = ({ children }: ContainerProps) => (
-  <div className="container py-6">{children}</div>
+const Container = ({ children, className }: ContainerProps) => (
+  <div className={cn("container py-6", className)}>{children}</div>
 );
 
 export default Container;
