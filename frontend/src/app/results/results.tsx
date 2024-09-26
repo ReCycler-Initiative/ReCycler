@@ -208,7 +208,7 @@ export default function Result() {
 
   return (
     <Suspense>
-      <div className="flex h-full">
+      <div className="flex flex-1">
         <Map
           ref={mapRef}
           mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_TOKEN}
