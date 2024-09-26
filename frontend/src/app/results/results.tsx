@@ -18,7 +18,7 @@ import { Material } from "@/types";
 import { Loader2Icon, MapPinned } from "lucide-react";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { Suspense, useCallback, useEffect, useRef, useState } from "react";
+import { Suspense, use, useCallback, useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import Map, {
   CircleLayer,
@@ -199,8 +199,13 @@ export default function Result() {
 
   const geolocateControlRef = useRef<any>();
   const initialGeolocate = useRef(true);
+  const [isTracking, setTracking] = useState(false);
 
   const handleGeolocateChange = useCallback((position: GeolocationPosition) => {
+    if (!isTracking) {
+      return;
+    }
+
     mapRef.current?.flyTo({
       center: [position.coords.longitude, position.coords.latitude],
       zoom: initialGeolocate ? 15 : mapRef.current?.getZoom(),
@@ -209,7 +214,6 @@ export default function Result() {
   }, []);
 
   useEffect(() => {
-    console.log(geolocateControlRef.current);
     if (geolocateControlRef.current) {
       geolocateControlRef.current?.trigger();
     }
@@ -276,6 +280,8 @@ export default function Result() {
               <GeolocateControl
                 ref={geolocateControlRef}
                 onGeolocate={handleGeolocateChange}
+                onTrackUserLocationEnd={() => setTracking(false)}
+                onTrackUserLocationStart={() => setTracking(true)}
                 position="bottom-right"
                 trackUserLocation
               />
