@@ -1,7 +1,8 @@
 import { getMaterials } from "@/services/api";
+import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { useFormContext } from "react-hook-form";
-import { useQuery } from "@tanstack/react-query";
+import LoadingSpinner from "./loading-spinner";
 
 const CustomCheckbox = ({ label, name }: { label: string; name: string }) => {
   const { register, watch } = useFormContext();
@@ -25,13 +26,22 @@ const CustomCheckbox = ({ label, name }: { label: string; name: string }) => {
 };
 
 export const Materials = () => {
-  const { data: materials } = useQuery({
+  const { data: materials, isFetching } = useQuery({
     queryKey: ["materials"],
     queryFn: getMaterials,
     staleTime: Infinity,
   });
 
   const [showMore, setShowMore] = useState(false);
+
+  if (isFetching) {
+    return (
+      <div className="flex items-center flex-col gap-4 py-6">
+        <LoadingSpinner />
+        <p>Haetaan materiaaleja...</p>
+      </div>
+    );
+  }
 
   return (
     <>
