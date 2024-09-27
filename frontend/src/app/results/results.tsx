@@ -278,8 +278,8 @@ export default function Result() {
               const feature = e.features[0];
               if (
                 !feature?.properties?.cluster &&
-                feature.geometry &&
-                feature.geometry.type === "Point"
+                feature?.geometry &&
+                feature?.geometry.type === "Point"
               ) {
                 setDetails(feature);
               }
