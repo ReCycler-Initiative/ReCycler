@@ -81,6 +81,24 @@ const layerStyle: SymbolLayer = {
   },
 };
 
+const highlighLayer: CircleLayer = {
+  id: "point2",
+  type: "circle",
+  source: "collection_spots",
+  paint: {
+    "circle-color": "#f1f075",
+    "circle-radius": [
+      "case",
+      ["==", ["get", "has_all_materials"], true],
+      25,
+      0,
+    ],
+    "circle-stroke-width": 1,
+    "circle-stroke-color": "#FFD700",
+    "circle-stroke-opacity": 1,
+  },
+};
+
 const clusters: CircleLayer = {
   id: "clusters",
   type: "circle",
@@ -122,14 +140,30 @@ const filterFeaturesBySelectedMaterials = (
     return collectionSpots;
   }
 
-  let features = collectionSpots.features?.filter((feature: any) => {
-    const featureMaterials = JSON.parse(
-      feature.properties.materials
-    ) as Material[];
-    return featureMaterials.some((material) =>
-      materials.includes(material.code)
-    );
-  });
+  let features = collectionSpots.features
+    ?.filter((feature: any) => {
+      const featureMaterials = JSON.parse(
+        feature.properties.materials
+      ) as Material[];
+      return featureMaterials.some((material) =>
+        materials.includes(material.code)
+      );
+    })
+    .map((feature: any) => {
+      const featureMaterials = JSON.parse(
+        feature.properties.materials
+      ) as Material[];
+
+      return {
+        ...feature,
+        properties: {
+          ...feature.properties,
+          has_all_materials: materials.every((material) =>
+            featureMaterials.map((f) => f.code).includes(material)
+          ),
+        },
+      };
+    });
 
   return {
     ...collectionSpots,
@@ -266,6 +300,7 @@ export default function Result() {
                 clusterMaxZoom={14}
                 clusterRadius={50}
               >
+                <Layer {...highlighLayer} />
                 <Layer {...layerStyle} />
                 <Layer {...clusters} />
                 <Layer {...clusterCount} />
