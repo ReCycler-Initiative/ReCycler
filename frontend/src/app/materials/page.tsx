@@ -16,7 +16,7 @@ const MaterialsPage = () => {
 
   return (
     <Form {...form}>
-      <Container className="max-w-2xl pt-14">
+      <Container className="max-w-2xl pt-7 lg:pt-14">
         <h1 className="text-xl font-medium mb-4 font-sans">
           Mitäs tänään kierrätetään?
         </h1>
