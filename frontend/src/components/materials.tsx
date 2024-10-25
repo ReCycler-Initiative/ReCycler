@@ -37,7 +37,7 @@ const CustomCheckbox = ({ label, name }: { label: string; name: string }) => {
             <InfoIcon className="text-gray-500" />
           </Button>
         </PopoverTrigger>
-        <PopoverContent>
+        <PopoverContent className="text-sm" align="center" sideOffset={5}>
           <h4 className="mb-4 font-bold text-base">Lamput</h4>
           <p className="text-green-600">Kyllä</p>
           <ul className="list-disc py-2 px-4 mb-2">
