@@ -10,7 +10,6 @@ import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 const CustomCheckbox = ({ label, name }: { label: string; name: string }) => {
   const { register, watch } = useFormContext();
   const checked: boolean = watch(name);
-  const [infoOpen, setInfoOpen] = useState(false);
 
   return (
     <div className="relative">
@@ -28,7 +27,7 @@ const CustomCheckbox = ({ label, name }: { label: string; name: string }) => {
         <span className="checkbox-mark"></span>
         <span className="text-sm">{label}</span>
       </label>
-      <Popover modal open={infoOpen} onOpenChange={setInfoOpen}>
+      <Popover modal>
         <PopoverTrigger asChild>
           <Button
             className="text-gray-600 absolute bottom-[1px] right-[1px]"
