@@ -12,19 +12,6 @@ const CustomCheckbox = ({ label, name }: { label: string; name: string }) => {
   const checked: boolean = watch(name);
   const [infoOpen, setInfoOpen] = useState(false);
 
-  const [scrollPosition, setScrollPosition] = useState<number>(0);
-
-  const handleScroll = () => {
-    setInfoOpen(false);
-  };
-
-  useEffect(() => {
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-    };
-  }, []);
-
   return (
     <div className="relative">
       <label
@@ -51,7 +38,7 @@ const CustomCheckbox = ({ label, name }: { label: string; name: string }) => {
             <InfoIcon className="text-gray-500" />
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="text-sm">
+        <PopoverContent>
           <h4 className="mb-4 font-bold text-base">Lamput</h4>
           <p className="text-green-600">Kyllä</p>
           <ul className="list-disc py-2 px-4 mb-2">
