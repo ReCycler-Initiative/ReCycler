@@ -25,7 +25,7 @@ export default function RootLayout({
         <Analytics />
         <Providers>
           <div className="flex flex-col h-full">
-            <header className="pb-2 pl-1 border-b border-gray-400 sticky top-0 bg-white shadow-md">
+            <header className="pb-2 pl-1 border-b border-gray-400 sticky top-0 bg-white shadow-md z-50">
               <Link href="/">
                 <Image src={logo} alt="Recycler logo" width={150} />
               </Link>
