@@ -1,7 +1,7 @@
 import { getMaterials } from "@/services/api";
 import { useQuery } from "@tanstack/react-query";
 import { InfoIcon, Paperclip, RecycleIcon } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useFormContext } from "react-hook-form";
 import LoadingSpinner from "./loading-spinner";
 import { Button } from "./ui/button";
@@ -10,6 +10,20 @@ import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 const CustomCheckbox = ({ label, name }: { label: string; name: string }) => {
   const { register, watch } = useFormContext();
   const checked: boolean = watch(name);
+  const [infoOpen, setInfoOpen] = useState(false);
+
+  const [scrollPosition, setScrollPosition] = useState<number>(0);
+
+  const handleScroll = () => {
+    setInfoOpen(false);
+  };
+
+  useEffect(() => {
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, []);
 
   return (
     <div className="relative">
@@ -27,7 +41,7 @@ const CustomCheckbox = ({ label, name }: { label: string; name: string }) => {
         <span className="checkbox-mark"></span>
         <span className="text-sm">{label}</span>
       </label>
-      <Popover>
+      <Popover modal open={infoOpen} onOpenChange={setInfoOpen}>
         <PopoverTrigger asChild>
           <Button
             className="text-gray-600 absolute bottom-[1px] right-[1px]"
