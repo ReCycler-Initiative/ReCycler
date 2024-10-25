@@ -16,7 +16,7 @@ const MaterialsPage = () => {
 
   return (
     <Form {...form}>
-      <Container>
+      <Container className="max-w-2xl pt-14">
         <h1 className="text-xl font-medium mb-4 font-sans">
           Mitäs tänään kierrätetään?
         </h1>
@@ -24,7 +24,7 @@ const MaterialsPage = () => {
           <Materials />
         </div>
       </Container>
-      <div className="fixed lg:static bottom-0 bg-white lg:bg-transparent border lg:border-none p-4 left-0 right-0 border-gray-400 flex flex-col items-center gap-y-4">
+      <div className="fixed lg:static bottom-0 bg-white lg:bg-transparent border lg:border-none p-4 lg:p-0 left-0 right-0 border-gray-400 flex flex-col items-center gap-y-4">
         Materiaaleja valittu {selectedMaterials.length} kpl
         <Button asChild className="w-full max-w-96" size="lg">
           <Link
