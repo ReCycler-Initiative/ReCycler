@@ -1,5 +1,6 @@
 import { getMaterials } from "@/services/api";
 import { useQuery } from "@tanstack/react-query";
+import { Paperclip, RecycleIcon } from "lucide-react";
 import { useState } from "react";
 import { useFormContext } from "react-hook-form";
 import LoadingSpinner from "./loading-spinner";
@@ -11,8 +12,9 @@ const CustomCheckbox = ({ label, name }: { label: string; name: string }) => {
   return (
     <label
       data-checked={checked}
-      className="border border-gray-700 py-2 px-2 text-center h-16 flex justify-center items-center bg-white rounded-sm data-[checked=true]:bg-gray-700 data-[checked=true]:text-white"
+      className="border flex-col border-gray-700 py-2 px-2 justify-center text-center aspect-square flex items-center bg-white rounded-sm data-[checked=true]:bg-gray-700 data-[checked=true]:text-white"
     >
+      <RecycleIcon className="mb-3 text-red-600" />
       <input
         {...register(name)}
         checked={checked || false}
@@ -20,7 +22,7 @@ const CustomCheckbox = ({ label, name }: { label: string; name: string }) => {
         type="checkbox"
       />
       <span className="checkbox-mark"></span>
-      {label}
+      <span className="text-sm">{label}</span>
     </label>
   );
 };
@@ -45,7 +47,7 @@ export const Materials = () => {
 
   return (
     <>
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {materials?.map((material) => (
           <CustomCheckbox
             key={material.code}

@@ -16,11 +16,11 @@ const HomePage = () => {
           src={hero}
       </div>
          */}
-      <Container className="flex-1">
+      <Container className="flex-1 max-w-4xl">
         <h1 className="text-2xl font-medium mb-4 font-sans">
           Tervetuloa Recycleriin
         </h1>
-        <p className="mb-16 font-sans">
+        <p className="mb-12 font-sans">
           Tervetuloa ReCycler-sovellukseen! ReCycler auttaa sinua löytämään
           helposti lähimmät kierrätyspisteet kotitalousjätteillesi kaikkialla
           Suomessa. Olipa kyseessä mikä tahansa jäte, ReCycler opastaa sinut

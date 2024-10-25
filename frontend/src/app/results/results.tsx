@@ -430,9 +430,9 @@ export default function Result() {
         >
           <DrawerContent>
             <DrawerHeader>
-              <DrawerTitle>Valitut materiaalit</DrawerTitle>
+              <DrawerTitle className="text-center">Valitut materiaalit</DrawerTitle>
             </DrawerHeader>
-            <div className="max-h-[500px] overflow-y-scroll">
+            <div className="max-h-[500px] overflow-y-scroll max-w-2xl mx-auto">
               <Form {...form}>
                 <Container>
                   <Materials />
