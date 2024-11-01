@@ -119,9 +119,13 @@ const CustomCheckbox = ({
   return (
     <label
       data-checked={checked}
-      className="border flex-col border-gray-700 py-2 px-2 justify-center text-center aspect-square flex items-center bg-white rounded-sm data-[checked=true]:bg-gray-700 data-[checked=true]:text-white"
+      className="border flex-col border-gray-700 py-2 px-2 pt-[35%] sm:pt-[40%] md:pt-11 text-center aspect-square flex items-center bg-white rounded-sm data-[checked=true]:bg-gray-700 data-[checked=true]:text-white"
     >
-      {icon ?? <RecycleIcon className="mb-3 text-red-600" />}
+      {icon ? (
+        <div className="mb-3">{icon}</div>
+      ) : (
+        <RecycleIcon className="mb-3 text-red-600" />
+      )}
       <input
         {...register(name)}
         checked={checked || false}
