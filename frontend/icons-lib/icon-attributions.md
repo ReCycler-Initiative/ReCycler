@@ -1,4 +1,4 @@
-svgrepo.com Attributions:
+Icon attributions - svgrepo.com:
 
 Filename: plastic.svg
 
@@ -133,7 +133,6 @@ Device Desktop
 COLLECTION: Wolf Kit Rounded Line Icons
 LICENSE: CC Attribution License
 AUTHOR: thewolfkit
-
 
 Filename: building.svg
 
