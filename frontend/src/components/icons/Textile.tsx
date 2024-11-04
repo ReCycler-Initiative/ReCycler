@@ -2,14 +2,14 @@ import React from "react";
 
 const Textile = () => (
   <svg
-    fill="#000000"
+    fill="currentColor"
     height="24px"
     width="24px"
     version="1.1"
     id="Capa_1"
     xmlns="http://www.w3.org/2000/svg"
     viewBox="0 0 412.678 412.678"
-    stroke="#000000"
+    stroke="currentColor"
     stroke-width="5.7774920000000005"
   >
     <g id="SVGRepo_bgCarrier" stroke-width="0" />

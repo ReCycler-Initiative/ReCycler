@@ -2,7 +2,7 @@ import React from "react";
 
 const Dangerous = () => (
   <svg
-    fill="#000000"
+    fill="currentColor"
     height="24px"
     width="24px"
     version="1.1"
@@ -10,7 +10,6 @@ const Dangerous = () => (
     xmlns="http://www.w3.org/2000/svg"
     xmlnsXlink="http://www.w3.org/1999/xlink"
     viewBox="0 0 151.366 151.366"
-    xmlSpace="preserve"
   >
     <g>
       <path
