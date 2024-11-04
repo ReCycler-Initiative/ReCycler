@@ -106,7 +106,6 @@ COLLECTION: Start Universal Tiny Oval Icons
 LICENSE: PD License
 AUTHOR: Salah Elimam
 
-
 Filename: textilereuse.svg
 
 Shirt SVG Vector
@@ -130,7 +129,15 @@ AUTHOR: Taras Shypka
 
 Filename: electricwaste.svg
 
-Name: Device Desktop
+Device Desktop
 COLLECTION: Wolf Kit Rounded Line Icons
 LICENSE: CC Attribution License
 AUTHOR: thewolfkit
+
+
+Filename: building.svg
+
+Building SVG Vector
+COLLECTION: Dazzle Line Icons
+LICENSE: CC Attribution License
+AUTHOR: Dazzle UI
