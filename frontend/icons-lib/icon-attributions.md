@@ -2,28 +2,28 @@ svgrepo.com Attributions:
 
 Filename: plastic.svg
 
-Name: Plastic Bottle 2 SVG Vector
+Plastic Bottle SVG Vector
 COLLECTION: Variety Duotone Line Icons
 LICENSE: PD License
 AUTHOR: Mary Akv
 
 Filename: textile.svg
 
-Name: Weave SVG Vector
+Weave SVG Vector
 COLLECTION: Oval Line Action Icons
 LICENSE: CC Attribution License
 AUTHOR: Shannon E. Thomas
 
 Filename: wood.svg
 
-Name: Wood SVG Vector
+Wood SVG Vector
 COLLECTION: Iconhub Line Icons
 LICENSE: CC Attribution License
 AUTHOR: iconhub
 
 Filename: garden.svg
 
-Name: Garden Shovel Gardening SVG Vector
+Garden Shovel Gardening SVG Vector
 COLLECTION: Gardening Line Vectors
 LICENSE: CC Attribution License
 AUTHOR: Cahya Kurniawan
@@ -31,56 +31,56 @@ AUTHOR: Cahya Kurniawan
 
 Filename: dangerous.svg
 
-Name: Dangerous SVG Vector
+Dangerous SVG Vector
 COLLECTION: Science And Medical
 LICENSE: CC0 License
 UPLOADER: SVG Repo
 
 Filename: cardboard.svg
 
-Name: Cardboard Box With Lid SVG Vector
-COLLECTION: Boxes
-LICENSE: CC0 License
-UPLOADER: SVG Repo
+Cardboard Box SVG Vector
+COLLECTION: Other Icooon Mono Vectors
+LICENSE: PD License
+AUTHOR: Icooon Mono
 
 Filename: carbattery.svg
 
-Name: Car Battery SVG Vector 
+Car Battery SVG Vector 
 COLLECTION: Dazzle Line Icons
 LICENSE: CC Attribution License
 AUTHOR: Dazzle UI
 
 Filename: woodbeam.svg
 
-Name: Wood Beam SVG Vector
+Wood Beam SVG Vector
 COLLECTION: Game Interface Icons 2
 LICENSE: CC Attribution License
 AUTHOR: game-icons.net
 
 Filename: energywate.svg
 
-Name: Energy Hand Recycle SVG Vector
+Energy Hand Recycle SVG Vector
 COLLECTION: Environment And Recycling Icons
 LICENSE: PD License
 Author: N/A
 
 Filename: smallbattery.svg
 
-Name Battery Mid SVG Vector 
+Battery Mid SVG Vector 
 COLLECTION: Dazzle Line Icons
 LICENSE: CC Attribution License
 AUTHOR: Dazzle UI
 
 Filename: glass.svg
 
-Name: Glass SVG Vector
+Glass SVG Vector
 COLLECTION: Gentlecons Interface Icons
 LICENSE: CC Attribution License
 AUTHOR: Konstantin Filatov
 
 Filename: metal.svg
 
-Name: Metal Recycling SVG Vector
+Metal Recycling SVG Vector
 COLLECTION: Website Interface Line Icons
 LICENSE: CC Attribution License
 AUTHOR: Sooodesign
@@ -94,10 +94,10 @@ AUTHOR: Leonid Tsvetkov
 
 Filename: carton.svg
 
-Milk Carton SVG Vector
-COLLECTION: Food And Drink Icooon Mono Vectors
+Milk Organic SVG Vector
+COLLECTION: Organic Food Line Icons
 LICENSE: PD License
-AUTHOR: Icooon Mono
+AUTHOR: Wojciech Zasina
 
 Filename: paper.svg
 
@@ -109,10 +109,10 @@ AUTHOR: Icooon Mono
 
 Filename: textilereuse.svg
 
-Shirt Origami Paper SVG Vector
-COLLECTION: Origami Animal Line Vectors
+Shirt SVG Vector
+COLLECTION: Software Mansion Curved Line Icons
 LICENSE: CC Attribution License
-AUTHOR: Lima Studio
+AUTHOR: Software Mansion
 
 Filename: contruction.svg
 
@@ -128,9 +128,9 @@ COLLECTION: Flare Dashed Icons
 LICENSE: PD License
 AUTHOR: Taras Shypka
 
-Filename: electric.vg
+Filename: electricwaste.svg
 
-Electric Plug SVG Vector
-COLLECTION: Real Assets 8
-LICENSE: CC0 License
-UPLOADER: SVG Repo
+Name: Device Desktop
+COLLECTION: Wolf Kit Rounded Line Icons
+LICENSE: CC Attribution License
+AUTHOR: thewolfkit
