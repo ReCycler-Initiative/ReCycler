@@ -26,7 +26,7 @@ const MaterialsPage = () => {
       </Container>
       <div className="fixed lg:static bottom-0 bg-white lg:bg-transparent border lg:border-none p-4 lg:p-0 left-0 right-0 border-gray-400 flex flex-col items-center gap-y-4">
         Materiaaleja valittu {selectedMaterials.length} kpl
-        <Button asChild className="w-full max-w-96" size="lg">
+        <Button asChild className="w-full max-w-96 lg:mb-6" size="lg">
           <Link
             href={`results?materials=${encodeURIComponent(selectedMaterials.map(([key]) => key).join(","))}`}
           >
