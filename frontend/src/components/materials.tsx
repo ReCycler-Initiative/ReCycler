@@ -6,6 +6,7 @@ import { useFormContext } from "react-hook-form";
 import CarBattery from "./icons/CarBattery";
 import CardBoard from "./icons/CardBoard";
 import Carton from "./icons/Carton";
+import Construction from "./icons/Building";
 import Dangerous from "./icons/Dangerous";
 import EnergyWaste from "./icons/EnergyWaste";
 import Garden from "./icons/Garden";
@@ -14,12 +15,13 @@ import Lamp from "./icons/Lamp";
 import Metal from "./icons/Metal";
 import Paper from "./icons/Paper";
 import Plastic from "./icons/Plastic";
+import SmallBattery from "./icons/SmallBattery";
 import Textile from "./icons/Textile";
 import TextileReuse from "./icons/TextileReuse";
+import WasteBin from "./icons/WasteBin";
 import Wood from "./icons/Wood";
-import WoodBeam from "./icons/WoodBeam";
 import LoadingSpinner from "./loading-spinner";
-import SmallBattery from "./icons/SmallBattery";
+import ElectricWaste from "./icons/ElectricWaste";
 
 const iconMap: { code: number; name?: string; icon?: ReactNode }[] = [
   {
@@ -40,7 +42,7 @@ const iconMap: { code: number; name?: string; icon?: ReactNode }[] = [
   },
   {
     code: 118,
-    icon: <WoodBeam />,
+    icon: <Wood />,
   },
   {
     code: 116,
@@ -60,7 +62,7 @@ const iconMap: { code: number; name?: string; icon?: ReactNode }[] = [
   },
   {
     code: 114,
-    name: "Muu jäte",
+    icon: <WasteBin />,
   },
   {
     code: 104,
@@ -84,15 +86,15 @@ const iconMap: { code: number; name?: string; icon?: ReactNode }[] = [
   },
   {
     code: 119,
-    name: "Rakennus- ja purkujäte",
+    icon: <Construction />,
   },
   {
     code: 109,
-    name: "Sähkölaitteet (SER)",
+    icon: <ElectricWaste />,
   },
   {
     code: 100,
-    name: "Sekajäte",
+    icon: <WasteBin />,
   },
   {
     code: 113,
