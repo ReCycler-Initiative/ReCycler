@@ -113,3 +113,24 @@ Shirt Origami Paper SVG Vector
 COLLECTION: Origami Animal Line Vectors
 LICENSE: CC Attribution License
 AUTHOR: Lima Studio
+
+Filename: contruction.svg
+
+Building Construction Saw SVG Vector
+COLLECTION: Tool Glyphs Icons
+LICENSE: CC0 License
+UPLOADER: SVG Repo
+
+Filename: wastebin.svg
+
+Trash SVG Vector
+COLLECTION: Flare Dashed Icons
+LICENSE: PD License
+AUTHOR: Taras Shypka
+
+Filename: electric.vg
+
+Electric Plug SVG Vector
+COLLECTION: Real Assets 8
+LICENSE: CC0 License
+UPLOADER: SVG Repo
