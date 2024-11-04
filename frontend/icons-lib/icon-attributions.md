@@ -9,10 +9,10 @@ AUTHOR: Mary Akv
 
 Filename: textile.svg
 
-Weave SVG Vector
-COLLECTION: Oval Line Action Icons
-LICENSE: CC Attribution License
-AUTHOR: Shannon E. Thomas
+Textile Recycling SVG Vector
+COLLECTION: Ecopack
+LICENSE: CC0 License
+UPLOADER: SVG Repo
 
 Filename: wood.svg
 
@@ -59,10 +59,10 @@ AUTHOR: game-icons.net
 
 Filename: energywate.svg
 
-Energy Hand Recycle SVG Vector
-COLLECTION: Environment And Recycling Icons
-LICENSE: PD License
-Author: N/A
+Fire Square SVG Vector
+COLLECTION: Solar Outline Icons
+LICENSE: CC Attribution License
+AUTHOR: Solar Icons
 
 Filename: smallbattery.svg
 
@@ -101,10 +101,10 @@ AUTHOR: Wojciech Zasina
 
 Filename: paper.svg
 
-Paper Plane SVG Vector
-COLLECTION: Other Icooon Mono Vectors
+Newspaper SVG Vector
+COLLECTION: Start Universal Tiny Oval Icons
 LICENSE: PD License
-AUTHOR: Icooon Mono
+AUTHOR: Salah Elimam
 
 
 Filename: textilereuse.svg
