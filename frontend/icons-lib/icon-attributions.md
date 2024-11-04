@@ -23,10 +23,10 @@ AUTHOR: iconhub
 
 Filename: garden.svg
 
-Flower SVG Vector
-COLLECTION: Minimal UI Icons
-LICENSE: PD License
-AUTHOR: bypeople
+Flower Heart SVG Vector
+COLCOLLECTION: Jtb Variety Thin Icons
+LICENSE: MIT License
+AUTHOR: jtblabs
 
 
 Filename: dangerous.svg
