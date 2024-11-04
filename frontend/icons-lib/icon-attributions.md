@@ -122,10 +122,10 @@ UPLOADER: SVG Repo
 
 Filename: wastebin.svg
 
-Trash SVG Vector
-COLLECTION: Flare Dashed Icons
-LICENSE: PD License
-AUTHOR: Taras Shypka
+Trash bin trash SVG Vector
+COLLECTION: Solar Outline Icons
+LICENSE: CC Attribution License
+AUTHOR: Solar Icons
 
 Filename: electricwaste.svg
 
