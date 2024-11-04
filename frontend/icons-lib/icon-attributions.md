@@ -23,10 +23,10 @@ AUTHOR: iconhub
 
 Filename: garden.svg
 
-Garden Shovel Gardening SVG Vector
-COLLECTION: Gardening Line Vectors
-LICENSE: CC Attribution License
-AUTHOR: Cahya Kurniawan
+Flower SVG Vector
+COLLECTION: Minimal UI Icons
+LICENSE: PD License
+AUTHOR: bypeople
 
 
 Filename: dangerous.svg
