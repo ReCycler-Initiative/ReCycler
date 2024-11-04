@@ -18,7 +18,7 @@ const Wood = () => (
       transform="translate(24) rotate(90)"
       style={{
         fill: "none",
-        stroke: "#000000",
+        stroke: "currentColor",
         strokeLinecap: "round",
         strokeLinejoin: "round",
         strokeWidth: "2px",
@@ -30,7 +30,7 @@ const Wood = () => (
       d="M21,14.22a19.44,19.44,0,0,1-3.5-.88c-2.67-.91-5.53-.2-6,4.66"
       style={{
         fill: "none",
-        stroke: "#000000",
+        stroke: "currentColor",
         strokeLinecap: "round",
         strokeLinejoin: "round",
         strokeWidth: "2px",
@@ -42,7 +42,7 @@ const Wood = () => (
       d="M13,9.52A8.86,8.86,0,0,0,16.45,8,5.13,5.13,0,0,0,18,6"
       style={{
         fill: "none",
-        stroke: "#000000",
+        stroke: "currentColor",
         strokeLinecap: "round",
         strokeLinejoin: "round",
         strokeWidth: "2px",
@@ -54,7 +54,7 @@ const Wood = () => (
       d="M3,12c2,0,4.61-.55,5.07-3.33A12.6,12.6,0,0,1,8.86,6"
       style={{
         fill: "none",
-        stroke: "#000000",
+        stroke: "currentColor",
         strokeLinecap: "round",
         strokeLinejoin: "round",
         strokeWidth: "2px",
@@ -66,7 +66,7 @@ const Wood = () => (
       d="M8,15a9.6,9.6,0,0,0-2,3"
       style={{
         fill: "none",
-        stroke: "#000000",
+        stroke: "currentColor",
         strokeLinecap: "round",
         strokeLinejoin: "round",
         strokeWidth: "2px",

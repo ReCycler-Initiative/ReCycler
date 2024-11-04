@@ -9,7 +9,7 @@ const Metal = () => (
     id="Capa_1"
     xmlns="http://www.w3.org/2000/svg"
     viewBox="0 0 376.868 376.868"
-    stroke="#000000"
+    stroke="currentColor"
     stroke-width="6.7836240000000005"
   >
     <g id="SVGRepo_bgCarrier" stroke-width="0" />
