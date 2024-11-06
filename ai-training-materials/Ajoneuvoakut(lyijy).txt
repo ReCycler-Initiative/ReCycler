@@ -1,35 +1,38 @@
 Ajoneuvoakut (lyijy)
 
-Useat akut sisältävät vaarallisia aineita. Tuo akut oikeaan keräykseen! Talteen saatujen akkujen materiaalit kierrätetään uusien tuotteiden raaka-aineeksi tai hyödynnetään energiana. 
+Useat akut sisältävät vaarallisia aineita. Tuo akut oikeaan keräykseen! Talteen saatujen akkujen materiaalit kierrätetään uusien tuotteiden raaka-aineeksi tai hyödynnetään energiana.
 
 ReCyclerissä esitetyt vastaanottopisteet on tarkoitettu kotitalouksien jätteille.
 
 Lajitteluohje:
 
-Noudata aina alueellisia ja keräyspistekohtaisia ohjeita! Tässä esitetyt lajitteluohj ovat yleisluontoisia, vallitsevan käytännön mukaisia.
+Noudata aina alueellisia ja keräyspistekohtaisia ohjeita! Tässä esitetyt lajitteluohjeet ovat yleisluonteisia ja vallitsevan käytännön mukaisia.
 
-- Kyllä: ajoneuvoakut
-- Kyllä: henkilö-, paketti- ja kuorma-autojen akut mopojen ja moottoripyörien akut
-- Kyllä: kolmi- ja nelipyörien sekä kevyiden nelipyörien akut, traktorin, moottorityökoneen ja maastoajoneuvon akut 
-- Kyllä: auton alustalle rakennettujen työkoneiden akut, hinattavien laitteiden ja moottorittomien ajoneuvojen akut perävaunujen akut
-- Kyllä:  matkailuautojen akut, museoajoneuvojen akut, huoltoautojen akut, varatievalojen akut, varavoima-akut, trukkien akut
-- Kyllä: siivouskoneiden akut
-- Kyllä: veneakut
+KYLLÄ:
+- ajoneuvoakut
+- henkilö-, paketti- ja kuorma-autojen akut
+- mopojen ja moottoripyörien akut
+- kolmi- ja nelipyörien sekä kevyiden nelipyörien akut
+- traktorin, moottorityökoneen ja maastoajoneuvon akut
+- auton alustalle rakennettujen työkoneiden akut
+- hinattavien laitteiden ja moottorittomien ajoneuvojen akut
+- perävaunujen akut
+- matkailuautojen akut, museoajoneuvojen akut, huoltoautojen akut
+- varatievalojen akut, varavoima-akut
+- trukkien akut
+- siivouskoneiden akut
+- veneakut
 
-- Ei: kannettavia akkuja ja paristoja -> paristojen keräykseen 
-- Ei: litiumakut
+EI:
+- kannettavia akkuja ja paristoja → paristojen keräykseen
+- litiumakut
 
-
-
-Akut voi myös usein palauttaa samaan liikkeeseen, mistä ne on ostettu tai saman alan liikkeeseen. Akut kuljetetaan keräyspisteistä käsittelylaitoksille.
-
+Akut voi myös usein palauttaa samaan liikkeeseen, mistä ne on ostettu, tai saman alan liikkeeseen. Akut kuljetetaan keräyspisteistä käsittelylaitoksille.
 
 Käsittelylaitoksessa akut puretaan hyödynnettäviksi materiaaleiksi.
 
-Lyijystä saadaan lähes 100 prosenttia hyödynnettyä ja sitä käytetään mm. uusien akkujen valmistuksessa. Muovi kierrätetään akkukoteloiden materiaaliksi. Osa komponenteista voidaan hyödyntää energiana jätevoimalaitoksissa.
+Lyijystä saadaan lähes 100 prosenttia hyödynnettyä, ja sitä käytetään mm. uusien akkujen valmistuksessa. Muovi kierrätetään akkukoteloiden materiaaliksi. Osa komponenteista voidaan hyödyntää energiana jätevoimalaitoksissa.
 
 Lyijyakut tunnistaa akussa olevasta Pb-merkinnästä. Lyijyhappoakun keskeinen komponentti on lyijy, joka on raskasmetalli. Käytetyn akun jättäminen luontoon vahingoittaa ympäristöä.
 
-Mikäli sinulla on ajoneuvoakku, valitse ReCycler palvelussa Ajoneuvoakut (lyijy) ja näytä kierrätyspisteet.
-
-
+Mikäli sinulla on ajoneuvoakku, valitse ReCycler-palvelussa "Ajoneuvoakut (lyijy)" ja näytä kierrätyspisteet.
