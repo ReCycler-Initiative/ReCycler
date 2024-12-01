@@ -6,6 +6,7 @@ import "./globals.css";
 import Providers from "./providers";
 import logo from "./recycler-logo.png";
 import { Analytics } from "@vercel/analytics/react";
+import { Chat } from "@/components/chat";
 
 const inter = Inter({ subsets: ["latin"] });
 
