@@ -6,6 +6,7 @@ import { Materials } from "@/components/materials";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 import Link from "next/link";
+import Script from "next/script";
 import { useForm } from "react-hook-form";
 
 const MaterialsPage = () => {
@@ -17,6 +18,16 @@ const MaterialsPage = () => {
 
   return (
     <Form {...form}>
+      <Script id="chatling">
+        {`window.chtlConfig = { chatbotId: "3433989154" }`}
+      </Script>
+      <Script
+        async
+        data-id="3433989154"
+        id="chatling-embed-script"
+        type="text/javascript"
+        src="https://chatling.ai/js/embed.js"
+      ></Script>
       <Container className="max-w-2xl pt-7 lg:pt-14">
         <h1 className="text-xl font-medium mb-4 font-sans">
           Mitäs tänään kierrätetään?
@@ -35,9 +46,9 @@ const MaterialsPage = () => {
           </Link>
         </Button>
       </div>
-      <div className="fixed z-50 right-2 bottom-32 lg:bottom-4">
+      {/* <div className="fixed z-50 right-2 bottom-32 lg:bottom-4">
         <Chat />
-      </div>
+      </div> */}
     </Form>
   );
 };
