@@ -1,6 +1,5 @@
 "use client";
 
-import { Chat } from "@/components/chat";
 import Container from "@/components/container";
 import { Materials } from "@/components/materials";
 import { Button } from "@/components/ui/button";
@@ -35,9 +34,9 @@ const MaterialsPage = () => {
           </Link>
         </Button>
       </div>
-      <div className="fixed z-50 right-2 bottom-32 lg:bottom-4">
+      {/* <div className="fixed z-50 right-2 bottom-32 lg:bottom-4">
         <Chat />
-      </div>
+      </div> */}
     </Form>
   );
 };
