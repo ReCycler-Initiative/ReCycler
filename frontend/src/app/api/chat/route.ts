@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(request: NextRequest) {
   const body = await request.json();
-  const response = await chat.chat(body.conversationId, body.message);
+  const response = await chat.chat(body.message);
 
-  return NextResponse.json(response);
+  return NextResponse.json({ message: response });
 }
