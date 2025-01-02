@@ -1,11 +1,6 @@
-import * as chatgtp from "./chatgpt";
-import * as chatling from "./chatling";
+import db from "@/services/db";
 
-export const chat = (
-  conversationId: string,
-  message: string
-): Promise<string> =>
-  // chatling.chat(conversationId, message).then((response) => {
-  //   return response.data.response;
-  // });
-  chatgtp.chat(message);
+export const chat = (message: string): Promise<string> =>
+  db
+    .raw("SELECT generate_rag_response(?)", [message])
+    .then((res) => res.rows[0].generate_rag_response);
