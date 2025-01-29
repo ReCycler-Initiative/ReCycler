@@ -1,18 +1,28 @@
-Poistotekstiilien kierrättäminen auttaa vähentämään kaatopaikalle menevän jätteen määrää ja säästää luonnonvaroja. Kierrätyksessä voidaan hyödyntää esimerkiksi vanhoja vaatteita, verhoja, mattoja ja muita tekstiilejä.
+Poistotekstiili
+
+Poistotekstiilit ovat rikkinäisiä, loppuun kuluneita tai muuten käyttökelvottomia tekstiilejä, joita ei voi enää käyttää uudelleen. Poistotekstiilin kierrätys on tärkeää, jotta arvokkaat materiaalit saadaan hyödynnettyä uusiksi tuotteiksi, kuten kierrätyskuiduksi, eristeiksi tai uusiksi tekstiileiksi. Poistotekstiiliä vastaanottavat lajitteluasemat löytyvät ReCycler-palvelusta.
 
 Lajitteluohje:
 
-Noudata aina alueellisia ja keräyspistekohtaisia ohjeita! Seuraavat lajitteluohjeet ovat yleisluonteisia ja noudattavat vallitsevaa käytäntöä.
+Noudata aina alueellisia ohjeita ja lajitteluasemien käytäntöjä.
 
 KYLLÄ:
-- Vaatteet (puhtaat ja ehjät)
-- Verhot ja matot
-- Kengät ja käsineet (puhtaat ja ehjät)
-- Puuvillatekstiilit, fleece, villat, lakanat ja pyyhkeet
+- rikkinäiset ja loppuun kuluneet vaatteet
+- käyttökelvottomat kodintekstiilit, kuten verhot, pyyhkeet ja lakanat
+- puhtaat ja kuivat tekstiilit ilman kovia osia, kuten nappeja tai vetoketjuja
+- farkut, villapaidat ja muut kangasmateriaalit, jotka soveltuvat kierrätykseen
 
 EI:
-- Märät ja likaiset vaatteet → sekajätteeseen
-- Kumikengät, muovipinnoitteiset tekstiilit → sekajätteeseen
-- Tekstiilit, jotka on käsitelty myrkyllisillä aineilla → sekajätteeseen
+- märät, homeiset tai likaiset tekstiilit
+- alusvaatteet, sukat ja sukkahousut
+- matot, tyynyt, peitot ja pehmusteet
+- pehmolelut ja muut täytetyt tekstiilituotteet
 
-Poistotekstiilit kierrätetään tekstiiliteollisuudessa uusiksi tuotteiksi, kuten vaatteiksi, pehmustetuiksi tuotteiksi tai energian tuottamiseen.
+Muista:
+Poistotekstiili tulee pakata tiiviisti muovipussiin, jotta se pysyy kuivana ja puhtaana kierrätystä varten. Vain puhtaat ja kuivat tekstiilit voidaan hyödyntää kierrätysmateriaalina.
+
+Keräys ja kuljetus:
+Poistotekstiiliä kerätään alueellisesti lajitteluasemilla tai erillisissä keräyspisteissä. Tarkista oman alueesi keräyspaikat ReCycler-palvelusta tai paikallisen jätehuoltoyhtiön verkkosivuilta.
+
+Käsittely:
+Poistotekstiilit lajitellaan ja käsitellään mekaanisesti tai kemiallisesti. K
