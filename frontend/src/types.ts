@@ -80,3 +80,8 @@ export const LocationGeoJson = z.object({
   geometry: Point,
   properties: LocationProperties,
 });
+
+export const LocationGeoJsonCollection = z.object({
+  type: z.literal("FeatureCollection"),
+  features: z.array(LocationGeoJson),
+});

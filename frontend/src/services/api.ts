@@ -18,3 +18,8 @@ export const chat = async ({
   axios
     .post("api/chat", { conversationId, message })
     .then((response) => response.data);
+
+export const getLocations = () =>
+  axios
+    .get("api/organizations/3c546d07-7ed4-425f-bb2f-a7fb4541de40/locations")
+    .then((response) => response.data);
