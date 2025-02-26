@@ -1,4 +1,5 @@
 import db from "@/services/db";
+import { DbLocation, LocationGeoJson } from "@/types";
 import { NextResponse } from "next/server";
 import { z, ZodError } from "zod";
 
@@ -7,6 +8,8 @@ const GetLocationsRequest = z.object({
 });
 
 type TGetLocationRequest = z.infer<typeof GetLocationsRequest>;
+
+const LocationDtos = z.array(LocationGeoJson);
 
 export async function GET(
   _: Request,
@@ -26,7 +29,44 @@ export async function GET(
       organizationId,
     ]);
 
-    return NextResponse.json(result.rows);
+    const locationDTOs = z
+      .array(DbLocation)
+      .transform((rows) => {
+        return rows.reduce(
+          (acc, row) => {
+            let existing = acc.find((l) => l.properties.id === row.location_id);
+
+            if (!existing) {
+              existing = {
+                type: "Feature",
+                geometry: {
+                  type: "Point",
+                  coordinates: [100, 100],
+                },
+                properties: {
+                  id: row.location_id,
+                  name: row.location_name,
+                  fields: [],
+                },
+              };
+
+              acc.push(existing);
+            }
+
+            existing.properties.fields.push({
+              name: row.field_name,
+              type: row.field_type,
+              value: row.field_values,
+            });
+
+            return acc;
+          },
+          [] as z.infer<typeof LocationDtos>
+        );
+      })
+      .parse(result.rows);
+
+    return NextResponse.json(locationDTOs);
   } catch (error) {
     if (error instanceof ZodError) {
       return NextResponse.json({ error: error.errors }, { status: 400 });
