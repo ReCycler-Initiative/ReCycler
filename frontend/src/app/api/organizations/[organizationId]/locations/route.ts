@@ -72,6 +72,8 @@ export async function GET(
       return NextResponse.json({ error: error.errors }, { status: 400 });
     }
 
+    console.error(error);
+
     return NextResponse.json(
       { error: "Something went wrong" },
       { status: 500 }
