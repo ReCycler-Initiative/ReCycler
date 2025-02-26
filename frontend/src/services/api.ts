@@ -24,5 +24,5 @@ export const getLocations = (
   organizationId: string
 ): Promise<z.infer<typeof LocationGeoJsonCollection>> =>
   axios
-    .get(`api/organizations/${organizationId}/locations`)
+    .get(`/api/organizations/${organizationId}/locations`)
     .then((response) => response.data);
