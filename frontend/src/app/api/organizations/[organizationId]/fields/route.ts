@@ -15,7 +15,7 @@ export async function GET(
   }
 
   const result = await db.raw(
-    `SELECT * FROM recycler.fields WHERE organization_id = ?`,
+    `SELECT * FROM recycler.fields f WHERE organization_id = ? ORDER BY f.order`,
     [organizationId]
   );
 
