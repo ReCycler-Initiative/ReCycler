@@ -33,6 +33,7 @@ export const DbLocation = z.object({
   location_id: z.string().uuid(),
   location_name: z.string(),
   location_geom: z.null(),
+  field_order: z.number(),
   field_name: z.string(),
   field_type: FieldType,
   field_values: FieldValue,
