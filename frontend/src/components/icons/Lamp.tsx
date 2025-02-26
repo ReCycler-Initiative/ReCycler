@@ -8,11 +8,11 @@ const Lamp = () => (
     fill="none"
     xmlns="http://www.w3.org/2000/svg"
   >
-    <g id="SVGRepo_bgCarrier" stroke-width="0" />
+    <g id="SVGRepo_bgCarrier" strokeWidth="0" />
     <g
       id="SVGRepo_tracerCarrier"
-      stroke-linecap="round"
-      stroke-linejoin="round"
+      strokeLinecap="round"
+      strokeLinejoin="round"
     />
     <g id="SVGRepo_iconCarrier">
       <path
@@ -22,7 +22,7 @@ const Lamp = () => (
       <path
         d="M14.9923 16V16C13.1812 17.2106 10.8191 17.2106 9.00806 16V16"
         stroke="currentColor"
-        stroke-width="2"
+        strokeWidth="2"
       />
     </g>
   </svg>
