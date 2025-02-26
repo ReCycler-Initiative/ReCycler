@@ -54,8 +54,10 @@ export async function GET(
             }
 
             existing.properties.fields.push({
+              data_type: row.field_data_type,
               name: row.field_name,
-              type: row.field_type,
+              field_type: row.field_type,
+              order: row.field_order,
               value: row.field_values,
             });
 

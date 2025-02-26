@@ -25,29 +25,48 @@ export type ChatResponse = {
   };
 };
 
-const FieldType = z.union([z.literal("multi_select"), z.literal("text_input")]);
+export const FieldType = z.union([
+  z.literal("multi_select"),
+  z.literal("text_input"),
+]);
 
-const FieldValue = z.union([z.string(), z.array(z.string())]);
+export const FieldValue = z.union([z.string(), z.array(z.string())]);
+
+export const FieldDataType = z.union([
+  z.literal("array"),
+  z.literal("boolean"),
+  z.literal("number"),
+  z.literal("string"),
+]);
+
+export const Field = z.object({
+  data_type: FieldDataType,
+  field_type: FieldType,
+  name: z.string(),
+  order: z.number(),
+});
 
 export const DbLocation = z.object({
-  location_id: z.string().uuid(),
-  location_name: z.string(),
-  location_geom: z.null(),
-  field_order: z.number(),
+  field_data_type: FieldDataType,
   field_name: z.string(),
+  field_order: z.number(),
   field_type: FieldType,
   field_values: FieldValue,
+  location_geom: z.null(),
+  location_id: z.string().uuid(),
+  location_name: z.string(),
 });
 
 export const LocationProperties = z.object({
   id: z.string().uuid(),
   name: z.string(),
   fields: z.array(
-    z.object({
-      name: z.string(),
-      type: FieldType,
-      value: FieldValue,
-    })
+    z.intersection(
+      Field,
+      z.object({
+        value: FieldValue,
+      })
+    )
   ),
 });
 

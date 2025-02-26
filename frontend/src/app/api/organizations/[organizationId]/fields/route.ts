@@ -1,5 +1,7 @@
 import db from "@/services/db";
+import { Field } from "@/types";
 import { NextResponse } from "next/server";
+import { z } from "zod";
 
 export async function GET(
   _: Request,
@@ -19,5 +21,5 @@ export async function GET(
     [organizationId]
   );
 
-  return NextResponse.json(result.rows);
+  return NextResponse.json(z.array(Field).parse(result.rows));
 }
