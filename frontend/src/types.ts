@@ -46,13 +46,18 @@ export const Field = z.object({
   order: z.number(),
 });
 
+export const Point = z.object({
+  type: z.literal("Point"),
+  coordinates: z.tuple([z.number(), z.number()]),
+});
+
 export const DbLocation = z.object({
   field_data_type: FieldDataType,
   field_name: z.string(),
   field_order: z.number(),
   field_type: FieldType,
   field_values: FieldValue,
-  location_geom: z.null(),
+  location_geom: Point,
   location_id: z.string().uuid(),
   location_name: z.string(),
 });
@@ -72,9 +77,6 @@ export const LocationProperties = z.object({
 
 export const LocationGeoJson = z.object({
   type: z.literal("Feature"),
-  geometry: z.object({
-    type: z.literal("Point"),
-    coordinates: z.tuple([z.number(), z.number()]),
-  }),
+  geometry: Point,
   properties: LocationProperties,
 });

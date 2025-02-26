@@ -39,10 +39,7 @@ export async function GET(
             if (!existing) {
               existing = {
                 type: "Feature",
-                geometry: {
-                  type: "Point",
-                  coordinates: [100, 100],
-                },
+                geometry: row.location_geom,
                 properties: {
                   id: row.location_id,
                   name: row.location_name,
