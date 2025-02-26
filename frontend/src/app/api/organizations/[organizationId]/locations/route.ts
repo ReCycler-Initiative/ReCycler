@@ -1,8 +1,5 @@
 import db from "@/services/db";
-import {
-  DbLocation,
-  LocationGeoJsonCollection
-} from "@/types";
+import { DbLocation, LocationGeoJsonCollection } from "@/types";
 import { NextResponse } from "next/server";
 import { z, ZodError } from "zod";
 
