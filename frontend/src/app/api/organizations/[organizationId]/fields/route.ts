@@ -5,7 +5,7 @@ export async function GET(
   _: Request,
   { params }: { params: { organizationId: string[] } }
 ) {
-  const organizationId = params.organizationId;
+  const organizationId = (await params).organizationId;
 
   if (!organizationId) {
     return NextResponse.json(
