@@ -1,3 +1,5 @@
+import { z } from "zod";
+
 export type CollectionSpot = {
   id: number;
   name: string;
@@ -22,3 +24,37 @@ export type ChatResponse = {
     response: string;
   };
 };
+
+const FieldType = z.union([z.literal("text"), z.literal("multi_select")]);
+
+const FieldValue = z.union([z.string(), z.array(z.string())]);
+
+export const DbLocation = z.object({
+  location_id: z.string().uuid(),
+  location_name: z.string(),
+  location_geom: z.null(),
+  field_name: z.string(),
+  field_type: FieldType,
+  field_values: FieldValue,
+});
+
+export const LocationProperties = z.object({
+  id: z.string().uuid(),
+  name: z.string(),
+  fields: z.array(
+    z.object({
+      name: z.string(),
+      type: FieldType,
+      value: FieldValue,
+    })
+  ),
+});
+
+export const LocationGeoJson = z.object({
+  type: z.literal("Feature"),
+  geometry: z.object({
+    type: z.literal("Point"),
+    coordinates: z.tuple([z.number(), z.number()]),
+  }),
+  properties: LocationProperties,
+});
