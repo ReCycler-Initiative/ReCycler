@@ -1,5 +1,6 @@
-import { ChatResponse, Material } from "@/types";
+import { LocationGeoJsonCollection, Material } from "@/types";
 import axios from "axios";
+import { z } from "zod";
 
 export const getCollectionSpots = async (): Promise<
   GeoJSON.FeatureCollection<GeoJSON.Geometry>
@@ -19,7 +20,9 @@ export const chat = async ({
     .post("api/chat", { conversationId, message })
     .then((response) => response.data);
 
-export const getLocations = () =>
+export const getLocations = (
+  organizationId: string
+): Promise<z.infer<typeof LocationGeoJsonCollection>> =>
   axios
-    .get("api/organizations/3c546d07-7ed4-425f-bb2f-a7fb4541de40/locations")
+    .get(`api/organizations/${organizationId}/locations`)
     .then((response) => response.data);
