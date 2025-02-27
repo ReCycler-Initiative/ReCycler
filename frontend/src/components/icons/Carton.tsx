@@ -9,7 +9,7 @@ const Carton = () => (
     width="24px"
     height="24px"
     viewBox="0 0 160 160"
-    enable-background="new 0 0 160 160"
+    enableBackground="new 0 0 160 160"
   >
     <path
       id="milk"
