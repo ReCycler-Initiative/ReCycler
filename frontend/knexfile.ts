@@ -5,7 +5,7 @@ const {
   POSTGRES_USER = "postgres",
   POSTGRES_PASSWORD = "foobar",
   POSTGRES_HOST = "localhost",
-  POSTGRES_PORT = "5432",
+  POSTGRES_PORT = "5433",
 } = process.env;
 
 const config: Knex.Config = {
