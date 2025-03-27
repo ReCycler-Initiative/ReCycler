@@ -85,3 +85,7 @@ export const LocationGeoJsonCollection = z.object({
   type: z.literal("FeatureCollection"),
   features: z.array(LocationGeoJson),
 });
+
+export const Organization = z.object({
+  name: z.string(),
+});
