@@ -70,15 +70,13 @@ const FormItemContext = React.createContext<FormItemContextValue>(
   {} as FormItemContextValue
 );
 
-const FormItem = (
-  {
-    ref,
-    className,
-    ...props
-  }: React.HTMLAttributes<HTMLDivElement> & {
-    ref: React.RefObject<HTMLDivElement>;
-  }
-) => {
+const FormItem = ({
+  ref,
+  className,
+  ...props
+}: React.HTMLAttributes<HTMLDivElement> & {
+  ref?: React.RefObject<HTMLDivElement>;
+}) => {
   const id = React.useId();
 
   return (
@@ -89,15 +87,13 @@ const FormItem = (
 };
 FormItem.displayName = "FormItem";
 
-const FormLabel = (
-  {
-    ref,
-    className,
-    ...props
-  }: React.ComponentPropsWithoutRef<typeof LabelPrimitive.Root> & {
-    ref: React.RefObject<React.ElementRef<typeof LabelPrimitive.Root>>;
-  }
-) => {
+const FormLabel = ({
+  ref,
+  className,
+  ...props
+}: React.ComponentPropsWithoutRef<typeof LabelPrimitive.Root> & {
+  ref?: React.RefObject<React.ElementRef<typeof LabelPrimitive.Root>>;
+}) => {
   const { error, formItemId } = useFormField();
 
   return (
@@ -111,14 +107,12 @@ const FormLabel = (
 };
 FormLabel.displayName = "FormLabel";
 
-const FormControl = (
-  {
-    ref,
-    ...props
-  }: React.ComponentPropsWithRef<typeof Slot> & {
-    ref: React.RefObject<React.ElementRef<typeof Slot>>;
-  }
-) => {
+const FormControl = ({
+  ref,
+  ...props
+}: React.ComponentPropsWithRef<typeof Slot> & {
+  ref?: React.RefObject<React.ElementRef<typeof Slot>>;
+}) => {
   const { error, formItemId, formDescriptionId, formMessageId } =
     useFormField();
 
@@ -138,15 +132,13 @@ const FormControl = (
 };
 FormControl.displayName = "FormControl";
 
-const FormDescription = (
-  {
-    ref,
-    className,
-    ...props
-  }: React.HTMLAttributes<HTMLParagraphElement> & {
-    ref: React.RefObject<HTMLParagraphElement>;
-  }
-) => {
+const FormDescription = ({
+  ref,
+  className,
+  ...props
+}: React.HTMLAttributes<HTMLParagraphElement> & {
+  ref?: React.RefObject<HTMLParagraphElement>;
+}) => {
   const { formDescriptionId } = useFormField();
 
   return (
@@ -160,16 +152,14 @@ const FormDescription = (
 };
 FormDescription.displayName = "FormDescription";
 
-const FormMessage = (
-  {
-    ref,
-    className,
-    children,
-    ...props
-  }: React.HTMLAttributes<HTMLParagraphElement> & {
-    ref: React.RefObject<HTMLParagraphElement>;
-  }
-) => {
+const FormMessage = ({
+  ref,
+  className,
+  children,
+  ...props
+}: React.HTMLAttributes<HTMLParagraphElement> & {
+  ref?: React.RefObject<HTMLParagraphElement>;
+}) => {
   const { error, formMessageId } = useFormField();
   const body = error ? String(error?.message) : children;
 
