@@ -1,13 +1,20 @@
-import { useFormContext } from "react-hook-form";
+import {
+  ControllerProps,
+  FieldPath,
+  FieldValues,
+  useFormContext,
+} from "react-hook-form";
 import { FormControl, FormField, FormItem, FormLabel } from "../ui/form";
 import { Input } from "../ui/input";
 
-type FormInputProps = {
+type FormInputProps<
+  TFieldValues extends FieldValues = FieldValues,
+  TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
+> = {
   label: string;
-  name: string;
-};
+} & Omit<ControllerProps<TFieldValues, TName>, "render">;
 
-const FormInput = ({ label, name }: FormInputProps) => {
+const FormInput = ({ label, rules, name }: FormInputProps) => {
   const form = useFormContext();
   return (
     <FormField
@@ -17,12 +24,13 @@ const FormInput = ({ label, name }: FormInputProps) => {
         <FormItem>
           <FormLabel>{label}</FormLabel>
           <FormControl>
-            <Input {...field} />
+            <Input {...field} value={field.value ?? ""} />
           </FormControl>
           {/* <FormDescription>This is your public display name.</FormDescription>
         <FormMessage /> */}
         </FormItem>
       )}
+      rules={rules}
     />
   );
 };
