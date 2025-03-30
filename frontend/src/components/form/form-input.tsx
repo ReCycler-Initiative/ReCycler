@@ -6,23 +6,26 @@ import {
 } from "react-hook-form";
 import { FormControl, FormField, FormItem, FormLabel } from "../ui/form";
 import { Input } from "../ui/input";
+import { cn } from "@/lib/utils";
+import { FormInputProps } from "./types";
 
-type FormInputProps<
-  TFieldValues extends FieldValues = FieldValues,
-  TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
-> = {
-  label: string;
-} & Omit<ControllerProps<TFieldValues, TName>, "render">;
-
-const FormInput = ({ label, rules, name }: FormInputProps) => {
+const FormInput = ({
+  className,
+  label,
+  rules,
+  name,
+  showLabel = true,
+}: FormInputProps) => {
   const form = useFormContext();
   return (
     <FormField
       control={form.control}
       name={name}
       render={({ field }) => (
-        <FormItem>
-          <FormLabel>{label}</FormLabel>
+        <FormItem className={className}>
+          <FormLabel className={cn({ "sr-only": !showLabel })}>
+            {label}
+          </FormLabel>
           <FormControl>
             <Input {...field} value={field.value ?? ""} />
           </FormControl>

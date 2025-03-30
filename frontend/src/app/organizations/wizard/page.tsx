@@ -1,10 +1,11 @@
 "use client";
 
 import FormInput from "@/components/form/form-input";
+import FormSelect from "@/components/form/form-select";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
-import { LocationProperties, Organization } from "@/types";
-import { PlusIcon } from "lucide-react";
+import { Field, LocationProperties, Organization } from "@/types";
+import { PlusIcon, Trash } from "lucide-react";
 import { createContext, useContext, useState } from "react";
 import {
   FieldValues,
@@ -99,7 +100,7 @@ function Step<T extends FieldValues>({
             {title}
           </h1>
           <div className="py-12">
-            <div className="mx-auto max-w-xl">
+            <div className="mx-auto max-w-4xl">
               {children}
               <StepActions>
                 {onNext && <StepNext />}
@@ -116,7 +117,7 @@ function Step<T extends FieldValues>({
 type TOrganization = z.infer<typeof Organization>;
 
 type FullState = {
-  fields: Field[];
+  fields: TField[];
   organization: TOrganization;
 };
 
@@ -177,10 +178,10 @@ const OrganizationStep = ({
   );
 };
 
-type Field = z.infer<typeof LocationProperties>;
+type TField = z.infer<typeof Field>;
 
 type LocationFieldsFormState = {
-  fields: Field[];
+  fields: TField[];
 };
 
 const LocationFieldsModel = ({
@@ -190,7 +191,7 @@ const LocationFieldsModel = ({
 }: {
   onNext: () => void;
   onPrevious: () => void;
-  values: Field[];
+  values: TField[];
 }) => {
   const form = useForm<LocationFieldsFormState>({
     defaultValues: {
@@ -211,9 +212,63 @@ const LocationFieldsModel = ({
       onStepChange={() => undefined}
       title="Kohteesta kerättävät tiedot"
     >
-      <Button>
-        Lisää kenttä <PlusIcon />
-      </Button>
+      <div className="flex flex-col gap-6">
+        {fieldsArray.fields.map((field, index) => (
+          <div key={field.id} className="flex flex-row gap-4 items-end">
+            <FormInput
+              className="flex-2"
+              label="Nimi"
+              name={`fields.${index}.name`}
+              rules={{ required: "Kenttä on pakollinen" }}
+              showLabel={index === 0}
+            />
+            <FormSelect
+              className="flex-1"
+              label="Kentän tyyppi"
+              items={["mutliselect", "text_input"].map((item) => ({
+                value: item,
+                label: item,
+              }))}
+              name={`fields.${index}.field_type`}
+              rules={{ required: "Tyyppi on pakollinen" }}
+              showLabel={index === 0}
+            />
+            <FormSelect
+              className="flex-1"
+              label="Sisällön tyyppi"
+              items={["string", "number", "boolean", "array"].map((item) => ({
+                value: item,
+                label: item,
+              }))}
+              name={`fields.${index}.data_type`}
+              rules={{ required: "Tyyppi on pakollinen" }}
+              showLabel={index === 0}
+            />
+            <Button
+              onClick={() => fieldsArray.remove(index)}
+              size="icon"
+              variant="destructive"
+            >
+              <span className="sr-only">Poista</span>
+              <Trash size="16" />
+            </Button>
+          </div>
+        ))}
+
+        <Button
+          className="w-fit"
+          onClick={() =>
+            fieldsArray.append({
+              name: "",
+              data_type: "string",
+              field_type: "text_input",
+              order: fieldsArray.fields.length,
+            })
+          }
+        >
+          Lisää kenttä <PlusIcon />
+        </Button>
+      </div>
     </Step>
   );
 };
