@@ -273,6 +273,36 @@ const LocationFieldsModel = ({
   );
 };
 
+const SummaryStep = ({
+  onPrevious,
+  onNext,
+  values,
+}: {
+  onNext: () => void;
+  onPrevious: () => void;
+  values: FullState;
+}) => {
+  const form = useForm<FullState>({
+    defaultValues: values,
+  });
+
+  return (
+    <Step
+      form={form}
+      onNext={onNext}
+      onPrevious={onPrevious}
+      onStepChange={() => undefined}
+      title="Yhteenveto"
+    >
+      <div className="flex flex-col gap-6">
+        <h2 className="text-xl">Organisaatio</h2>
+        <p>{values.organization.name}</p>
+        <h2 className="text-xl">Kentät</h2>
+      </div>
+    </Step>
+  );
+};
+
 const Wizard = () => {
   const [step, setStep] = useState("step1");
   const [fullState, setFullState] = useState<FullState>({
@@ -310,11 +340,21 @@ const Wizard = () => {
     );
   }
 
+  if (step === "step3") {
+    return (
+      <LocationFieldsModel
+        onNext={() => setStep("step4")}
+        onPrevious={() => setStep("step2")}
+        values={fullState.fields}
+      />
+    );
+  }
+
   return (
-    <LocationFieldsModel
+    <SummaryStep
       onNext={() => undefined}
       onPrevious={() => setStep("step2")}
-      values={fullState.fields}
+      values={fullState}
     />
   );
 };
