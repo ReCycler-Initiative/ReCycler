@@ -4,21 +4,36 @@ import FormInput from "@/components/form/form-input";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 import { LocationProperties, Organization } from "@/types";
-import { useState } from "react";
+import { createContext, useContext, useState } from "react";
 import {
   FieldValues,
   useFieldArray,
   useForm,
+  useFormContext,
   UseFormReturn,
 } from "react-hook-form";
 import { z } from "zod";
+
+type StepActionsContextProps = {
+  onNext?: () => void;
+  onPrevious?: () => void;
+  onStepChange: (values: any) => void;
+};
+
+const StepActionsContext = createContext<StepActionsContextProps>({
+  onStepChange: () => {},
+});
 
 type StepActionsProps = {
   children: React.ReactNode;
 };
 
 function StepActions({ children }: StepActionsProps) {
-  return <div className="py-16 flex justify-end">{children}</div>;
+  return (
+    <div className="py-16 flex flex-row-reverse justify-between">
+      {children}
+    </div>
+  );
 }
 
 type StepNextProps = {
@@ -27,8 +42,27 @@ type StepNextProps = {
 
 function StepNext({ children }: StepNextProps) {
   return (
-    <Button type="submit" size="lg">
+    <Button className="w-full max-w-40" type="submit" size="lg">
       {children ?? "Jatka"}
+    </Button>
+  );
+}
+
+function StepPrevious() {
+  const { onPrevious, onStepChange } = useContext(StepActionsContext);
+  const form = useFormContext();
+
+  return (
+    <Button
+      className="w-full max-w-40"
+      onClick={() => {
+        onStepChange(form.getValues());
+        onPrevious?.();
+      }}
+      variant="outline"
+      size="lg"
+    >
+      Takaisin
     </Button>
   );
 }
@@ -36,6 +70,8 @@ function StepNext({ children }: StepNextProps) {
 type StepProps<T extends FieldValues> = {
   children: React.ReactNode;
   form: UseFormReturn<T, any, undefined>;
+  onNext: () => void;
+  onPrevious?: () => void;
   onStepChange: (values: T) => void;
   title: string;
 };
@@ -43,25 +79,30 @@ type StepProps<T extends FieldValues> = {
 function Step<T extends FieldValues>({
   children,
   form,
+  onNext,
+  onPrevious,
   onStepChange,
   title,
 }: StepProps<T>) {
   return (
-    <Form {...form}>
-      <form
-        className="flex-1 bg-white"
-        onSubmit={form.handleSubmit((values) => {
-          onStepChange(values);
-        })}
-      >
-        <h1 className="text-2xl text-center py-6 border-b bg-gray-50 text-primary">
-          {title}
-        </h1>
-        <div className="py-12">
-          <div className="mx-auto max-w-xl">{children}</div>
-        </div>
-      </form>
-    </Form>
+    <StepActionsContext.Provider value={{ onNext, onPrevious, onStepChange }}>
+      <Form {...form}>
+        <form
+          className="flex-1 bg-white"
+          onSubmit={form.handleSubmit((values) => {
+            onStepChange(values);
+            onNext();
+          })}
+        >
+          <h1 className="text-2xl text-center py-6 border-b bg-gray-50 text-primary">
+            {title}
+          </h1>
+          <div className="py-12">
+            <div className="mx-auto max-w-xl">{children}</div>
+          </div>
+        </form>
+      </Form>
+    </StepActionsContext.Provider>
   );
 }
 
@@ -72,11 +113,22 @@ type FullState = {
   organization: TOrganization;
 };
 
-const WelcomeStep = ({ onStepChange }: { onStepChange: () => void }) => {
+const WelcomeStep = ({
+  onNext,
+  onStepChange,
+}: {
+  onNext: () => void;
+  onStepChange: () => void;
+}) => {
   const form = useForm();
 
   return (
-    <Step form={form} onStepChange={onStepChange} title="Tervetuloa">
+    <Step
+      form={form}
+      onNext={onNext}
+      onStepChange={onStepChange}
+      title="Tervetuloa"
+    >
       <p>
         Tämän vaiheittaisen opastuksen avulla voit luoda oman tilin ja
         määritellä, millaisia tietoja haluat tallentaa eri kohteista. Aloitetaan
@@ -91,8 +143,12 @@ const WelcomeStep = ({ onStepChange }: { onStepChange: () => void }) => {
 
 const OrganizationStep = ({
   onStepChange,
+  onPrevious,
+  onNext,
   values,
 }: {
+  onNext: () => void;
+  onPrevious: () => void;
   onStepChange: (values: TOrganization) => void;
   values: TOrganization;
 }) => {
@@ -101,7 +157,13 @@ const OrganizationStep = ({
   });
 
   return (
-    <Step form={form} onStepChange={onStepChange} title="Organisaatio">
+    <Step
+      form={form}
+      onNext={onNext}
+      onPrevious={onPrevious}
+      onStepChange={onStepChange}
+      title="Organisaatio"
+    >
       <FormInput
         label="Nimi"
         name="name"
@@ -109,6 +171,7 @@ const OrganizationStep = ({
       />
       <StepActions>
         <StepNext />
+        <StepPrevious />
       </StepActions>
     </Step>
   );
@@ -120,7 +183,15 @@ type LocationFieldsFormState = {
   fields: Field[];
 };
 
-const LocationFieldsModel = ({ values }: { values: Field[] }) => {
+const LocationFieldsModel = ({
+  onNext,
+  onPrevious,
+  values,
+}: {
+  onNext: () => void;
+  onPrevious: () => void;
+  values: Field[];
+}) => {
   const form = useForm<LocationFieldsFormState>({
     defaultValues: {
       fields: values,
@@ -133,7 +204,13 @@ const LocationFieldsModel = ({ values }: { values: Field[] }) => {
   });
 
   return (
-    <Step form={form} onStepChange={() => undefined} title="Kohteen kentät">
+    <Step
+      form={form}
+      onNext={onNext}
+      onPrevious={onPrevious}
+      onStepChange={() => undefined}
+      title="Kohteen kentät"
+    >
       <StepActions>
         <StepNext />
       </StepActions>
@@ -151,12 +228,19 @@ const Wizard = () => {
   });
 
   if (step === "step1") {
-    return <WelcomeStep onStepChange={() => setStep("step2")} />;
+    return (
+      <WelcomeStep
+        onNext={() => setStep("step2")}
+        onStepChange={() => undefined}
+      />
+    );
   }
 
   if (step === "step2") {
     return (
       <OrganizationStep
+        onNext={() => setStep("step3")}
+        onPrevious={() => setStep("step1")}
         onStepChange={() => {
           setFullState((prev) => ({
             ...prev,
@@ -171,7 +255,13 @@ const Wizard = () => {
     );
   }
 
-  return <LocationFieldsModel values={fullState.fields} />;
+  return (
+    <LocationFieldsModel
+      onNext={() => undefined}
+      onPrevious={() => setStep("step2")}
+      values={fullState.fields}
+    />
+  );
 };
 
 export default Wizard;
