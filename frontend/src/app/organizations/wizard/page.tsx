@@ -13,20 +13,6 @@ import {
 } from "react-hook-form";
 import { z } from "zod";
 
-type StepProps = {
-  children: React.ReactNode;
-  title: string;
-};
-
-function Step({ children, title }: StepProps) {
-  return (
-    <div className="p-10 mx-auto w-full max-w-xl">
-      <h1 className="text-3xl mb-6">{title}</h1>
-      {children}
-    </div>
-  );
-}
-
 type StepActionsProps = {
   children: React.ReactNode;
 };
@@ -43,25 +29,28 @@ function StepNext({ children }: StepNextProps) {
   return <Button type="submit">{children ?? "Jatka"}</Button>;
 }
 
-type StepFormProps<T extends FieldValues> = {
+type StepProps<T extends FieldValues> = {
   children: React.ReactNode;
   form: UseFormReturn<T, any, undefined>;
   onStepChange: (values: T) => void;
+  title: string;
 };
 
-function StepForm<T extends FieldValues>({
+function Step<T extends FieldValues>({
   children,
   form,
   onStepChange,
-}: StepFormProps<T>) {
+  title,
+}: StepProps<T>) {
   return (
     <Form {...form}>
       <form
-        className="contents"
+        className="p-10 mx-auto w-full max-w-xl"
         onSubmit={form.handleSubmit((values) => {
           onStepChange(values);
         })}
       >
+        <h1 className="text-3xl mb-6">{title}</h1>
         {children}
       </form>
     </Form>
@@ -79,17 +68,15 @@ const WelcomeStep = ({ onStepChange }: { onStepChange: () => void }) => {
   const form = useForm();
 
   return (
-    <Step title="Tervetuloa">
-      <StepForm form={form} onStepChange={onStepChange}>
-        <p>
-          Tämän vaiheittaisen opastuksen avulla voit luoda oman tilin ja
-          määritellä, millaisia tietoja haluat tallentaa eri kohteista.
-          Aloitetaan ensimmäisestä vaiheesta klikkaamalla {'"Aloitetaan"'}.
-        </p>
-        <StepActions>
-          <StepNext>Aloita</StepNext>
-        </StepActions>
-      </StepForm>
+    <Step form={form} onStepChange={onStepChange} title="Tervetuloa">
+      <p>
+        Tämän vaiheittaisen opastuksen avulla voit luoda oman tilin ja
+        määritellä, millaisia tietoja haluat tallentaa eri kohteista. Aloitetaan
+        ensimmäisestä vaiheesta klikkaamalla {'"Aloitetaan"'}.
+      </p>
+      <StepActions>
+        <StepNext>Aloita</StepNext>
+      </StepActions>
     </Step>
   );
 };
@@ -106,18 +93,16 @@ const OrganizationStep = ({
   });
 
   return (
-    <StepForm form={form} onStepChange={onStepChange}>
-      <Step title="Organisaatio">
-        <FormInput
-          label="Nimi"
-          name="name"
-          rules={{ required: "Nimi on pakollinen" }}
-        />
-        <StepActions>
-          <StepNext />
-        </StepActions>
-      </Step>
-    </StepForm>
+    <Step form={form} onStepChange={onStepChange} title="Organisaatio">
+      <FormInput
+        label="Nimi"
+        name="name"
+        rules={{ required: "Nimi on pakollinen" }}
+      />
+      <StepActions>
+        <StepNext />
+      </StepActions>
+    </Step>
   );
 };
 
@@ -140,13 +125,11 @@ const LocationFieldsModel = ({ values }: { values: Field[] }) => {
   });
 
   return (
-    <StepForm form={form} onStepChange={() => undefined}>
-      <Step title="Kohteen kentät">
-        <StepActions>
-          <StepNext />
-        </StepActions>
-      </Step>
-    </StepForm>
+    <Step form={form} onStepChange={() => undefined} title="Kohteen kentät">
+      <StepActions>
+        <StepNext />
+      </StepActions>
+    </Step>
   );
 };
 
