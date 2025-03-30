@@ -5,8 +5,45 @@ import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 import { LocationProperties, Organization } from "@/types";
 import { useState } from "react";
-import { useFieldArray, useForm } from "react-hook-form";
+import {
+  DefaultValues,
+  FieldValues,
+  useFieldArray,
+  useForm,
+} from "react-hook-form";
 import { z } from "zod";
+
+type StepProps<T extends FieldValues> = {
+  children: React.ReactNode;
+  onStepChange: (values: T) => void;
+  title: string;
+  values: DefaultValues<T>;
+};
+
+function Step<T extends FieldValues>({
+  children,
+  onStepChange,
+  title,
+  values,
+}: StepProps<T>) {
+  const form = useForm<T>({
+    defaultValues: values,
+  });
+
+  return (
+    <Form {...form}>
+      <form
+        className="p-10 mx-auto w-full max-w-xl"
+        onSubmit={form.handleSubmit((values) => {
+          onStepChange(values);
+        })}
+      >
+        <h1 className="mb-6">{title}</h1>
+        {children}
+      </form>
+    </Form>
+  );
+}
 
 type TOrganization = z.infer<typeof Organization>;
 
@@ -16,10 +53,10 @@ type FullState = {
 };
 
 const OrganizationStep = ({
-  onNext,
+  onStepChange,
   values,
 }: {
-  onNext: (values: TOrganization) => void;
+  onStepChange: (values: TOrganization) => void;
   values: TOrganization;
 }) => {
   const form = useForm<TOrganization>({
@@ -27,23 +64,16 @@ const OrganizationStep = ({
   });
 
   return (
-    <Form {...form}>
-      <form
-        className="p-10 mx-auto w-full max-w-xl"
-        onSubmit={form.handleSubmit((values) => {
-          onNext(values);
-        })}
-      >
-        <FormInput
-          label="Nimi"
-          name="name"
-          rules={{ required: "Nimi on pakollinen" }}
-        />
-        <div className="pt-6 flex justify-end">
-          <Button>Seuraava</Button>
-        </div>
-      </form>
-    </Form>
+    <Step onStepChange={onStepChange} title="Organisaatio" values={values}>
+      <FormInput
+        label="Nimi"
+        name="name"
+        rules={{ required: "Nimi on pakollinen" }}
+      />
+      <div className="pt-6 flex justify-end">
+        <Button>Seuraava</Button>
+      </div>
+    </Step>
   );
 };
 
@@ -88,7 +118,7 @@ const Wizard = () => {
   if (step === "step1") {
     return (
       <OrganizationStep
-        onNext={() => {
+        onStepChange={() => {
           setFullState((prev) => ({
             ...prev,
             organization: {
