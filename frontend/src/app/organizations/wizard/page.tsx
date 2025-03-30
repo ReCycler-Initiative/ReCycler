@@ -10,11 +10,13 @@ import {
   FieldValues,
   useFieldArray,
   useForm,
+  UseFormReturn,
 } from "react-hook-form";
 import { z } from "zod";
 
 type StepProps<T extends FieldValues> = {
   children: React.ReactNode;
+  form: UseFormReturn<T, any, undefined>;
   onStepChange: (values: T) => void;
   title: string;
   values: DefaultValues<T>;
@@ -22,6 +24,7 @@ type StepProps<T extends FieldValues> = {
 
 function Step<T extends FieldValues>({
   children,
+  form,
   onStepChange,
   title,
   values,
@@ -64,7 +67,7 @@ const OrganizationStep = ({
   });
 
   return (
-    <Step onStepChange={onStepChange} title="Organisaatio" values={values}>
+    <Step form={form} onStepChange={onStepChange} title="Organisaatio">
       <FormInput
         label="Nimi"
         name="name"
@@ -96,13 +99,11 @@ const LocationFieldsModel = ({ values }: { values: Field[] }) => {
   });
 
   return (
-    <div className="p-10 mx-auto w-full max-w-xl">
-      <Form {...form}>
-        <div className="pt-6 flex justify-end">
-          <Button type="submit">Seuraava</Button>
-        </div>
-      </Form>
-    </div>
+    <Step form={form} onStepChange={() => undefined} title="Kohteen kentät">
+      <div className="pt-6 flex justify-end">
+        <Button type="submit">Seuraava</Button>
+      </div>
+    </Step>
   );
 };
 
