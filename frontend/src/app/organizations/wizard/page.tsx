@@ -27,6 +27,22 @@ function Step({ children, title }: StepProps) {
   );
 }
 
+type StepActionsProps = {
+  children: React.ReactNode;
+};
+
+function StepActions({ children }: StepActionsProps) {
+  return <div className="pt-6 flex justify-end">{children}</div>;
+}
+
+type StepNextProps = {
+  children?: string;
+};
+
+function StepNext({ children }: StepNextProps) {
+  return <Button type="submit">{children ?? "Jatka"}</Button>;
+}
+
 type StepFormProps<T extends FieldValues> = {
   children: React.ReactNode;
   form: UseFormReturn<T, any, undefined>;
@@ -60,16 +76,20 @@ type FullState = {
 };
 
 const WelcomeStep = ({ onStepChange }: { onStepChange: () => void }) => {
+  const form = useForm();
+
   return (
     <Step title="Tervetuloa">
-      <p>
-        Tämän vaiheittaisen opastuksen avulla voit luoda oman tilin ja
-        määritellä, millaisia tietoja haluat tallentaa eri kohteista. Aloitetaan
-        ensimmäisestä vaiheesta klikkaamalla {'"Seuraava"'}.
-      </p>
-      <div className="pt-6 flex justify-end">
-        <Button onClick={onStepChange}>Seuraava</Button>
-      </div>
+      <StepForm form={form} onStepChange={onStepChange}>
+        <p>
+          Tämän vaiheittaisen opastuksen avulla voit luoda oman tilin ja
+          määritellä, millaisia tietoja haluat tallentaa eri kohteista.
+          Aloitetaan ensimmäisestä vaiheesta klikkaamalla {'"Aloitetaan"'}.
+        </p>
+        <StepActions>
+          <StepNext>Aloita</StepNext>
+        </StepActions>
+      </StepForm>
     </Step>
   );
 };
@@ -93,9 +113,9 @@ const OrganizationStep = ({
           name="name"
           rules={{ required: "Nimi on pakollinen" }}
         />
-        <div className="pt-6 flex justify-end">
-          <Button>Seuraava</Button>
-        </div>
+        <StepActions>
+          <StepNext />
+        </StepActions>
       </Step>
     </StepForm>
   );
@@ -122,9 +142,9 @@ const LocationFieldsModel = ({ values }: { values: Field[] }) => {
   return (
     <StepForm form={form} onStepChange={() => undefined}>
       <Step title="Kohteen kentät">
-        <div className="pt-6 flex justify-end">
-          <Button type="submit">Seuraava</Button>
-        </div>
+        <StepActions>
+          <StepNext />
+        </StepActions>
       </Step>
     </StepForm>
   );
@@ -153,7 +173,7 @@ const Wizard = () => {
               ...prev.organization,
             },
           }));
-          setStep("step2");
+          setStep("step3");
         }}
         values={fullState.organization}
       />
