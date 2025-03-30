@@ -4,6 +4,7 @@ import FormInput from "@/components/form/form-input";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 import { LocationProperties, Organization } from "@/types";
+import { PlusIcon } from "lucide-react";
 import { createContext, useContext, useState } from "react";
 import {
   FieldValues,
@@ -70,7 +71,7 @@ function StepPrevious() {
 type StepProps<T extends FieldValues> = {
   children: React.ReactNode;
   form: UseFormReturn<T, any, undefined>;
-  onNext: () => void;
+  onNext?: () => void;
   onPrevious?: () => void;
   onStepChange: (values: T) => void;
   title: string;
@@ -91,14 +92,20 @@ function Step<T extends FieldValues>({
           className="flex-1 bg-white"
           onSubmit={form.handleSubmit((values) => {
             onStepChange(values);
-            onNext();
+            onNext?.();
           })}
         >
           <h1 className="text-2xl text-center py-6 border-b bg-gray-50 text-primary">
             {title}
           </h1>
           <div className="py-12">
-            <div className="mx-auto max-w-xl">{children}</div>
+            <div className="mx-auto max-w-xl">
+              {children}
+              <StepActions>
+                {onNext && <StepNext />}
+                {onPrevious && <StepPrevious />}
+              </StepActions>
+            </div>
           </div>
         </form>
       </Form>
@@ -134,9 +141,6 @@ const WelcomeStep = ({
         määritellä, millaisia tietoja haluat tallentaa eri kohteista. Aloitetaan
         ensimmäisestä vaiheesta klikkaamalla {'"Aloitetaan"'}.
       </p>
-      <StepActions>
-        <StepNext>Aloita</StepNext>
-      </StepActions>
     </Step>
   );
 };
@@ -169,10 +173,6 @@ const OrganizationStep = ({
         name="name"
         rules={{ required: "Nimi on pakollinen" }}
       />
-      <StepActions>
-        <StepNext />
-        <StepPrevious />
-      </StepActions>
     </Step>
   );
 };
@@ -209,11 +209,11 @@ const LocationFieldsModel = ({
       onNext={onNext}
       onPrevious={onPrevious}
       onStepChange={() => undefined}
-      title="Kohteen kentät"
+      title="Kohteesta kerättävät tiedot"
     >
-      <StepActions>
-        <StepNext />
-      </StepActions>
+      <Button>
+        Lisää kenttä <PlusIcon />
+      </Button>
     </Step>
   );
 };
