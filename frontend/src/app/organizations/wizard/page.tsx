@@ -18,7 +18,7 @@ type StepActionsProps = {
 };
 
 function StepActions({ children }: StepActionsProps) {
-  return <div className="pt-6 flex justify-end">{children}</div>;
+  return <div className="py-16 flex justify-end">{children}</div>;
 }
 
 type StepNextProps = {
@@ -26,7 +26,11 @@ type StepNextProps = {
 };
 
 function StepNext({ children }: StepNextProps) {
-  return <Button type="submit">{children ?? "Jatka"}</Button>;
+  return (
+    <Button type="submit" size="lg">
+      {children ?? "Jatka"}
+    </Button>
+  );
 }
 
 type StepProps<T extends FieldValues> = {
@@ -45,13 +49,17 @@ function Step<T extends FieldValues>({
   return (
     <Form {...form}>
       <form
-        className="p-10 mx-auto w-full max-w-xl"
+        className="flex-1 bg-white"
         onSubmit={form.handleSubmit((values) => {
           onStepChange(values);
         })}
       >
-        <h1 className="text-3xl mb-6">{title}</h1>
-        {children}
+        <h1 className="text-2xl text-center py-6 border-b bg-gray-50 text-primary">
+          {title}
+        </h1>
+        <div className="py-12">
+          <div className="mx-auto max-w-xl">{children}</div>
+        </div>
       </form>
     </Form>
   );
