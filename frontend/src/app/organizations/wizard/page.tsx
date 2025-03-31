@@ -6,10 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Field, Organization } from "@/types";
 import { PlusIcon, Trash } from "lucide-react";
 import { useState } from "react";
-import {
-  useFieldArray,
-  useForm
-} from "react-hook-form";
+import { useFieldArray, useForm } from "react-hook-form";
 import { z } from "zod";
 import Step from "./step";
 
@@ -86,8 +83,10 @@ type LocationFieldsFormState = {
 const LocationFieldsModel = ({
   onNext,
   onPrevious,
+  onStepChange,
   values,
 }: {
+  onStepChange: (values: LocationFieldsFormState) => void;
   onNext: () => void;
   onPrevious: () => void;
   values: TField[];
@@ -108,7 +107,7 @@ const LocationFieldsModel = ({
       form={form}
       onNext={onNext}
       onPrevious={onPrevious}
-      onStepChange={() => undefined}
+      onStepChange={onStepChange}
       title="Kohteesta kerättävät tiedot"
     >
       <div className="flex flex-col gap-6">
@@ -197,6 +196,15 @@ const SummaryStep = ({
         <h2 className="text-xl">Organisaatio</h2>
         <p>{values.organization.name}</p>
         <h2 className="text-xl">Kentät</h2>
+        <div className="grid grid-cols-3">
+          {values.fields.map((field) => (
+            <>
+              <div>{field.name}</div>
+              <div>{field.data_type}</div>
+              <div>{field.field_type}</div>
+            </>
+          ))}
+        </div>
       </div>
     </Step>
   );
@@ -225,12 +233,10 @@ const Wizard = () => {
       <OrganizationStep
         onNext={() => setStep("step3")}
         onPrevious={() => setStep("step1")}
-        onStepChange={() => {
+        onStepChange={(values) => {
           setFullState((prev) => ({
             ...prev,
-            organization: {
-              ...prev.organization,
-            },
+            organization: values,
           }));
           setStep("step3");
         }}
@@ -244,6 +250,12 @@ const Wizard = () => {
       <LocationFieldsModel
         onNext={() => setStep("step4")}
         onPrevious={() => setStep("step2")}
+        onStepChange={(values) => {
+          setFullState((prev) => ({
+            ...prev,
+            fields: values.fields,
+          }));
+        }}
         values={fullState.fields}
       />
     );
