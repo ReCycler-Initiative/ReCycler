@@ -279,7 +279,7 @@ const Wizard = () => {
   return (
     <SummaryStep
       onNext={() => undefined}
-      onPrevious={() => setStep("step2")}
+      onPrevious={() => setStep("step3")}
       values={fullState}
     />
   );
