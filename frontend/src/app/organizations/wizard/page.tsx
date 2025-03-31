@@ -29,6 +29,7 @@ const WelcomeStep = ({
   return (
     <Step
       form={form}
+      nextText="Aloita"
       onNext={onNext}
       onStepChange={onStepChange}
       title="Tervetuloa"
@@ -190,6 +191,7 @@ const SummaryStep = ({
       onNext={onNext}
       onPrevious={onPrevious}
       onStepChange={() => undefined}
+      nextText="Lähetä"
       title="Yhteenveto"
     >
       <div className="flex flex-col gap-y-6">

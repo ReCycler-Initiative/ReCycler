@@ -59,6 +59,7 @@ function StepPrevious() {
 type StepProps<T extends FieldValues> = {
   children: React.ReactNode;
   form: UseFormReturn<T, any, undefined>;
+  nextText?: string;
   onNext?: () => void;
   onPrevious?: () => void;
   onStepChange: (values: T) => void;
@@ -68,6 +69,7 @@ type StepProps<T extends FieldValues> = {
 function Step<T extends FieldValues>({
   children,
   form,
+  nextText,
   onNext,
   onPrevious,
   onStepChange,
@@ -90,7 +92,7 @@ function Step<T extends FieldValues>({
             <div className="mx-auto max-w-4xl">
               {children}
               <StepActions>
-                {onNext && <StepNext />}
+                {onNext && <StepNext>{nextText}</StepNext>}
                 {onPrevious && <StepPrevious />}
               </StepActions>
             </div>
