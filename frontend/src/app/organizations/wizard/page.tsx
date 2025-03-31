@@ -5,7 +5,7 @@ import FormSelect from "@/components/form/form-select";
 import { Button } from "@/components/ui/button";
 import { Field, Organization } from "@/types";
 import { PlusIcon, Trash } from "lucide-react";
-import { useState } from "react";
+import { Fragment, useState } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
 import { z } from "zod";
 import Step from "./step";
@@ -192,18 +192,33 @@ const SummaryStep = ({
       onStepChange={() => undefined}
       title="Yhteenveto"
     >
-      <div className="flex flex-col gap-6">
-        <h2 className="text-xl">Organisaatio</h2>
-        <p>{values.organization.name}</p>
-        <h2 className="text-xl">Kentät</h2>
-        <div className="grid grid-cols-3">
-          {values.fields.map((field) => (
-            <>
-              <div>{field.name}</div>
-              <div>{field.data_type}</div>
-              <div>{field.field_type}</div>
-            </>
-          ))}
+      <div className="flex flex-col gap-y-6">
+        <div>
+          <h2 className="text-xl mb-4">Organisaatio</h2>
+          <dl>
+            <dt className="font-bold">Nimi</dt>
+            <dd className="mb-4">{values.organization.name}</dd>
+          </dl>
+        </div>
+        <div>
+          <h2 className="text-xl mb-4">Kohteesta kerättävät tiedot</h2>
+          <div className="grid grid-cols-3 grap-y-4 [&>div]:px-4 [&>div]:py-2">
+            <div className="grid grid-cols-subgrid col-span-3 bg-primary text-white">
+              <div>Nimi</div>
+              <div>Data tyyppi</div>
+              <div>Kentän tyyppi</div>
+            </div>
+            {values.fields.map((field) => (
+              <div
+                key={field.name}
+                className="grid grid-cols-subgrid col-span-3 even:bg-gray-100"
+              >
+                <div>{field.name}</div>
+                <div>{field.data_type}</div>
+                <div>{field.field_type}</div>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </Step>
