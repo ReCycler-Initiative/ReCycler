@@ -3,19 +3,14 @@
 import FormInput from "@/components/form/form-input";
 import FormSelect from "@/components/form/form-select";
 import { Button } from "@/components/ui/button";
-import { Field, Organization } from "@/types";
+import { CreateOrganizationRequest } from "@/types";
 import { PlusIcon, Trash } from "lucide-react";
-import { Fragment, useState } from "react";
+import { useState } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
 import { z } from "zod";
 import Step from "./step";
 
-type TOrganization = z.infer<typeof Organization>;
-
-type FullState = {
-  fields: TField[];
-  organization: TOrganization;
-};
+type TCreateOrganizationRequest = z.infer<typeof CreateOrganizationRequest>;
 
 const WelcomeStep = ({
   onNext,
@@ -51,10 +46,10 @@ const OrganizationStep = ({
 }: {
   onNext: () => void;
   onPrevious: () => void;
-  onStepChange: (values: TOrganization) => void;
-  values: TOrganization;
+  onStepChange: (values: TCreateOrganizationRequest["organization"]) => void;
+  values: TCreateOrganizationRequest["organization"];
 }) => {
-  const form = useForm<TOrganization>({
+  const form = useForm<TCreateOrganizationRequest["organization"]>({
     defaultValues: values,
   });
 
@@ -75,10 +70,8 @@ const OrganizationStep = ({
   );
 };
 
-type TField = z.infer<typeof Field>;
-
 type LocationFieldsFormState = {
-  fields: TField[];
+  fields: TCreateOrganizationRequest["fields"];
 };
 
 const LocationFieldsModel = ({
@@ -90,7 +83,7 @@ const LocationFieldsModel = ({
   onStepChange: (values: LocationFieldsFormState) => void;
   onNext: () => void;
   onPrevious: () => void;
-  values: TField[];
+  values: TCreateOrganizationRequest["fields"];
 }) => {
   const form = useForm<LocationFieldsFormState>({
     defaultValues: {
@@ -179,9 +172,9 @@ const SummaryStep = ({
 }: {
   onNext: () => void;
   onPrevious: () => void;
-  values: FullState;
+  values: TCreateOrganizationRequest;
 }) => {
-  const form = useForm<FullState>({
+  const form = useForm<TCreateOrganizationRequest>({
     defaultValues: values,
   });
 
@@ -229,7 +222,7 @@ const SummaryStep = ({
 
 const Wizard = () => {
   const [step, setStep] = useState("step1");
-  const [fullState, setFullState] = useState<FullState>({
+  const [fullState, setFullState] = useState<TCreateOrganizationRequest>({
     organization: {
       name: "",
     },

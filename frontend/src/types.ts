@@ -89,3 +89,8 @@ export const LocationGeoJsonCollection = z.object({
 export const Organization = z.object({
   name: z.string(),
 });
+
+export const CreateOrganizationRequest = z.object({
+  organization: Organization,
+  fields: z.array(Field),
+});
