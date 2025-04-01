@@ -9,6 +9,7 @@ import { useState } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
 import { z } from "zod";
 import Step from "./step";
+import { createOrganization } from "@/services/api";
 
 type TCreateOrganizationRequest = z.infer<typeof CreateOrganizationRequest>;
 
@@ -181,7 +182,10 @@ const SummaryStep = ({
   return (
     <Step
       form={form}
-      onNext={onNext}
+      onNext={async (values) => {
+        await createOrganization(values);
+        onNext();
+      }}
       onPrevious={onPrevious}
       onStepChange={() => undefined}
       nextText="Lähetä"
