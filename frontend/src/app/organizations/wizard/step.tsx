@@ -4,7 +4,7 @@ import { createContext, useContext } from "react";
 import { FieldValues, useFormContext, UseFormReturn } from "react-hook-form";
 
 type StepActionsContextProps = {
-  onNext?: () => void;
+  onNext?: (value: any) => void;
   onPrevious?: () => void;
   onStepChange: (values: any) => void;
 };
@@ -60,7 +60,7 @@ type StepProps<T extends FieldValues> = {
   children: React.ReactNode;
   form: UseFormReturn<T, any, undefined>;
   nextText?: string;
-  onNext?: () => void;
+  onNext?: (value: T) => Promise<void> | void;
   onPrevious?: () => void;
   onStepChange: (values: T) => void;
   title: string;
@@ -80,9 +80,9 @@ function Step<T extends FieldValues>({
       <Form {...form}>
         <form
           className="flex-1 bg-white"
-          onSubmit={form.handleSubmit((values) => {
+          onSubmit={form.handleSubmit(async (values) => {
             onStepChange(values);
-            onNext?.();
+            await onNext?.(values);
           })}
         >
           <h1 className="text-2xl text-center py-6 border-b bg-gray-50 text-primary">
