@@ -10,6 +10,7 @@ import { useFieldArray, useForm } from "react-hook-form";
 import { z } from "zod";
 import Step from "./step";
 import { createOrganization } from "@/services/api";
+import { useRouter } from "next/navigation";
 
 type TCreateOrganizationRequest = z.infer<typeof CreateOrganizationRequest>;
 
@@ -225,6 +226,7 @@ const SummaryStep = ({
 };
 
 const Wizard = () => {
+  const router = useRouter();
   const [step, setStep] = useState("step1");
   const [fullState, setFullState] = useState<TCreateOrganizationRequest>({
     organization: {
@@ -277,7 +279,7 @@ const Wizard = () => {
 
   return (
     <SummaryStep
-      onNext={() => undefined}
+      onNext={() => router.push("wizard/thankyou")}
       onPrevious={() => setStep("step3")}
       values={fullState}
     />
