@@ -14,6 +14,8 @@ You can test the development version of ReCycler at: http://www.recyclerapp.fi. 
 ReCycler provides an intuitive interface featuring a map view that visualizes the locations of recommended recycling collection spots along with detailed information about each site. ReCycler can dynamically display the user’s current location on the map, so the user does not need to adjust the map while moving manually.
 ### Multi-organization support and admin tools (to be released in 2025)
 A single instance of Recycler can be utilized by multiple organizations and multiple use cases, each with their own needs. While the current development demo (www.recyclerapp.fi) focuses on recycling collection points, the platform can be effortlessly adapted to support other use cases as well. A demo of the multi-organization development version will be released later, once the required user interface implementations have reached a sufficient level of readiness.
+
+The multi-organization model requires the development of user management and admin tools to enable flexible and secure access control, organization-specific configurations, and efficient oversight across different domains.
 ## How to contribute
 We welcome contributions from developers, designers, and anyone passionate about sustainable practices. Please follow the guidelines outlined in our [contributing.md](contributing.md) file.
 ## Installation
