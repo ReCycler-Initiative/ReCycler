@@ -7,7 +7,7 @@ _With ReCycler, it’s easier than you think!_
 ReCycler is an open-source platform aimed at creating a more modern and user-centric recycling service, building upon the data foundation of the existing kierrätys.info. The ReCycler platform leverages the kierrätys.info API (https://api.kierratys.info/) to obtain basic information about recycling collection spots. Additionally, the service utilizes [Mapbox's](http://www.mapbox.com) mapping and location-based services. The idea of the platform is to provide solutions to various use cases efficiently and seamlessly.
 
 ## Demo
-You can test the development version of ReCycler at: http://www.recyclerapp.fi. Please note that the development version may not be the same as the version published on GitHub. The current development version of ReCycler also leverages the [Chatling](http://www.chatling.com), which features a chatbot trained on proprietary datasets.
+You can test the development version of ReCycler at: http://www.recyclerapp.fi. Please note that the development version may not be the same as the version published on GitHub. The current development version of ReCycler also leverages the [Chatling](http://www.chatling.com), which features an AI chatbot trained on dedicated [datasets](ai-training-materials).
 
 ## Features
 ### User-friendly interface for smart recycling guidance
