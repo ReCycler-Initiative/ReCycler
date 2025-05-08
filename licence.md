@@ -1,4 +1,4 @@
-   Copyrights 2024 Jussi Niilahti & Pirkka Huhtala
+   Copyrights 2025, Jussi Niilahti & Pirkka Huhtala
 
 
                                  Apache License
