@@ -5,7 +5,7 @@ import {
   FormField,
   FormItem,
   FormLabel,
-  FormMessage
+  FormMessage,
 } from "@/components/ui/form";
 import { Textarea } from "@/components/ui/textarea";
 import { FormInputProps } from "./types";
@@ -14,10 +14,10 @@ type FormTextAreaProps = {
   label: string;
 };
 
-export function FormTextArea({ label, rules }: FormInputProps) {
+export function FormTextArea({ label, name, rules }: FormInputProps) {
   return (
     <FormField
-      name="bio"
+      name={name}
       render={({ field }) => (
         <FormItem>
           <FormLabel>{label}</FormLabel>
