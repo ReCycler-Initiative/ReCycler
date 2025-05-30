@@ -8,7 +8,7 @@ export const POST = withZodPost(CreateOrganizationRequest, async (params) => {
 
   knex.insert(organization);
 
-  await knex.transaction(async (trx) => {
+  const result = await knex.transaction(async (trx) => {
     const [row] = await trx
       .insert(organization)
       .into("recycler.organizations")
@@ -24,9 +24,15 @@ export const POST = withZodPost(CreateOrganizationRequest, async (params) => {
           .into("recycler.fields")
       )
     );
+
+    return {
+      ...params,
+      organization: {
+        ...organization,
+        id: row.id,
+      },
+    };
   });
 
-  return NextResponse.json({
-    message: "Organization created",
-  });
+  return NextResponse.json(result);
 });

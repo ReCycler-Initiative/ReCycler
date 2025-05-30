@@ -3,7 +3,11 @@
 import FormInput from "@/components/form/form-input";
 import FormSelect from "@/components/form/form-select";
 import { Button } from "@/components/ui/button";
-import { CreateOrganizationRequest } from "@/types";
+import {
+  CreateOrganizationRequest,
+  NewOrganization,
+  Organization,
+} from "@/types";
 import { PlusIcon, Trash } from "lucide-react";
 import { useState } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
@@ -34,7 +38,7 @@ const WelcomeStep = ({
       <p>
         Tämän vaiheittaisen opastuksen avulla voit luoda oman tilin ja
         määritellä, millaisia tietoja haluat tallentaa eri kohteista. Aloitetaan
-        ensimmäisestä vaiheesta klikkaamalla {'"Aloitetaan"'}.
+        ensimmäisestä vaiheesta klikkaamalla {'"Aloita"'}.
       </p>
     </Step>
   );
@@ -172,7 +176,7 @@ const SummaryStep = ({
   onNext,
   values,
 }: {
-  onNext: () => void;
+  onNext: (organization: z.infer<typeof Organization>) => void;
   onPrevious: () => void;
   values: TCreateOrganizationRequest;
 }) => {
@@ -184,8 +188,8 @@ const SummaryStep = ({
     <Step
       form={form}
       onNext={async (values) => {
-        await createOrganization(values);
-        onNext();
+        const { organization } = await createOrganization(values);
+        onNext(organization);
       }}
       onPrevious={onPrevious}
       onStepChange={() => undefined}
@@ -279,7 +283,9 @@ const Wizard = () => {
 
   return (
     <SummaryStep
-      onNext={() => router.push("wizard/thankyou")}
+      onNext={(organization) =>
+        router.push(`wizard/thankyou/${organization.id}`)
+      }
       onPrevious={() => setStep("step3")}
       values={fullState}
     />
