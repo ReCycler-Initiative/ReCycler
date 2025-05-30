@@ -1,5 +1,6 @@
 import {
   CreateOrganizationRequest,
+  CreateOrganizationResponse,
   LocationGeoJsonCollection,
   Material,
 } from "@/types";
@@ -34,4 +35,6 @@ export const getLocations = (
 export const createOrganization = async (
   request: z.infer<typeof CreateOrganizationRequest>
 ) =>
-  axios.post("/api/organizations", request).then((response) => response.data);
+  axios
+    .post("/api/organizations", request)
+    .then((response) => CreateOrganizationResponse.parse(response.data));

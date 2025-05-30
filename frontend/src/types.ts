@@ -86,11 +86,22 @@ export const LocationGeoJsonCollection = z.object({
   features: z.array(LocationGeoJson),
 });
 
-export const Organization = z.object({
+export const NewOrganization = z.object({
   name: z.string(),
 });
 
 export const CreateOrganizationRequest = z.object({
+  organization: NewOrganization,
+  fields: z.array(Field),
+});
+
+export const Organization = NewOrganization.merge(
+  z.object({
+    id: z.string().uuid(),
+  })
+);
+
+export const CreateOrganizationResponse = z.object({
   organization: Organization,
   fields: z.array(Field),
 });
