@@ -2,19 +2,16 @@
 
 import FormInput from "@/components/form/form-input";
 import FormSelect from "@/components/form/form-select";
+import { FormTextArea } from "@/components/form/form-textarea";
 import { Button } from "@/components/ui/button";
-import {
-  CreateOrganizationRequest,
-  NewOrganization,
-  Organization,
-} from "@/types";
+import { createOrganization } from "@/services/api";
+import { CreateOrganizationRequest, NewUseCase, Organization } from "@/types";
 import { PlusIcon, Trash } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
 import { z } from "zod";
 import Step from "./step";
-import { createOrganization } from "@/services/api";
-import { useRouter } from "next/navigation";
 
 type TCreateOrganizationRequest = z.infer<typeof CreateOrganizationRequest>;
 
@@ -71,6 +68,42 @@ const OrganizationStep = ({
         label="Nimi"
         name="name"
         rules={{ required: "Nimi on pakollinen" }}
+      />
+    </Step>
+  );
+};
+
+type UseCaseFormState = z.infer<typeof NewUseCase>;
+
+const UseCase = ({
+  onNext,
+  onPrevious,
+  onStepChange,
+  values,
+}: {
+  onStepChange: (values: UseCaseFormState) => void;
+  onNext: () => void;
+  onPrevious: () => void;
+  values: UseCaseFormState;
+}) => {
+  const form = useForm<UseCaseFormState>({
+    defaultValues: values,
+  });
+
+  return (
+    <Step
+      form={form}
+      onNext={onNext}
+      onPrevious={onPrevious}
+      onStepChange={onStepChange}
+      title="Käyttötapaus"
+    >
+      <FormTextArea
+        label="Kuvaus"
+        name="description"
+        rules={{
+          required: "Käyttötapaus on pakollinen",
+        }}
       />
     </Step>
   );
@@ -237,6 +270,9 @@ const Wizard = () => {
       name: "",
     },
     fields: [],
+    useCase: {
+      description: "",
+    },
   });
 
   if (step === "step1") {
@@ -267,9 +303,25 @@ const Wizard = () => {
 
   if (step === "step3") {
     return (
-      <LocationFieldsModel
+      <UseCase
         onNext={() => setStep("step4")}
         onPrevious={() => setStep("step2")}
+        onStepChange={(values) => {
+          setFullState((prev) => ({
+            ...prev,
+            useCase: values,
+          }));
+        }}
+        values={fullState.useCase}
+      />
+    );
+  }
+
+  if (step === "step4") {
+    return (
+      <LocationFieldsModel
+        onNext={() => setStep("step5")}
+        onPrevious={() => setStep("step4")}
         onStepChange={(values) => {
           setFullState((prev) => ({
             ...prev,

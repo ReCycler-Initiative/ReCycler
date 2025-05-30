@@ -90,8 +90,13 @@ export const NewOrganization = z.object({
   name: z.string(),
 });
 
+export const NewUseCase = z.object({
+  description: z.string(),
+});
+
 export const CreateOrganizationRequest = z.object({
   organization: NewOrganization,
+  useCase: NewUseCase,
   fields: z.array(Field),
 });
 
