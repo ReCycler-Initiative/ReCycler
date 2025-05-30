@@ -22,7 +22,7 @@ export const POST = withZodPost(CreateOrganizationRequest, async (params) => {
       .into("recycler.use_cases")
       .returning("id");
 
-    await Promise.all(
+    const fieldRows = await Promise.all(
       fields.map((field) =>
         trx
           .insert({
@@ -30,11 +30,13 @@ export const POST = withZodPost(CreateOrganizationRequest, async (params) => {
             organization_id: organizationRow.id,
           })
           .into("recycler.fields")
+          .returning("id")
       )
     );
 
+    const fieldIds = fieldRows.flat().map((row) => row.id);
+
     return {
-      ...params,
       organization: {
         ...organization,
         id: organizationRow.id,
@@ -43,6 +45,10 @@ export const POST = withZodPost(CreateOrganizationRequest, async (params) => {
         ...useCase,
         id: useCaseRow.id,
       },
+      fields: fields.map((field, index) => ({
+        ...field,
+        id: fieldIds[index],
+      })),
     };
   });
 
