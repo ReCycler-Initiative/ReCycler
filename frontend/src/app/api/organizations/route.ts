@@ -4,14 +4,22 @@ import { withZodPost } from "@/utils/routes";
 import { NextResponse } from "next/server";
 
 export const POST = withZodPost(CreateOrganizationRequest, async (params) => {
-  const { organization, fields } = params;
+  const { organization, fields, useCase } = params;
 
   knex.insert(organization);
 
   const result = await knex.transaction(async (trx) => {
-    const [row] = await trx
+    const [organizationRow] = await trx
       .insert(organization)
       .into("recycler.organizations")
+      .returning("id");
+
+    const [useCaseRow] = await trx
+      .insert({
+        ...useCase,
+        organization_id: organizationRow.id,
+      })
+      .into("recycler.use_cases")
       .returning("id");
 
     await Promise.all(
@@ -19,7 +27,7 @@ export const POST = withZodPost(CreateOrganizationRequest, async (params) => {
         trx
           .insert({
             ...field,
-            organization_id: row.id,
+            organization_id: organizationRow.id,
           })
           .into("recycler.fields")
       )
@@ -29,7 +37,11 @@ export const POST = withZodPost(CreateOrganizationRequest, async (params) => {
       ...params,
       organization: {
         ...organization,
-        id: row.id,
+        id: organizationRow.id,
+      },
+      useCase: {
+        ...useCase,
+        id: useCaseRow.id,
       },
     };
   });
