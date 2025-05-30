@@ -328,7 +328,7 @@ const Wizard = () => {
     return (
       <LocationFieldsModel
         onNext={() => setStep("step5")}
-        onPrevious={() => setStep("step4")}
+        onPrevious={() => setStep("step3")}
         onStepChange={(values) => {
           setFullState((prev) => ({
             ...prev,
