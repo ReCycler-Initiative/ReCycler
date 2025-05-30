@@ -238,6 +238,13 @@ const SummaryStep = ({
           </dl>
         </div>
         <div>
+          <h2 className="text-xl mb-4">Käyttötapaus</h2>
+          <dl>
+            <dt className="font-bold">Kuvaus</dt>
+            <dd className="mb-4">{values.useCase.description}</dd>
+          </dl>
+        </div>
+        <div>
           <h2 className="text-xl mb-4">Kohteesta kerättävät tiedot</h2>
           <div className="grid grid-cols-3 grap-y-4 [&>div]:px-4 [&>div]:py-2">
             <div className="grid grid-cols-subgrid col-span-3 bg-primary text-white">
