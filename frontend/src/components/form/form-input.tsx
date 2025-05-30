@@ -1,12 +1,9 @@
+import { cn } from "@/lib/utils";
 import {
-  ControllerProps,
-  FieldPath,
-  FieldValues,
-  useFormContext,
+  useFormContext
 } from "react-hook-form";
 import { FormControl, FormField, FormItem, FormLabel } from "../ui/form";
 import { Input } from "../ui/input";
-import { cn } from "@/lib/utils";
 import { FormInputProps } from "./types";
 
 const FormInput = ({
