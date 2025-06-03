@@ -24,10 +24,10 @@ To install the ReCycler application, please take a look at the detailed instruct
 ReCycler is open-source and distributed under the [Apache-2.0 license](licence.md). Please feel free to use, modify, and distribute the software according to the terms of the license. This project was originally developed by © Jussi Niilahti and Pirkka Huhtala.
 
 The recycling collection spots data used in this project is sourced from the [Kierrätys.info service (API)](https://kierratys.info/tietoa-sivustosta).  
-All copyrights related to the Kierrätys.info service and its data are held by **KIVO ry** (The Association for Finnish Local and Regional Authorities in Waste Management).  
+All copyrights related to the Kierrätys.info service and its data are held by KIVO ry (The Association for Finnish Local and Regional Authorities in Waste Management).  
 Use of the data is subject to the terms and conditions of the Kierrätys.info service.
 
-The map interface in ReCycler uses **Mapbox** services for rendering and geospatial data.
+The map interface in ReCycler uses Mapbox services for rendering and geospatial data.
 
 Map data and map service © [Mapbox](https://www.mapbox.com/) and its data providers.  
 Usage of Mapbox is subject to their [Terms of Service](https://www.mapbox.com/legal/tos) and [Attribution Guidelines](https://docs.mapbox.com/help/getting-started/attribution/).
