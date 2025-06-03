@@ -23,8 +23,8 @@ const HomePage = () => {
         <p className="mb-12 font-sans">
           Tervetuloa ReCycler-sovellukseen! ReCycler auttaa sinua löytämään
           helposti lähimmät kierrätyspisteet kotitalousjätteillesi kaikkialla
-          Suomessa. Olipa kyseessä mikä tahansa jäte, ReCycler opastaa sinut
-          oikeaan paikkaan. Aloita ympäristöystävällinen valinta jo tänään!
+          Suomessa. Olipa kyseessä mikä tahansa kierrätysmateriaali, ReCycler opastaa sinut
+          oikeaan paikkaan. Tee ympäristöystävällisiä päätöksiä jo tänään!
         </p>
         <div className="flex flex-col gap-4 items-center">
           <Button className="w-full max-w-96" asChild size="lg">
@@ -38,14 +38,14 @@ const HomePage = () => {
       {/* Footer */}
       <footer className="w-full mt-16 bg-gray-200 py-4 text-center">
         <p className="text-sm">
-          ReCycler on Github-projekti. Lähdekoodi löytyy{" "}
+          ReCycler on Github-projekti. Lähdekoodi ja lisenssitiedot löytyvät projektin {" "}
           <a
             href="https://github.com/ReCycler-Initiative/ReCycler"
             className="text-blue-500 underline"
             target="_blank"
             rel="noopener noreferrer"
           >
-            täältä
+           Github-sivuilta
           </a>
           . Projekti on lisensoitu Apache 2.0 -lisenssillä.
         </p>
