@@ -23,7 +23,7 @@ To install the ReCycler application, please take a look at the detailed instruct
 ## About licenses, authors and data sources
 ReCycler is open-source and distributed under the [Apache-2.0 license](licence.md). Please feel free to use, modify, and distribute the software according to the terms of the license. This project was originally developed by © Jussi Niilahti and Pirkka Huhtala.
 
-The recycling collection spots data used in this project is sourced from the [Kierrätys.info API service](https://api.kierratys.info).  
+The recycling collection spots data used in this project is sourced from the [Kierrätys.info service (API)](https://kierratys.info/tietoa-sivustosta).  
 All copyrights related to the Kierrätys.info service and its data are held by **KIVO ry** (The Association for Finnish Local and Regional Authorities in Waste Management).  
 Use of the data is subject to the terms and conditions of the Kierrätys.info service.
 
