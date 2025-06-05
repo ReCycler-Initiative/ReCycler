@@ -15,7 +15,7 @@ const TitleBar = ({
       <Link href={toHomeHref}>
         <Image src={logo} alt="Recycler logo" width={150} />
       </Link>
-      {children && <nav className="pt-2 px-12">{children}</nav>}
+      {children}
     </header>
   );
 };
