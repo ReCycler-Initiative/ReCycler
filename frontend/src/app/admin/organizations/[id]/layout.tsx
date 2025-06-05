@@ -12,7 +12,11 @@ const AdminLayout = async ({
   return (
     <div className="flex flex-col h-full">
       <TitleBar toHomeHref={`/admin/organizations/${id}`}>
-        <Link href={`${id}/general_info`}>General Info</Link>
+        <div>
+          <nav className="pt-2 px-12">
+            <Link href={`${id}/general_info`}>General Info</Link>
+          </nav>
+        </div>
       </TitleBar>
       <main className="flex-1 flex flex-col bg-gray-100">{children}</main>
     </div>
