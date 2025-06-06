@@ -48,7 +48,7 @@ const HomePage = () => {
            Github-sivuilta
           </a>
           . Projekti on lisensoitu Apache 2.0 -lisenssillä. Projektissa käytetty kierrätyspisteiden
-          sijaintitieto on peräisin Kierrätys.info-palvelun rajapinnasta (API). Kaikki oikeudet
+          sijainti- ja ominaisuustiedot ovat peräisin Kierrätys.info-palvelun rajapinnasta (API). Kaikki oikeudet
           Kierrätys.info-palveluun ja sen dataan omistaa KIVO ry.</p>
       </footer>
     </>
