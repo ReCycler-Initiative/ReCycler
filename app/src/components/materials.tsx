@@ -23,10 +23,12 @@ import Wood from "./icons/Wood";
 import LoadingSpinner from "./loading-spinner";
 import ElectricWaste from "./icons/ElectricWaste";
 import BioWaste from "./icons/BioWaste";
+import { cn } from "@/utils/shadcn";
 
-const iconMap: { code: number; name?: string; icon?: ReactNode }[] = [
+const iconMap: { code: number; color: string; name?: string; icon?: ReactNode }[] = [
   {
     code: 115,
+    color: "bg-[#FF0000]",
     icon: <CarBattery />,
   },
   {
@@ -35,6 +37,7 @@ const iconMap: { code: number; name?: string; icon?: ReactNode }[] = [
   },
   {
     code: 110,
+    color: "bg-[#FF0000]",
     icon: <SmallBattery />,
   },
   {
@@ -95,13 +98,14 @@ const iconMap: { code: number; name?: string; icon?: ReactNode }[] = [
   },
   {
     code: 100,
+    color: "bg-[#000000]",
     icon: <WasteBin />,
   },
   {
     code: 113,
     icon: <TextileReuse />,
   },
-    {
+  {
     code: 112,
     icon: <BioWaste />,
   },
@@ -112,10 +116,12 @@ const iconMap: { code: number; name?: string; icon?: ReactNode }[] = [
 ];
 
 const CustomCheckbox = ({
+  color,
   icon,
   label,
   name,
 }: {
+  color?: string;
   icon?: ReactNode;
   label: string;
   name: string;
@@ -126,7 +132,7 @@ const CustomCheckbox = ({
   return (
     <label
       data-checked={checked}
-      className="border flex-col border-gray-700 py-2 px-2 pt-[35%] sm:pt-[40%] md:pt-11 text-center aspect-square flex items-center bg-white rounded-sm data-[checked=true]:bg-gray-700 data-[checked=true]:text-white"
+      className={cn("border flex-col border-gray-700 py-2 px-2 pt-[35%] sm:pt-[40%] md:pt-11 text-center aspect-square flex items-center bg-white rounded-sm data-[checked=true]:bg-gray-700 data-[checked=true]:text-white text-white", color)}
     >
       {icon ? (
         <div className="mb-3">{icon}</div>
@@ -152,6 +158,7 @@ export const Materials = () => {
       getMaterials().then((res) =>
         res.map((m) => ({
           ...m,
+          color: iconMap.find((i) => i.code === m.code)?.color,
           icon: iconMap.find((i) => i.code === m.code)?.icon,
         }))
       ),
@@ -175,6 +182,7 @@ export const Materials = () => {
         {materials?.map((material) => (
           <CustomCheckbox
             key={material.code}
+            color={material.color}
             label={material.name}
             name={`materials.${material.code}`}
             icon={material.icon}
