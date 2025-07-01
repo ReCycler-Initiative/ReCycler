@@ -22,6 +22,7 @@ import WasteBin from "./icons/WasteBin";
 import Wood from "./icons/Wood";
 import LoadingSpinner from "./loading-spinner";
 import ElectricWaste from "./icons/ElectricWaste";
+import BioWaste from "./icons/BioWaste";
 
 const iconMap: { code: number; name?: string; icon?: ReactNode }[] = [
   {
@@ -99,6 +100,10 @@ const iconMap: { code: number; name?: string; icon?: ReactNode }[] = [
   {
     code: 113,
     icon: <TextileReuse />,
+  },
+    {
+    code: 112,
+    icon: <BioWaste />,
   },
   {
     code: 108,
