@@ -18,7 +18,7 @@ import { Material } from "@/types";
 import { Loader2Icon, MapPinned } from "lucide-react";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { Suspense, use, useCallback, useEffect, useRef, useState } from "react";
+import { Suspense, useCallback, useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import Map, {
   CircleLayer,
@@ -41,7 +41,7 @@ const CollectionPointIcon = () => {
   useEffect(() => {
     if (map) {
       const loadIcon = () => {
-        map.loadImage("collection-point.png", (error, image) => {
+        map.loadImage("../collection-point.png", (error, image) => {
           if (error) throw error;
 
           if (map.hasImage("collection-point")) {
