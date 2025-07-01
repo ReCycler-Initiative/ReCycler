@@ -9,10 +9,10 @@ import { z } from "zod";
 
 export const getCollectionSpots = async (): Promise<
   GeoJSON.FeatureCollection<GeoJSON.Geometry>
-> => axios.get("api/collection_spots").then((response) => response.data);
+> => axios.get("/api/collection_spots").then((response) => response.data);
 
 export const getMaterials = (): Promise<Array<Material>> =>
-  axios.get("api/materials").then((response) => response.data);
+  axios.get("/api/materials").then((response) => response.data);
 
 export const chat = async ({
   conversationId,
