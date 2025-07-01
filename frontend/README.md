@@ -2,15 +2,24 @@
 
 ## Tech stack used
 
+- Node.js
 - TypeScript
 - React
 - Next.js
 - Tailwind CSS
 - Mapbox
 - Docker
-- Postgres
+- PostgreSQL
 
 ## Getting Started
+
+### Prerequisites
+
+- Node.js
+- npm
+- Docker
+
+We recommend using [NVM (Node Version Manager)](https://github.com/nvm-sh/nvm?tab=readme-ov-file#installing-and-updating) to manage Node.js versions.
 
 ### Set upt env variables
 
@@ -30,27 +39,6 @@ Launch local services
 
 ```bash
 docker compose up
-```
-
-Install LLM
-
-1. Connect OLLAMA container via terminal
-
-```bash
-docker exec -it frontend-ollama-1 /bin/bash
-```
-
-2. Pull [Ahma-7B-Instruct-GGUF](https://huggingface.co/mradermacher/Ahma-7B-Instruct-GGUF) LLM from Hugging Face
-
-```bash
-ollama pull hf.co/mradermacher/Ahma-7B-Instruct-GGUF:Q4_K_M
-ollama pull all-minilm
-```
-
-3. Close connection
-
-```bash
-exit
 ```
 
 Run migrations
