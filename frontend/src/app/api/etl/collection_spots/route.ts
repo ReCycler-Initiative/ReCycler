@@ -27,7 +27,7 @@ export async function POST(request: NextRequest) {
       let totalItems: number;
 
       // Get the details of the first page and set total_items
-      const limit = 50;
+      const limit = +(request.nextUrl.searchParams.get("limit") ?? 1000);
       const from = +(request.nextUrl.searchParams.get("from") ?? 1);
       const to = request.nextUrl.searchParams.get("to");
 

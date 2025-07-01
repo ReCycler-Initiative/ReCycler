@@ -12,7 +12,7 @@ perform_post_requests() {
   for ((i=start; i<=end; i+=pageSize)); do
     from=$i
     to=$((i + pageSize - 1))
-    curl -X POST "https://re-cycler-three.vercel.app/api/etl/collection_spots?from=$from&to=$to"
+    curl -X POST "https://re-cycler-three.vercel.app/api/etl/collection_spots?from=$from&to=$to&limit=50"
   done
 }
 
