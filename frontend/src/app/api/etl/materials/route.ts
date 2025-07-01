@@ -51,7 +51,7 @@ export const dynamic = "force-dynamic"; // static by default, unless reading the
 
 // Config
 const apiKey = process.env.KIERRATYS_API_KEY;
-const baseUrl = `https://api.kierratys.info/materialtypes/?api_key=${apiKey}`;
+const baseUrl = process.env.KIERRATYS_API_URL;
 
 export function GET(request: Request) {
   return new Response(`Hello from materials etl`);
@@ -66,7 +66,7 @@ export async function POST() {
       await db("recycler.materials").delete();
 
       // Fetch materials from the API
-      const response = await axios.get(baseUrl);
+      const response = await axios.get(`${baseUrl}/materialtypes/?api_key=${apiKey}`);
 
       if (response.status === 200) {
         const data = response.data;

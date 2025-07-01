@@ -1,3 +1,4 @@
+# ETL process for Vercel
 #!/bin/bash
 
 # Perform the DELETE request

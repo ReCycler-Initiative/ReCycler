@@ -6,7 +6,7 @@ import { NextRequest } from "next/server";
 export const dynamic = "force-dynamic"; // static by default, unless reading the request
 
 // Config
-const baseUrl = "https://api.kierratys.info/collectionspots/";
+const baseUrl = process.env.KIERRATYS_API_URL
 const apiKey = process.env.KIERRATYS_API_KEY;
 
 export function GET() {
@@ -31,7 +31,7 @@ export async function POST(request: NextRequest) {
       const from = +(request.nextUrl.searchParams.get("from") ?? 1);
       const to = request.nextUrl.searchParams.get("to");
 
-      const firstPageUrl = `${baseUrl}?api_key=${apiKey}&format=json&limit=${limit}&offset=0`;
+      const firstPageUrl = `${baseUrl}/collectionspots/?api_key=${apiKey}&format=json&limit=${limit}&offset=0`;
       let response = await axios.get(firstPageUrl);
       let data = response.data;
       totalItems = to ? +to * limit : data.count;
@@ -42,7 +42,7 @@ export async function POST(request: NextRequest) {
       const totalPages = Math.ceil(totalItems / limit);
 
       while (offset < totalItems) {
-        const url = `${baseUrl}?api_key=${apiKey}&format=json&limit=${limit}&offset=${offset}`;
+        const url = `${baseUrl}/collectionspots?api_key=${apiKey}&format=json&limit=${limit}&offset=${offset}`;
         const page = Math.ceil(offset / limit) + 1;
 
         console.log(`Loading page ${page} of ${totalPages}`);
