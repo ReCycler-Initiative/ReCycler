@@ -1,4 +1,4 @@
-# Recycler frontend
+# Recycler App
 
 ## Tech stack used
 
