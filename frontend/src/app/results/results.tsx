@@ -173,6 +173,7 @@ const filterFeaturesBySelectedMaterials = (
 
 export default function Result() {
   const [mapLoaded, setMapLoaded] = useState(false);
+  const [styleLoaded, setStyleLoaded] = useState(true);
   const [geojson, setGeojson] =
     useState<GeoJSON.FeatureCollection<GeoJSON.Geometry> | null>(null);
   const [details, setDetails] = useState<MapboxGeoJSONFeature | null>(null);
@@ -224,6 +225,9 @@ export default function Result() {
 
       map.on("mouseenter", "point", showPointer);
       map.on("mouseleave", "point", hidePointer);
+      map.on("style.load", () => {
+        setStyleLoaded(true);
+      });
       return () => {
         map.off("mouseenter", "point", showPointer);
         map.off("mouseleave", "point", hidePointer);
@@ -260,17 +264,18 @@ export default function Result() {
           ref={mapRef}
           mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_TOKEN}
           initialViewState={{
-            longitude: 24.94, // Suomen keskelle hieman länteen
-            latitude: 64.0, // Suomen keskelle hieman etelään
-            zoom: 4, // Sopiva zoom-taso kattamaan laaja alue
+            longitude: 24.94, // Finland long
+            latitude: 64.0, // Finland lat
+            zoom: 4, // Proper zoom extent
           }}
           onLoad={() => {
             setMapLoaded(true);
-          }}
+          }
+          }
           mapStyle={
             mapStyle === "detail"
-              ? process.env.NEXT_PUBLIC_MAPBOX_STYLE
-              : "mapbox://styles/niilahti/clmt6xzzj00kq01qnb79e9a2l"
+              ? process.env.NEXT_PUBLIC_MAPBOX_STYLE_DETAIL // Background map detail / street
+              : process.env.NEXT_PUBLIC_MAPBOX_STYLE_SATELLITE // Background map satellite
           }
           interactiveLayerIds={["point"]}
           onClick={(e) => {
@@ -289,25 +294,28 @@ export default function Result() {
         >
           {geojson && (
             <>
-              <Source
-                id="collection_spots"
-                type="geojson"
-                data={filterFeaturesBySelectedMaterials(
-                  selectedMaterials,
-                  geojson
-                )}
-                cluster
-                clusterMaxZoom={14}
-                clusterRadius={50}
-              >
-                <Layer {...highlighLayer} />
-                <Layer {...layerStyle} />
-                <Layer {...clusters} />
-                <Layer {...clusterCount} />
-              </Source>
+              {styleLoaded && (
+                <Source
+                  id="collection_spots"
+                  type="geojson"
+                  data={filterFeaturesBySelectedMaterials(
+                    selectedMaterials,
+                    geojson
+                  )}
+                  cluster
+                  clusterMaxZoom={14}
+                  clusterRadius={50}
+                >
+                  <Layer {...highlighLayer} />
+                  <Layer {...layerStyle} />
+                  <Layer {...clusters} />
+                  <Layer {...clusterCount} />
+                </Source>
+              )}
               <CollectionPointIcon />
               <MapStyleControl
                 onToggle={(selected) => {
+                  setStyleLoaded(false);
                   setStyle(selected ? "satellite" : "detail");
                 }}
                 selected={mapStyle === "satellite"}
@@ -342,7 +350,7 @@ export default function Result() {
                   onClose={() => setDetails(null)}
                   anchor="bottom"
                   maxWidth="360px"
-                  className="[&_.mapboxgl-popup-content]:min-w-52 [&_.mapboxgl-popup-content]:px-0 [&_.mapboxgl-popup-content]:py-0 [&_.mapboxgl-popup-close-button]:right-1.5"
+                  className="[&_.mapboxgl-popup-content]:min-w-52 [&_.mapboxgl-popup-content]:px-0 [&_.mapboxgl-popup-content]:py-0 [&_.mapboxgl-popup-close-button]:hidden"
                 >
                   <div className="px-5 py-4 border-b">
                     <h2 className="text-base font-semibold mb-1">
