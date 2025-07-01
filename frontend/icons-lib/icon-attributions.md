@@ -140,3 +140,8 @@ Building SVG Vector
 COLLECTION: Dazzle Line Icons
 LICENSE: CC Attribution License
 AUTHOR: Dazzle UI
+
+Filename: biowaste.svg
+COLLECTION: Sustainability Ecological Balance Vectors
+LICENSE: CC Attribution License
+AUTHOR: Chanut-is
