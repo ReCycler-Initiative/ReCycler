@@ -26,93 +26,27 @@ import BioWaste from "./icons/BioWaste";
 import { cn } from "@/utils/shadcn";
 
 const iconMap: { code: number; color: string; name?: string; icon?: ReactNode }[] = [
-  {
-    code: 115,
-    color: "bg-[#FF0000]",
-    icon: <CarBattery />,
-  },
-  {
-    code: 102,
-    icon: <EnergyWaste />,
-  },
-  {
-    code: 110,
-    color: "bg-[#FF0000]",
-    icon: <SmallBattery />,
-  },
-  {
-    code: 105,
-    icon: <Carton />,
-  },
-  {
-    code: 118,
-    icon: <Wood />,
-  },
-  {
-    code: 116,
-    icon: <Lamp />,
-  },
-  {
-    code: 107,
-    icon: <Glass />,
-  },
-  {
-    code: 106,
-    icon: <Metal />,
-  },
-  {
-    code: 111,
-    icon: <Plastic />,
-  },
-  {
-    code: 114,
-    icon: <WasteBin />,
-  },
-  {
-    code: 104,
-    icon: <CardBoard />,
-  },
-  {
-    code: 103,
-    icon: <Paper />,
-  },
-  {
-    code: 120,
-    icon: <Textile />,
-  },
-  {
-    code: 117,
-    icon: <Wood />,
-  },
-  {
-    code: 101,
-    icon: <Garden />,
-  },
-  {
-    code: 119,
-    icon: <Construction />,
-  },
-  {
-    code: 109,
-    icon: <ElectricWaste />,
-  },
-  {
-    code: 100,
-    color: "bg-[#000000]",
-    icon: <WasteBin />,
-  },
-  {
-    code: 113,
-    icon: <TextileReuse />,
-  },
-  {
-    code: 112,
-    icon: <BioWaste />,
-  },
-  {
-    code: 108,
-    icon: <Dangerous />,
-  },
+  { code: 115, color: "bg-[#d9001e]", icon: <CarBattery /> },
+  { code: 102, color: "bg-[#000000]", icon: <EnergyWaste /> }, // musta
+  { code: 110, color: "bg-[#d9001e]", icon: <SmallBattery /> },
+  { code: 105, icon: <Carton /> },
+  { code: 118, icon: <Wood /> },
+  { code: 116, icon: <Lamp /> },
+  { code: 107, icon: <Glass /> },
+  { code: 106, icon: <Metal /> },
+  { code: 111, icon: <Plastic /> },
+  { code: 114, icon: <WasteBin /> },
+  { code: 104, icon: <CardBoard /> },
+  { code: 103, icon: <Paper /> },
+  { code: 120, icon: <Textile /> },
+  { code: 117, icon: <Wood /> },
+  { code: 101, icon: <Garden /> },
+  { code: 119, icon: <Construction /> },
+  { code: 109, icon: <ElectricWaste /> },
+  { code: 100, color: "bg-[#000000]", icon: <WasteBin /> },
+  { code: 113, icon: <TextileReuse /> },
+  { code: 112, color: "bg-[#139339]", icon: <BioWaste /> },
+  { code: 108, icon: <Dangerous /> },
 ];
 
 const CustomCheckbox = ({
@@ -130,10 +64,13 @@ const CustomCheckbox = ({
   const checked: boolean = watch(name);
 
   return (
-    <label
-      data-checked={checked}
-      className={cn("border flex-col border-gray-700 py-2 px-2 pt-[35%] sm:pt-[40%] md:pt-11 text-center aspect-square flex items-center bg-white rounded-sm data-[checked=true]:bg-gray-700 data-[checked=true]:text-white text-white", color)}
-    >
+<label
+  className={cn(
+    "box-border border-4 flex-col py-2 px-2 pt-[35%] sm:pt-[40%] md:pt-11 text-center aspect-square flex items-center rounded-sm text-white transition-all duration-200",
+    color,
+    checked ? "border-[#FFD700]" : "border-black-400"
+  )}
+>
       {icon ? (
         <div className="mb-3">{icon}</div>
       ) : (
@@ -145,7 +82,6 @@ const CustomCheckbox = ({
         className="hidden"
         type="checkbox"
       />
-      <span className="checkbox-mark"></span>
       <span className="text-sm">{label}</span>
     </label>
   );
@@ -188,32 +124,7 @@ export const Materials = () => {
             icon={material.icon}
           />
         ))}
-        {/* {showMore &&
-          moreWasteTypes.map((type, i) => (
-            <CustomCheckbox key={i} label={type} name={`materials.${type}`} />
-          ))} */}
       </div>
-      {/* <div className="flex justify-center mb-28">
-        <Button
-          className="flex flex-col p-4 h-auto"
-          onClick={() => setShowMore(!showMore)}
-          variant="ghost"
-        >
-          {showMore && (
-            <span>
-              <ChevronUpIcon />
-            </span>
-          )}
-          {showMore
-            ? "Näytä vähemmän materiaaleja"
-            : "Näytä lisää materiaaleja"}
-          {!showMore && (
-            <span>
-              <ChevronDownIcon />
-            </span>
-          )}
-        </Button> 
-      </div>*/}
     </>
   );
 };
