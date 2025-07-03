@@ -11,7 +11,7 @@ type TGetLocationRequest = z.infer<typeof GetLocationsRequest>;
 
 export async function GET(
   _: Request,
-  { params }: { params: TGetLocationRequest }
+  { params }: { params: Promise<TGetLocationRequest> }
 ) {
   try {
     const { organizationId } = GetLocationsRequest.parse(await params);

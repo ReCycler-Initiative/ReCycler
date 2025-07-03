@@ -1,11 +1,11 @@
 import db from "@/services/db";
 import { Field } from "@/types";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 
 export async function GET(
-  _: Request,
-  { params }: { params: { organizationId: string[] } }
+  _: NextRequest,
+  { params }: { params: Promise<{ organizationId: string }> }
 ) {
   const organizationId = (await params).organizationId;
 
