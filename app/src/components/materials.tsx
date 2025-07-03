@@ -87,7 +87,7 @@ const CustomCheckbox = ({
 
   return (
     <label
-      className="flex aspect-square flex-col items-center justify-center rounded-sm px-2 py-2 text-center text-white transition-all duration-200"
+      className="flex aspect-square flex-col items-center justify-center rounded-sm px-2 py-2 text-center text-white"
       style={{
         backgroundColor,
         boxShadow,
