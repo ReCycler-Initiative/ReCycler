@@ -3,11 +3,13 @@ import { useQuery } from "@tanstack/react-query";
 import { RecycleIcon } from "lucide-react";
 import { ReactNode } from "react";
 import { useFormContext } from "react-hook-form";
+import BioWaste from "./icons/BioWaste";
+import Construction from "./icons/Building";
 import CarBattery from "./icons/CarBattery";
 import CardBoard from "./icons/CardBoard";
 import Carton from "./icons/Carton";
-import Construction from "./icons/Building";
 import Dangerous from "./icons/Dangerous";
+import ElectricWaste from "./icons/ElectricWaste";
 import EnergyWaste from "./icons/EnergyWaste";
 import Garden from "./icons/Garden";
 import Glass from "./icons/Glass";
@@ -21,8 +23,6 @@ import TextileReuse from "./icons/TextileReuse";
 import WasteBin from "./icons/WasteBin";
 import Wood from "./icons/Wood";
 import LoadingSpinner from "./loading-spinner";
-import ElectricWaste from "./icons/ElectricWaste";
-import BioWaste from "./icons/BioWaste";
 
 // HEX → rgba
 const hexToRgba = (hex: string, alpha: number): string => {
@@ -81,9 +81,7 @@ const CustomCheckbox = ({
     ? hexToRgba(baseHex, checked ? 1 : 0.85)
     : "transparent";
 
-  const boxShadow = checked
-    ? `inset 0 0 0 4px #FFD700`
-    : undefined; // ei reunusta kun ei valittu
+  const boxShadow = checked ? `inset 0 0 0 4px #FFD700` : undefined; // ei reunusta kun ei valittu
 
   return (
     <label
@@ -134,7 +132,7 @@ export const Materials = () => {
   }
 
   return (
-    <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+    <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
       {materials?.map((material) => (
         <CustomCheckbox
           key={material.code}
