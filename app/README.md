@@ -66,3 +66,9 @@ curl -X POST http://localhost:3000/api/etl/collection_spots
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+
+To add new migration file
+
+```bash
+npm run knex -- migrate:make
+```
