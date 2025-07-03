@@ -13,7 +13,7 @@ import {
   DrawerTitle,
 } from "@/components/ui/drawer";
 import { Form } from "@/components/ui/form";
-import { getCollectionSpots, getLocations } from "@/services/api";
+import { getLocations } from "@/services/api";
 import { Material } from "@/types";
 import { Loader2Icon, MapPinned } from "lucide-react";
 import "mapbox-gl/dist/mapbox-gl.css";
@@ -23,8 +23,8 @@ import {
   useRouter,
   useSearchParams,
 } from "next/navigation";
-import { Suspense, use, useCallback, useEffect, useRef, useState } from "react";
-import { useForm } from "react-hook-form";
+import { Suspense, useCallback, useEffect, useRef, useState } from "react";
+import { useForm, useWatch } from "react-hook-form";
 import Map, {
   CircleLayer,
   FullscreenControl,
@@ -206,7 +206,10 @@ export default function Result() {
     },
   });
 
-  const formMaterials = form.watch("materials", {});
+  const formMaterials = useWatch({
+    name: "materials",
+    defaultValue: {},
+  });
 
   useEffect(() => {
     const fetchData = async () => {
@@ -237,7 +240,7 @@ export default function Result() {
     }
   }, [mapLoaded, geojson]);
 
-  const geolocateControlRef = useRef<any>();
+  const geolocateControlRef = useRef<any>(null);
   const initialGeolocate = useRef(true);
   const [isTracking, setTracking] = useState(false);
 

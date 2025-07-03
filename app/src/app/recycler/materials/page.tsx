@@ -5,13 +5,16 @@ import { Materials } from "@/components/materials";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 import Link from "next/link";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 
 const MaterialsPage = () => {
   const form = useForm();
-  const materials: [string, boolean][] = Object.entries(
-    form.watch("materials", [])
-  );
+  const materialValues = useWatch({
+    control: form.control,
+    name: "materials",
+    defaultValue: {},
+  });
+  const materials: [string, boolean][] = Object.entries(materialValues);
   const selectedMaterials = materials.filter(([, value]) => value);
 
   return (
