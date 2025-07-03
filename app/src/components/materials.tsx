@@ -2,7 +2,7 @@ import { getMaterials } from "@/services/api";
 import { useQuery } from "@tanstack/react-query";
 import { RecycleIcon } from "lucide-react";
 import { ReactNode } from "react";
-import { useFormContext } from "react-hook-form";
+import { useFormContext, useWatch } from "react-hook-form";
 import BioWaste from "./icons/BioWaste";
 import Construction from "./icons/Building";
 import CarBattery from "./icons/CarBattery";
@@ -74,8 +74,8 @@ const CustomCheckbox = ({
   label: string;
   name: string;
 }) => {
-  const { register, watch } = useFormContext();
-  const checked: boolean = watch(name);
+  const { register } = useFormContext();
+  const checked: boolean = useWatch({ name });
 
   const backgroundColor = baseHex
     ? hexToRgba(baseHex, checked ? 1 : 0.85)

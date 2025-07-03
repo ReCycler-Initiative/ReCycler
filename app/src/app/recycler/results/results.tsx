@@ -19,7 +19,7 @@ import { Loader2Icon, MapPinned } from "lucide-react";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useCallback, useEffect, useRef, useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import Map, {
   CircleLayer,
   FullscreenControl,
@@ -201,7 +201,11 @@ export default function Result() {
     },
   });
 
-  const formMaterials = form.watch("materials", {});
+  const formMaterials = useWatch({
+    control: form.control,
+    name: "materials",
+    defaultValue: {},
+  });
 
   useEffect(() => {
     const fetchData = async () => {
@@ -235,7 +239,7 @@ export default function Result() {
     }
   }, [mapLoaded, geojson]);
 
-  const geolocateControlRef = useRef<any>();
+  const geolocateControlRef = useRef<any>(null);
   const initialGeolocate = useRef(true);
   const [isTracking, setTracking] = useState(false);
 
@@ -270,8 +274,7 @@ export default function Result() {
           }}
           onLoad={() => {
             setMapLoaded(true);
-          }
-          }
+          }}
           mapStyle={
             mapStyle === "detail"
               ? process.env.NEXT_PUBLIC_MAPBOX_STYLE_DETAIL // Background map detail / street
@@ -438,7 +441,9 @@ export default function Result() {
         >
           <DrawerContent>
             <DrawerHeader>
-              <DrawerTitle className="text-center">Valitut materiaalit</DrawerTitle>
+              <DrawerTitle className="text-center">
+                Valitut materiaalit
+              </DrawerTitle>
             </DrawerHeader>
             <div className="max-h-[500px] overflow-y-scroll max-w-2xl mx-auto">
               <Form {...form}>

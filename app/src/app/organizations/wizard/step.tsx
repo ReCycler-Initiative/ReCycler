@@ -58,7 +58,7 @@ function StepPrevious() {
 
 type StepProps<T extends FieldValues> = {
   children: React.ReactNode;
-  form: UseFormReturn<T, any, undefined>;
+  form: UseFormReturn<T, any>;
   nextText?: string;
   onNext?: (value: T) => Promise<void> | void;
   onPrevious?: () => void;
