@@ -27,7 +27,7 @@ export const POST = withZodPost(CreateOrganizationRequest, async (params) => {
         trx
           .insert({
             ...field,
-            organization_id: organizationRow.id,
+            use_case_id: useCaseRow.id,
           })
           .into("recycler.fields")
           .returning("id")
