@@ -1,7 +1,7 @@
 import { getMaterials } from "@/services/api";
 import { useQuery } from "@tanstack/react-query";
 import { RecycleIcon } from "lucide-react";
-import { ReactNode, useState } from "react";
+import { ReactNode } from "react";
 import { useFormContext } from "react-hook-form";
 import CarBattery from "./icons/CarBattery";
 import CardBoard from "./icons/CardBoard";
@@ -23,39 +23,53 @@ import Wood from "./icons/Wood";
 import LoadingSpinner from "./loading-spinner";
 import ElectricWaste from "./icons/ElectricWaste";
 import BioWaste from "./icons/BioWaste";
-import { cn } from "@/utils/shadcn";
 
-const iconMap: { code: number; color: string; name?: string; icon?: ReactNode }[] = [
-  { code: 115, color: "bg-[#d9001e]", icon: <CarBattery /> },
-  { code: 102, color: "bg-[#000000]", icon: <EnergyWaste /> }, // musta
-  { code: 110, color: "bg-[#d9001e]", icon: <SmallBattery /> },
-  { code: 105, icon: <Carton /> },
-  { code: 118, icon: <Wood /> },
-  { code: 116, icon: <Lamp /> },
-  { code: 107, icon: <Glass /> },
-  { code: 106, icon: <Metal /> },
-  { code: 111, icon: <Plastic /> },
-  { code: 114, icon: <WasteBin /> },
-  { code: 104, icon: <CardBoard /> },
-  { code: 103, icon: <Paper /> },
-  { code: 120, icon: <Textile /> },
-  { code: 117, icon: <Wood /> },
-  { code: 101, icon: <Garden /> },
-  { code: 119, icon: <Construction /> },
-  { code: 109, icon: <ElectricWaste /> },
-  { code: 100, color: "bg-[#000000]", icon: <WasteBin /> },
-  { code: 113, icon: <TextileReuse /> },
-  { code: 112, color: "bg-[#139339]", icon: <BioWaste /> },
-  { code: 108, icon: <Dangerous /> },
+// HEX → rgba
+const hexToRgba = (hex: string, alpha: number): string => {
+  if (!hex) return "transparent";
+  const sanitized = hex.replace("#", "");
+  const bigint = parseInt(sanitized, 16);
+  const r = (bigint >> 16) & 255;
+  const g = (bigint >> 8) & 255;
+  const b = bigint & 255;
+  return `rgba(${r},${g},${b},${alpha})`;
+};
+
+const iconMap: {
+  code: number;
+  baseHex?: string;
+  icon?: ReactNode;
+}[] = [
+  { code: 115, baseHex: "#d9001e", icon: <CarBattery /> },
+  { code: 102, baseHex: "#000000", icon: <EnergyWaste /> },
+  { code: 110, baseHex: "#d9001e", icon: <SmallBattery /> },
+  { code: 105, baseHex: "#176eb1", icon: <Carton /> },
+  { code: 118, baseHex: "#d9001e", icon: <Wood /> },
+  { code: 116, baseHex: "#d9001e", icon: <Lamp /> },
+  { code: 107, baseHex: "#21a07b", icon: <Glass /> },
+  { code: 106, baseHex: "#485b66", icon: <Metal /> },
+  { code: 111, baseHex: "#820f71", icon: <Plastic /> },
+  { code: 109, baseHex: "#d9001e", icon: <ElectricWaste /> },
+  { code: 100, baseHex: "#000000", icon: <WasteBin /> },
+  { code: 112, baseHex: "#139339", icon: <BioWaste /> },
+  { code: 114, baseHex: "#000000", icon: <WasteBin /> },
+  { code: 104, baseHex: "#176eb1", icon: <CardBoard /> },
+  { code: 103, baseHex: "#176eb1", icon: <Paper /> },
+  { code: 120, baseHex: "#6b9030", icon: <Textile /> },
+  { code: 117, baseHex: "#d9001e", icon: <Wood /> },
+  { code: 101, baseHex: "#139339", icon: <Garden /> },
+  { code: 119, baseHex: "#0c3a6f", icon: <Construction /> },
+  { code: 113, baseHex: "#6b9030", icon: <TextileReuse /> },
+  { code: 108, baseHex: "#d9001e", icon: <Dangerous /> },
 ];
 
 const CustomCheckbox = ({
-  color,
+  baseHex,
   icon,
   label,
   name,
 }: {
-  color?: string;
+  baseHex?: string;
   icon?: ReactNode;
   label: string;
   name: string;
@@ -63,24 +77,30 @@ const CustomCheckbox = ({
   const { register, watch } = useFormContext();
   const checked: boolean = watch(name);
 
+  const backgroundColor = baseHex
+    ? hexToRgba(baseHex, checked ? 1 : 0.85)
+    : "transparent";
+
+  const boxShadow = checked
+    ? `inset 0 0 0 4px #FFD700`
+    : undefined; // ei reunusta kun ei valittu
+
   return (
-<label
-  className={cn(
-    "box-border border-4 flex-col py-2 px-2 pt-[35%] sm:pt-[40%] md:pt-11 text-center aspect-square flex items-center rounded-sm text-white transition-all duration-200",
-    color,
-    checked ? "border-[#FFD700]" : "border-black-400"
-  )}
->
-      {icon ? (
-        <div className="mb-3">{icon}</div>
-      ) : (
-        <RecycleIcon className="mb-3 text-red-600" />
-      )}
+    <label
+      className="flex aspect-square flex-col items-center justify-center rounded-sm px-2 py-2 text-center text-white transition-all duration-200"
+      style={{
+        backgroundColor,
+        boxShadow,
+      }}
+    >
+      <div className="mb-2 transform scale-125">
+        {icon ?? <RecycleIcon className="text-red-600" />}
+      </div>
       <input
         {...register(name)}
         checked={checked || false}
-        className="hidden"
         type="checkbox"
+        className="hidden"
       />
       <span className="text-sm">{label}</span>
     </label>
@@ -92,16 +112,17 @@ export const Materials = () => {
     queryKey: ["materials"],
     queryFn: () =>
       getMaterials().then((res) =>
-        res.map((m) => ({
-          ...m,
-          color: iconMap.find((i) => i.code === m.code)?.color,
-          icon: iconMap.find((i) => i.code === m.code)?.icon,
-        }))
+        res.map((m) => {
+          const match = iconMap.find((i) => i.code === m.code);
+          return {
+            ...m,
+            baseHex: match?.baseHex,
+            icon: match?.icon,
+          };
+        })
       ),
     staleTime: Infinity,
   });
-
-  const [showMore, setShowMore] = useState(false);
 
   if (isFetching) {
     return (
@@ -113,18 +134,16 @@ export const Materials = () => {
   }
 
   return (
-    <>
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        {materials?.map((material) => (
-          <CustomCheckbox
-            key={material.code}
-            color={material.color}
-            label={material.name}
-            name={`materials.${material.code}`}
-            icon={material.icon}
-          />
-        ))}
-      </div>
-    </>
+    <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+      {materials?.map((material) => (
+        <CustomCheckbox
+          key={material.code}
+          baseHex={material.baseHex}
+          label={material.name}
+          name={`materials.${material.code}`}
+          icon={material.icon}
+        />
+      ))}
+    </div>
   );
 };
