@@ -16,6 +16,7 @@ import { Form } from "@/components/ui/form";
 import { getCollectionSpots } from "@/services/api";
 import { Material } from "@/types";
 import { Loader2Icon, MapPinned } from "lucide-react";
+import { GeolocateControl as TGeolocateControl } from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useCallback, useEffect, useRef, useState } from "react";
@@ -216,6 +217,8 @@ export default function Result() {
     fetchData();
   }, []);
 
+  const geolocateControlRef = useRef<TGeolocateControl>(null);
+
   useEffect(() => {
     const map = mapRef.current;
     if (map) {
@@ -232,6 +235,9 @@ export default function Result() {
       map.on("style.load", () => {
         setStyleLoaded(true);
       });
+
+      geolocateControlRef.current?.trigger();
+
       return () => {
         map.off("mouseenter", "point", showPointer);
         map.off("mouseleave", "point", hidePointer);
@@ -239,7 +245,6 @@ export default function Result() {
     }
   }, [mapLoaded, geojson]);
 
-  const geolocateControlRef = useRef<any>(null);
   const initialGeolocate = useRef(true);
   const [isTracking, setTracking] = useState(false);
 
@@ -254,12 +259,6 @@ export default function Result() {
     });
     initialGeolocate.current = false;
   }, []);
-
-  useEffect(() => {
-    if (geolocateControlRef.current) {
-      geolocateControlRef.current?.trigger();
-    }
-  }, [geolocateControlRef.current]);
 
   return (
     <Suspense>
@@ -295,6 +294,35 @@ export default function Result() {
           }}
           maxBounds={finlandBounds as any}
         >
+          <MapStyleControl
+            onToggle={(selected) => {
+              setStyleLoaded(false);
+              setStyle(selected ? "satellite" : "detail");
+            }}
+            selected={mapStyle === "satellite"}
+          />
+          <GeolocateControl
+            ref={geolocateControlRef}
+            onGeolocate={handleGeolocateChange}
+            onTrackUserLocationEnd={() => setTracking(false)}
+            onTrackUserLocationStart={() => setTracking(true)}
+            positionOptions={{ enableHighAccuracy: true }}
+            position="bottom-right"
+            trackUserLocation
+          />
+          <SelectedMaterialsControl
+            amount={selectedMaterials.length}
+            onClick={() => setShowMaterials(true)}
+          />
+          <NavigationControl position="top-right" />
+          <FullscreenControl position="top-right" />
+          <ScaleControl position="bottom-left" />
+          <GeocoderControl
+            mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_TOKEN!}
+            position="top-left"
+            placeholder="Etsi"
+            bbox={[19.0, 59.0, 32.0, 71.0]} //Search only from Finland bounds
+          />
           {geojson && (
             <>
               {styleLoaded && (
@@ -316,35 +344,6 @@ export default function Result() {
                 </Source>
               )}
               <CollectionPointIcon />
-              <MapStyleControl
-                onToggle={(selected) => {
-                  setStyleLoaded(false);
-                  setStyle(selected ? "satellite" : "detail");
-                }}
-                selected={mapStyle === "satellite"}
-              />
-              <GeolocateControl
-                ref={geolocateControlRef}
-                onGeolocate={handleGeolocateChange}
-                onTrackUserLocationEnd={() => setTracking(false)}
-                onTrackUserLocationStart={() => setTracking(true)}
-                positionOptions={{ enableHighAccuracy: true }}
-                position="bottom-right"
-                trackUserLocation
-              />
-              <SelectedMaterialsControl
-                amount={selectedMaterials.length}
-                onClick={() => setShowMaterials(true)}
-              />
-              <NavigationControl position="top-right" />
-              <FullscreenControl position="top-right" />
-              <ScaleControl position="bottom-left" />
-              <GeocoderControl
-                mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_TOKEN!}
-                position="top-left"
-                placeholder="Etsi"
-                bbox={[19.0, 59.0, 32.0, 71.0]} //Search only from Finland bounds
-              />
               {details && (
                 <Popup
                   key={new Date().getTime()}
