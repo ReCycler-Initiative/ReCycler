@@ -352,9 +352,9 @@ export default function Result() {
                   onClose={() => setDetails(null)}
                   anchor="bottom"
                   maxWidth="360px"
-                  className="[&_.mapboxgl-popup-content]:min-w-52 [&_.mapboxgl-popup-content]:px-0 [&_.mapboxgl-popup-content]:py-0 [&_.mapboxgl-popup-close-button]:hidden"
+                  className="[&_.mapboxgl-popup-content]:min-w-52 [&_.mapboxgl-popup-content]:p-0! [&_.mapboxgl-popup-close-button]:hidden"
                 >
-                  <div className="px-5 py-4 border-b">
+                  <div className="p-3 border-b">
                     <h2 className="text-base font-semibold mb-1">
                       {details.properties?.name}
                     </h2>
@@ -369,7 +369,7 @@ export default function Result() {
                     </div>
                   </div>
                   {details.properties?.opening_hours_fi && (
-                    <div className="px-5 py-4 border-b">
+                    <div className="p-3 border-b">
                       <h3 className="sr-only">Aukioloajat</h3>
                       <div
                         dangerouslySetInnerHTML={{
@@ -378,7 +378,7 @@ export default function Result() {
                       />
                     </div>
                   )}
-                  <ul className="text-sm px-5 py-4 leading-6 list-disc columns-2">
+                  <ul className="text-sm p-3 leading-6 list-disc columns-2">
                     {details.properties &&
                       JSON.parse(details.properties.materials)
                         .sort((a: Material, b: Material) =>
