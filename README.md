@@ -19,9 +19,10 @@ The multi-organization model requires the development of user management and adm
 ## How to contribute
 We welcome contributions from developers, designers, and anyone passionate about sustainable practices. Please follow the guidelines outlined in our [contributing.md](contributing.md) file.
 ## Installation
-To install the ReCycler application, please take a look at the detailed instructions in the [backend/api](/backend/api/README.md) and [frontend](/frontend/README.md) folders.
+To install the ReCycler application, please take a look at the detailed instructions in the [app](/app/README.md) folders.
 ## About licenses, authors and data sources
-ReCycler is open-source and distributed under the [Apache-2.0 license](licence.md). Please feel free to use, modify, and distribute the software according to the terms of the license. This project was originally developed by © Jussi Niilahti and Pirkka Huhtala.
+Usage of Mapbox is subject to their [Terms of Service](https://www.mapbox.com/legal/tos) and [Attribution Guidelines](https://docs.mapbox.com/help/getting-started/attribution/).
+ReCycler is open-source and distributed under the [Apache-2.0 license](licence.md). Please feel free to use, modify, and distribute the software according to the terms of the license. This project was originally developed by © [Jussi Niilahti](https://www.linkedin.com/in/jussi-niilahti) and [Pirkka Huhtala](https://www.linkedin.com/in/pirkka-huhtala/).
 
 The recycling collection spots data used in this project is sourced from the [Kierrätys.info service (API)](https://kierratys.info/tietoa-sivustosta).  
 All copyrights related to the Kierrätys.info service and its data are held by KIVO ry (The Association for Finnish Local and Regional Authorities in Waste Management).  
@@ -34,11 +35,3 @@ Usage of Mapbox is subject to their [Terms of Service](https://www.mapbox.com/le
 
 ## Contact
 For any inquiries or suggestions, please reach out to us through GitHub. You can contact us by creating an issue in the repository, participating in discussions, or submitting pull requests. We value and welcome your contributions and feedback.
-Let's collaborate to create a more sustainable future with ReCycler! :seedling::recycle:
-## Screenshots from the development version (www.recyclerapp.fi), February 24, 2025
-
-![recycler-screenshot](images/recycler-gui-feb2025-intro.png)
-![recycler-screenshot](images/recycler-gui-feb2025-materials.png)
-![recycler-screenshot](images/recycler-gui-feb2025-finland.png)
-![recycler-screenshot](images/recycler-gui-feb2025-detailed.png)
-![recycler-screenshot](images/recycler-gui-feb2025-satellite.png)
