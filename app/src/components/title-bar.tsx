@@ -11,8 +11,8 @@ const TitleBar = ({
   toHomeHref?: string;
 }) => {
   return (
-    <header className="pb-2 pl-1 border-b border-gray-400 sticky top-0 bg-white shadow-md z-50 flex items-center">
-      <Link href={toHomeHref}>
+    <header className="pl-1 border-b border-gray-400 sticky top-0 bg-white shadow-md z-50 flex items-center">
+      <Link className="pb-2" href={toHomeHref}>
         <Image src={logo} alt="Recycler logo" width={150} />
       </Link>
       {children}
