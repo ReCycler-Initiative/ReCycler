@@ -35,14 +35,16 @@ import Map, {
   SymbolLayer,
   useMap,
 } from "react-map-gl";
+import OnboardingHint from "@/components/ui/OnboardingHint";
 
+// Custom icon loader for collection points
 const CollectionPointIcon = () => {
   const { current: map } = useMap();
 
   useEffect(() => {
     if (map) {
       const loadIcon = () => {
-        map.loadImage("../collection-point.png", (error, image) => {
+        map.loadImage("../images/collection-point.png", (error, image) => {
           if (error) throw error;
 
           if (map.hasImage("collection-point")) {
@@ -67,11 +69,14 @@ const CollectionPointIcon = () => {
 
   return null;
 };
+
+// Bounding box to restrict map movement to Finland
 const finlandBounds = [
-  [10.0, 54.0], // Southwest
-  [40.0, 75.0], // Northeast
+  [10.0, 54.0], // Southwest corner
+  [40.0, 75.0], // Northeast corner
 ];
 
+// Style for rendering point features (icons)
 const layerStyle: SymbolLayer = {
   id: "point",
   type: "symbol",
@@ -82,6 +87,7 @@ const layerStyle: SymbolLayer = {
   },
 };
 
+// Style for highlighting features that match all selected materials
 const highlighLayer: CircleLayer = {
   id: "point2",
   type: "circle",
@@ -100,6 +106,7 @@ const highlighLayer: CircleLayer = {
   },
 };
 
+// Style for cluster circles
 const clusters: CircleLayer = {
   id: "clusters",
   type: "circle",
@@ -122,6 +129,7 @@ const clusters: CircleLayer = {
   },
 };
 
+// Style for displaying cluster counts (numbers inside clusters)
 const clusterCount: SymbolLayer = {
   id: "cluster-count",
   type: "symbol",
@@ -133,6 +141,7 @@ const clusterCount: SymbolLayer = {
   },
 };
 
+// Helper to filter features based on selected materials
 const filterFeaturesBySelectedMaterials = (
   materials: number[],
   collectionSpots: GeoJSON.FeatureCollection<GeoJSON.Geometry>
@@ -190,6 +199,11 @@ export default function Result() {
       .filter(Boolean)
       .map((code) => +code) || [];
   const [showMaterials, setShowMaterials] = useState(false);
+
+  // Whether to show geolocation onboarding hint at startup
+  const [showGeoHint, setShowGeoHint] = useState(true);
+
+  // Setup form state for material selection
   const form = useForm({
     defaultValues: {
       materials: selectedMaterials.reduce(
@@ -208,17 +222,18 @@ export default function Result() {
     defaultValue: {},
   });
 
+  // Load collection points from API
   useEffect(() => {
     const fetchData = async () => {
       let response = await getCollectionSpots();
       setGeojson(response);
     };
-
     fetchData();
   }, []);
 
   const geolocateControlRef = useRef<TGeolocateControl>(null);
 
+  // Add pointer cursor on hover and handle map style reload
   useEffect(() => {
     const map = mapRef.current;
     if (map) {
@@ -236,6 +251,7 @@ export default function Result() {
         setStyleLoaded(true);
       });
 
+      // Trigger initial geolocation if available
       geolocateControlRef.current?.trigger();
 
       return () => {
@@ -245,9 +261,28 @@ export default function Result() {
     }
   }, [mapLoaded, geojson]);
 
+  // Check geolocation permission to decide if the hint should be shown
+  useEffect(() => {
+    (async () => {
+      try {
+        // Not all browsers support this API; fallback is handled in the component
+        // @ts-expect-error: PermissionName "geolocation" is valid at runtime
+        const status = await navigator.permissions?.query({
+          name: "geolocation" as PermissionName,
+        });
+        if (status && status.state === "granted") {
+          setShowGeoHint(false);
+        }
+      } catch {
+        // Ignore errors; fallback is localStorage check inside OnboardingHint
+      }
+    })();
+  }, []);
+
   const initialGeolocate = useRef(true);
   const [isTracking, setTracking] = useState(false);
 
+  // Fly the map to the user’s position when tracking is enabled
   const handleGeolocateChange = useCallback((position: GeolocationPosition) => {
     if (!isTracking) {
       return;
@@ -258,7 +293,7 @@ export default function Result() {
       zoom: initialGeolocate ? 15 : mapRef.current?.getZoom(),
     });
     initialGeolocate.current = false;
-  }, []);
+  }, [isTracking]);
 
   return (
     <Suspense>
@@ -267,17 +302,17 @@ export default function Result() {
           ref={mapRef}
           mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_TOKEN}
           initialViewState={{
-            longitude: 24.94, // Finland long
-            latitude: 64.0, // Finland lat
-            zoom: 4, // Proper zoom extent
+            longitude: 24.94, // Default longitude (Finland)
+            latitude: 64.0,  // Default latitude (Finland)
+            zoom: 4,         // Initial zoom
           }}
           onLoad={() => {
             setMapLoaded(true);
           }}
           mapStyle={
             mapStyle === "detail"
-              ? process.env.NEXT_PUBLIC_MAPBOX_STYLE_DETAIL // Background map detail / street
-              : process.env.NEXT_PUBLIC_MAPBOX_STYLE_SATELLITE // Background map satellite
+              ? process.env.NEXT_PUBLIC_MAPBOX_STYLE_DETAIL // Street/detail background
+              : process.env.NEXT_PUBLIC_MAPBOX_STYLE_SATELLITE // Satellite background
           }
           interactiveLayerIds={["point"]}
           onClick={(e) => {
@@ -301,6 +336,7 @@ export default function Result() {
             }}
             selected={mapStyle === "satellite"}
           />
+
           <GeolocateControl
             ref={geolocateControlRef}
             onGeolocate={handleGeolocateChange}
@@ -310,6 +346,20 @@ export default function Result() {
             position="bottom-right"
             trackUserLocation
           />
+
+          {/* Onboarding hint anchored to the geolocate control */}
+          {showGeoHint && (
+            <OnboardingHint
+              anchorSelector=".mapboxgl-ctrl-geolocate, .maplibregl-ctrl-geolocate"
+              storageKey="onboarded:geo"
+            >
+              <b>User location and tracking</b><br />
+              Use this button to display your location. A second click enables
+              <i> location tracking</i>, keeping the map centered on you.  
+              You can disable tracking from the same button.
+            </OnboardingHint>
+          )}
+
           <SelectedMaterialsControl
             amount={selectedMaterials.length}
             onClick={() => setShowMaterials(true)}
@@ -320,9 +370,10 @@ export default function Result() {
           <GeocoderControl
             mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_TOKEN!}
             position="top-left"
-            placeholder="Etsi"
-            bbox={[19.0, 59.0, 32.0, 71.0]} //Search only from Finland bounds
+            placeholder="Search"
+            bbox={[19.0, 59.0, 32.0, 71.0]} // Limit search to Finland bounds
           />
+
           {geojson && (
             <>
               {styleLoaded && (
@@ -370,7 +421,7 @@ export default function Result() {
                   </div>
                   {details.properties?.opening_hours_fi && (
                     <div className="p-3 border-b">
-                      <h3 className="sr-only">Aukioloajat</h3>
+                      <h3 className="sr-only">Opening hours</h3>
                       <div
                         dangerouslySetInnerHTML={{
                           __html: details.properties?.opening_hours_fi,
@@ -400,7 +451,7 @@ export default function Result() {
                         href={`https://www.google.com/maps/search/?api=1&query=${(details.geometry as GeoJSON.Point).coordinates[1]},${(details.geometry as GeoJSON.Point).coordinates[0]}`}
                         target="_blank"
                       >
-                        <span>Avaa Google Maps</span>
+                        <span>Open in Google Maps</span>
                         <MapPinned className="ml-2" size={18} />
                       </a>
                     </Button>
@@ -410,12 +461,15 @@ export default function Result() {
             </>
           )}
         </Map>
+
         {!mapLoaded && (
           <div className="fixed flex inset-0 items-center justify-center flex-col gap-6 text-black">
             <Loader2Icon className="animate-spin" />
-            Haetaan kierrätyspisteitä
+            Loading collection points
           </div>
         )}
+
+        {/* Drawer for selecting materials */}
         <Drawer
           open={showMaterials}
           onOpenChange={(open) => {
@@ -441,7 +495,7 @@ export default function Result() {
           <DrawerContent>
             <DrawerHeader>
               <DrawerTitle className="text-center">
-                Valitut materiaalit
+                Selected materials
               </DrawerTitle>
             </DrawerHeader>
             <div className="max-h-[500px] overflow-y-scroll max-w-2xl mx-auto">
