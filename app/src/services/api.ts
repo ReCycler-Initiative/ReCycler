@@ -3,6 +3,7 @@ import {
   CreateOrganizationResponse,
   LocationGeoJsonCollection,
   Material,
+  UseCase,
 } from "@/types";
 import axios from "axios";
 import { z } from "zod";
@@ -38,3 +39,10 @@ export const createOrganization = async (
   axios
     .post("/api/organizations", request)
     .then((response) => CreateOrganizationResponse.parse(response.data));
+
+export const getUseCases = (
+  organizationId: string
+): Promise<Array<z.infer<typeof UseCase>>> =>
+  axios
+    .get(`/api/organizations/${organizationId}/use_cases`)
+    .then((response) => response.data);

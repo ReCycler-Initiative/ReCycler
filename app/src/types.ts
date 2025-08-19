@@ -92,7 +92,14 @@ export const NewOrganization = z.object({
 
 export const NewUseCase = z.object({
   description: z.string(),
+  name: z.string(),
 });
+
+export const UseCase = NewUseCase.merge(
+  z.object({
+    id: z.string().uuid(),
+  })
+);
 
 export const CreateOrganizationRequest = z.object({
   organization: NewOrganization,
