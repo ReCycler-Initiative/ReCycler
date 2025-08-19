@@ -1,4 +1,12 @@
 import TitleBar from "@/components/title-bar";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import Link from "next/link";
 
 const AdminLayout = async ({
@@ -12,8 +20,19 @@ const AdminLayout = async ({
   return (
     <div className="flex flex-col h-full">
       <TitleBar toHomeHref={`/admin/organizations/${id}`}>
-        <div className="ml-8">
-          <nav className="[&>a]:inline-block [&>a]:py-3 [&>a]:px-4">
+        <div className="flex ml-8">
+          <div className="flex items-center">
+            <Label className="mr-4">Use case</Label>
+            <Select>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="light">Recycler</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <nav className="[&>a]:inline-block [&>a]:py-3 [&>a]:px-4 ml-4">
             <Link href={`/admin/organizations/${id}/general_info`}>
               General Info
             </Link>
