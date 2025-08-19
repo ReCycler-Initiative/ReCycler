@@ -1,12 +1,9 @@
 import { Analytics } from "@vercel/analytics/react";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
-import Image from "next/image";
-import Link from "next/link";
 import Script from "next/script";
 import "./globals.css";
 import Providers from "./providers";
-import logo from "./recycler-logo.png";
 
 const inter = Inter({ subsets: ["latin"] });
 
