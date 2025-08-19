@@ -69,6 +69,12 @@ export default function OnboardingHint({
         imageSrc: "/images/materialSelectorOnBoarding.png",
         imageAlt: "Materiaalivalitsin",
       },
+            {
+        title: "ReCycler-avustaja",
+        body: <>Kysy kierrätysneuvoja ReCycler avustimelta - se kertoo, mihin eri materiaalit voi viedä.</>,
+        imageSrc: "/images/chatbotOnBoarding.png",
+        imageAlt: "ReCycler avustin",
+      },
       {
         title: "Kaikki valmista!",
         body: <>Hienoa - Olet valmis etsimään kierrätyspisteitä!</>,
