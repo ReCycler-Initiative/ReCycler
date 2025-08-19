@@ -370,7 +370,7 @@ export default function Result() {
           <GeocoderControl
             mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_TOKEN!}
             position="top-left"
-            placeholder="Search"
+            placeholder="Etsi"
             bbox={[19.0, 59.0, 32.0, 71.0]} // Limit search to Finland bounds
           />
 
