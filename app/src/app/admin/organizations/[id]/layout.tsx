@@ -1,3 +1,5 @@
+"use client";
+
 import TitleBar from "@/components/title-bar";
 import { Label } from "@/components/ui/label";
 import {
@@ -7,28 +9,40 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { getUseCases } from "@/services/api";
+import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
+import { useParams } from "next/navigation";
 
-const AdminLayout = async ({
+const AdminLayout = ({
   children,
   params,
 }: {
   children: React.ReactNode;
   params: Promise<{ id: string }>;
 }) => {
-  const { id } = await params;
+  const { id } = useParams<{ id: string }>();
+  const useCasesQuery = useQuery({
+    queryKey: ["use_cases", id],
+    queryFn: () => getUseCases(id),
+  });
+
   return (
     <div className="flex flex-col h-full">
       <TitleBar toHomeHref={`/admin/organizations/${id}`}>
         <div className="flex ml-8">
           <div className="flex items-center">
             <Label className="mr-4">Use case</Label>
-            <Select>
+            <Select value={useCasesQuery.data?.[0]?.id}>
               <SelectTrigger className="w-[180px]">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="light">Recycler</SelectItem>
+                {useCasesQuery.data?.map((useCase) => (
+                  <SelectItem key={useCase.id} value={useCase.id}>
+                    {useCase.name}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>
