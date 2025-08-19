@@ -17,7 +17,7 @@ const AdminLayout = async ({
             <Link href={`/admin/organizations/${id}/general_info`}>
               General Info
             </Link>
-            
+            <Link href={`/admin/organizations/${id}/locations`}>Locations</Link>
           </nav>
         </div>
       </TitleBar>
