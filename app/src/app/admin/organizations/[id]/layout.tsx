@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/select";
 import { getUseCases } from "@/services/api";
 import { useQuery } from "@tanstack/react-query";
-import { Ham, HamburgerIcon, LucideHamburger, MenuIcon } from "lucide-react";
+import { MenuIcon } from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 
