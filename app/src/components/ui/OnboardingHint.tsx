@@ -70,10 +70,10 @@ export default function OnboardingHint({
         imageAlt: "Materiaalivalitsin",
       },
       {
-        title: "ReCycler-avustaja",
-        body: <>Kysy kierrätysneuvoja ReCycler avustimelta - se kertoo, mihin eri materiaalit voi viedä.</>,
+        title: "ReCycler avustaja",
+        body: <>Kysy kierrätysneuvoja ReCycler avustajalta - se kertoo, mihin eri materiaalit voi viedä.</>,
         imageSrc: "/images/chatbotOnBoarding.png",
-        imageAlt: "ReCycler avustin",
+        imageAlt: "ReCycler avustaja",
       },
       {
         title: "Kaikki valmista!",
