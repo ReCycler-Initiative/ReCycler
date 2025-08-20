@@ -69,7 +69,7 @@ export default function OnboardingHint({
         imageSrc: "/images/materialSelectorOnBoarding.png",
         imageAlt: "Materiaalivalitsin",
       },
-            {
+      {
         title: "ReCycler-avustaja",
         body: <>Kysy kierrätysneuvoja ReCycler avustimelta - se kertoo, mihin eri materiaalit voi viedä.</>,
         imageSrc: "/images/chatbotOnBoarding.png",
@@ -87,6 +87,16 @@ export default function OnboardingHint({
     if (localStorage.getItem(storageKey) === "1") return;
     setVisible(true);
   }, [storageKey]);
+
+  // --- added: allow opening the wizard manually from the title bar
+  useEffect(() => {
+    const handler = () => {
+      setIndex(0);
+      setVisible(true);
+    };
+    window.addEventListener("open-onboarding", handler as EventListener);
+    return () => window.removeEventListener("open-onboarding", handler as EventListener);
+  }, []);
 
   const markDone = () => {
     setVisible(false);
@@ -113,7 +123,7 @@ export default function OnboardingHint({
       } ${overlay && overlayBlur ? "backdrop-blur-sm" : ""}`}
       role="dialog"
     >
-      <div className="w-[min(92vw,620px)] rounded-2xl shadow-xl border border-black/5 bg-white/95 p-6">
+      <div className="w-[min(92vw,620px)] rounded-2xl shadow-xl bg-white p-6">
         {/* Header + progress */}
         <div className="flex items-center justify-between mb-2">
           <div className="text-lg font-semibold">{step.title}</div>
