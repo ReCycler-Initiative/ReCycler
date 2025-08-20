@@ -283,17 +283,29 @@ export default function Result() {
   const [isTracking, setTracking] = useState(false);
 
   // Fly the map to the user’s position when tracking is enabled
-  const handleGeolocateChange = useCallback((position: GeolocationPosition) => {
-    if (!isTracking) {
-      return;
-    }
+  const handleGeolocateChange = useCallback(
+    (position: GeolocationPosition) => {
+      if (!isTracking) {
+        return;
+      }
 
-    mapRef.current?.flyTo({
-      center: [position.coords.longitude, position.coords.latitude],
-      zoom: initialGeolocate ? 15 : mapRef.current?.getZoom(),
-    });
-    initialGeolocate.current = false;
-  }, [isTracking]);
+      mapRef.current?.flyTo({
+        center: [position.coords.longitude, position.coords.latitude],
+        zoom: initialGeolocate ? 15 : mapRef.current?.getZoom(),
+      });
+      initialGeolocate.current = false;
+    },
+    [isTracking]
+  );
+
+  // On unmount, notify TitleBar
+  useEffect(() => {
+    return () => {
+      if (typeof window !== "undefined") {
+        window.dispatchEvent(new Event("map-unloaded"));
+      }
+    };
+  }, []);
 
   return (
     <Suspense>
@@ -303,11 +315,15 @@ export default function Result() {
           mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_TOKEN}
           initialViewState={{
             longitude: 24.94, // Default longitude (Finland)
-            latitude: 64.0,  // Default latitude (Finland)
-            zoom: 4,         // Initial zoom
+            latitude: 64.0, // Default latitude (Finland)
+            zoom: 4, // Initial zoom
           }}
           onLoad={() => {
             setMapLoaded(true);
+            // Inform TitleBar that the map is ready
+            if (typeof window !== "undefined") {
+              window.dispatchEvent(new Event("map-loaded"));
+            }
           }}
           mapStyle={
             mapStyle === "detail"
@@ -353,10 +369,11 @@ export default function Result() {
               anchorSelector=".mapboxgl-ctrl-geolocate, .maplibregl-ctrl-geolocate"
               storageKey="onboarded:geo"
             >
-              <b>User location and tracking</b><br />
+              <b>User location and tracking</b>
+              <br />
               Use this button to display your location. A second click enables
-              <i> location tracking</i>, keeping the map centered on you.  
-              You can disable tracking from the same button.
+              <i> location tracking</i>, keeping the map centered on you. You
+              can disable tracking from the same button.
             </OnboardingHint>
           )}
 
