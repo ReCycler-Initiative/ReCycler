@@ -31,15 +31,14 @@ const MaterialsPage = () => {
         Materiaaleja valittu {selectedMaterials.length} kpl
         <Button asChild className="w-full max-w-96 lg:mb-6" size="lg">
           <Link
-            href={`/recycler/results?materials=${encodeURIComponent(selectedMaterials.map(([key]) => key).join(","))}`}
+            href={`/recycler/results?materials=${encodeURIComponent(
+              selectedMaterials.map(([key]) => key).join(",")
+            )}`}
           >
             Näytä kierrätyspisteet
           </Link>
         </Button>
       </div>
-      {/* <div className="fixed z-50 right-2 bottom-32 lg:bottom-4">
-        <Chat />
-      </div> */}
     </Form>
   );
 };
