@@ -35,7 +35,7 @@ import Map, {
   SymbolLayer,
   useMap,
 } from "react-map-gl";
-import OnboardingHint from "@/components/ui/OnboardingHint";
+import OnboardingHint from "@/components/ui/onboarding-hint";
 
 // Custom icon loader for collection points
 const CollectionPointIcon = () => {
