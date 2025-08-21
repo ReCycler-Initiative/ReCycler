@@ -71,7 +71,9 @@ export default function OnboardingHint({
       },
       {
         title: "ReCycler avustaja",
-        body: <>Kysy kierrätysneuvoja ReCycler avustajalta - se kertoo, mihin eri materiaalit voi viedä.</>,
+        body: (
+          <>Kysy kierrätysneuvoja ReCycler avustajalta - se kertoo, mihin eri materiaalit voi viedä.</>
+        ),
         imageSrc: "/images/chatbotOnBoarding.png",
         imageAlt: "ReCycler avustaja",
       },
@@ -88,7 +90,7 @@ export default function OnboardingHint({
     setVisible(true);
   }, [storageKey]);
 
-  // --- added: allow opening the wizard manually from the title bar
+  // --- allow opening the wizard manually from the title bar
   useEffect(() => {
     const handler = () => {
       setIndex(0);
@@ -113,6 +115,7 @@ export default function OnboardingHint({
 
   // Todellinen koko CSS-pikseleinä = natural / DPR
   const natural = step.imageSrc ? imgSizes[step.imageSrc] : undefined;
+
   const cssWidth = natural ? natural.w / dpr : undefined;
   const cssHeight = natural ? natural.h / dpr : undefined;
 
@@ -122,6 +125,8 @@ export default function OnboardingHint({
         overlay ? "bg-black/40" : ""
       } ${overlay && overlayBlur ? "backdrop-blur-sm" : ""}`}
       role="dialog"
+      aria-modal="true"
+      aria-label={step.title}
     >
       <div className="w-[min(92vw,620px)] rounded-2xl shadow-xl bg-white p-6">
         {/* Header + progress */}
