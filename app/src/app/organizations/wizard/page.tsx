@@ -278,6 +278,7 @@ const Wizard = () => {
     },
     fields: [],
     useCase: {
+      name: "",
       description: "",
     },
   });
