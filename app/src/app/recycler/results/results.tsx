@@ -266,7 +266,6 @@ export default function Result() {
     (async () => {
       try {
         // Not all browsers support this API; fallback is handled in the component
-        // @ts-expect-error: PermissionName "geolocation" is valid at runtime
         const status = await navigator.permissions?.query({
           name: "geolocation" as PermissionName,
         });
@@ -364,18 +363,7 @@ export default function Result() {
           />
 
           {/* Onboarding hint anchored to the geolocate control */}
-          {showGeoHint && (
-            <OnboardingHint
-              anchorSelector=".mapboxgl-ctrl-geolocate, .maplibregl-ctrl-geolocate"
-              storageKey="onboarded:geo"
-            >
-              <b>User location and tracking</b>
-              <br />
-              Use this button to display your location. A second click enables
-              <i> location tracking</i>, keeping the map centered on you. You
-              can disable tracking from the same button.
-            </OnboardingHint>
-          )}
+          {showGeoHint && <OnboardingHint storageKey="onboarded:geo" />}
 
           <SelectedMaterialsControl
             amount={selectedMaterials.length}
