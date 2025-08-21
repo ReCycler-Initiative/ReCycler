@@ -26,10 +26,10 @@ export default function OnboardingHint({
   const [visible, setVisible] = useState(false);
   const [index, setIndex] = useState(0);
 
-  // Store each image's natural size (pixels)
+  // Store each image's natural size (CSS pixels at DPR=1; we record actual naturalWidth/Height)
   const [imgSizes, setImgSizes] = useState<Record<string, { w: number; h: number }>>({});
 
-  // Device pixel ratio
+  // Track device pixel ratio to render images at crisp but consistent CSS sizes
   const [dpr, setDpr] = useState(1);
   useEffect(() => {
     const update = () => setDpr(window.devicePixelRatio || 1);
@@ -86,11 +86,12 @@ export default function OnboardingHint({
   );
 
   useEffect(() => {
+    // Respect "already seen" flag from previous sessions
     if (localStorage.getItem(storageKey) === "1") return;
     setVisible(true);
   }, [storageKey]);
 
-  // --- allow opening the wizard manually from the title bar
+  // Allow opening the wizard manually via a custom window event
   useEffect(() => {
     const handler = () => {
       setIndex(0);
@@ -113,11 +114,24 @@ export default function OnboardingHint({
   const step = steps[index];
   const pct = ((index + 1) / steps.length) * 100;
 
-  // Todellinen koko CSS-pikseleinä = natural / DPR
+  // Natural size in device-independent pixels; actual rendered CSS size should divide by DPR
   const natural = step.imageSrc ? imgSizes[step.imageSrc] : undefined;
 
-  const cssWidth = natural ? natural.w / dpr : undefined;
-  const cssHeight = natural ? natural.h / dpr : undefined;
+  // Target max render box for visual consistency (tweak as needed)
+  const MAX_W = 560; // px
+  const MAX_H = 320; // px
+
+  // Compute CSS width/height from natural size and DPR, then clamp into a max box
+  let cssWidth: number | undefined;
+  let cssHeight: number | undefined;
+
+  if (natural) {
+    const wCss = natural.w / dpr;
+    const hCss = natural.h / dpr;
+    const scale = Math.min(1, MAX_W / wCss, MAX_H / hCss); // never upscale
+    cssWidth = Math.floor(wCss * scale);
+    cssHeight = Math.floor(hCss * scale);
+  }
 
   return (
     <div
@@ -142,7 +156,7 @@ export default function OnboardingHint({
           <div className="h-full bg-black rounded-full" style={{ width: `${pct}%` }} />
         </div>
 
-        {/* Image */}
+        {/* Image (rounded corners + thin border; gently normalized sizing) */}
         {step.imageSrc && (
           <div className="mb-3 flex items-center justify-start">
             <img
@@ -157,11 +171,16 @@ export default function OnboardingHint({
                   }));
                 }
               }}
+              // Keep explicit sizing to avoid layout shift and keep images visually similar
               style={{
-                width: cssWidth ? `${cssWidth}px` : "auto",
-                height: cssHeight ? `${cssHeight}px` : "auto",
+                width: cssWidth ? `${cssWidth}px` : undefined,
+                height: cssHeight ? `${cssHeight}px` : undefined,
                 display: "block",
+                // As a fallback, ensure image never breaks the container
+                maxWidth: `${MAX_W}px`,
+                maxHeight: `${MAX_H}px`,
               }}
+              className="rounded-lg border border-gray-200 shadow-sm"
               loading="eager"
             />
           </div>
