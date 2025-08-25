@@ -2,8 +2,8 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { ReactNode } from "react";
 import logo from "../app/recycler-logo.png";
-import { ReactNode, useEffect, useState } from "react";
 
 const TitleBar = ({
   children,
