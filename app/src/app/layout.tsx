@@ -19,16 +19,6 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="h-full">
-      <Script id="chatling">
-        {`window.chtlConfig = { chatbotId: "3433989154" }`}
-      </Script>
-      <Script
-        async
-        data-id="3433989154"
-        id="chatling-embed-script"
-        type="text/javascript"
-        src="https://chatling.ai/js/embed.js"
-      ></Script>
       <body className={`${inter.className} h-full`}>
         <Analytics />
         <Providers>
