@@ -40,7 +40,7 @@ const HomePage = () => {
       </Container>
       {/* Footer */}
       <footer className="w-full mt-16 bg-gray-200 py-4 text-center">
-        <p className="text-sm">
+        <p className="text-xs">
           ReCycler on Github-projekti. Lähdekoodi ja lisenssitiedot löytyvät
           projektin{" "}
           <a
