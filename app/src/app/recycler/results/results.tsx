@@ -470,7 +470,7 @@ export default function Result() {
         {!mapLoaded && (
           <div className="fixed flex inset-0 items-center justify-center flex-col gap-6 text-black">
             <Loader2Icon className="animate-spin" />
-            Loading collection points
+            Ladataan kierrätyspisteet kartalle
           </div>
         )}
 
