@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
+import React, { useEffect, useMemo, useState } from "react";
 
 type Step = {
   title: string;
@@ -26,18 +26,6 @@ export default function OnboardingHint({
   const [visible, setVisible] = useState(false);
   const [index, setIndex] = useState(0);
 
-  // Store each image's natural size (for consistent sizing)
-  const [imgSizes, setImgSizes] = useState<Record<string, { w: number; h: number }>>({});
-
-  // Track device pixel ratio to render crisp images on high-DPI screens
-  const [dpr, setDpr] = useState(1);
-  useEffect(() => {
-    const update = () => setDpr(window.devicePixelRatio || 1);
-    update();
-    window.addEventListener("resize", update);
-    return () => window.removeEventListener("resize", update);
-  }, []);
-
   // Onboarding steps
   const steps: Step[] = useMemo(
     () => [
@@ -51,8 +39,9 @@ export default function OnboardingHint({
         title: "Ota paikannus käyttöön",
         body: (
           <>
-            Klikkaa sijaintipainiketta keskittääksesi kartan omaan sijaintiisi. Voit myös ottaa
-            jatkuvan paikannuksen käyttöön painamalla painiketta toisen kerran.
+            Klikkaa sijaintipainiketta keskittääksesi kartan omaan sijaintiisi.
+            Voit myös ottaa jatkuvan paikannuksen käyttöön painamalla painiketta
+            toisen kerran.
           </>
         ),
         imageSrc: "/images/geolocationOnBoarding.png",
@@ -60,20 +49,30 @@ export default function OnboardingHint({
       },
       {
         title: "Vaihda taustanäkymä",
-        body: <>Vaihda kartan taustanäkymä: normaali kartta tai satelliittikuva.</>,
+        body: (
+          <>Vaihda kartan taustanäkymä: normaali kartta tai satelliittikuva.</>
+        ),
         imageSrc: "/images/backgroundMapOnBoarding.png",
         imageAlt: "Taustakarttavalitsin",
       },
       {
         title: "Valitse materiaalit",
-        body: <>Valitse haluamasi materiaalit - vastaavat keräyspisteet korostetaan kartalla.</>,
+        body: (
+          <>
+            Valitse haluamasi materiaalit - vastaavat keräyspisteet korostetaan
+            kartalla.
+          </>
+        ),
         imageSrc: "/images/materialSelectorOnBoarding.png",
         imageAlt: "Materiaalivalitsin",
       },
       {
         title: "ReCycler avustaja",
         body: (
-          <>Kysy kierrätysneuvoja ReCycler avustajalta - se kertoo, mihin eri materiaalit voi viedä.</>
+          <>
+            Kysy kierrätysneuvoja ReCycler avustajalta - se kertoo, mihin eri
+            materiaalit voi viedä.
+          </>
         ),
         imageSrc: "/images/chatbotOnBoarding.png",
         imageAlt: "ReCycler avustaja",
@@ -99,7 +98,8 @@ export default function OnboardingHint({
       setVisible(true);
     };
     window.addEventListener("open-onboarding", handler as EventListener);
-    return () => window.removeEventListener("open-onboarding", handler as EventListener);
+    return () =>
+      window.removeEventListener("open-onboarding", handler as EventListener);
   }, []);
 
   const markDone = () => {
@@ -108,29 +108,13 @@ export default function OnboardingHint({
   };
 
   const prev = () => setIndex((i) => Math.max(0, i - 1));
-  const next = () => (index < steps.length - 1 ? setIndex((i) => i + 1) : markDone());
+  const next = () =>
+    index < steps.length - 1 ? setIndex((i) => i + 1) : markDone();
 
   if (!visible) return null;
 
   const step = steps[index];
   const pct = ((index + 1) / steps.length) * 100;
-
-  // Natural size in pixels, later scaled down according to DPR and max box
-  const natural = step.imageSrc ? imgSizes[step.imageSrc] : undefined;
-
-  const MAX_W = 560;
-  const MAX_H = 320;
-
-  let cssWidth: number | undefined;
-  let cssHeight: number | undefined;
-
-  if (natural) {
-    const wCss = natural.w / dpr;
-    const hCss = natural.h / dpr;
-    const scale = Math.min(1, MAX_W / wCss, MAX_H / hCss); // never upscale
-    cssWidth = Math.floor(wCss * scale);
-    cssHeight = Math.floor(hCss * scale);
-  }
 
   return (
     <div
@@ -152,7 +136,10 @@ export default function OnboardingHint({
 
         {/* Progress bar */}
         <div className="w-full h-1.5 rounded-full bg-gray-200 mb-4 overflow-hidden">
-          <div className="h-full bg-black rounded-full" style={{ width: `${pct}%` }} />
+          <div
+            className="h-full bg-black rounded-full"
+            style={{ width: `${pct}%` }}
+          />
         </div>
 
         {/* Step image */}
@@ -161,24 +148,7 @@ export default function OnboardingHint({
             <img
               src={step.imageSrc}
               alt={step.imageAlt ?? ""}
-              onLoad={(e) => {
-                const t = e.currentTarget;
-                if (!imgSizes[step.imageSrc!]) {
-                  setImgSizes((prev) => ({
-                    ...prev,
-                    [step.imageSrc!]: { w: t.naturalWidth, h: t.naturalHeight },
-                  }));
-                }
-              }}
-              style={{
-                width: cssWidth ? `${cssWidth}px` : undefined,
-                height: cssHeight ? `${cssHeight}px` : undefined,
-                display: "block",
-                maxWidth: `${MAX_W}px`,
-                maxHeight: `${MAX_H}px`,
-              }}
-              className="rounded-lg border border-gray-200 shadow-sm"
-              loading="eager"
+              className="rounded-lg border border-gray-200 shadow-sm max-h-14"
             />
           </div>
         )}
@@ -187,20 +157,29 @@ export default function OnboardingHint({
         <div className="text-sm leading-6 text-gray-800">{step.body}</div>
 
         {/* Actions (Back on the left, Skip/Next on the right) */}
-        <div className="mt-5 flex flex-wrap items-center gap-2">
+        <div className="mt-5 flex flex-wrap items-center gap-2 gap-y-4">
           {/* Back button aligned left */}
-          <Button variant="ghost" className="text-sm" onClick={prev} disabled={index === 0}>
-            Takaisin
-          </Button>
+          {allowSkip && (
+            <Button
+              variant="outline"
+              className="max-sm:w-full"
+              onClick={markDone}
+            >
+              Ohita
+            </Button>
+          )}
 
           {/* Right side buttons */}
-          <div className="ml-auto flex gap-2">
-            {allowSkip && (
-              <Button variant="outline" className="text-sm" onClick={markDone}>
-                Ohita
-              </Button>
-            )}
-            <Button className="text-sm" onClick={next}>
+          <div className="ml-auto flex gap-2 max-sm:w-full">
+            <Button
+              variant="ghost"
+              className="max-sm:w-full"
+              onClick={prev}
+              disabled={index === 0}
+            >
+              Takaisin
+            </Button>
+            <Button className="max-sm:w-full" onClick={next}>
               {index === steps.length - 1 ? "Valmis" : "Seuraava"}
             </Button>
           </div>
