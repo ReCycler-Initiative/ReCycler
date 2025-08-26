@@ -153,25 +153,29 @@ export default function OnboardingHint({
         )}
 
         {/* Body */}
-        <div className="text-sm leading-6 text-gray-800">{step.body}</div>
+        <div className="leading-6 text-gray-800">{step.body}</div>
 
         {/* Actions */}
-        <div className="mt-5 flex items-center justify-between gap-2">
+        <div className="mt-5 flex items-center justify-between gap-2 max-sm:flex-col">
           <Button
+            className="max-sm:w-full"
             variant="ghost"
-            className="text-sm"
             onClick={prev}
             disabled={index === 0}
           >
             Takaisin
           </Button>
-          <div className="flex gap-2">
+          <div className="flex gap-4 max-sm:w-full">
             {allowSkip && (
-              <Button variant="outline" className="text-sm" onClick={markDone}>
+              <Button
+                className="max-sm:w-full"
+                variant="outline"
+                onClick={markDone}
+              >
                 Ohita
               </Button>
             )}
-            <Button className="text-sm" onClick={next}>
+            <Button className="max-sm:w-full" onClick={next}>
               {index === steps.length - 1 ? "Valmis" : "Seuraava"}
             </Button>
           </div>
