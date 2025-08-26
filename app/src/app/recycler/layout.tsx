@@ -17,7 +17,7 @@ const RecyclerLayout = ({ children }: { children: ReactNode }) => {
         type="text/javascript"
         src="https://chatling.ai/js/embed.js"
       ></Script>
-      <Layout>{children}</Layout>;
+      <Layout>{children}</Layout>
     </>
   );
 };
