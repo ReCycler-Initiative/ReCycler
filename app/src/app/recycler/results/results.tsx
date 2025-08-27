@@ -42,29 +42,27 @@ const CollectionPointIcon = () => {
   const { current: map } = useMap();
 
   useEffect(() => {
-    if (map) {
-      const loadIcon = () => {
-        map.loadImage("../images/collection-point.png", (error, image) => {
-          if (error) throw error;
+    if (!map) return;
 
-          if (map.hasImage("collection-point")) {
-            return;
-          }
-
-          if (image) {
-            map.addImage("collection-point", image);
-          }
-        });
-      };
-
-      map.on("styleimagemissing", () => {
-        loadIcon();
+    const loadIcon = () => {
+      // Load icon only once per style
+      if (map.hasImage("collection-point")) return;
+      map.loadImage("../images/collection-point.png", (error, image) => {
+        if (error) throw error;
+        if (!image) return;
+        if (!map.hasImage("collection-point")) {
+          map.addImage("collection-point", image);
+        }
       });
+    };
 
-      return () => {
-        map.off("styleimagemissing", loadIcon);
-      };
-    }
+    const onStyleImageMissing = () => loadIcon();
+
+    loadIcon();
+    map.on("styleimagemissing", onStyleImageMissing);
+    return () => {
+      map.off("styleimagemissing", onStyleImageMissing);
+    };
   }, [map]);
 
   return null;
@@ -150,7 +148,7 @@ const filterFeaturesBySelectedMaterials = (
     return collectionSpots;
   }
 
-  let features = collectionSpots.features
+  const features = collectionSpots.features
     ?.filter((feature: any) => {
       const featureMaterials = JSON.parse(
         feature.properties.materials
@@ -225,7 +223,7 @@ export default function Result() {
   // Load collection points from API
   useEffect(() => {
     const fetchData = async () => {
-      let response = await getCollectionSpots();
+      const response = await getCollectionSpots();
       setGeojson(response);
     };
     fetchData();
@@ -233,69 +231,75 @@ export default function Result() {
 
   const geolocateControlRef = useRef<TGeolocateControl>(null);
 
-  // Add pointer cursor on hover and handle map style reload
+  // Track whether we've issued the first programmatic trigger
+  const didInitialTrigger = useRef(false);
+  const initialGeolocate = useRef(true); // first camera ease only
+
+  // Pointer cursor + style load handling
   useEffect(() => {
     const map = mapRef.current;
-    if (map) {
-      const showPointer = () => {
-        map.getCanvas().style.cursor = "pointer";
-      };
+    if (!map) return;
 
-      const hidePointer = () => {
-        map.getCanvas().style.cursor = "";
-      };
+    const showPointer = () => {
+      map.getCanvas().style.cursor = "pointer";
+    };
+    const hidePointer = () => {
+      map.getCanvas().style.cursor = "";
+    };
+    const onStyleLoad = () => setStyleLoaded(true);
 
-      map.on("mouseenter", "point", showPointer);
-      map.on("mouseleave", "point", hidePointer);
-      map.on("style.load", () => {
-        setStyleLoaded(true);
-      });
+    map.on("mouseenter", "point", showPointer);
+    map.on("mouseleave", "point", hidePointer);
+    map.on("style.load", onStyleLoad);
 
-      // Trigger initial geolocation if available
+    // Trigger once when map is ready and style is loaded
+    if (mapLoaded && styleLoaded && !didInitialTrigger.current) {
       geolocateControlRef.current?.trigger();
-
-      return () => {
-        map.off("mouseenter", "point", showPointer);
-        map.off("mouseleave", "point", hidePointer);
-      };
+      didInitialTrigger.current = true;
     }
-  }, [mapLoaded, geojson]);
+
+    return () => {
+      map.off("mouseenter", "point", showPointer);
+      map.off("mouseleave", "point", hidePointer);
+      map.off("style.load", onStyleLoad);
+    };
+  }, [mapLoaded, styleLoaded, geojson]);
 
   // Check geolocation permission to decide if the hint should be shown
   useEffect(() => {
     (async () => {
       try {
-        // Not all browsers support this API; fallback is handled in the component
-        const status = await navigator.permissions?.query({
+        const status = await (navigator.permissions as any)?.query({
           name: "geolocation" as PermissionName,
         });
         if (status && status.state === "granted") {
           setShowGeoHint(false);
         }
       } catch {
-        // Ignore errors; fallback is localStorage check inside OnboardingHint
+        // ignore — fallback handled in OnboardingHint
       }
     })();
   }, []);
 
-  const initialGeolocate = useRef(true);
   const [isTracking, setTracking] = useState(false);
 
-  // Fly the map to the user’s position when tracking is enabled
-  const handleGeolocateChange = useCallback(
-    (position: GeolocationPosition) => {
-      if (!isTracking) {
-        return;
-      }
+  // Camera: do a single initial ease to user position, then let GeolocateControl own the camera
+  const handleGeolocateChange = useCallback((position: GeolocationPosition) => {
+    if (!initialGeolocate.current) return;
+    mapRef.current?.easeTo({
+      center: [position.coords.longitude, position.coords.latitude],
+      zoom: 15,
+      duration: 500,
+    });
+    initialGeolocate.current = false;
+  }, []);
 
-      mapRef.current?.flyTo({
-        center: [position.coords.longitude, position.coords.latitude],
-        zoom: initialGeolocate ? 15 : mapRef.current?.getZoom(),
-      });
-      initialGeolocate.current = false;
-    },
-    [isTracking]
-  );
+  // If the style is reloaded while we are in tracking mode, retrigger geolocation
+  useEffect(() => {
+    if (styleLoaded && isTracking) {
+      geolocateControlRef.current?.trigger();
+    }
+  }, [styleLoaded, isTracking]);
 
   // On unmount, notify TitleBar
   useEffect(() => {
@@ -313,21 +317,20 @@ export default function Result() {
           ref={mapRef}
           mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_TOKEN}
           initialViewState={{
-            longitude: 24.94, // Default longitude (Finland)
-            latitude: 64.0, // Default latitude (Finland)
-            zoom: 4, // Initial zoom
+            longitude: 24.94,
+            latitude: 64.0,
+            zoom: 4,
           }}
           onLoad={() => {
             setMapLoaded(true);
-            // Inform TitleBar that the map is ready
             if (typeof window !== "undefined") {
               window.dispatchEvent(new Event("map-loaded"));
             }
           }}
           mapStyle={
             mapStyle === "detail"
-              ? process.env.NEXT_PUBLIC_MAPBOX_STYLE_DETAIL // Street/detail background
-              : process.env.NEXT_PUBLIC_MAPBOX_STYLE_SATELLITE // Satellite background
+              ? (process.env.NEXT_PUBLIC_MAPBOX_STYLE_DETAIL as string)
+              : (process.env.NEXT_PUBLIC_MAPBOX_STYLE_SATELLITE as string)
           }
           interactiveLayerIds={["point"]}
           onClick={(e) => {
@@ -346,6 +349,7 @@ export default function Result() {
         >
           <MapStyleControl
             onToggle={(selected) => {
+              // Toggle style and force styleLoaded=false so we know when it finishes
               setStyleLoaded(false);
               setStyle(selected ? "satellite" : "detail");
             }}
@@ -355,11 +359,15 @@ export default function Result() {
           <GeolocateControl
             ref={geolocateControlRef}
             onGeolocate={handleGeolocateChange}
-            onTrackUserLocationEnd={() => setTracking(false)}
             onTrackUserLocationStart={() => setTracking(true)}
+            // IMPORTANT: do not flip tracking off here; Mapbox emits End on minor interactions
+            onTrackUserLocationEnd={() => {
+              // keep UI state; let the user decide to turn tracking off explicitly
+            }}
             positionOptions={{ enableHighAccuracy: true }}
             position="bottom-right"
             trackUserLocation
+            showUserHeading
           />
 
           {/* Onboarding hint anchored to the geolocate control */}
@@ -376,7 +384,7 @@ export default function Result() {
             mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_TOKEN!}
             position="top-left"
             placeholder="Etsi"
-            bbox={[19.0, 59.0, 32.0, 71.0]} // Limit search to Finland bounds
+            bbox={[19.0, 59.0, 32.0, 71.0]}
           />
 
           {geojson && (
@@ -500,7 +508,7 @@ export default function Result() {
           <DrawerContent>
             <DrawerHeader>
               <DrawerTitle className="text-center">
-                Valitse materiaalit
+                Selected materials
               </DrawerTitle>
             </DrawerHeader>
             <div className="max-h-[500px] overflow-y-scroll max-w-2xl mx-auto">
