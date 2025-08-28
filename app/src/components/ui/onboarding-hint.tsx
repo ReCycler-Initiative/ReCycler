@@ -59,8 +59,10 @@ export default function OnboardingHint({
         title: "Valitse materiaalit",
         body: (
           <>
-            Valitse haluamasi materiaalit - vastaavat keräyspisteet korostetaan
-            kartalla.
+            Valitse haluamasi materiaalit – vastaavat keräyspisteet 
+            korostetaan kartalla. Jos kaikki valitut materiaalit voidaan 
+            palauttaa samaan kierrätyspisteeseen, kyseinen piste 
+            korostetaan kartalla kierrätysikonilla, jossa on keltainen reunus.
           </>
         ),
         imageSrc: "/images/materialSelectorOnBoarding.png",
