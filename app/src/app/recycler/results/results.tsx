@@ -233,8 +233,11 @@ export default function Result() {
 
   const initialGeolocate = useRef(true); // first camera ease only
   const [isTracking, setTracking] = useState(false);
+  const awaitingPermission = useRef(false); // set true when user clicks the geo button
+  const didGeolocateOnce = useRef(false); // stop retries after first success
+  const retryTimer = useRef<number | null>(null); // retry loop id
 
-  // Camera: do a single initial ease to user position after user clicks the geolocation button
+  // Camera: do a single initial ease to user position
   const handleGeolocateChange = useCallback((position: GeolocationPosition) => {
     if (!initialGeolocate.current) return;
     mapRef.current?.easeTo({
@@ -243,6 +246,12 @@ export default function Result() {
       duration: 500,
     });
     initialGeolocate.current = false;
+    didGeolocateOnce.current = true;
+    awaitingPermission.current = false;
+    if (retryTimer.current) {
+      window.clearInterval(retryTimer.current);
+      retryTimer.current = null;
+    }
   }, []);
 
   // If the style is reloaded while we are in tracking mode, retrigger geolocation
@@ -252,7 +261,32 @@ export default function Result() {
     }
   }, [styleLoaded, isTracking]);
 
-  // Pointer cursor + style load handling (no auto geolocate trigger here)
+  // Re-trigger automatically when permission flips to granted after the prompt
+  useEffect(() => {
+    let perm: any | null = null;
+    (async () => {
+      try {
+        // @ts-ignore
+        perm = await navigator.permissions?.query({
+          name: "geolocation" as PermissionName,
+        });
+        if (!perm) return;
+        const handle = () => {
+          if (perm!.state === "granted" && awaitingPermission.current && !didGeolocateOnce.current) {
+            geolocateControlRef.current?.trigger();
+          }
+        };
+        perm.onchange = handle;
+      } catch {
+        // Permissions API not supported
+      }
+    })();
+    return () => {
+      if (perm) perm.onchange = null;
+    };
+  }, []);
+
+  // Pointer cursor + style load handling
   useEffect(() => {
     const map = mapRef.current;
     if (!map) return;
@@ -276,13 +310,49 @@ export default function Result() {
     };
   }, []);
 
-  // On unmount, notify TitleBar
+  // Cleanup retry interval on unmount
   useEffect(() => {
     return () => {
+      if (retryTimer.current) {
+        window.clearInterval(retryTimer.current);
+        retryTimer.current = null;
+      }
       if (typeof window !== "undefined") {
         window.dispatchEvent(new Event("map-unloaded"));
       }
     };
+  }, []);
+
+  // Fallback: run native geolocation once on button click to guarantee a result
+  const requestNativeOnce = useCallback(() => {
+    if (!("geolocation" in navigator)) return;
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        if (didGeolocateOnce.current) return;
+        handleGeolocateChange(pos);
+      },
+      // if permission denied or temporarily blocked, we'll rely on retry + permission onchange
+      () => {},
+      { enableHighAccuracy: true, maximumAge: 0, timeout: 10000 }
+    );
+  }, [handleGeolocateChange]);
+
+  // Start a short retry loop after user click; stops on success
+  const startRetryLoop = useCallback(() => {
+    if (retryTimer.current) return;
+    // Try to re-trigger Mapbox control a few times after permission dialog closes
+    let attempts = 0;
+    retryTimer.current = window.setInterval(() => {
+      if (didGeolocateOnce.current || attempts > 8) {
+        if (retryTimer.current) {
+          window.clearInterval(retryTimer.current);
+          retryTimer.current = null;
+        }
+        return;
+      }
+      geolocateControlRef.current?.trigger();
+      attempts += 1;
+    }, 500);
   }, []);
 
   return (
@@ -334,10 +404,21 @@ export default function Result() {
           <GeolocateControl
             ref={geolocateControlRef}
             onGeolocate={handleGeolocateChange}
-            onTrackUserLocationStart={() => setTracking(true)}
+            onTrackUserLocationStart={() => {
+              setTracking(true);
+              awaitingPermission.current = true; // user clicked the button
+              didGeolocateOnce.current = false;
+              // run both Mapbox trigger (implicit) + native fallback + retry safety net
+              requestNativeOnce();
+              startRetryLoop();
+            }}
             // IMPORTANT: do not flip tracking off here; Mapbox emits End on minor interactions
             onTrackUserLocationEnd={() => {
               // keep UI state; let the user decide to turn tracking off explicitly
+            }}
+            onError={() => {
+              // if error due to permission denied, wait for permission change and retry loop keeps running
+              awaitingPermission.current = true;
             }}
             positionOptions={{ enableHighAccuracy: true }}
             position="bottom-right"
