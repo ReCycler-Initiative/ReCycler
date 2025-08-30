@@ -231,14 +231,15 @@ export default function Result() {
 
   const geolocateControlRef = useRef<TGeolocateControl>(null);
 
-  const initialGeolocate = useRef(true); // first camera ease only
-  const awaitingPermission = useRef(false); // set when user clicks the geo button
+  // First smooth recenter only; we reset this on every new click so subsequent presses recenter again
+  const initialGeolocate = useRef(true);
+  const awaitingPermission = useRef(false);
 
-  // Detect iOS
+  // Detect iOS Safari / WKWebView
   const isIOS =
     typeof navigator !== "undefined" && /iP(ad|hone|od)/.test(navigator.userAgent);
 
-  // First nice center after geolocation
+  // Smoothly recenter on geolocate success (only when initialGeolocate is true)
   const handleGeolocateChange = useCallback((position: GeolocationPosition) => {
     if (!initialGeolocate.current) return;
     mapRef.current?.easeTo({
@@ -246,31 +247,35 @@ export default function Result() {
       zoom: Math.max(mapRef.current?.getZoom() ?? 4, 15),
       duration: 500,
     });
-    initialGeolocate.current = false;
+    // After a successful center, we can keep following; next user click will reset this flag
     awaitingPermission.current = false;
+    initialGeolocate.current = false;
   }, []);
 
-  // iOS fallback: force native getCurrentPosition on click gesture, then hand over to Mapbox
+  // iOS fallback: run native getCurrentPosition on user gesture; then hand over to Mapbox following
   const iosUserGestureLocate = useCallback(() => {
     if (!isIOS) return;
     if (!("geolocation" in navigator)) return;
 
     navigator.geolocation.getCurrentPosition(
       (pos) => {
+        // Center immediately from native position (keeps things reliable on iOS)
         mapRef.current?.easeTo({
           center: [pos.coords.longitude, pos.coords.latitude],
           zoom: Math.max(mapRef.current?.getZoom() ?? 4, 15),
           duration: 500,
         });
-        // Trigger Mapbox following after native fix so button turns blue
+        // Kick Mapbox following so the button turns blue with the dot
         setTimeout(() => geolocateControlRef.current?.trigger(), 0);
       },
-      () => {},
+      () => {
+        // Ignore; Mapbox control will show its own error UI if needed
+      },
       { enableHighAccuracy: true, maximumAge: 0, timeout: 10000 }
     );
   }, [isIOS]);
 
-  // Permissions API fallback (not available on iOS)
+  // Permissions API retrigger (non-iOS only). iOS Safari doesn't support this, so we skip it there.
   useEffect(() => {
     if (isIOS) return;
     let perm: any | null = null;
@@ -368,6 +373,7 @@ export default function Result() {
         >
           <MapStyleControl
             onToggle={(selected) => {
+              // Switch style; set styleLoaded=false to wait layers until it's ready
               setStyleLoaded(false);
               setStyle(selected ? "satellite" : "detail");
             }}
@@ -378,18 +384,29 @@ export default function Result() {
             ref={geolocateControlRef}
             onGeolocate={handleGeolocateChange}
             onTrackUserLocationStart={() => {
+              // Every user click should allow a fresh smooth center
+              initialGeolocate.current = true;
               awaitingPermission.current = true;
-              iosUserGestureLocate(); // On iOS, run native fix immediately on user gesture
+              // iOS needs a native call on the same gesture for reliable prompt + first fix
+              iosUserGestureLocate();
+            }}
+            onTrackUserLocationEnd={() => {
+              // When leaving following mode, prepare next click to recenter again
+              initialGeolocate.current = true;
+              awaitingPermission.current = false;
             }}
             onError={() => {
+              // Reset so a retry click will recenter
               awaitingPermission.current = false;
+              initialGeolocate.current = true;
             }}
             positionOptions={{ enableHighAccuracy: true }}
             position="bottom-right"
-            trackUserLocation={true}   // enables following mode (blue button with dot)
+            trackUserLocation={true}   // blue button with dot; Mapbox following mode
             showUserHeading
           />
 
+          {/* Onboarding hint anchored to the geolocate control */}
           {showGeoHint && <OnboardingHint storageKey="onboarded:geo" />}
 
           <SelectedMaterialsControl
@@ -453,7 +470,7 @@ export default function Result() {
                   </div>
                   {details.properties?.opening_hours_fi && (
                     <div className="p-3 border-b">
-                      <h3 className="sr-only">Opening hours</h3>
+                      <h3 className="sr-only">Aukioloajat</h3>
                       <div
                         dangerouslySetInnerHTML={{
                           __html: details.properties?.opening_hours_fi,
@@ -483,7 +500,7 @@ export default function Result() {
                         href={`https://www.google.com/maps/search/?api=1&query=${(details.geometry as GeoJSON.Point).coordinates[1]},${(details.geometry as GeoJSON.Point).coordinates[0]}`}
                         target="_blank"
                       >
-                        <span>Open in Google Maps</span>
+                        <span>Avaa Google Mapsissa</span>
                         <MapPinned className="ml-2" size={18} />
                       </a>
                     </Button>
@@ -497,7 +514,7 @@ export default function Result() {
         {!mapLoaded && (
           <div className="fixed flex inset-0 items-center justify-center flex-col gap-6 text-black">
             <Loader2Icon className="animate-spin" />
-            Loading collection points on map
+            Ladataan kierrätyspisteitä kartalle
           </div>
         )}
 
@@ -527,7 +544,7 @@ export default function Result() {
           <DrawerContent>
             <DrawerHeader>
               <DrawerTitle className="text-center">
-                Selected materials
+                Valitut materiaalit
               </DrawerTitle>
             </DrawerHeader>
             <div className="max-h-[500px] overflow-y-scroll max-w-2xl mx-auto">
