@@ -68,7 +68,7 @@ const CollectionPointIcon = () => {
   return null;
 };
 
-// Restrict map movement to Finland
+// Bounding box to restrict map movement to Finland
 const finlandBounds = [
   [10.0, 54.0], // Southwest corner
   [40.0, 75.0], // Northeast corner
@@ -231,75 +231,9 @@ export default function Result() {
 
   const geolocateControlRef = useRef<TGeolocateControl>(null);
 
-  // First smooth recenter only; we reset this on every new click so subsequent presses recenter again
-  const initialGeolocate = useRef(true);
-  const awaitingPermission = useRef(false);
-
-  // Detect iOS Safari / WKWebView
-  const isIOS =
-    typeof navigator !== "undefined" && /iP(ad|hone|od)/.test(navigator.userAgent);
-
-  // Smoothly recenter on geolocate success (only when initialGeolocate is true)
-  const handleGeolocateChange = useCallback((position: GeolocationPosition) => {
-    if (!initialGeolocate.current) return;
-    mapRef.current?.easeTo({
-      center: [position.coords.longitude, position.coords.latitude],
-      zoom: Math.max(mapRef.current?.getZoom() ?? 4, 15),
-      duration: 500,
-    });
-    // After a successful center, we can keep following; next user click will reset this flag
-    awaitingPermission.current = false;
-    initialGeolocate.current = false;
-  }, []);
-
-  // iOS fallback: run native getCurrentPosition on user gesture; then hand over to Mapbox following
-  const iosUserGestureLocate = useCallback(() => {
-    if (!isIOS) return;
-    if (!("geolocation" in navigator)) return;
-
-    navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        // Center immediately from native position (keeps things reliable on iOS)
-        mapRef.current?.easeTo({
-          center: [pos.coords.longitude, pos.coords.latitude],
-          zoom: Math.max(mapRef.current?.getZoom() ?? 4, 15),
-          duration: 500,
-        });
-        // Kick Mapbox following so the button turns blue with the dot
-        setTimeout(() => geolocateControlRef.current?.trigger(), 0);
-      },
-      () => {
-        // Ignore; Mapbox control will show its own error UI if needed
-      },
-      { enableHighAccuracy: true, maximumAge: 0, timeout: 10000 }
-    );
-  }, [isIOS]);
-
-  // Permissions API retrigger (non-iOS only). iOS Safari doesn't support this, so we skip it there.
-  useEffect(() => {
-    if (isIOS) return;
-    let perm: any | null = null;
-    (async () => {
-      try {
-        // @ts-ignore
-        perm = await navigator.permissions?.query({
-          name: "geolocation" as PermissionName,
-        });
-        if (!perm) return;
-        const handle = () => {
-          if (perm!.state === "granted" && awaitingPermission.current) {
-            geolocateControlRef.current?.trigger();
-          }
-        };
-        perm.onchange = handle;
-      } catch {
-        // Not supported
-      }
-    })();
-    return () => {
-      if (perm) perm.onchange = null;
-    };
-  }, [isIOS]);
+  // Track whether we've issued the first programmatic trigger
+  const didInitialTrigger = useRef(false);
+  const initialGeolocate = useRef(true); // first camera ease only
 
   // Pointer cursor + style load handling
   useEffect(() => {
@@ -318,14 +252,56 @@ export default function Result() {
     map.on("mouseleave", "point", hidePointer);
     map.on("style.load", onStyleLoad);
 
+    // Trigger once when map is ready and style is loaded
+    if (mapLoaded && styleLoaded && !didInitialTrigger.current) {
+      geolocateControlRef.current?.trigger();
+      didInitialTrigger.current = true;
+    }
+
     return () => {
       map.off("mouseenter", "point", showPointer);
       map.off("mouseleave", "point", hidePointer);
       map.off("style.load", onStyleLoad);
     };
+  }, [mapLoaded, styleLoaded, geojson]);
+
+  // Check geolocation permission to decide if the hint should be shown
+  useEffect(() => {
+    (async () => {
+      try {
+        const status = await (navigator.permissions as any)?.query({
+          name: "geolocation" as PermissionName,
+        });
+        if (status && status.state === "granted") {
+          setShowGeoHint(false);
+        }
+      } catch {
+        // ignore — fallback handled in OnboardingHint
+      }
+    })();
   }, []);
 
-  // Cleanup on unmount
+  const [isTracking, setTracking] = useState(false);
+
+  // Camera: do a single initial ease to user position, then let GeolocateControl own the camera
+  const handleGeolocateChange = useCallback((position: GeolocationPosition) => {
+    if (!initialGeolocate.current) return;
+    mapRef.current?.easeTo({
+      center: [position.coords.longitude, position.coords.latitude],
+      zoom: 15,
+      duration: 500,
+    });
+    initialGeolocate.current = false;
+  }, []);
+
+  // If the style is reloaded while we are in tracking mode, retrigger geolocation
+  useEffect(() => {
+    if (styleLoaded && isTracking) {
+      geolocateControlRef.current?.trigger();
+    }
+  }, [styleLoaded, isTracking]);
+
+  // On unmount, notify TitleBar
   useEffect(() => {
     return () => {
       if (typeof window !== "undefined") {
@@ -373,7 +349,7 @@ export default function Result() {
         >
           <MapStyleControl
             onToggle={(selected) => {
-              // Switch style; set styleLoaded=false to wait layers until it's ready
+              // Toggle style and force styleLoaded=false so we know when it finishes
               setStyleLoaded(false);
               setStyle(selected ? "satellite" : "detail");
             }}
@@ -383,26 +359,14 @@ export default function Result() {
           <GeolocateControl
             ref={geolocateControlRef}
             onGeolocate={handleGeolocateChange}
-            onTrackUserLocationStart={() => {
-              // Every user click should allow a fresh smooth center
-              initialGeolocate.current = true;
-              awaitingPermission.current = true;
-              // iOS needs a native call on the same gesture for reliable prompt + first fix
-              iosUserGestureLocate();
-            }}
+            onTrackUserLocationStart={() => setTracking(true)}
+            // IMPORTANT: do not flip tracking off here; Mapbox emits End on minor interactions
             onTrackUserLocationEnd={() => {
-              // When leaving following mode, prepare next click to recenter again
-              initialGeolocate.current = true;
-              awaitingPermission.current = false;
-            }}
-            onError={() => {
-              // Reset so a retry click will recenter
-              awaitingPermission.current = false;
-              initialGeolocate.current = true;
+              // keep UI state; let the user decide to turn tracking off explicitly
             }}
             positionOptions={{ enableHighAccuracy: true }}
             position="bottom-right"
-            trackUserLocation={true}   // blue button with dot; Mapbox following mode
+            trackUserLocation
             showUserHeading
           />
 
@@ -470,7 +434,7 @@ export default function Result() {
                   </div>
                   {details.properties?.opening_hours_fi && (
                     <div className="p-3 border-b">
-                      <h3 className="sr-only">Aukioloajat</h3>
+                      <h3 className="sr-only">Opening hours</h3>
                       <div
                         dangerouslySetInnerHTML={{
                           __html: details.properties?.opening_hours_fi,
@@ -500,7 +464,7 @@ export default function Result() {
                         href={`https://www.google.com/maps/search/?api=1&query=${(details.geometry as GeoJSON.Point).coordinates[1]},${(details.geometry as GeoJSON.Point).coordinates[0]}`}
                         target="_blank"
                       >
-                        <span>Avaa Google Mapsissa</span>
+                        <span>Open in Google Maps</span>
                         <MapPinned className="ml-2" size={18} />
                       </a>
                     </Button>
@@ -514,7 +478,7 @@ export default function Result() {
         {!mapLoaded && (
           <div className="fixed flex inset-0 items-center justify-center flex-col gap-6 text-black">
             <Loader2Icon className="animate-spin" />
-            Ladataan kierrätyspisteitä kartalle
+            Ladataan kierrätyspisteet kartalle
           </div>
         )}
 
@@ -544,7 +508,7 @@ export default function Result() {
           <DrawerContent>
             <DrawerHeader>
               <DrawerTitle className="text-center">
-                Valitut materiaalit
+                Selected materials
               </DrawerTitle>
             </DrawerHeader>
             <div className="max-h-[500px] overflow-y-scroll max-w-2xl mx-auto">
