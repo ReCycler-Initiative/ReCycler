@@ -39,9 +39,9 @@ export default function OnboardingHint({
         title: "Ota paikannus käyttöön",
         body: (
           <>
-            Klikkaa sijaintipainiketta keskittääksesi kartan omaan sijaintiisi.
-            Voit myös ottaa jatkuvan paikannuksen käyttöön painamalla painiketta
-            toisen kerran.
+          Klikkaa sijaintipainiketta, niin kartta keskitetään nykyiseen sijaintiisi.
+ReCycler-sovellus kysyy sinulta luvan sijainnin käyttämiseen.
+Jos painat painiketta uudelleen, voit ottaa käyttöön jatkuvan paikannuksen.
           </>
         ),
         imageSrc: "/images/geolocationOnBoarding.png",
