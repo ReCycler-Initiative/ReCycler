@@ -231,59 +231,10 @@ export default function Result() {
 
   const geolocateControlRef = useRef<TGeolocateControl>(null);
 
-  // Track whether we've issued the first programmatic trigger
-  const didInitialTrigger = useRef(false);
   const initialGeolocate = useRef(true); // first camera ease only
-
-  // Pointer cursor + style load handling
-  useEffect(() => {
-    const map = mapRef.current;
-    if (!map) return;
-
-    const showPointer = () => {
-      map.getCanvas().style.cursor = "pointer";
-    };
-    const hidePointer = () => {
-      map.getCanvas().style.cursor = "";
-    };
-    const onStyleLoad = () => setStyleLoaded(true);
-
-    map.on("mouseenter", "point", showPointer);
-    map.on("mouseleave", "point", hidePointer);
-    map.on("style.load", onStyleLoad);
-
-    // Trigger once when map is ready and style is loaded
-    if (mapLoaded && styleLoaded && !didInitialTrigger.current) {
-      geolocateControlRef.current?.trigger();
-      didInitialTrigger.current = true;
-    }
-
-    return () => {
-      map.off("mouseenter", "point", showPointer);
-      map.off("mouseleave", "point", hidePointer);
-      map.off("style.load", onStyleLoad);
-    };
-  }, [mapLoaded, styleLoaded, geojson]);
-
-  // Check geolocation permission to decide if the hint should be shown
-  useEffect(() => {
-    (async () => {
-      try {
-        const status = await (navigator.permissions as any)?.query({
-          name: "geolocation" as PermissionName,
-        });
-        if (status && status.state === "granted") {
-          setShowGeoHint(false);
-        }
-      } catch {
-        // ignore — fallback handled in OnboardingHint
-      }
-    })();
-  }, []);
-
   const [isTracking, setTracking] = useState(false);
 
-  // Camera: do a single initial ease to user position, then let GeolocateControl own the camera
+  // Camera: do a single initial ease to user position after user clicks the geolocation button
   const handleGeolocateChange = useCallback((position: GeolocationPosition) => {
     if (!initialGeolocate.current) return;
     mapRef.current?.easeTo({
@@ -300,6 +251,30 @@ export default function Result() {
       geolocateControlRef.current?.trigger();
     }
   }, [styleLoaded, isTracking]);
+
+  // Pointer cursor + style load handling (no auto geolocate trigger here)
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map) return;
+
+    const showPointer = () => {
+      map.getCanvas().style.cursor = "pointer";
+    };
+    const hidePointer = () => {
+      map.getCanvas().style.cursor = "";
+    };
+    const onStyleLoad = () => setStyleLoaded(true);
+
+    map.on("mouseenter", "point", showPointer);
+    map.on("mouseleave", "point", hidePointer);
+    map.on("style.load", onStyleLoad);
+
+    return () => {
+      map.off("mouseenter", "point", showPointer);
+      map.off("mouseleave", "point", hidePointer);
+      map.off("style.load", onStyleLoad);
+    };
+  }, []);
 
   // On unmount, notify TitleBar
   useEffect(() => {
