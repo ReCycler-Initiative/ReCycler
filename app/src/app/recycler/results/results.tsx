@@ -231,37 +231,23 @@ export default function Result() {
 
   const geolocateControlRef = useRef<TGeolocateControl>(null);
 
+  // Ei automaattista triggeröintiä avatessa — kysytään lupa vasta käyttäjän painaessa nappia
   const initialGeolocate = useRef(true); // first camera ease only
-  const [isTracking, setTracking] = useState(false);
-  const awaitingPermission = useRef(false); // set true when user clicks the geo button
-  const didGeolocateOnce = useRef(false); // stop retries after first success
-  const retryTimer = useRef<number | null>(null); // retry loop id
+  const awaitingPermission = useRef(false); // set when user clicks the geo button
 
-  // Camera: do a single initial ease to user position
+  // Ensimmäinen keskitys nätisti (yksi kerta)
   const handleGeolocateChange = useCallback((position: GeolocationPosition) => {
     if (!initialGeolocate.current) return;
     mapRef.current?.easeTo({
       center: [position.coords.longitude, position.coords.latitude],
-      zoom: 15,
+      zoom: Math.max(mapRef.current?.getZoom() ?? 4, 15),
       duration: 500,
     });
     initialGeolocate.current = false;
-    didGeolocateOnce.current = true;
     awaitingPermission.current = false;
-    if (retryTimer.current) {
-      window.clearInterval(retryTimer.current);
-      retryTimer.current = null;
-    }
   }, []);
 
-  // If the style is reloaded while we are in tracking mode, retrigger geolocation
-  useEffect(() => {
-    if (styleLoaded && isTracking) {
-      geolocateControlRef.current?.trigger();
-    }
-  }, [styleLoaded, isTracking]);
-
-  // Re-trigger automatically when permission flips to granted after the prompt
+  // Jos Permissions API on tuettu: kun tila vaihtuu granted -> retrigger kerran
   useEffect(() => {
     let perm: any | null = null;
     (async () => {
@@ -272,13 +258,14 @@ export default function Result() {
         });
         if (!perm) return;
         const handle = () => {
-          if (perm!.state === "granted" && awaitingPermission.current && !didGeolocateOnce.current) {
+          if (perm!.state === "granted" && awaitingPermission.current) {
             geolocateControlRef.current?.trigger();
+            // jätetään initialGeolocate.current true -> saadaan kaunis ensimmäinen ease
           }
         };
         perm.onchange = handle;
       } catch {
-        // Permissions API not supported
+        // Permissions API ei saatavilla – joissain selaimissa käyttäjä voi joutua klikkaamaan nappia uudelleen
       }
     })();
     return () => {
@@ -310,49 +297,13 @@ export default function Result() {
     };
   }, []);
 
-  // Cleanup retry interval on unmount
+  // On unmount, notify TitleBar
   useEffect(() => {
     return () => {
-      if (retryTimer.current) {
-        window.clearInterval(retryTimer.current);
-        retryTimer.current = null;
-      }
       if (typeof window !== "undefined") {
         window.dispatchEvent(new Event("map-unloaded"));
       }
     };
-  }, []);
-
-  // Fallback: run native geolocation once on button click to guarantee a result
-  const requestNativeOnce = useCallback(() => {
-    if (!("geolocation" in navigator)) return;
-    navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        if (didGeolocateOnce.current) return;
-        handleGeolocateChange(pos);
-      },
-      // if permission denied or temporarily blocked, we'll rely on retry + permission onchange
-      () => {},
-      { enableHighAccuracy: true, maximumAge: 0, timeout: 10000 }
-    );
-  }, [handleGeolocateChange]);
-
-  // Start a short retry loop after user click; stops on success
-  const startRetryLoop = useCallback(() => {
-    if (retryTimer.current) return;
-    // Try to re-trigger Mapbox control a few times after permission dialog closes
-    let attempts = 0;
-    retryTimer.current = window.setInterval(() => {
-      if (didGeolocateOnce.current || attempts > 8) {
-        if (retryTimer.current) {
-          window.clearInterval(retryTimer.current);
-          retryTimer.current = null;
-        }
-        return;
-      }
-      geolocateControlRef.current?.trigger();
-      attempts += 1;
-    }, 500);
   }, []);
 
   return (
@@ -405,24 +356,17 @@ export default function Result() {
             ref={geolocateControlRef}
             onGeolocate={handleGeolocateChange}
             onTrackUserLocationStart={() => {
-              setTracking(true);
-              awaitingPermission.current = true; // user clicked the button
-              didGeolocateOnce.current = false;
-              // run both Mapbox trigger (implicit) + native fallback + retry safety net
-              requestNativeOnce();
-              startRetryLoop();
-            }}
-            // IMPORTANT: do not flip tracking off here; Mapbox emits End on minor interactions
-            onTrackUserLocationEnd={() => {
-              // keep UI state; let the user decide to turn tracking off explicitly
+              // Käyttäjän klikki → lupa kysytään vasta nyt
+              awaitingPermission.current = true;
+              // HUOM: emme käsittele onTrackUserLocationEnd:iä lainkaan — annetaan Mapboxin hallita seurantaa
             }}
             onError={() => {
-              // if error due to permission denied, wait for permission change and retry loop keeps running
-              awaitingPermission.current = true;
+              // jos käyttäjä hylkää, jäädään odottamaan mahdollista uutta klikkausta
+              awaitingPermission.current = false;
             }}
             positionOptions={{ enableHighAccuracy: true }}
             position="bottom-right"
-            trackUserLocation
+            trackUserLocation={true}   // sininen nappi + piste; kamera seuraa
             showUserHeading
           />
 
