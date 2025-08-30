@@ -68,7 +68,7 @@ const CollectionPointIcon = () => {
   return null;
 };
 
-// Bounding box to restrict map movement to Finland
+// Restrict map movement to Finland
 const finlandBounds = [
   [10.0, 54.0], // Southwest corner
   [40.0, 75.0], // Northeast corner
@@ -231,11 +231,14 @@ export default function Result() {
 
   const geolocateControlRef = useRef<TGeolocateControl>(null);
 
-  // Ei automaattista triggeröintiä avatessa — kysytään lupa vasta käyttäjän painaessa nappia
   const initialGeolocate = useRef(true); // first camera ease only
   const awaitingPermission = useRef(false); // set when user clicks the geo button
 
-  // Ensimmäinen keskitys nätisti (yksi kerta)
+  // Detect iOS
+  const isIOS =
+    typeof navigator !== "undefined" && /iP(ad|hone|od)/.test(navigator.userAgent);
+
+  // First nice center after geolocation
   const handleGeolocateChange = useCallback((position: GeolocationPosition) => {
     if (!initialGeolocate.current) return;
     mapRef.current?.easeTo({
@@ -247,8 +250,29 @@ export default function Result() {
     awaitingPermission.current = false;
   }, []);
 
-  // Jos Permissions API on tuettu: kun tila vaihtuu granted -> retrigger kerran
+  // iOS fallback: force native getCurrentPosition on click gesture, then hand over to Mapbox
+  const iosUserGestureLocate = useCallback(() => {
+    if (!isIOS) return;
+    if (!("geolocation" in navigator)) return;
+
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        mapRef.current?.easeTo({
+          center: [pos.coords.longitude, pos.coords.latitude],
+          zoom: Math.max(mapRef.current?.getZoom() ?? 4, 15),
+          duration: 500,
+        });
+        // Trigger Mapbox following after native fix so button turns blue
+        setTimeout(() => geolocateControlRef.current?.trigger(), 0);
+      },
+      () => {},
+      { enableHighAccuracy: true, maximumAge: 0, timeout: 10000 }
+    );
+  }, [isIOS]);
+
+  // Permissions API fallback (not available on iOS)
   useEffect(() => {
+    if (isIOS) return;
     let perm: any | null = null;
     (async () => {
       try {
@@ -260,18 +284,17 @@ export default function Result() {
         const handle = () => {
           if (perm!.state === "granted" && awaitingPermission.current) {
             geolocateControlRef.current?.trigger();
-            // jätetään initialGeolocate.current true -> saadaan kaunis ensimmäinen ease
           }
         };
         perm.onchange = handle;
       } catch {
-        // Permissions API ei saatavilla – joissain selaimissa käyttäjä voi joutua klikkaamaan nappia uudelleen
+        // Not supported
       }
     })();
     return () => {
       if (perm) perm.onchange = null;
     };
-  }, []);
+  }, [isIOS]);
 
   // Pointer cursor + style load handling
   useEffect(() => {
@@ -297,7 +320,7 @@ export default function Result() {
     };
   }, []);
 
-  // On unmount, notify TitleBar
+  // Cleanup on unmount
   useEffect(() => {
     return () => {
       if (typeof window !== "undefined") {
@@ -345,7 +368,6 @@ export default function Result() {
         >
           <MapStyleControl
             onToggle={(selected) => {
-              // Toggle style and force styleLoaded=false so we know when it finishes
               setStyleLoaded(false);
               setStyle(selected ? "satellite" : "detail");
             }}
@@ -356,21 +378,18 @@ export default function Result() {
             ref={geolocateControlRef}
             onGeolocate={handleGeolocateChange}
             onTrackUserLocationStart={() => {
-              // Käyttäjän klikki → lupa kysytään vasta nyt
               awaitingPermission.current = true;
-              // HUOM: emme käsittele onTrackUserLocationEnd:iä lainkaan — annetaan Mapboxin hallita seurantaa
+              iosUserGestureLocate(); // On iOS, run native fix immediately on user gesture
             }}
             onError={() => {
-              // jos käyttäjä hylkää, jäädään odottamaan mahdollista uutta klikkausta
               awaitingPermission.current = false;
             }}
             positionOptions={{ enableHighAccuracy: true }}
             position="bottom-right"
-            trackUserLocation={true}   // sininen nappi + piste; kamera seuraa
+            trackUserLocation={true}   // enables following mode (blue button with dot)
             showUserHeading
           />
 
-          {/* Onboarding hint anchored to the geolocate control */}
           {showGeoHint && <OnboardingHint storageKey="onboarded:geo" />}
 
           <SelectedMaterialsControl
@@ -478,7 +497,7 @@ export default function Result() {
         {!mapLoaded && (
           <div className="fixed flex inset-0 items-center justify-center flex-col gap-6 text-black">
             <Loader2Icon className="animate-spin" />
-            Ladataan kierrätyspisteet kartalle
+            Loading collection points on map
           </div>
         )}
 
