@@ -232,38 +232,31 @@ export default function Result() {
   const geolocateControlRef = useRef<TGeolocateControl>(null);
 
   // Track whether we've issued the first programmatic trigger
-  const didInitialTrigger = useRef(false);
   const initialGeolocate = useRef(true); // first camera ease only
 
-  // Pointer cursor + style load handling
-  useEffect(() => {
-    const map = mapRef.current;
-    if (!map) return;
-
+  const onMapLoad = useCallback(() => {
+    const map = mapRef.current!;
     const showPointer = () => {
       map.getCanvas().style.cursor = "pointer";
     };
+
     const hidePointer = () => {
       map.getCanvas().style.cursor = "";
     };
+
     const onStyleLoad = () => setStyleLoaded(true);
 
     map.on("mouseenter", "point", showPointer);
     map.on("mouseleave", "point", hidePointer);
     map.on("style.load", onStyleLoad);
 
-    // Trigger once when map is ready and style is loaded
-    if (mapLoaded && styleLoaded && !didInitialTrigger.current) {
-      geolocateControlRef.current?.trigger();
-      didInitialTrigger.current = true;
-    }
+    geolocateControlRef.current?.trigger();
+    setMapLoaded(true);
 
-    return () => {
-      map.off("mouseenter", "point", showPointer);
-      map.off("mouseleave", "point", hidePointer);
-      map.off("style.load", onStyleLoad);
-    };
-  }, [mapLoaded, styleLoaded, geojson]);
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(new Event("map-loaded"));
+    }
+  }, []);
 
   // Check geolocation permission to decide if the hint should be shown
   useEffect(() => {
@@ -281,8 +274,6 @@ export default function Result() {
     })();
   }, []);
 
-  const [isTracking, setTracking] = useState(false);
-
   // Camera: do a single initial ease to user position, then let GeolocateControl own the camera
   const handleGeolocateChange = useCallback((position: GeolocationPosition) => {
     if (!initialGeolocate.current) return;
@@ -293,13 +284,6 @@ export default function Result() {
     });
     initialGeolocate.current = false;
   }, []);
-
-  // If the style is reloaded while we are in tracking mode, retrigger geolocation
-  useEffect(() => {
-    if (styleLoaded && isTracking) {
-      geolocateControlRef.current?.trigger();
-    }
-  }, [styleLoaded, isTracking]);
 
   // On unmount, notify TitleBar
   useEffect(() => {
@@ -321,12 +305,7 @@ export default function Result() {
             latitude: 64.0,
             zoom: 4,
           }}
-          onLoad={() => {
-            setMapLoaded(true);
-            if (typeof window !== "undefined") {
-              window.dispatchEvent(new Event("map-loaded"));
-            }
-          }}
+          onLoad={onMapLoad}
           mapStyle={
             mapStyle === "detail"
               ? (process.env.NEXT_PUBLIC_MAPBOX_STYLE_DETAIL as string)
@@ -359,7 +338,6 @@ export default function Result() {
           <GeolocateControl
             ref={geolocateControlRef}
             onGeolocate={handleGeolocateChange}
-            onTrackUserLocationStart={() => setTracking(true)}
             // IMPORTANT: do not flip tracking off here; Mapbox emits End on minor interactions
             onTrackUserLocationEnd={() => {
               // keep UI state; let the user decide to turn tracking off explicitly
