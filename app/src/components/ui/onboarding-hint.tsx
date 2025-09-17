@@ -11,14 +11,12 @@ type Step = {
 };
 
 type Props = {
-  storageKey: string;
   overlay?: boolean;
   overlayBlur?: boolean;
   allowSkip?: boolean;
 };
 
 export default function OnboardingHint({
-  storageKey,
   overlay = true,
   overlayBlur = false,
   allowSkip = true,
@@ -87,12 +85,6 @@ Jos painat painiketta uudelleen, voit ottaa käyttöön jatkuvan paikannuksen.
     []
   );
 
-  // Show onboarding only if not completed earlier
-  useEffect(() => {
-    if (localStorage.getItem(storageKey) === "1") return;
-    setVisible(true);
-  }, [storageKey]);
-
   // Allow manual reopening via custom event
   useEffect(() => {
     const handler = () => {
@@ -106,7 +98,6 @@ Jos painat painiketta uudelleen, voit ottaa käyttöön jatkuvan paikannuksen.
 
   const markDone = () => {
     setVisible(false);
-    localStorage.setItem(storageKey, "1");
   };
 
   const prev = () => setIndex((i) => Math.max(0, i - 1));

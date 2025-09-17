@@ -349,7 +349,7 @@ export default function Result() {
           />
 
           {/* Onboarding hint anchored to the geolocate control */}
-          {showGeoHint && <OnboardingHint storageKey="onboarded:geo" />}
+          {showGeoHint && <OnboardingHint />}
 
           <SelectedMaterialsControl
             amount={selectedMaterials.length}
