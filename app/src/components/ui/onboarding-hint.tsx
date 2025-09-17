@@ -6,8 +6,9 @@ import React, { useEffect, useMemo, useState } from "react";
 type Step = {
   title: string;
   body: React.ReactNode;
-  imageSrc?: string;
-  imageAlt?: string;
+  imageSrc?: string | null;
+  imageAlt?: string | null;
+  ctaLabel?: string; // käytetään viimeisessä stepissä
 };
 
 type Props = {
@@ -27,120 +28,6 @@ export default function OnboardingHint({
   // Onboarding steps
   const steps: Step[] = useMemo(
     () => [
-<<<<<<< HEAD
-{
-  title: "Hae osoitteella tai paikalla",
-  body: (
-    <>
-      Kirjoita osoite, paikka tai alue hakukenttään.
-      <br />
-      Saat ehdotuksia kirjoittaessasi; klikkaa ehdotusta tai paina Enter, niin karttaikkuna keskittyy valittuun sijaintiin.
-      <br /><br />
-      Esimerkkejä:&nbsp;
-      <span className="inline-flex gap-2 flex-wrap">
-        <span className="px-2 py-1 rounded-full bg-gray-100">Mannerheimintie 10</span>
-        <span className="px-2 py-1 rounded-full bg-gray-100">Kauppatori</span>
-        <span className="px-2 py-1 rounded-full bg-gray-100">Hervanta</span>
-      </span>
-      <br /><br />
-      <small>Vinkki: ↑/↓ selaa ehdotuksia, ↩︎ Enter hakee</small>
-      <br /><br />
-    </>
-  ),
-  imageSrc: "/images/searchBoxOnBoarding.png",
-  imageAlt: "Hakukenttä",
-  // Lisäksi komponenttitasolla: placeholder="Hae osoite, paikka tai alue", aria-label="Haku"
-},
- {
-  title: "Ota paikannus käyttöön",
-  body: (
-    <>
-      Napsauta sijaintipainiketta. Ensimmäisellä kerralla Recycleriä käytettäessä 
-      verkkoselain kysyy luvan sijainnin käyttöön – hyväksy, niin karttaikkuna 
-      keskittyy nykyiseen sijaintiisi.
-      <br /><br />
-      Paina painiketta uudelleen, niin <b>Seuraa sijaintiani</b> -tila kytkeytyy päälle/pois. 
-      Seurantatilassa näkymä seuraa sijaintiasi liikkuessasi.
-      <br /><br />
-      <small>
-       Vinkki: Jos et anna lupaa tai paikannus ei toimi, voit hakea kohteen osoitteella tai paikannimellä.
-      </small>
-    </>
-  ),
-  imageSrc: "/images/geolocationOnBoarding.png",
-  imageAlt: "Sijaintipainike",
-},
-      {
-  title: "Vaihda taustanäkymä",
-  body: (
-    <>
-      Klikkaa taustakarttapainiketta (maapallo-kuvake).  
-      <br />
-      Voit vaihtaa kartan taustanäkymän: <b>normaali kartta</b> (selkeä kadut ja alueet) tai <b>satelliittikuva</b> (realistinen ilmakuvanäkymä).
-      <br /><br />
-      <small>Vinkki: käytä karttanäkymää reittien ja osoitteiden hakuun, satelliittia kun haluat nähdä rakennukset ja maaston tarkemmin. 
-      3D-näkymässä voit puolestaan tarkastella rakennuksia ja maastoa kolmiulotteisesti eri kulmista.</small>
-    </>
-  ),
-  imageSrc: "/images/backgroundMapOnBoarding.png",
-  imageAlt: "Taustakartan vaihtopainike",
-},
-   {
-  title: "Valitse materiaalit",
-  body: (
-    <>
-      Valitse haluamasi materiaalit painikkeesta.  
-      <br />
-      Numerokuvake <b>(0 → 1, 2…)</b> kertoo, montako materiaalia on valittuna.
-      <br /><br />
-      <small>Vinkki: Kartalla korostetaan ne keräyspisteet, jotka ottavat vastaan kaikki valitsemasi materiaalit.  
-      Nämä pisteet näkyvät <b>keltaisella reunuksella</b> varustetulla kierrätyskuvakkeella.</small>
-    </>
-  ),
-  imageSrc: "/images/materialSelectorOnBoarding.png",
-  imageAlt: "Materiaalivalintapainike",
-},
-{
-  title: "ReCycler-avustaja",
-  body: (
-    <>
-      Kysy kierrätysasioista ReCycler-avustajalta selkokielellä – sinun ei tarvitse tuntea virallisia termejä.  Avustaja antaa lajitteluohjeet ja kertoo, mihin jätelajiin materiaali kuuluu. 
-      <br /><br />
-      <small>Vinkki: Voit esimerkiksi kysyä, että
-      <ul>
-        <li>“Mihin laitan rikkinäisen paistinpannun?”</li>
-        <li>“Voiko pizzalaatikon kierrättää?”</li>
-        <li>“Miten paristot ja akut pitää pakata?”</li>
-      </ul>
-      Recycler-avustaja ei näe (toistaiseksi) karttaa eikä paikanna pisteitä. Löydät keräyspisteet haulla tai materiaalivalinnalla.</small>
-    </>
-  ),
-  imageSrc: "/images/chatbotOnBoarding.png",
-  imageAlt: "ReCycler-avustaja",
-},
-{
-  title: "Kaikki valmista!",
-  body: (
-    <>
-      Hienoa – olet nyt valmis käyttämään ReCycleriä!
-      <br /><br />
-      Oikein mukavia kierrätyshetkiä!
-      <br /><br />
-      <small>Vinkki: Voit heti kokeilla:
-      <ul>
-        <li>Hae osoite, paikka tai alue kartalta</li>
-        <li>Valitse materiaalit ja katso, mitkä pisteet sopivat</li>
-        <li>Kysy lajitteluohjeita ReCycler-avustajalta</li>
-      </ul>
-      </small>
-    </>
-  ),
-  imageSrc: null,
-  imageAlt: null,
-  ctaLabel: "Aloita"
-}
-
-=======
       {
         title: "Hae osoitteella tai paikalla",
         body: (
@@ -151,10 +38,8 @@ export default function OnboardingHint({
             niin karttaikkuna keskittyy valittuun sijaintiin.
             <br />
             <br />
-            <small>Vinkki: ↑/↓ selaa ehdotuksia, ↩︎ Enter hakee</small>
-            <br />
-            <br />
             Esimerkkejä:&nbsp;
+            <small>
             <span className="inline-flex gap-2 flex-wrap">
               <span className="px-2 py-1 rounded-full bg-gray-100">
                 Mannerheimintie 10
@@ -166,17 +51,23 @@ export default function OnboardingHint({
                 Hervanta
               </span>
             </span>
+            </small>
+            <br />
+            <br />
+            <small>Vinkki: ↑/↓ selaa ehdotuksia, ↩︎ Enter hakee</small>
+            <br />
+            <br />
+
           </>
         ),
         imageSrc: "/images/searchBoxOnBoarding.png",
         imageAlt: "Hakukenttä",
-        // Lisäksi komponenttitasolla: placeholder="Hae osoite, paikka tai alue", aria-label="Haku"
       },
       {
         title: "Ota paikannus käyttöön",
         body: (
           <>
-            Napsauta sijaintipainiketta. Ensimmäisellä kerralla Recycleriä
+            Napsauta sijaintipainiketta. Ensimmäisellä kerralla ReCycleriä
             käytettäessä verkkoselain kysyy luvan sijainnin käyttöön – hyväksy,
             niin karttaikkuna keskittyy nykyiseen sijaintiisi.
             <br />
@@ -186,9 +77,10 @@ export default function OnboardingHint({
             Seurantatilassa näkymä seuraa sijaintiasi liikkuessasi.
             <br />
             <br />
-            Jos et anna lupaa tai paikannus ei toimi, voit hakea kohteen
-            osoitteella tai paikannimellä.
-            <br />
+            <small>
+              Vinkki: Jos et anna lupaa tai paikannus ei toimi, voit hakea kohteen
+              osoitteella tai paikannimellä.
+            </small>
           </>
         ),
         imageSrc: "/images/geolocationOnBoarding.png",
@@ -226,9 +118,10 @@ export default function OnboardingHint({
             valittuna.
             <br />
             <br />
-            Kartalla korostetaan ne keräyspisteet, jotka ottavat vastaan kaikki
-            valitsemasi materiaalit. Nämä pisteet näkyvät keltaisella
-            reunuksella varustetulla kierrätyskuvakkeella.
+            <small>
+            Vinkki: Kartalla korostetaan ne keltaisella reunuksella keräyspisteet, jotka ottavat vastaan kaikki
+            valitsemasi materiaalit.
+            </small>
           </>
         ),
         imageSrc: "/images/materialSelectorOnBoarding.png",
@@ -243,17 +136,28 @@ export default function OnboardingHint({
             <br />
             <br />
             Voit esimerkiksi kysyä:
-            <ul>
-              <li>“Mihin laitan rikkinäisen paistinpannun?”</li>
-              <li>“Voiko pizzalaatikon kierrättää?”</li>
-              <li>“Miten paristot ja akut pitää pakata?”</li>
-            </ul>
+            <small>
+            <span className="inline-flex gap-2 flex-wrap">
+              <span className="px-2 py-1 rounded-full bg-gray-100">
+                Mihin laitan rikkinäisen paistinpannun?
+              </span>
+              <br />
+              <span className="px-2 py-1 rounded-full bg-gray-100">
+               Voiko pizzalaatikon kierrättää?
+              </span>
+              <br />
+              <span className="px-2 py-1 rounded-full bg-gray-100">
+               Miten paristot ja akut pitää pakata?
+              </span>
+            </span>
+            </small>
+            <br /><br />
             Avustaja antaa lajitteluohjeet ja kertoo, mihin jätelajiin
             materiaali kuuluu.
             <br />
             <br />
             <small>
-              Huom: Recycler-avustaja ei näe (toistaiseksi) karttaa eikä
+              Vinkki: ReCycler-avustaja ei näe (toistaiseksi) karttaa eikä
               paikanna pisteitä. Löydät keräyspisteet haulla tai
               materiaalivalinnalla.
             </small>
@@ -266,22 +170,13 @@ export default function OnboardingHint({
         title: "Kaikki valmista!",
         body: (
           <>
-            Hienoa – olet nyt valmis käyttämään ReCycleriä!
-            <br />
-            <br />
-            Voit heti kokeilla:
-            <ul>
-              <li>Hae osoite, paikka tai alue kartalta</li>
-              <li>Valitse materiaalit ja katso, mitkä pisteet sopivat</li>
-              <li>Kysy lajitteluohjeita ReCycler-avustajalta</li>
-            </ul>
-            <br />
             Oikein mukavia kierrätyshetkiä!
           </>
         ),
+        imageSrc: null,
+        imageAlt: null,
         ctaLabel: "Aloita",
       },
->>>>>>> da605027fbfd02873f88d1e724a7987e70d0a6d8
     ],
     []
   );
@@ -309,6 +204,8 @@ export default function OnboardingHint({
 
   const step = steps[index];
   const pct = ((index + 1) / steps.length) * 100;
+  const nextLabel =
+    index === steps.length - 1 ? step.ctaLabel ?? "Valmis" : "Seuraava";
 
   return (
     <div
@@ -374,7 +271,7 @@ export default function OnboardingHint({
               Takaisin
             </Button>
             <Button className="max-sm:w-full" onClick={next}>
-              {index === steps.length - 1 ? "Valmis" : "Seuraava"}
+              {nextLabel}
             </Button>
           </div>
         </div>
