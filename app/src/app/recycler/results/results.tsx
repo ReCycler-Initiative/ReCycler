@@ -255,22 +255,6 @@ export default function Result() {
     }
   }, []);
 
-  // Check geolocation permission to decide if the hint should be shown
-  useEffect(() => {
-    (async () => {
-      try {
-        const status = await (navigator.permissions as any)?.query({
-          name: "geolocation" as PermissionName,
-        });
-        if (status && status.state === "granted") {
-          setShowGeoHint(false);
-        }
-      } catch {
-        // ignore — fallback handled in OnboardingHint
-      }
-    })();
-  }, []);
-
   // Camera: do a single initial ease to user position, then let GeolocateControl own the camera
   const handleGeolocateChange = useCallback((position: GeolocationPosition) => {
     if (!initialGeolocate.current) return;
