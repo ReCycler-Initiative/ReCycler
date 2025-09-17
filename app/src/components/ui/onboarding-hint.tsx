@@ -37,24 +37,23 @@ export default function OnboardingHint() {
             <br />
             Esimerkkejä:&nbsp;
             <small>
-            <span className="inline-flex gap-2 flex-wrap">
-              <span className="px-2 py-1 rounded-full bg-gray-100">
-                Mannerheimintie 10
+              <span className="inline-flex gap-2 flex-wrap">
+                <span className="px-2 py-1 rounded-full bg-gray-100">
+                  Mannerheimintie 10
+                </span>
+                <span className="px-2 py-1 rounded-full bg-gray-100">
+                  Kauppatori
+                </span>
+                <span className="px-2 py-1 rounded-full bg-gray-100">
+                  Hervanta
+                </span>
               </span>
-              <span className="px-2 py-1 rounded-full bg-gray-100">
-                Kauppatori
-              </span>
-              <span className="px-2 py-1 rounded-full bg-gray-100">
-                Hervanta
-              </span>
-            </span>
             </small>
             <br />
             <br />
             <small>Vinkki: ↑/↓ selaa ehdotuksia, ↩︎ Enter hakee</small>
             <br />
             <br />
-
           </>
         ),
         imageSrc: "/images/searchBoxOnBoarding.png",
@@ -75,8 +74,8 @@ export default function OnboardingHint() {
             <br />
             <br />
             <small>
-              Vinkki: Jos et anna lupaa tai paikannus ei toimi, voit hakea kohteen
-              osoitteella tai paikannimellä.
+              Vinkki: Jos et anna lupaa tai paikannus ei toimi, voit hakea
+              kohteen osoitteella tai paikannimellä.
             </small>
           </>
         ),
@@ -116,8 +115,9 @@ export default function OnboardingHint() {
             <br />
             <br />
             <small>
-            Vinkki: Kartalla korostetaan ne keltaisella reunuksella keräyspisteet, jotka ottavat vastaan kaikki
-            valitsemasi materiaalit.
+              Vinkki: Kartalla korostetaan ne keltaisella reunuksella
+              keräyspisteet, jotka ottavat vastaan kaikki valitsemasi
+              materiaalit.
             </small>
           </>
         ),
@@ -134,21 +134,22 @@ export default function OnboardingHint() {
             <br />
             Voit esimerkiksi kysyä:
             <small>
-            <span className="inline-flex gap-2 flex-wrap">
-              <span className="px-2 py-1 rounded-full bg-gray-100">
-                Mihin laitan rikkinäisen paistinpannun?
+              <span className="inline-flex gap-2 flex-wrap">
+                <span className="px-2 py-1 rounded-full bg-gray-100">
+                  Mihin laitan rikkinäisen paistinpannun?
+                </span>
+                <br />
+                <span className="px-2 py-1 rounded-full bg-gray-100">
+                  Voiko pizzalaatikon kierrättää?
+                </span>
+                <br />
+                <span className="px-2 py-1 rounded-full bg-gray-100">
+                  Miten paristot ja akut pitää pakata?
+                </span>
               </span>
-              <br />
-              <span className="px-2 py-1 rounded-full bg-gray-100">
-               Voiko pizzalaatikon kierrättää?
-              </span>
-              <br />
-              <span className="px-2 py-1 rounded-full bg-gray-100">
-               Miten paristot ja akut pitää pakata?
-              </span>
-            </span>
             </small>
-            <br /><br />
+            <br />
+            <br />
             Avustaja antaa lajitteluohjeet ja kertoo, mihin jätelajiin
             materiaali kuuluu.
             <br />
@@ -165,11 +166,7 @@ export default function OnboardingHint() {
       },
       {
         title: "Kaikki valmista!",
-        body: (
-          <>
-            Oikein mukavia kierrätyshetkiä!
-          </>
-        ),
+        body: <>Oikein mukavia kierrätyshetkiä!</>,
         imageSrc: null,
         imageAlt: null,
         ctaLabel: "Aloita",
@@ -197,12 +194,10 @@ export default function OnboardingHint() {
   const next = () =>
     index < steps.length - 1 ? setIndex((i) => i + 1) : markDone();
 
-  if (!visible) return null;
-
   const step = steps[index];
   const pct = ((index + 1) / steps.length) * 100;
   const nextLabel =
-    index === steps.length - 1 ? step.ctaLabel ?? "Valmis" : "Seuraava";
+    index === steps.length - 1 ? (step.ctaLabel ?? "Valmis") : "Seuraava";
 
   return (
     <Dialog open={visible} onOpenChange={setVisible}>
@@ -217,7 +212,6 @@ export default function OnboardingHint() {
             </span>
           </DialogTitle>
         </DialogHeader>
-
         <div className="w-full h-1.5 rounded-full bg-gray-200 mb-4 overflow-hidden">
           <div
             className="h-full bg-black rounded-full"
@@ -236,7 +230,7 @@ export default function OnboardingHint() {
         )}
 
         <div className="text-sm leading-6 text-gray-800">{step.body}</div>
-        <DialogFooter className="mt-5">
+        <DialogFooter className="mt-5 gap-y-6">
           <Button
             variant="outline"
             className="max-sm:w-full"
