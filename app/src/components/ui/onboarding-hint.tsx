@@ -2,6 +2,13 @@
 
 import { Button } from "@/components/ui/button";
 import React, { useEffect, useMemo, useState } from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "./dialog";
 
 type Step = {
   title: string;
@@ -11,17 +18,7 @@ type Step = {
   ctaLabel?: string; // käytetään viimeisessä stepissä
 };
 
-type Props = {
-  overlay?: boolean;
-  overlayBlur?: boolean;
-  allowSkip?: boolean;
-};
-
-export default function OnboardingHint({
-  overlay = true,
-  overlayBlur = false,
-  allowSkip = true,
-}: Props) {
+export default function OnboardingHint() {
   const [visible, setVisible] = useState(false);
   const [index, setIndex] = useState(0);
 
@@ -208,24 +205,19 @@ export default function OnboardingHint({
     index === steps.length - 1 ? step.ctaLabel ?? "Valmis" : "Seuraava";
 
   return (
-    <div
-      className={`fixed inset-0 z-50 flex items-center justify-center ${
-        overlay ? "bg-black/40" : ""
-      } ${overlay && overlayBlur ? "backdrop-blur-sm" : ""}`}
-      role="dialog"
-      aria-modal="true"
-      aria-label={step.title}
-    >
-      <div className="w-[min(92vw,620px)] rounded-2xl shadow-xl bg-white p-6">
-        {/* Header with title + step counter */}
-        <div className="flex items-center justify-between mb-2">
-          <div className="text-lg font-semibold">{step.title}</div>
-          <div className="text-xs text-gray-600 select-none">
-            {index + 1}/{steps.length}
-          </div>
-        </div>
+    <Dialog open={visible} onOpenChange={setVisible}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>
+            <span className="flex items-center justify-between">
+              {step.title}
+              <span className="text-xs text-gray-600 select-none">
+                {index + 1}/{steps.length}
+              </span>
+            </span>
+          </DialogTitle>
+        </DialogHeader>
 
-        {/* Progress bar */}
         <div className="w-full h-1.5 rounded-full bg-gray-200 mb-4 overflow-hidden">
           <div
             className="h-full bg-black rounded-full"
@@ -233,7 +225,6 @@ export default function OnboardingHint({
           />
         </div>
 
-        {/* Step image */}
         {step.imageSrc && (
           <div className="mb-3 flex items-center justify-start">
             <img
@@ -244,23 +235,15 @@ export default function OnboardingHint({
           </div>
         )}
 
-        {/* Step body text */}
         <div className="text-sm leading-6 text-gray-800">{step.body}</div>
-
-        {/* Actions (Back on the left, Skip/Next on the right) */}
-        <div className="mt-5 flex flex-wrap items-center gap-2 gap-y-4">
-          {/* Back button aligned left */}
-          {allowSkip && (
-            <Button
-              variant="outline"
-              className="max-sm:w-full"
-              onClick={markDone}
-            >
-              Ohita
-            </Button>
-          )}
-
-          {/* Right side buttons */}
+        <DialogFooter className="mt-5">
+          <Button
+            variant="outline"
+            className="max-sm:w-full"
+            onClick={markDone}
+          >
+            Ohita
+          </Button>
           <div className="ml-auto flex gap-2 max-sm:w-full">
             <Button
               variant="ghost"
@@ -274,8 +257,8 @@ export default function OnboardingHint({
               {nextLabel}
             </Button>
           </div>
-        </div>
-      </div>
-    </div>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }
