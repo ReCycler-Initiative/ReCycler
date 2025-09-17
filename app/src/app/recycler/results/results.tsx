@@ -198,9 +198,6 @@ export default function Result() {
       .map((code) => +code) || [];
   const [showMaterials, setShowMaterials] = useState(false);
 
-  // Whether to show geolocation onboarding hint at startup
-  const [showGeoHint, setShowGeoHint] = useState(true);
-
   // Setup form state for material selection
   const form = useForm({
     defaultValues: {
@@ -348,8 +345,7 @@ export default function Result() {
             showUserHeading
           />
 
-          {/* Onboarding hint anchored to the geolocate control */}
-          {showGeoHint && <OnboardingHint />}
+          <OnboardingHint />
 
           <SelectedMaterialsControl
             amount={selectedMaterials.length}
