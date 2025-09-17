@@ -486,7 +486,7 @@ export default function Result() {
           <DrawerContent>
             <DrawerHeader>
               <DrawerTitle className="text-center">
-                Selected materials
+                Valitse materiaalit
               </DrawerTitle>
             </DrawerHeader>
             <div className="max-h-[500px] overflow-y-scroll max-w-2xl mx-auto">
