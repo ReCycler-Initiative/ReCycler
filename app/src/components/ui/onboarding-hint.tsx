@@ -29,60 +29,114 @@ export default function OnboardingHint({
   // Onboarding steps
   const steps: Step[] = useMemo(
     () => [
+{
+  title: "Hae osoitteella tai paikalla",
+  body: (
+    <>
+      Kirjoita osoite, paikka tai alue hakukenttään.
+      <br />
+      Saat ehdotuksia kirjoittaessasi; klikkaa ehdotusta tai paina Enter, niin karttaikkuna keskittyy valittuun sijaintiin.
+      <br /><br />
+      <small>Vinkki: ↑/↓ selaa ehdotuksia, ↩︎ Enter hakee</small>
+      <br /><br />
+      Esimerkkejä:&nbsp;
+      <span className="inline-flex gap-2 flex-wrap">
+        <span className="px-2 py-1 rounded-full bg-gray-100">Mannerheimintie 10</span>
+        <span className="px-2 py-1 rounded-full bg-gray-100">Kauppatori</span>
+        <span className="px-2 py-1 rounded-full bg-gray-100">Hervanta</span>
+      </span>
+    </>
+  ),
+  imageSrc: "/images/searchBoxOnBoarding.png",
+  imageAlt: "Hakukenttä",
+  // Lisäksi komponenttitasolla: placeholder="Hae osoite, paikka tai alue", aria-label="Haku"
+},
       {
-        title: "Hae osoitteella tai paikalla",
-        body: <>Käytä hakupalkkia löytääksesi osoitteen tai paikan.</>,
-        imageSrc: "/images/searchBoxOnBoarding.png",
-        imageAlt: "Hakukenttä",
-      },
+  title: "Ota paikannus käyttöön",
+  body: (
+    <>
+      Napsauta sijaintipainiketta. Ensimmäisellä kerralla Recycleriä käytettäessä verkkoselain kysyy luvan sijainnin käyttöön – hyväksy, niin karttaikkuna keskittyy nykyiseen sijaintiisi.
+      <br /><br />
+      Paina painiketta uudelleen, niin <b>Seuraa sijaintiani</b> -tila kytkeytyy päälle/pois (esimerkkikuvassa toiminto on päällä). Seurantatilassa näkymä seuraa sijaintiasi liikkuessasi.
+      <br /><br />
+      Jos et anna lupaa tai paikannus ei toimi, voit hakea kohteen osoitteella tai paikannimellä.
+      <br />
+    </>
+  ),
+  imageSrc: "/images/geolocationOnBoarding.png",
+  imageAlt: "Sijaintipainike",
+},
       {
-        title: "Ota paikannus käyttöön",
-        body: (
-          <>
-          Klikkaa sijaintipainiketta, niin kartta keskitetään nykyiseen sijaintiisi.
-ReCycler-sovellus kysyy sinulta luvan sijainnin käyttämiseen.
-Jos painat painiketta uudelleen, voit ottaa käyttöön jatkuvan paikannuksen.
-          </>
-        ),
-        imageSrc: "/images/geolocationOnBoarding.png",
-        imageAlt: "Sijaintipainike",
-      },
-      {
-        title: "Vaihda taustanäkymä",
-        body: (
-          <>Vaihda kartan taustanäkymä: normaali kartta tai satelliittikuva.</>
-        ),
-        imageSrc: "/images/backgroundMapOnBoarding.png",
-        imageAlt: "Taustakarttavalitsin",
-      },
-      {
-        title: "Valitse materiaalit",
-        body: (
-          <>
-            Valitse haluamasi materiaalit – vastaavat keräyspisteet 
-            korostetaan kartalla. Jos kaikki valitut materiaalit voidaan 
-            palauttaa samaan kierrätyspisteeseen, kyseinen piste 
-            korostetaan kartalla kierrätysikonilla, jossa on keltainen reunus.
-          </>
-        ),
-        imageSrc: "/images/materialSelectorOnBoarding.png",
-        imageAlt: "Materiaalivalitsin",
-      },
-      {
-        title: "ReCycler avustaja",
-        body: (
-          <>
-            Kysy kierrätysneuvoja ReCycler avustajalta - se kertoo, mihin eri
-            materiaalit voi viedä.
-          </>
-        ),
-        imageSrc: "/images/chatbotOnBoarding.png",
-        imageAlt: "ReCycler avustaja",
-      },
-      {
-        title: "Kaikki valmista!",
-        body: <>Hienoa - Olet valmis etsimään kierrätyspisteitä!</>,
-      },
+  title: "Vaihda taustanäkymä",
+  body: (
+    <>
+      Klikkaa taustakarttapainiketta (maapallo-kuvake).  
+      <br />
+      Voit vaihtaa kartan taustanäkymän: <b>normaali kartta</b> (selkeä kadut ja alueet) tai <b>satelliittikuva</b> (realistinen ilmakuvanäkymä).
+      <br /><br />
+      <small>Vinkki: käytä karttanäkymää reittien ja osoitteiden hakuun, satelliittia kun haluat nähdä rakennukset ja maaston tarkemmin. 
+      3D-näkymässä voit puolestaan tarkastella rakennuksia ja maastoa kolmiulotteisesti eri kulmista.</small>
+    </>
+  ),
+  imageSrc: "/images/backgroundMapOnBoarding.png",
+  imageAlt: "Taustakartan vaihtopainike",
+},
+   {
+  title: "Valitse materiaalit",
+  body: (
+    <>
+      Valitse haluamasi materiaalit painikkeesta.  
+      <br />
+      Numerokuvake <b>(0 → 1, 2…)</b> kertoo, montako materiaalia on valittuna.
+      <br /><br />
+      Kartalla korostetaan ne keräyspisteet, jotka ottavat vastaan kaikki valitsemasi materiaalit.  
+      Nämä pisteet näkyvät keltaisella reunuksella varustetulla kierrätyskuvakkeella.
+    </>
+  ),
+  imageSrc: "/images/materialSelectorOnBoarding.png",
+  imageAlt: "Materiaalivalintapainike",
+},
+{
+  title: "ReCycler-avustaja",
+  body: (
+    <>
+      Kysy kierrätysasioista ReCycler-avustajalta selkokielellä – sinun ei tarvitse tuntea virallisia termejä.
+      <br /><br />
+      Voit esimerkiksi kysyä:
+      <ul>
+        <li>“Mihin laitan rikkinäisen paistinpannun?”</li>
+        <li>“Voiko pizzalaatikon kierrättää?”</li>
+        <li>“Miten paristot ja akut pitää pakata?”</li>
+      </ul>
+      Avustaja antaa lajitteluohjeet ja kertoo, mihin jätelajiin materiaali kuuluu. 
+      <br /><br />
+      <small>Huom: Recycler-avustaja ei näe (toistaiseksi) karttaa eikä paikanna pisteitä. Löydät keräyspisteet haulla tai materiaalivalinnalla.</small>
+    </>
+  ),
+  imageSrc: "/images/chatbotOnBoarding.png",
+  imageAlt: "ReCycler-avustaja",
+},
+{
+  title: "Kaikki valmista!",
+  body: (
+    <>
+      Hienoa – olet nyt valmis käyttämään ReCycleriä!  
+      <br /><br />
+      Voit heti kokeilla:
+      <ul>
+        <li>Hae osoite, paikka tai alue kartalta</li>
+        <li>Valitse materiaalit ja katso, mitkä pisteet sopivat</li>
+        <li>Kysy lajitteluohjeita ReCycler-avustajalta</li>
+      </ul>
+      <br />
+      Oikein mukavia kierrätyshetkiä!
+    </>
+  ),
+  imageSrc: null,
+  imageAlt: null,
+  ctaLabel: "Aloita"
+}
+
     ],
     []
   );
