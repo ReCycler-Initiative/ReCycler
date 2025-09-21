@@ -198,9 +198,6 @@ export default function Result() {
       .map((code) => +code) || [];
   const [showMaterials, setShowMaterials] = useState(false);
 
-  // Whether to show geolocation onboarding hint at startup
-  const [showGeoHint, setShowGeoHint] = useState(true);
-
   // Setup form state for material selection
   const form = useForm({
     defaultValues: {
@@ -256,22 +253,6 @@ export default function Result() {
     if (typeof window !== "undefined") {
       window.dispatchEvent(new Event("map-loaded"));
     }
-  }, []);
-
-  // Check geolocation permission to decide if the hint should be shown
-  useEffect(() => {
-    (async () => {
-      try {
-        const status = await (navigator.permissions as any)?.query({
-          name: "geolocation" as PermissionName,
-        });
-        if (status && status.state === "granted") {
-          setShowGeoHint(false);
-        }
-      } catch {
-        // ignore — fallback handled in OnboardingHint
-      }
-    })();
   }, []);
 
   // Camera: do a single initial ease to user position, then let GeolocateControl own the camera
@@ -348,8 +329,7 @@ export default function Result() {
             showUserHeading
           />
 
-          {/* Onboarding hint anchored to the geolocate control */}
-          {showGeoHint && <OnboardingHint />}
+          <OnboardingHint />
 
           <SelectedMaterialsControl
             amount={selectedMaterials.length}
