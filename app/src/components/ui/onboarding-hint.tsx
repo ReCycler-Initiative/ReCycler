@@ -67,8 +67,7 @@ export default function OnboardingHint({
         title: "Ota paikannus käyttöön",
         body: (
           <>
-            Napsauta sijaintipainiketta. Ensimmäisellä kerralla ReCycleriä
-            käytettäessä verkkoselain kysyy luvan sijainnin käyttöön – hyväksy,
+            Napsauta sijaintipainiketta. Ensimmäisellä kerralla ReCycler-sovellusta käytettäessä verkkoselain kysyy luvan sijainnin käyttöön – hyväksy,
             niin karttaikkuna keskittyy nykyiseen sijaintiisi.
             <br />
             <br />
