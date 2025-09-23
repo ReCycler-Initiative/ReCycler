@@ -2,6 +2,8 @@
 
 import { PageTemplate } from "@/components/admin/page-template";
 import FormInput from "@/components/form/form-input";
+import LoadingSpinner from "@/components/loading-spinner";
+import { LoadingState } from "@/components/loading-state";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 import { getOrganizationById } from "@/services/api";
@@ -29,10 +31,12 @@ const GeneralInfoPage = () => {
   return (
     <Form {...form}>
       <PageTemplate title="Organization Information">
-        <div className="my-2">
-          <FormInput label="Name" name="name" />
-        </div>
-        <Button disabled={!form.formState.isDirty}>Save</Button>
+        <LoadingState isLoading={query.isLoading} error={!!query.error}>
+          <div className="my-2">
+            <FormInput label="Name" name="name" />
+          </div>
+          <Button disabled={!form.formState.isDirty}>Save</Button>
+        </LoadingState>
       </PageTemplate>
     </Form>
   );
