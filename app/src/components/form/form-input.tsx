@@ -20,7 +20,7 @@ const FormInput = ({
       name={name}
       render={({ field }) => (
         <FormItem className={className}>
-          <FormLabel className={cn({ "sr-only": !showLabel })}>
+          <FormLabel className={cn("mb-2", { "sr-only": !showLabel })}>
             {label}
           </FormLabel>
           <FormControl>
