@@ -32,10 +32,11 @@ const GeneralInfoPage = () => {
     <Form {...form}>
       <PageTemplate title="Organization Information">
         <LoadingState isLoading={query.isLoading} error={!!query.error}>
-          <div className="my-2">
+          <div className="my-2 max-w-xl">
             <FormInput label="Name" name="name" />
           </div>
-          <Button disabled={!form.formState.isDirty}>Save</Button>
+          <hr />
+          <Button className="sm:w-fit ml-auto" disabled={!form.formState.isDirty}>Save</Button>
         </LoadingState>
       </PageTemplate>
     </Form>
