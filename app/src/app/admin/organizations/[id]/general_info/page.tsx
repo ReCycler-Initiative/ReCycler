@@ -36,7 +36,12 @@ const GeneralInfoPage = () => {
             <FormInput label="Name" name="name" />
           </div>
           <hr />
-          <Button className="sm:w-fit ml-auto" disabled={!form.formState.isDirty}>Save</Button>
+          <Button
+            className="sm:w-fit ml-auto"
+            disabled={!form.formState.isDirty}
+          >
+            Save
+          </Button>
         </LoadingState>
       </PageTemplate>
     </Form>
