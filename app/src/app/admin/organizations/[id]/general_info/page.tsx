@@ -6,7 +6,7 @@ import LoadingSpinner from "@/components/loading-spinner";
 import { LoadingState } from "@/components/loading-state";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
-import { getOrganizationById } from "@/services/api";
+import { getOrganizationById, updateOrganization } from "@/services/api";
 import { Organization } from "@/types";
 import { useQuery } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
@@ -30,20 +30,25 @@ const GeneralInfoPage = () => {
 
   return (
     <Form {...form}>
-      <PageTemplate title="Organization Information">
-        <LoadingState isLoading={query.isLoading} error={!!query.error}>
-          <div className="my-2 max-w-xl">
-            <FormInput label="Name" name="name" />
-          </div>
-          <hr />
-          <Button
-            className="sm:w-fit ml-auto"
-            disabled={!form.formState.isDirty}
-          >
-            Save
-          </Button>
-        </LoadingState>
-      </PageTemplate>
+      <form
+        onSubmit={form.handleSubmit((values) => updateOrganization(values))}
+        className="space-y-4"
+      >
+        <PageTemplate title="Organization Information">
+          <LoadingState isLoading={query.isLoading} error={!!query.error}>
+            <div className="my-2 max-w-xl">
+              <FormInput label="Name" name="name" />
+            </div>
+            <hr />
+            <Button
+              className="sm:w-fit ml-auto"
+              disabled={!form.formState.isDirty}
+            >
+              Save
+            </Button>
+          </LoadingState>
+        </PageTemplate>
+      </form>
     </Form>
   );
 };
