@@ -2,13 +2,12 @@
 
 import { PageTemplate } from "@/components/admin/page-template";
 import FormInput from "@/components/form/form-input";
-import LoadingSpinner from "@/components/loading-spinner";
 import { LoadingState } from "@/components/loading-state";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 import { getOrganizationById, updateOrganization } from "@/services/api";
 import { Organization } from "@/types";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -16,9 +15,22 @@ import { z } from "zod";
 const GeneralInfoPage = () => {
   const { id } = useParams<{ id: string }>();
 
+  const queryClient = useQueryClient();
+
+  const queryKey = ["organization", id];
+
   const query = useQuery({
-    queryKey: ["organization", id],
+    queryKey: queryKey,
     queryFn: () => getOrganizationById(id),
+  });
+
+  const mutation = useMutation({
+    mutationFn: (data: z.infer<typeof Organization>) =>
+      updateOrganization(data),
+    onSuccess: (data) => {
+      form.reset(data);
+      queryClient.setQueryData(queryKey, data);
+    },
   });
 
   const form = useForm<z.infer<typeof Organization>>({
@@ -31,7 +43,7 @@ const GeneralInfoPage = () => {
   return (
     <Form {...form}>
       <form
-        onSubmit={form.handleSubmit((values) => updateOrganization(values))}
+        onSubmit={form.handleSubmit((values) => mutation.mutateAsync(values))}
         className="space-y-4"
       >
         <PageTemplate title="Organization Information">
@@ -43,6 +55,8 @@ const GeneralInfoPage = () => {
             <Button
               className="sm:w-fit ml-auto"
               disabled={!form.formState.isDirty}
+              isLoading={form.formState.isSubmitting}
+              type="submit"
             >
               Save
             </Button>
