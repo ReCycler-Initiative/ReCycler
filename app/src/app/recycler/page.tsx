@@ -2,7 +2,6 @@
 
 import Container from "@/components/container";
 import { Button } from "@/components/ui/button";
-import Image from "next/image";
 import Link from "next/link";
 //import hero from "./recycle.png"; //let´s place when suitable photo
 

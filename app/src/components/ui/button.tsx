@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Slot } from "@radix-ui/react-slot";
+import { Slot, Slottable } from "@radix-ui/react-slot";
 import { cva, type VariantProps } from "class-variance-authority";
 
 import { cn } from "@/lib/utils";
@@ -65,7 +65,7 @@ const Button = ({
       type={props.type || "button"}
       {...props}
     >
-      {props.children}
+      <Slottable>{props.children}</Slottable>
       <Loader2Icon className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 hidden animate-spin group-data-[loading=true]:block" />
       <span className="sr-only">Loading...</span>
     </Comp>
