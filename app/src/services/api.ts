@@ -54,3 +54,10 @@ export const getOrganizationById = (
   axios
     .get(`/api/organizations/${id}`)
     .then((response) => Organization.parse(response.data));
+
+export const updateOrganization = (
+  organization: z.infer<typeof Organization>
+): Promise<z.infer<typeof Organization>> =>
+  axios
+    .put(`/api/organizations/${organization.id}`, organization)
+    .then((response) => Organization.parse(response.data));
