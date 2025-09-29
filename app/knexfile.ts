@@ -16,11 +16,14 @@ const config: Knex.Config = {
     password: POSTGRES_PASSWORD,
     host: POSTGRES_HOST,
     port: +POSTGRES_PORT,
-    ssl: POSTGRES_HOST !== "localhost",
+    ssl: POSTGRES_HOST !== "localhost" ? { rejectUnauthorized: false } : false,
+    application_name: `recycler-app-${process.pid}`,
   },
   pool: {
-    min: 2,
+    min: 0,
     max: 10,
+    idleTimeoutMillis: 30_000,
+    acquireTimeoutMillis: 10_000,
   },
   migrations: {
     tableName: "knex_migrations",
