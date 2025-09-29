@@ -1,69 +1,35 @@
 "use client";
 
-import { PageTemplate } from "@/components/admin/page-template";
+import { EditorTemplate, useEditor } from "@/components/editor";
 import FormInput from "@/components/form/form-input";
-import { LoadingState } from "@/components/loading-state";
-import { Button } from "@/components/ui/button";
-import { Form } from "@/components/ui/form";
 import { getOrganizationById, updateOrganization } from "@/services/api";
 import { Organization } from "@/types";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
-import { useForm } from "react-hook-form";
 import { z } from "zod";
 
 const GeneralInfoPage = () => {
   const { id } = useParams<{ id: string }>();
 
-  const queryClient = useQueryClient();
-
-  const queryKey = ["organization", id];
-
-  const query = useQuery({
-    queryKey: queryKey,
-    queryFn: () => getOrganizationById(id),
-  });
-
-  const mutation = useMutation({
-    mutationFn: (data: z.infer<typeof Organization>) =>
-      updateOrganization(data),
-    onSuccess: (data) => {
-      form.reset(data);
-      queryClient.setQueryData(queryKey, data);
-    },
-  });
-
-  const form = useForm<z.infer<typeof Organization>>({
+  const editor = useEditor<
+    z.infer<typeof Organization>,
+    z.infer<typeof Organization>
+  >({
     defaultValues: {
       name: "",
     },
-    values: query.data,
+    queryKey: ["organization", id],
+    queryFn: () => getOrganizationById(id),
+    mutationFn: (data) => updateOrganization(data),
+    toFormState: Organization.parse,
+    toApiData: Organization.parse,
   });
 
   return (
-    <Form {...form}>
-      <form
-        onSubmit={form.handleSubmit((values) => mutation.mutateAsync(values))}
-        className="space-y-4"
-      >
-        <PageTemplate title="Organization Information">
-          <LoadingState isLoading={query.isLoading} error={!!query.error}>
-            <div className="my-2 max-w-xl">
-              <FormInput label="Name" name="name" />
-            </div>
-            <hr />
-            <Button
-              className="sm:w-fit ml-auto"
-              disabled={!form.formState.isDirty}
-              isLoading={form.formState.isSubmitting}
-              type="submit"
-            >
-              Save
-            </Button>
-          </LoadingState>
-        </PageTemplate>
-      </form>
-    </Form>
+    <EditorTemplate {...editor}>
+      <div className="my-2 max-w-xl">
+        <FormInput label="Name" name="name" />
+      </div>
+    </EditorTemplate>
   );
 };
 export default GeneralInfoPage;
