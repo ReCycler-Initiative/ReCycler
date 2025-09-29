@@ -5,6 +5,7 @@ import { Form } from "@/components/ui/form";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ReactNode } from "react";
 import { DefaultValues, FieldValues, useForm } from "react-hook-form";
+import { toast } from "sonner";
 
 type UseEditorProps<ApiData, FormData> = {
   defaultValues: DefaultValues<FormData>;
@@ -39,8 +40,12 @@ export const useEditor = <ApiData, FormData extends FieldValues>({
   const mutation = useMutation<ApiData, Error, FormData>({
     mutationFn: (data) => mutationFn(toApiData(data)),
     onSuccess: (data) => {
+      toast.success("Save successful");
       form.reset(toFormState(data));
       queryClient.setQueryData(queryKey, data);
+    },
+    onError: () => {
+      toast.error("Save failed");
     },
   });
 
