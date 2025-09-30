@@ -1,10 +1,10 @@
 "use client";
 
 import TitleBar from "@/components/title-bar";
+import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 
 const OrganizationLayout = ({ children }: { children: React.ReactNode }) => {
-  // Tracks whether the map has finished loading (set by custom events from the map page)
   const [mapReady, setMapReady] = useState(false);
 
   useEffect(() => {
@@ -18,8 +18,6 @@ const OrganizationLayout = ({ children }: { children: React.ReactNode }) => {
     };
   }, []);
 
-  // Allows user to re-open the onboarding wizard on demand.
-  // We dispatch a custom event that the OnboardingHint component listens to.
   const openOnboarding = () => {
     window.dispatchEvent(new Event("open-onboarding"));
   };
@@ -28,19 +26,20 @@ const OrganizationLayout = ({ children }: { children: React.ReactNode }) => {
     <>
       <TitleBar>
         {/* Contextual actions on the right side */}
-        <div className="flex items-center gap-2 ml-auto">
-          {/* Only visible when the map has loaded */}
+        <div className="flex items-center ml-auto">
           {mapReady && (
-            <button
+            <Button
+              variant="outline"
               onClick={openOnboarding}
-              className="px-3 py-1.5 rounded-md text-sm border border-gray-300 hover:bg-gray-50"
+              className="h-10 px-4 mr-2"  // ← 2 px väli (vaihda tarvittaessa mr-1 = 4 px)
               aria-label="Open onboarding"
             >
               Ohjeet
-            </button>
+            </Button>
           )}
         </div>
       </TitleBar>
+
       <main className="flex-1 flex flex-col bg-gray-100">{children}</main>
     </>
   );
