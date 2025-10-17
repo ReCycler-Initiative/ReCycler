@@ -3,6 +3,7 @@
 import { useUser } from "@auth0/nextjs-auth0";
 import { Button } from "./ui/button";
 import LoadingSpinner from "./loading-spinner";
+import Link from "next/link";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -54,7 +55,10 @@ export default function Auth0Login() {
             </DropdownMenuTrigger>
             <DropdownMenuContent>
               <DropdownMenuItem asChild>
-                <a href="/auth/logout">Kirjaudu ulos</a>
+                <Link href="/account-settings">Asetukset</Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link href="/auth/logout">Kirjaudu ulos</Link>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
