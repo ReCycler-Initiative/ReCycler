@@ -1,8 +1,8 @@
-Organization Registration and User Management
+Super-admin, Organization, adn user registration, User Management
 
-1. Service Entry Point
-- The service includes a public landing page with “Sign in” and “Register organization” options.
-- A registration wizard guides new organizations through setup, creating the initial Super Admin user — the owner of the entire service instance.
+1. Service Entry Point (org-admin-level)
+- The service includes a landing page with “Sign in”
+- A registration wizard guides through setup, creating the initial org-admin user — the owner of the entire service instance.
 
 2. Organizational Structure
 - Every user belongs to at least one organization.
@@ -11,26 +11,26 @@ Organization Registration and User Management
 
 3. Organization Setup Process
 - After registration, the Org Admin is prompted (via wizard) to:
-  - Complete the organization’s profile and contact details.
-  - Invite or add users to the organization.
-- Organizations may have user limits (e.g., up to 10 users) depending on the subscription plan.
+- Invite or add users to the organization.
+- Organizations may have user limits (e.g., up to 10 users or unlimited) depending on the subscription plan.
 - Alternatively, domain-based access can be enabled — for example, users with an email address under @example-firm-ltd.com can automatically join the organization without manual approval.
 
 4. Roles and Permissions
 Each organization has a role-based access model with the following roles:
 
-- Org Admin: Manages the entire organization, including all associated services and users.
+- Org-Admin: Manages the entire organization, including all associated services and users.
 - Owner: Manages a specific service or use case within the organization. The same user may be an Owner for multiple services across organizations.
 - Editor: Can edit a single service’s content, configurations, or data.
 - Viewer: Has read-only access to view information related to a service.
 
 5. Authentication and Identity
-- User identities are managed via Auth0, using user_id (Auth0 sub claim) and email as the key identifiers.
-- Each user is linked to one or more organizations within the service database, while Auth0 handles all identity, login, and authentication flows.
+- User identities are managed via Auth0, using user_id (Auth0 sub claim)
+- Organisation ids are managed in Auth0 
+- Each user is linked to one or more organizations within the database, while Auth0 handles all identity, login, and authentication flows.
 - All users must authenticate using an Auth0-supported method (e.g., social login, enterprise SSO, or passwordless login).
 
 6. Data Protection and Compliance
 - The service itself stores no personal data beyond what is required for authentication and role assignment.
-- All personal information (e.g., email, name) is managed by Auth0.
+- All personal information (e.g., email, name, photo) is managed by Auth0.
 - As a result, the service does not create additional GDPR-related obligations beyond those covered by Auth0’s compliance framework.
 
