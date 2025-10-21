@@ -55,7 +55,7 @@ export default function Auth0Login() {
             </DropdownMenuTrigger>
             <DropdownMenuContent>
               <DropdownMenuItem asChild>
-                <Link href="/account-settings">Asetukset</Link>
+                <Link href="/user-settings">Asetukset</Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
                 <Link href="/auth/logout">Kirjaudu ulos</Link>
