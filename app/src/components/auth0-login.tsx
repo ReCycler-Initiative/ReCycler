@@ -11,7 +11,7 @@ import {
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
 
-// Poimii nimikirjaimet: "Jussi Niilahti" -> "JN", "jussi@..." -> "J"
+// Extracts initials: "Joe Doe" -> "JD", "joe@..." -> "J"
 function getInitials(name?: string | null, email?: string | null) {
   const src = (name || email || "").trim();
   if (!src) return "?";
