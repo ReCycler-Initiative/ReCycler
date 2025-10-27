@@ -6,6 +6,12 @@ import { OnCallbackContext, SessionData } from "@auth0/nextjs-auth0/types";
 import { NextResponse } from "next/server";
 import { ManagementClient } from "auth0";
 
+export const managementClient = new ManagementClient({
+  domain: process.env.AUTH0_DOMAIN!,
+  clientId: process.env.AUTH0_CLIENT_ID!,
+  clientSecret: process.env.AUTH0_CLIENT_SECRET!,
+});
+
 // Initialize the Auth0 client
 export const auth0 = new Auth0Client({
   // Options are loaded from environment variables by default
@@ -33,24 +39,20 @@ export const auth0 = new Auth0Client({
       );
     }
 
-    const mgmt = new ManagementClient({
-      domain: process.env.AUTH0_DOMAIN!,
-      clientId: process.env.AUTH0_CLIENT_ID!,
-      clientSecret: process.env.AUTH0_CLIENT_SECRET!,
-    });
+    let returnUrl = ctx.returnTo || "/";
 
     try {
-      const organizations = await mgmt.users.organizations.list(
+      const organizations = await managementClient.users.organizations.list(
         session!.user.sub
       );
 
-      console.log("User Organizations:", organizations);
+      if (organizations.data.length === 0) {
+        returnUrl = "/organizations/wizard";
+      }
     } catch (err) {
       console.error("Error fetching user organizations:", err);
     }
 
-    return NextResponse.redirect(
-      new URL(ctx.returnTo || "/", process.env.APP_BASE_URL)
-    );
+    return NextResponse.redirect(new URL(returnUrl, process.env.APP_BASE_URL));
   },
 });
