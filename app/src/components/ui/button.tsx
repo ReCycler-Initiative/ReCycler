@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 import { Loader2Icon } from "lucide-react";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
+  "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-70",
   {
     variants: {
       variant: {
@@ -53,6 +53,12 @@ const Button = ({
   ref?: React.RefObject<HTMLButtonElement>;
 }) => {
   const Comp = asChild ? Slot : "button";
+
+  const spinnerColorClass =
+    variant === "outline" || variant === "ghost" || variant === "link"
+      ? "text-primary"
+      : "text-primary-foreground";
+
   return (
     <Comp
       className={cn(
@@ -66,7 +72,12 @@ const Button = ({
       {...props}
     >
       <Slottable>{props.children}</Slottable>
-      <Loader2Icon className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 hidden animate-spin group-data-[loading=true]:block" />
+      <Loader2Icon
+        className={cn(
+          "absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 hidden animate-spin group-data-[loading=true]:block",
+          spinnerColorClass
+        )}
+      />
       <span className="sr-only">Loading...</span>
     </Comp>
   );
