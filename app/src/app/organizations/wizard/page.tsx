@@ -346,7 +346,7 @@ const Wizard = () => {
       onNext={(organization) =>
         router.push(`wizard/thankyou/${organization.id}`)
       }
-      onPrevious={() => setStep("step3")}
+      onPrevious={() => setStep("step4")}
       values={fullState}
     />
   );
