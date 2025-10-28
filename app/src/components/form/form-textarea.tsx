@@ -20,7 +20,7 @@ export function FormTextArea({ label, name, rules }: FormInputProps) {
       name={name}
       render={({ field }) => (
         <FormItem>
-          <FormLabel>{label}</FormLabel>
+          <FormLabel className="mb-2">{label}</FormLabel>
           <FormControl>
             <Textarea className="resize-none" {...field} />
           </FormControl>

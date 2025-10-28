@@ -102,13 +102,22 @@ const UseCase = ({
       onStepChange={onStepChange}
       title="Käyttötapaus"
     >
-      <FormTextArea
-        label="Kuvaus"
-        name="description"
-        rules={{
-          required: "Käyttötapaus on pakollinen",
-        }}
-      />
+      <div className="flex flex-col gap-6">
+        <FormInput
+          label="Nimi"
+          name="name"
+          rules={{
+            required: "Nimi on pakollinen",
+          }}
+        />
+        <FormTextArea
+          label="Kuvaus"
+          name="description"
+          rules={{
+            required: "Kuvaus on pakollinen",
+          }}
+        />
+      </div>
     </Step>
   );
 };
