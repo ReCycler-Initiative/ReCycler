@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
-import { createContext, useContext } from "react";
+import { createContext, useContext, useState } from "react";
 import { FieldValues, useFormContext, UseFormReturn } from "react-hook-form";
 
 type StepActionsContextProps = {
@@ -27,11 +27,12 @@ function StepActions({ children }: StepActionsProps) {
 
 type StepNextProps = {
   children?: string;
+  isLoading?: boolean;
 };
 
-function StepNext({ children }: StepNextProps) {
+function StepNext({ children, isLoading }: StepNextProps) {
   return (
-    <Button className="w-full max-w-40" type="submit" size="lg">
+    <Button className="w-full max-w-40" type="submit" size="lg" isLoading={isLoading}>
       {children ?? "Jatka"}
     </Button>
   );
@@ -75,6 +76,8 @@ function Step<T extends FieldValues>({
   onStepChange,
   title,
 }: StepProps<T>) {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   return (
     <StepActionsContext.Provider value={{ onNext, onPrevious, onStepChange }}>
       <Form {...form}>
@@ -82,7 +85,14 @@ function Step<T extends FieldValues>({
           className="flex-1 bg-white"
           onSubmit={form.handleSubmit(async (values) => {
             onStepChange(values);
-            await onNext?.(values);
+            if (onNext) {
+              setIsSubmitting(true);
+              try {
+                await onNext(values);
+              } finally {
+                setIsSubmitting(false);
+              }
+            }
           })}
         >
           <h1 className="text-2xl text-center py-6 border-b bg-gray-50 text-primary">
@@ -92,7 +102,7 @@ function Step<T extends FieldValues>({
             <div className="mx-auto max-w-4xl">
               {children}
               <StepActions>
-                {onNext && <StepNext>{nextText}</StepNext>}
+                {onNext && <StepNext isLoading={isSubmitting}>{nextText}</StepNext>}
                 {onPrevious && <StepPrevious />}
               </StepActions>
             </div>
