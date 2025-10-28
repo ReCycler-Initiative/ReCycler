@@ -1,5 +1,5 @@
+import { managementClient } from "@/lib/auth0";
 import db from "@/services/db";
-import { DbLocation, LocationGeoJsonCollection } from "@/types";
 import { NextResponse } from "next/server";
 import { z, ZodError } from "zod";
 
@@ -15,20 +15,27 @@ export async function GET(
 ) {
   try {
     const { organizationId } = await params;
-    const organization = await db
+    const dbOrganization = await db
       .select("*")
       .from("recycler.organizations")
       .where("id", organizationId)
       .first();
 
-    if (!organization) {
+    if (!dbOrganization) {
       return NextResponse.json(
         { error: "Organization not found" },
         { status: 404 }
       );
     }
 
-    return NextResponse.json(organization);
+    const auth0Organization = await managementClient.organizations.get(
+      dbOrganization.auth0_id
+    );
+
+    return NextResponse.json({
+      ...dbOrganization,
+      name: auth0Organization.display_name || auth0Organization.name,
+    });
   } catch (error) {
     if (error instanceof ZodError) {
       return NextResponse.json({ error: error.errors }, { status: 400 });
@@ -51,23 +58,34 @@ export async function PUT(
     const { organizationId } = await params;
     const body = await request.json();
 
-    const organization = await db("recycler.organizations")
+    const dbOrganization = await db("recycler.organizations")
       .where("id", organizationId)
-      .update({
-        name: body.name,
-        updated_at: new Date(),
-      })
-      .returning("*")
-      .then((rows) => rows[0]);
+      .first();
 
-    if (!organization) {
+    if (!dbOrganization) {
       return NextResponse.json(
         { error: "Organization not found" },
         { status: 404 }
       );
     }
 
-    return NextResponse.json(organization);
+    await managementClient.organizations.update(
+      dbOrganization.auth0_id,
+      { display_name: body.name }
+    );
+
+    const updatedDbOrg = await db("recycler.organizations")
+      .where("id", organizationId)
+      .update({
+        updated_at: new Date(),
+      })
+      .returning("*")
+      .then((rows) => rows[0]);
+
+    return NextResponse.json({
+      ...updatedDbOrg,
+      name: body.name,
+    });
   } catch (error) {
     if (error instanceof ZodError) {
       return NextResponse.json({ error: error.errors }, { status: 400 });
