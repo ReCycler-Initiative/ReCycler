@@ -9,7 +9,7 @@ import Auth0Login from "./auth0-login";  // <-- tuotu tänne
 
 const TitleBar = ({
   children,
-  toHomeHref = "/",
+  toHomeHref = "/recycler",
 }: {
   children?: ReactNode;
   toHomeHref?: string;
