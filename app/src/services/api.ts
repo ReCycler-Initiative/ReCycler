@@ -61,3 +61,10 @@ export const updateOrganization = (
   axios
     .put(`/api/organizations/${organization.id}`, organization)
     .then((response) => Organization.parse(response.data));
+
+export const checkOrganizationAccess = (
+  organizationId: string
+): Promise<{ hasAccess: boolean }> =>
+  axios
+    .get(`/api/organizations/${organizationId}/access`)
+    .then((response) => response.data);
