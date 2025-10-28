@@ -109,11 +109,13 @@ export const CreateOrganizationRequest = z.object({
 
 export const Organization = NewOrganization.merge(
   z.object({
+    auth0_id: z.string(),
     id: z.string().uuid(),
   })
 );
 
 export const CreateOrganizationResponse = z.object({
   organization: Organization,
+  useCase: UseCase,
   fields: z.array(Field),
 });

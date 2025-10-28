@@ -5,7 +5,11 @@ import FormSelect from "@/components/form/form-select";
 import { FormTextArea } from "@/components/form/form-textarea";
 import { Button } from "@/components/ui/button";
 import { createOrganization } from "@/services/api";
-import { CreateOrganizationRequest, NewUseCase, Organization } from "@/types";
+import {
+  CreateOrganizationRequest,
+  CreateOrganizationResponse,
+  NewUseCase,
+} from "@/types";
 import { PlusIcon, Trash } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -209,7 +213,7 @@ const SummaryStep = ({
   onNext,
   values,
 }: {
-  onNext: (organization: z.infer<typeof Organization>) => void;
+  onNext: (result: z.infer<typeof CreateOrganizationResponse>) => void;
   onPrevious: () => void;
   values: TCreateOrganizationRequest;
 }) => {
@@ -221,8 +225,8 @@ const SummaryStep = ({
     <Step
       form={form}
       onNext={async (values) => {
-        const { organization } = await createOrganization(values);
-        onNext(organization);
+        const result = await createOrganization(values);
+        onNext(result);
       }}
       onPrevious={onPrevious}
       onStepChange={() => undefined}
@@ -343,10 +347,10 @@ const Wizard = () => {
 
   return (
     <SummaryStep
-      onNext={(organization) =>
-        router.push(`wizard/thankyou/${organization.id}`)
-      }
-      onPrevious={() => setStep("step3")}
+      onNext={(result) => {
+        router.push(`wizard/thankyou/${result.organization.id}`);
+      }}
+      onPrevious={() => setStep("step4")}
       values={fullState}
     />
   );
