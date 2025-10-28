@@ -1,5 +1,4 @@
-import { auth0, managementClient } from "@/lib/auth0";
-import db from "@/services/db";
+import { checkOrganizationAuthorization } from "@/lib/authorization";
 import { NextRequest, NextResponse } from "next/server";
 import { z, ZodError } from "zod";
 
@@ -16,42 +15,18 @@ export async function GET(
   { params }: { params: Promise<TGetOrganizationAccessRequest> }
 ) {
   try {
-    const session = await auth0.getSession(request);
-
-    if (!session) {
-      return NextResponse.json({ hasAccess: false }, { status: 401 });
-    }
-
     const { organizationId } = await params;
-    const dbOrganization = await db
-      .select("*")
-      .from("recycler.organizations")
-      .where("id", organizationId)
-      .first();
 
-    if (!dbOrganization) {
-      return NextResponse.json({ hasAccess: false }, { status: 404 });
-    }
-
-    if (!dbOrganization.auth0_id) {
-      console.error("Organization missing auth0_id:", organizationId);
-      return NextResponse.json(
-        { hasAccess: false, error: "Organization not properly configured" },
-        { status: 500 }
-      );
-    }
-
-    // Check if user is a member of the organization
-    const membersResponse = await managementClient.organizations.members.list(
-      dbOrganization.auth0_id
+    const authResult = await checkOrganizationAuthorization(
+      request,
+      organizationId
     );
 
-    const isMember = membersResponse.data.some(
-      (member) => member.user_id === session.user.sub
-    );
-
-    if (!isMember) {
-      return NextResponse.json({ hasAccess: false }, { status: 403 });
+    if (!authResult.authorized) {
+      // Return the error response with hasAccess: false
+      const response = authResult.response!;
+      const status = response.status;
+      return NextResponse.json({ hasAccess: false }, { status });
     }
 
     return NextResponse.json({ hasAccess: true });

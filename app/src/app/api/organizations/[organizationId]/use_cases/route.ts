@@ -2,9 +2,10 @@ import db from "@/services/db";
 import { UseCase } from "@/types";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
+import { checkOrganizationAuthorization } from "@/lib/authorization";
 
 export async function GET(
-  _: NextRequest,
+  request: NextRequest,
   { params }: { params: Promise<{ organizationId: string }> }
 ) {
   const organizationId = (await params).organizationId;
@@ -14,6 +15,16 @@ export async function GET(
       { error: "organisation_id is required" },
       { status: 400 }
     );
+  }
+
+  // Check authorization
+  const authResult = await checkOrganizationAuthorization(
+    request,
+    organizationId
+  );
+
+  if (!authResult.authorized) {
+    return authResult.response!;
   }
 
   const result = await db.raw(
