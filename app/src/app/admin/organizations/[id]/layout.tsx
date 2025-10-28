@@ -15,19 +15,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { getUseCases } from "@/services/api";
+import { checkOrganizationAccess, getUseCases } from "@/services/api";
 import { useQuery } from "@tanstack/react-query";
 import { MenuIcon } from "lucide-react";
 import Link from "next/link";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
+import { useEffect } from "react";
 
-const AdminLayout = ({
-  children,
-  params,
-}: {
-  children: React.ReactNode;
-  params: Promise<{ id: string }>;
-}) => {
+const Content = ({ children }: { children: React.ReactNode }) => {
   const { id } = useParams<{ id: string }>();
   const useCasesQuery = useQuery({
     queryKey: ["use_cases", id],
@@ -73,6 +68,49 @@ const AdminLayout = ({
       <main className="flex-1 flex flex-col bg-gray-100">{children}</main>
     </div>
   );
+};
+
+const AdminLayout = ({ children }: { children: React.ReactNode }) => {
+  const { id } = useParams<{ id: string }>();
+  const router = useRouter();
+
+  const accessQuery = useQuery({
+    queryKey: ["organization_access", id],
+    queryFn: () => checkOrganizationAccess(id),
+    retry: false,
+  });
+
+  useEffect(() => {
+    if (accessQuery.error) {
+      const error = accessQuery.error as any;
+      if (error.response?.status === 401) {
+        router.push("/api/auth/login");
+      } else if (error.response?.status === 403) {
+        router.push("/unauthorized");
+      } else {
+        // For 404, 500 and other errors, redirect to 404 page
+        router.push("/404");
+      }
+    }
+  }, [accessQuery.error, router]);
+
+  if (accessQuery.isLoading) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="text-lg">Loading...</div>
+      </div>
+    );
+  }
+
+  if (accessQuery.error || !accessQuery.data?.hasAccess) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="text-lg">Verifying access...</div>
+      </div>
+    );
+  }
+
+  return <Content>{children}</Content>;
 };
 
 export default AdminLayout;
