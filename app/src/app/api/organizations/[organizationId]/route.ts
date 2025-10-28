@@ -1,4 +1,5 @@
 import { auth0, managementClient } from "@/lib/auth0";
+import { checkOrganizationAuthorization } from "@/lib/authorization";
 import db from "@/services/db";
 import { NextRequest, NextResponse } from "next/server";
 import { z, ZodError } from "zod";
@@ -55,45 +56,26 @@ export async function PUT(
   { params }: { params: Promise<TGetOrganizationRequest> }
 ) {
   try {
-    const session = await auth0.getSession(request);
+    const { organizationId } = await params;
 
-    if (!session) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    // Check authorization
+    const authResult = await checkOrganizationAuthorization(
+      request,
+      organizationId
+    );
+
+    if (!authResult.authorized) {
+      return authResult.response!;
     }
 
-    const { organizationId } = await params;
     const body = await request.json();
 
-    const dbOrganization = await db("recycler.organizations")
-      .where("id", organizationId)
-      .first();
-
-    if (!dbOrganization) {
-      return NextResponse.json(
-        { error: "Organization not found" },
-        { status: 404 }
-      );
-    }
-
-    // Check if user is a member of the organization
-    const membersResponse = await managementClient.organizations.members.list(
-      dbOrganization.auth0_id
+    await managementClient.organizations.update(
+      authResult.organization!.auth0_id,
+      {
+        display_name: body.name,
+      }
     );
-
-    const isMember = membersResponse.data.some(
-      (member) => member.user_id === session.user.sub
-    );
-
-    if (!isMember) {
-      return NextResponse.json(
-        { error: "Forbidden: You are not a member of this organization" },
-        { status: 403 }
-      );
-    }
-
-    await managementClient.organizations.update(dbOrganization.auth0_id, {
-      display_name: body.name,
-    });
 
     const updatedDbOrg = await db("recycler.organizations")
       .where("id", organizationId)
