@@ -68,3 +68,10 @@ export const checkOrganizationAccess = (
   axios
     .get(`/api/organizations/${organizationId}/access`)
     .then((response) => response.data);
+
+export const getUserOrganizations = (): Promise<
+  Array<z.infer<typeof Organization>>
+> =>
+  axios
+    .get("/api/users/me/organizations")
+    .then((response) => response.data.map((org: any) => Organization.parse(org)));
