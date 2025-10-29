@@ -8,8 +8,11 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
+import { useQuery } from "@tanstack/react-query";
+import { getUserOrganizations } from "@/services/api";
 
 // Extracts initials: "Joe Doe" -> "JD", "joe@..." -> "J"
 function getInitials(name?: string | null, email?: string | null) {
@@ -22,6 +25,12 @@ function getInitials(name?: string | null, email?: string | null) {
 
 export default function Auth0Login() {
   const { user, isLoading } = useUser();
+  const organizationsQuery = useQuery({
+    queryKey: ["user_organizations"],
+    queryFn: getUserOrganizations,
+    enabled: !!user,
+  });
+
   if (isLoading) return <LoadingSpinner />;
 
   return (
@@ -54,6 +63,18 @@ export default function Auth0Login() {
               </span>
             </DropdownMenuTrigger>
             <DropdownMenuContent>
+              {organizationsQuery.data && organizationsQuery.data.length > 0 && (
+                <>
+                  {organizationsQuery.data.map((org) => (
+                    <DropdownMenuItem key={org.id} asChild>
+                      <Link href={`/admin/organizations/${org.id}`}>
+                        {org.name}
+                      </Link>
+                    </DropdownMenuItem>
+                  ))}
+                  <DropdownMenuSeparator />
+                </>
+              )}
               <DropdownMenuItem asChild>
                 <Link href="/user-settings">Asetukset</Link>
               </DropdownMenuItem>
