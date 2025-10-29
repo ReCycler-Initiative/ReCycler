@@ -40,14 +40,14 @@ export default function UserSettings() {
 
         {/* Organisation */}
         <section className="rounded-lg border border-gray-200 p-4 bg-white shadow-sm">
-          <h2 className="font-medium text-gray-800 mb-3">Organisaatio ja palvelu</h2>
+          <h2 className="font-medium text-gray-800 mb-3">Organisaatio ja palvelut</h2>
           <dl className="space-y-2">
             <div>
               <dt className="text-sm text-gray-500">Organisaatio</dt>
               <dd className="text-sm">{organization}</dd>
             </div>
             <div>
-              <dt className="text-sm text-gray-500">Palvelu</dt>
+              <dt className="text-sm text-gray-500">Palvelut</dt>
               <dd className="text-sm">{service}</dd>
             </div>
           </dl>
