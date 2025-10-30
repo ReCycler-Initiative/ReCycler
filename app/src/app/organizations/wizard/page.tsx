@@ -10,10 +10,10 @@ import {
   CreateOrganizationResponse,
   NewUseCase,
 } from "@/types";
-import { PlusIcon, Trash } from "lucide-react";
+
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { useFieldArray, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { z } from "zod";
 import Step from "./step";
 
@@ -122,100 +122,7 @@ const UseCase = ({
   );
 };
 
-type LocationFieldsFormState = {
-  fields: TCreateOrganizationRequest["fields"];
-};
 
-const LocationFieldsModel = ({
-  onNext,
-  onPrevious,
-  onStepChange,
-  values,
-}: {
-  onStepChange: (values: LocationFieldsFormState) => void;
-  onNext: () => void;
-  onPrevious: () => void;
-  values: TCreateOrganizationRequest["fields"];
-}) => {
-  const form = useForm<LocationFieldsFormState>({
-    defaultValues: {
-      fields: values,
-    },
-  });
-
-  const fieldsArray = useFieldArray({
-    control: form.control,
-    name: "fields",
-  });
-
-  return (
-    <Step
-      form={form}
-      onNext={onNext}
-      onPrevious={onPrevious}
-      onStepChange={onStepChange}
-      title="Kohteesta kerättävät tiedot"
-    >
-      <div className="flex flex-col gap-6">
-        {fieldsArray.fields.map((field, index) => (
-          <div key={field.id} className="flex flex-row gap-4 items-end">
-            <FormInput
-              className="flex-2"
-              label="Nimi"
-              name={`fields.${index}.name`}
-              rules={{ required: "Kenttä on pakollinen" }}
-              showLabel={index === 0}
-            />
-            <FormSelect
-              className="flex-1"
-              label="Kentän tyyppi"
-              items={["mutliselect", "text_input"].map((item) => ({
-                value: item,
-                label: item,
-              }))}
-              name={`fields.${index}.field_type`}
-              rules={{ required: "Tyyppi on pakollinen" }}
-              showLabel={index === 0}
-            />
-            <FormSelect
-              className="flex-1"
-              label="Sisällön tyyppi"
-              items={["string", "number", "boolean", "array"].map((item) => ({
-                value: item,
-                label: item,
-              }))}
-              name={`fields.${index}.data_type`}
-              rules={{ required: "Tyyppi on pakollinen" }}
-              showLabel={index === 0}
-            />
-            <Button
-              onClick={() => fieldsArray.remove(index)}
-              size="icon"
-              variant="destructive"
-            >
-              <span className="sr-only">Poista</span>
-              <Trash size="16" />
-            </Button>
-          </div>
-        ))}
-
-        <Button
-          className="w-fit"
-          onClick={() =>
-            fieldsArray.append({
-              name: "",
-              data_type: "string",
-              field_type: "text_input",
-              order: fieldsArray.fields.length,
-            })
-          }
-        >
-          Lisää kenttä <PlusIcon />
-        </Button>
-      </div>
-    </Step>
-  );
-};
 
 const SummaryStep = ({
   onPrevious,
@@ -257,26 +164,6 @@ const SummaryStep = ({
             <dd className="mb-4">{values.useCase.description}</dd>
           </dl>
         </div>
-        <div>
-          <h2 className="text-xl mb-4">Kohteesta kerättävät tiedot</h2>
-          <div className="grid grid-cols-3 grap-y-4 [&>div]:px-4 [&>div]:py-2">
-            <div className="grid grid-cols-subgrid col-span-3 bg-primary text-white">
-              <div>Nimi</div>
-              <div>Data tyyppi</div>
-              <div>Kentän tyyppi</div>
-            </div>
-            {values.fields.map((field) => (
-              <div
-                key={field.name}
-                className="grid grid-cols-subgrid col-span-3 even:bg-gray-100"
-              >
-                <div>{field.name}</div>
-                <div>{field.data_type}</div>
-                <div>{field.field_type}</div>
-              </div>
-            ))}
-          </div>
-        </div>
       </div>
     </Step>
   );
@@ -289,7 +176,6 @@ const Wizard = () => {
     organization: {
       name: "",
     },
-    fields: [],
     useCase: {
       name: "",
       description: "",
@@ -338,28 +224,12 @@ const Wizard = () => {
     );
   }
 
-  if (step === "step4") {
-    return (
-      <LocationFieldsModel
-        onNext={() => setStep("step5")}
-        onPrevious={() => setStep("step3")}
-        onStepChange={(values) => {
-          setFullState((prev) => ({
-            ...prev,
-            fields: values.fields,
-          }));
-        }}
-        values={fullState.fields}
-      />
-    );
-  }
-
   return (
     <SummaryStep
       onNext={(result) => {
         router.push(`wizard/thankyou/${result.organization.id}`);
       }}
-      onPrevious={() => setStep("step4")}
+      onPrevious={() => setStep("step3")}
       values={fullState}
     />
   );
