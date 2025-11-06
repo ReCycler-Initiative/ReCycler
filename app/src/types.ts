@@ -104,7 +104,6 @@ export const UseCase = NewUseCase.merge(
 export const CreateOrganizationRequest = z.object({
   organization: NewOrganization,
   useCase: NewUseCase,
-  fields: z.array(Field),
 });
 
 export const Organization = NewOrganization.merge(
@@ -117,5 +116,4 @@ export const Organization = NewOrganization.merge(
 export const CreateOrganizationResponse = z.object({
   organization: Organization,
   useCase: UseCase,
-  fields: z.array(Field),
 });

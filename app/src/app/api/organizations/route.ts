@@ -16,7 +16,7 @@ export const POST = withZodPost(
 
     const user = session.user;
 
-    const { organization, fields, useCase } = params;
+    const { organization, useCase } = params;
 
     const sanitizedOrgName = organization.name
       .toLowerCase()
@@ -54,20 +54,6 @@ export const POST = withZodPost(
           .into("recycler.use_cases")
           .returning("id");
 
-        const fieldRows = await Promise.all(
-          fields.map((field) =>
-            trx
-              .insert({
-                ...field,
-                use_case_id: useCaseRow.id,
-              })
-              .into("recycler.fields")
-              .returning("id")
-          )
-        );
-
-        const fieldIds = fieldRows.flat().map((row) => row.id);
-
         const response: z.infer<typeof CreateOrganizationResponse> = {
           organization: {
             ...organization,
@@ -78,10 +64,6 @@ export const POST = withZodPost(
             ...useCase,
             id: useCaseRow.id,
           },
-          fields: fields.map((field, index) => ({
-            ...field,
-            id: fieldIds[index],
-          })),
         };
 
         return response;
