@@ -19,7 +19,8 @@ const TitleBar = ({
       {/* Logo + optional children */}
       <div className="flex items-center gap-2 flex-1">
         <Link className="pb-2" href={toHomeHref}>
-          <Image src={logo} alt="Recycler logo" width={150} />
+         {/* logo */}
+    {/* <Image src={logo} alt="Recycler logo" width={150} /> */}
         </Link>
         {children}
       </div>
