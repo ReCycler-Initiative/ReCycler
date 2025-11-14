@@ -17,7 +17,7 @@ const HomePage = () => {
          */}
       <Container className="flex-1 max-w-4xl">
         <h1 className="text-2xl font-medium mb-4 font-sans">
-          Tervetuloa Recycleriin
+          Tervetuloa ReCycleriin
         </h1>
         <p className="mb-12 font-sans">
           Tervetuloa ReCycler-sovellukseen! ReCycler auttaa sinua löytämään
@@ -31,7 +31,7 @@ const HomePage = () => {
             <Link href="/recycler/materials">Lähde kierrättämään</Link>
           </Button>
           <Button className="w-full max-w-96" asChild variant="secondary">
-            <Link href="/recycler/results">
+            <Link className="no-underline" href="/recycler/results">
               Näytä lähimmät kierrätyspisteet
             </Link>
           </Button>
