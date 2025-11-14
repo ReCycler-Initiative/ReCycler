@@ -16,16 +16,11 @@ const TitleBar = ({
 }) => {
   return (
     <header className="pl-1 pr-3 border-b border-gray-400 sticky top-0 bg-white shadow-md z-50 flex items-center justify-between">
-      {/* Logo + optional children */}
       <div className="flex items-center gap-2 flex-1">
         <Link className="pb-2" href={toHomeHref}>
-         {/* logo */}
-    {/* <Image src={logo} alt="Recycler logo" width={150} /> */}
         </Link>
         {children}
       </div>
-
-      {/* left-upper corner: login */}
       <Auth0Login />
     </header>
   );
