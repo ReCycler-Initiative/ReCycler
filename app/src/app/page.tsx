@@ -7,7 +7,6 @@ const HomePage = () => {
       {/* Instruction text above the login button */}
       <p className="mb-6 font-sans text-center">
       </p>
-
       {/* Center the login button and ensure it uses the same font as the rest of the app */}
       <div className="flex justify-center">
         <div className="font-sans">
