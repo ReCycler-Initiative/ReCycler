@@ -2,6 +2,7 @@
 // Mocking up the setting page, values are static or fetched from auth0
 import { useUser } from "@auth0/nextjs-auth0";
 import Container from "./container";
+import Link from 'next/link';
 
 export default function UserSettings() {
   const { user, isLoading } = useUser();
@@ -10,9 +11,9 @@ export default function UserSettings() {
   if (!user) return <Container><p>Kirjaudu sisään nähdäksesi asetuksesi.</p></Container>;
 
   // static data, will be later stored in the backend / db
-  const organization = "Example Ltd.";
-  const service = "Example-service";
-  const role = "Org-Admin-example";
+  const organization = "ReCycler Ltd.";
+  const service = "Recycler";
+  const role = "Admin";
 
   return (
     <Container>
@@ -48,7 +49,7 @@ export default function UserSettings() {
             </div>
             <div>
               <dt className="text-sm text-gray-500">Palvelut</dt>
-              <dd className="text-sm">{service}</dd>
+              <dd className="text-sm underline"><Link href="/recycler">{service}</Link></dd>
             </div>
           </dl>
         </section>
