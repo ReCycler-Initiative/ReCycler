@@ -13,6 +13,7 @@ import {
 } from "./ui/dropdown-menu";
 import { useQuery } from "@tanstack/react-query";
 import { getUserOrganizations } from "@/services/api";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 // Extracts initials: "Joe Doe" -> "JD", "joe@..." -> "J"
 function getInitials(name?: string | null, email?: string | null) {
@@ -31,13 +32,20 @@ export default function Auth0Login() {
     enabled: !!user,
   });
 
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  // Rebuild full path with query params
+  const currentUrl =
+    pathname + (searchParams.toString() ? `?${searchParams.toString()}` : "");
+
   if (isLoading) return <LoadingSpinner />;
 
   return (
-    <div>
+    <div>  
       {!user ? (
         <Button asChild>
-          <a href="/auth/login">Kirjaudu sisään</a>
+          <a href={`/auth/login?returnTo=${encodeURIComponent(currentUrl)}`}>Kirjaudu sisään</a>
         </Button>
       ) : (
         <div className="flex items-center gap-1">
