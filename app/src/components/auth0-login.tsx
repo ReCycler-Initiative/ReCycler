@@ -42,7 +42,7 @@ export default function Auth0Login() {
   if (isLoading) return <LoadingSpinner />;
 
   return (
-    <div>  
+    <div>
       {!user ? (
         <Button asChild>
           <a href={`/auth/login?returnTo=${encodeURIComponent(currentUrl)}`}>Kirjaudu sisään</a>
