@@ -26,7 +26,11 @@ const OrganizationLayout = ({ children }: { children: React.ReactNode }) => {
 
   return (
     <>
-      <TitleBar logo={<Image className="pb-2" src={logo} alt="Recycler logo" width={150} />}>
+      <TitleBar
+        logo={
+          <Image className="pb-2" src={logo} alt="Recycler logo" width={150} />
+        }
+      >
         {/* Contextual actions on the right side */}
         <div className="flex items-center ml-auto">
           {mapReady && (

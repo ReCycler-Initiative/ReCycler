@@ -31,7 +31,10 @@ const Content = ({ children }: { children: React.ReactNode }) => {
 
   return (
     <div className="flex flex-col h-full">
-      <TitleBar toHomeHref={`/admin/organizations/${id}`}>
+      <TitleBar
+        logo={<p className="ml-2 font-bold">Organisaatio</p>}
+        toHomeHref={`/admin/organizations/${id}`}
+      >
         <div className="flex flex-1">
           <nav className="[&>a]:inline-block [&>a]:py-3 [&>a]:px-4 ml-4">
             <Link href={`/admin/organizations/${id}/locations`}>Locations</Link>
