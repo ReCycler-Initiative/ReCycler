@@ -1,7 +1,6 @@
 import Layout from "@/app/organizations/layout";
 import Script from "next/script";
 import { ReactNode } from "react";
-import type { Metadata } from "next";
 
 export async function generateMetadata() {
   return {

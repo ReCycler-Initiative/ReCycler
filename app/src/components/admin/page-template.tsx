@@ -4,7 +4,7 @@ export const PageTemplate = ({
   children,
   title,
 }: {
-  children: React.ReactNode;
+  children?: React.ReactNode;
   title: string;
 }) => (
   <Container className="flex flex-col gap-4 py-6 px-4">

@@ -2,7 +2,9 @@
 
 import TitleBar from "@/components/title-bar";
 import { Button } from "@/components/ui/button";
+import Image from "next/image";
 import { useEffect, useState } from "react";
+import logo from "../recycler-logo.png";
 
 const OrganizationLayout = ({ children }: { children: React.ReactNode }) => {
   const [mapReady, setMapReady] = useState(false);
@@ -24,14 +26,14 @@ const OrganizationLayout = ({ children }: { children: React.ReactNode }) => {
 
   return (
     <>
-      <TitleBar>
+      <TitleBar logo={<Image className="pb-2" src={logo} alt="Recycler logo" width={150} />}>
         {/* Contextual actions on the right side */}
         <div className="flex items-center ml-auto">
           {mapReady && (
             <Button
               variant="outline"
               onClick={openOnboarding}
-              className="h-10 px-4 mr-2"  // ← 2 px väli (vaihda tarvittaessa mr-1 = 4 px)
+              className="h-10 px-4 mr-2" // ← 2 px väli (vaihda tarvittaessa mr-1 = 4 px)
               aria-label="Open onboarding"
             >
               Ohjeet
