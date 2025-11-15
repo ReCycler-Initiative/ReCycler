@@ -1,11 +1,11 @@
 "use client";
-import TitleBarStartpage from "@/components/title-bar-startpage";
+import TitleBarService from "@/components/title-bar-service";
 import UserSettings from "@/components/user-settings";
 
 export default function Page() {
   return (
     <>
-      <TitleBarStartpage />
+      <TitleBarService />
       <main>
         <UserSettings />
       </main>
