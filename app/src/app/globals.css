@@ -1,4 +1,4 @@
-@import 'tailwindcss';
+@import "tailwindcss";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -51,6 +51,15 @@
     }
     to {
       height: 0;
+    }
+  }
+
+  @keyframes fadeInOnce {
+    0% {
+      opacity: 0;
+    }
+    100% {
+      opacity: 1;
     }
   }
 }
@@ -154,5 +163,9 @@
   }
   body {
     @apply bg-background text-foreground;
+  }
+
+  .fade-in-once {
+    animation: fadeInOnce 800ms ease-out forwards;
   }
 }
