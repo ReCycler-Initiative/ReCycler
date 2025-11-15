@@ -43,7 +43,7 @@ export default function Auth0Login() {
 
   return (
     <div className="relative">
-      <div>
+      <div className={cn("transition-opacity duration-700", { "opacity-0": !isLoading })}>
         <div className="h-12 w-12 rounded-full flex items-center justify-center bg-black/5 animate-pulse">
           <LoadingSpinner />
         </div>
@@ -54,7 +54,7 @@ export default function Auth0Login() {
             {!user ? (
               <Button
                 asChild
-                className="h-12 w-12 rounded-full fade-in-once [animation-delay:500ms] opacity-0"
+                className="h-12 w-12 rounded-full fade-in-once opacity-0"
                 size="icon"
               >
                 <a
@@ -65,7 +65,7 @@ export default function Auth0Login() {
                 </a>
               </Button>
             ) : (
-              <div className="flex items-center gap-1 fade-in-once [animation-delay:700ms] opacity-0">
+              <div className="flex items-center gap-1 fade-in-once opacity-0">
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <span
