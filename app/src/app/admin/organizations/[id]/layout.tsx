@@ -15,7 +15,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { checkOrganizationAccess, getUseCases } from "@/services/api";
+import {
+  checkOrganizationAccess,
+  getOrganizationById,
+  getUseCases,
+} from "@/services/api";
 import { useQuery } from "@tanstack/react-query";
 import { MenuIcon } from "lucide-react";
 import Link from "next/link";
@@ -24,6 +28,12 @@ import { useEffect } from "react";
 
 const Content = ({ children }: { children: React.ReactNode }) => {
   const { id } = useParams<{ id: string }>();
+
+  const organizationQuery = useQuery({
+    queryKey: ["organization", id],
+    queryFn: () => getOrganizationById(id),
+  });
+
   const useCasesQuery = useQuery({
     queryKey: ["use_cases", id],
     queryFn: () => getUseCases(id),
@@ -32,7 +42,7 @@ const Content = ({ children }: { children: React.ReactNode }) => {
   return (
     <div className="flex flex-col h-full">
       <TitleBar
-        logo={<p className="ml-2 font-bold">Organisaatio</p>}
+        logo={<p className="ml-2 font-bold">{organizationQuery.data?.name}</p>}
         toHomeHref={`/admin/organizations/${id}`}
       >
         <div className="flex flex-1">
