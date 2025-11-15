@@ -43,7 +43,7 @@ export default function Auth0Login() {
 
   return (
     <div className="relative">
-      <div className={cn("transition-opacity duration-700", { "opacity-0": !isLoading })}>
+      <div>
         <div className="h-12 w-12 rounded-full flex items-center justify-center bg-black/5 animate-pulse">
           <LoadingSpinner />
         </div>
