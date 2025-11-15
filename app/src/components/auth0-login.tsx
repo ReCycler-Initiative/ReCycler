@@ -15,6 +15,7 @@ import { useQuery } from "@tanstack/react-query";
 import { getUserOrganizations } from "@/services/api";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { LogInIcon } from "lucide-react";
+import { cn } from "@/utils/shadcn";
 
 // Extracts initials: "Joe Doe" -> "JD", "joe@..." -> "J"
 function getInitials(name?: string | null, email?: string | null) {
@@ -42,8 +43,10 @@ export default function Auth0Login() {
 
   return (
     <div className="relative">
-      <div className="h-12 w-12 rounded-full flex items-center justify-center bg-black/5 animate-pulse">
-        <LoadingSpinner />
+      <div className={cn("transition-opacity duration-700", { "opacity-0": !isLoading })}>
+        <div className="h-12 w-12 rounded-full flex items-center justify-center bg-black/5 animate-pulse">
+          <LoadingSpinner />
+        </div>
       </div>
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
         {!isLoading && (
@@ -51,7 +54,7 @@ export default function Auth0Login() {
             {!user ? (
               <Button
                 asChild
-                className="h-12 w-12 rounded-full fade-in-once"
+                className="h-12 w-12 rounded-full fade-in-once [animation-delay:500ms] opacity-0"
                 size="icon"
               >
                 <a
@@ -62,7 +65,7 @@ export default function Auth0Login() {
                 </a>
               </Button>
             ) : (
-              <div className="flex items-center gap-1 fade-in-once">
+              <div className="flex items-center gap-1 fade-in-once [animation-delay:700ms] opacity-0">
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <span
