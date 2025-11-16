@@ -36,6 +36,8 @@ import Map, {
   useMap,
 } from "react-map-gl";
 import OnboardingHint from "@/components/ui/onboarding-hint";
+import PopupEditText from "@/components/map/popup-edit-text";
+import { useUser } from "@auth0/nextjs-auth0";
 
 // Custom icon loader for collection points
 const CollectionPointIcon = () => {
@@ -180,6 +182,7 @@ const filterFeaturesBySelectedMaterials = (
 };
 
 export default function Result() {
+  const { user } = useUser();
   const [mapLoaded, setMapLoaded] = useState(false);
   const [styleLoaded, setStyleLoaded] = useState(true);
   const [geojson, setGeojson] =
@@ -412,6 +415,11 @@ export default function Result() {
                           </li>
                         ))}
                   </ul>
+                  {user && (
+                    <div className="p-3 border-t">
+                      <PopupEditText />
+                    </div>
+                  )}
                   <div className="text-center border-t">
                     <Button
                       className="text-[#ff1312] text-sm w-full"
