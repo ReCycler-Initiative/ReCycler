@@ -3,7 +3,7 @@
 import { useUser } from "@auth0/nextjs-auth0";
 import Container from "./container";
 import Link from 'next/link';
-import MaterialsList from "@/components/material-list";
+import MaterialsList from "./materials-list";
 
 export default function UserSettings() {
   const { user, isLoading } = useUser();
