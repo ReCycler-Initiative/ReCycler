@@ -3,8 +3,6 @@
 import { useUser } from "@auth0/nextjs-auth0";
 import Container from "./container";
 import Link from 'next/link';
-import MaterialsList from "./materials-list";
-
 export default function UserSettings() {
   const { user, isLoading } = useUser();
 
@@ -54,13 +52,6 @@ export default function UserSettings() {
             </div>
           </dl>
         </section>
-
-        {/* Materials list */}
-        <section className="rounded-lg border border-gray-200 p-4 bg-white shadow-sm">
-          <h2 className="font-medium text-gray-800 mb-3">Materiaalit</h2>
-          <MaterialsList title="Kaikki materiaalit" />
-        </section>
-
         <p className="text-xs text-gray-400">
           Käyttäjätiedot haetaan Auth0:sta. Tämä sovellus ei tallenna henkilötietoja.
         </p>
