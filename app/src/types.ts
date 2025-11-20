@@ -98,6 +98,8 @@ export const NewUseCase = z.object({
 export const UseCase = NewUseCase.merge(
   z.object({
     id: z.string().uuid(),
+    created_at: z.string().datetime().optional(),
+    updated_at: z.string().datetime().optional(),
   })
 );
 
