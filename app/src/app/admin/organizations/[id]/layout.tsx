@@ -74,6 +74,15 @@ const Content = ({ children }: { children: React.ReactNode }) => {
                   Organization Info
                 </Link>
               </DropdownMenuItem>
+              {selectedUseCaseId && selectedUseCaseId !== "new" && (
+                <DropdownMenuItem asChild>
+                  <Link
+                    href={`/admin/organizations/${id}/use_cases/${selectedUseCaseId}`}
+                  >
+                    Use Case Info
+                  </Link>
+                </DropdownMenuItem>
+              )}
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
