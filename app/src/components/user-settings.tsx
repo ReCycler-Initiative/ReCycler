@@ -1,53 +1,10 @@
 // components/user-settings.tsx
 "use client";
 
+import { getUserOrganizations } from "@/services/api";
 import { useUser } from "@auth0/nextjs-auth0";
 import { useQuery } from "@tanstack/react-query";
-import { getUserOrganizations, getUseCases } from "@/services/api";
-import { Organization, UseCase } from "@/types";
 import Container from "./container";
-import LoadingSpinner from "./loading-spinner";
-import Link from "next/link";
-import { z } from "zod";
-
-function OrganizationCard({ org }: { org: z.infer<typeof Organization> }) {
-  const useCasesQuery = useQuery({
-    queryKey: ["use_cases", org.id],
-    queryFn: () => getUseCases(org.id),
-  });
-
-  return (
-    <div className="rounded-lg border border-gray-200 p-4 bg-white shadow-sm">
-      <h3 className="font-medium text-gray-800 mb-3">{org.name}</h3>
-      <div>
-        <p className="text-sm text-gray-500 mb-2">Palvelut:</p>
-        {useCasesQuery.isLoading ? (
-          <div className="flex items-center gap-2 text-sm text-gray-500">
-            <LoadingSpinner />
-            <span>Ladataan palveluita...</span>
-          </div>
-        ) : useCasesQuery.error ? (
-          <p className="text-sm text-red-600">Virhe palveluiden lataamisessa</p>
-        ) : useCasesQuery.data && useCasesQuery.data.length > 0 ? (
-          <ul className="space-y-1">
-            {useCasesQuery.data.map((useCase: z.infer<typeof UseCase>) => (
-              <li key={useCase.id}>
-                <Link
-                  href={``}
-                  className="text-sm text-blue-600 hover:underline"
-                >
-                  {useCase.name}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p className="text-sm text-gray-500">Ei palveluita</p>
-        )}
-      </div>
-    </div>
-  );
-}
 
 export default function UserSettings() {
   const { user, isLoading } = useUser();
@@ -128,7 +85,6 @@ export default function UserSettings() {
             </div>
           )}
         </section>
-
         <p className="text-xs text-gray-400">
           Käyttäjätiedot haetaan Auth0:sta. Tämä sovellus ei tallenna
           henkilötietoja.
