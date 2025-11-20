@@ -24,10 +24,13 @@ import { useQuery } from "@tanstack/react-query";
 import { SettingsIcon } from "lucide-react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { use, useEffect, useState } from "react";
 
 const Content = ({ children }: { children: React.ReactNode }) => {
   const { id } = useParams<{ id: string }>();
+  const [selectedUseCaseId, setSelectedUseCaseId] = useState<
+    string | undefined
+  >();
 
   const organizationQuery = useQuery({
     queryKey: ["organization", id],
@@ -38,6 +41,12 @@ const Content = ({ children }: { children: React.ReactNode }) => {
     queryKey: ["use_cases", id],
     queryFn: () => getUseCases(id),
   });
+
+  useEffect(() => {
+    if (useCasesQuery.data && useCasesQuery.data.length > 0) {
+      setSelectedUseCaseId(useCasesQuery.data[0].id);
+    }
+  }, [useCasesQuery.data]);
 
   return (
     <div className="flex flex-col h-full">
@@ -51,7 +60,11 @@ const Content = ({ children }: { children: React.ReactNode }) => {
           </nav>
           <div className="flex items-center ml-auto mr-2">
             <Label className="mr-4">Use case</Label>
-            <Select value={useCasesQuery.data?.[0]?.id}>
+            <Select
+              defaultValue={useCasesQuery.data?.[0]?.id}
+              value={selectedUseCaseId}
+              onValueChange={setSelectedUseCaseId}
+            >
               <SelectTrigger className="w-[180px]">
                 <SelectValue />
               </SelectTrigger>
@@ -74,7 +87,7 @@ const Content = ({ children }: { children: React.ReactNode }) => {
                   Organization Info
                 </Link>
               </DropdownMenuItem>
-              {selectedUseCaseId && selectedUseCaseId !== "new" && (
+              {selectedUseCaseId && (
                 <DropdownMenuItem asChild>
                   <Link
                     href={`/admin/organizations/${id}/use_cases/${selectedUseCaseId}`}
