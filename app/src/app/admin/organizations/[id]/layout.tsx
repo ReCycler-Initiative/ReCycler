@@ -24,7 +24,7 @@ import { useQuery } from "@tanstack/react-query";
 import { SettingsIcon } from "lucide-react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
-import { use, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 const Content = ({ children }: { children: React.ReactNode }) => {
   const { id } = useParams<{ id: string }>();
