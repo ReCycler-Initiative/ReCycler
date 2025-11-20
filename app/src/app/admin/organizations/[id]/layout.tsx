@@ -21,7 +21,7 @@ import {
   getUseCases,
 } from "@/services/api";
 import { useQuery } from "@tanstack/react-query";
-import { MenuIcon } from "lucide-react";
+import { SettingsIcon } from "lucide-react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect } from "react";
@@ -66,7 +66,7 @@ const Content = ({ children }: { children: React.ReactNode }) => {
           </div>
           <DropdownMenu>
             <DropdownMenuTrigger className="mr-1 px-3">
-              <MenuIcon />
+              <SettingsIcon />
             </DropdownMenuTrigger>
             <DropdownMenuContent>
               <DropdownMenuItem asChild>
