@@ -91,8 +91,8 @@ export const NewOrganization = z.object({
 });
 
 export const NewUseCase = z.object({
-  description: z.string(),
-  name: z.string(),
+  description: z.string().max(2000),
+  name: z.string().max(255),
 });
 
 export const UseCase = NewUseCase.merge(
