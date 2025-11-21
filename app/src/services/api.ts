@@ -48,6 +48,25 @@ export const getUseCases = (
     .get(`/api/organizations/${organizationId}/use_cases`)
     .then((response) => response.data);
 
+export const getUseCaseById = (
+  organizationId: string,
+  useCaseId: string
+): Promise<z.infer<typeof UseCase>> =>
+  axios
+    .get(`/api/organizations/${organizationId}/use_cases/${useCaseId}`)
+    .then((response) => UseCase.parse(response.data));
+
+export const updateUseCase = (
+  organizationId: string,
+  useCase: z.infer<typeof UseCase>
+): Promise<z.infer<typeof UseCase>> =>
+  axios
+    .put(
+      `/api/organizations/${organizationId}/use_cases/${useCase.id}`,
+      useCase
+    )
+    .then((response) => UseCase.parse(response.data));
+
 export const getOrganizationById = (
   id: string
 ): Promise<z.infer<typeof Organization>> =>

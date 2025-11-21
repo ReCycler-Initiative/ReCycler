@@ -1,17 +1,77 @@
 // components/user-settings.tsx
-// Mocking up the setting page, values are static or fetched from auth0
+"use client";
+
+import { getUseCases, getUserOrganizations } from "@/services/api";
+import { Organization, UseCase } from "@/types";
 import { useUser } from "@auth0/nextjs-auth0";
+import { useQuery } from "@tanstack/react-query";
+import Link from "next/link";
+import { z } from "zod";
 import Container from "./container";
-import Link from 'next/link';
+import LoadingSpinner from "./loading-spinner";
+
+function OrganizationCard({ org }: { org: z.infer<typeof Organization> }) {
+  const useCasesQuery = useQuery({
+    queryKey: ["use_cases", org.id],
+    queryFn: () => getUseCases(org.id),
+  });
+
+  return (
+    <div className="rounded-lg border border-gray-200 p-4 bg-white shadow-sm">
+      <h3 className="font-medium text-gray-800 mb-3">{org.name}</h3>
+      <div>
+        <p className="text-sm text-gray-500 mb-2">Palvelut:</p>
+        {useCasesQuery.isLoading ? (
+          <div className="flex items-center gap-2 text-sm text-gray-500">
+            <LoadingSpinner />
+            <span>Ladataan palveluita...</span>
+          </div>
+        ) : useCasesQuery.error ? (
+          <p className="text-sm text-red-600">Virhe palveluiden lataamisessa</p>
+        ) : useCasesQuery.data && useCasesQuery.data.length > 0 ? (
+          <ul className="space-y-1">
+            {useCasesQuery.data.map((useCase: z.infer<typeof UseCase>) => (
+              <li key={useCase.id}>
+                <Link
+                  href={``}
+                  className="text-sm text-blue-600 hover:underline"
+                >
+                  {useCase.name}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="text-sm text-gray-500">Ei palveluita</p>
+        )}
+      </div>
+    </div>
+  );
+}
+
 export default function UserSettings() {
   const { user, isLoading } = useUser();
 
-  if (isLoading) return <Container><p>Ladataan käyttäjätietoja...</p></Container>;
-  if (!user) return <Container><p>Kirjaudu sisään nähdäksesi asetuksesi.</p></Container>;
+  const organizationsQuery = useQuery({
+    queryKey: ["user_organizations"],
+    queryFn: getUserOrganizations,
+    enabled: !!user,
+  });
+
+  if (isLoading)
+    return (
+      <Container>
+        <p>Ladataan käyttäjätietoja...</p>
+      </Container>
+    );
+  if (!user)
+    return (
+      <Container>
+        <p>Kirjaudu sisään nähdäksesi asetuksesi.</p>
+      </Container>
+    );
 
   // static data, will be later stored in the backend / db
-  const organization = "ReCycler Ltd.";
-  const service = "Recycler";
   const role = "Admin";
 
   return (
@@ -38,22 +98,39 @@ export default function UserSettings() {
           </dl>
         </section>
 
-        {/* Organisation */}
-        <section className="rounded-lg border border-gray-200 p-4 bg-white shadow-sm">
-          <h2 className="font-medium text-gray-800 mb-3">Organisaatio ja palvelut</h2>
-          <dl className="space-y-2">
-            <div>
-              <dt className="text-sm text-gray-500">Organisaatio</dt>
-              <dd className="text-sm">{organization}</dd>
+        {/* Organisations and Services */}
+        <section>
+          <h2 className="font-medium text-gray-800 mb-3 text-lg">
+            Organisaatiot ja palvelut
+          </h2>
+          {organizationsQuery.isLoading ? (
+            <div className="rounded-lg border border-gray-200 p-4 bg-white shadow-sm flex items-center gap-2 text-sm text-gray-500">
+              <LoadingSpinner />
+              <span>Ladataan organisaatioita...</span>
             </div>
-            <div>
-              <dt className="text-sm text-gray-500">Palvelut</dt>
-              <dd className="text-sm underline"><Link href="/recycler">{service}</Link></dd>
+          ) : organizationsQuery.error ? (
+            <div className="rounded-lg border border-gray-200 p-4 bg-white shadow-sm">
+              <p className="text-sm text-red-600">
+                Virhe organisaatioiden lataamisessa
+              </p>
             </div>
-          </dl>
+          ) : organizationsQuery.data && organizationsQuery.data.length > 0 ? (
+            <div className="space-y-4">
+              {organizationsQuery.data.map((org) => (
+                <OrganizationCard key={org.id} org={org} />
+              ))}
+            </div>
+          ) : (
+            <div className="rounded-lg border border-gray-200 p-4 bg-white shadow-sm">
+              <p className="text-sm text-gray-500">
+                Et kuulu yhteenkään organisaatioon
+              </p>
+            </div>
+          )}
         </section>
         <p className="text-xs text-gray-400">
-          Käyttäjätiedot haetaan Auth0:sta. Tämä sovellus ei tallenna henkilötietoja.
+          Käyttäjätiedot haetaan Auth0:sta. Tämä sovellus ei tallenna
+          henkilötietoja.
         </p>
       </div>
     </Container>
