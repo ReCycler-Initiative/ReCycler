@@ -1,3 +1,6 @@
+"use client";
+
+import { useState } from "react";
 import db from "@/services/db";
 
 export type Material = {
@@ -8,7 +11,7 @@ export type Material = {
 };
 
 interface Props {
-  page?: number; // 1 or 2 when >30 materials
+  page?: number;
   title?: string;
 }
 
@@ -31,14 +34,59 @@ export default async function MaterialsList({ page = 1, title }: Props) {
 
   const current = pages[Math.max(0, Math.min(pageCount - 1, page - 1))] || pages[0];
 
+  // 👇 Tästä alkaa mockup-editoinnin logiikka
+  return <EditableMaterialsList initialMaterials={current} title={title} page={page} total={materials.length} pageCount={pageCount} />;
+}
+
+function EditableMaterialsList({
+  initialMaterials,
+  title,
+  page,
+  total,
+  pageCount,
+}: {
+  initialMaterials: Material[];
+  title?: string;
+  page: number;
+  total: number;
+  pageCount: number;
+}) {
+  const [materials, setMaterials] = useState(initialMaterials);
+  const [editing, setEditing] = useState(false);
+
+  const handleChange = (index: number, newName: string) => {
+    const updated = [...materials];
+    updated[index].name = newName;
+    setMaterials(updated);
+  };
+
   return (
     <div>
       {title && <h3 className="text-lg font-medium mb-2">{title}</h3>}
 
+      <div className="flex items-center justify-between mb-2">
+        <button
+          onClick={() => setEditing(!editing)}
+          className="text-sm px-3 py-1 border rounded hover:bg-gray-50"
+        >
+          {editing ? "Lopeta muokkaus" : "Muokkaa listaa"}
+        </button>
+        {editing && <span className="text-xs text-gray-500">Mockup-editointi – ei tallenna tietokantaan</span>}
+      </div>
+
       <ul className="list-disc ml-5 columns-1 md:columns-2 text-sm">
-        {current.map((m) => (
-          <li key={m.code || m.id} className="break-inside-avoid">
-            {m.name}
+        {materials.map((m, i) => (
+          <li key={m.code || m.id} className="break-inside-avoid mb-1">
+            {editing ? (
+              <input
+                type="text"
+                value={m.name}
+                onChange={(e) => handleChange(i, e.target.value)}
+                className="border rounded px-1 py-0.5 w-full"
+              />
+            ) : (
+              m.name
+            )}
           </li>
         ))}
       </ul>
@@ -57,7 +105,9 @@ export default async function MaterialsList({ page = 1, title }: Props) {
           >
             2
           </a>
-          <div className="text-xs text-gray-500 ml-2">Näytetään {current.length} / {materials.length}</div>
+          <div className="text-xs text-gray-500 ml-2">
+            Näytetään {materials.length} / {total}
+          </div>
         </div>
       )}
     </div>
