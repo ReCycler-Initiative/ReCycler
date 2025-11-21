@@ -14,6 +14,7 @@ type UseEditorProps<ApiData, FormData> = {
   mutationFn: (data: ApiData) => Promise<ApiData>;
   toFormState: (data: ApiData) => FormData;
   toApiData: (data: FormData) => ApiData;
+  onSuccess: () => void;
 };
 
 type UseEditorReturn<ApiData, FormData extends FieldValues> = {
@@ -29,6 +30,7 @@ export const useEditor = <ApiData, FormData extends FieldValues>({
   mutationFn,
   toApiData,
   toFormState,
+  onSuccess,
 }: UseEditorProps<ApiData, FormData>): UseEditorReturn<ApiData, FormData> => {
   const queryClient = useQueryClient();
 
@@ -43,6 +45,10 @@ export const useEditor = <ApiData, FormData extends FieldValues>({
       toast.success("Save successful");
       form.reset(toFormState(data));
       queryClient.setQueryData(queryKey, data);
+
+      if (onSuccess) {
+        onSuccess();
+      }
     },
     onError: () => {
       toast.error("Save failed");
