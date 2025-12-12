@@ -124,7 +124,7 @@ export const Connector = z.object({
   id: z.string().uuid(),
   name: z.string(),
   url: z.string(),
-  organization_id: z.string().uuid(),
+  use_case_id: z.string().uuid(),
   created_at: z.coerce.date().optional(),
   updated_at: z.coerce.date().optional(),
 });
