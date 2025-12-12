@@ -56,6 +56,7 @@ const Content = ({ children }: { children: React.ReactNode }) => {
       >
         <div className="flex flex-1">
           <nav className="[&>a]:inline-block [&>a]:py-3 [&>a]:px-4 ml-4">
+            <Link href={`/admin/organizations/${id}/datasources`}>Data Sources</Link>
             <Link href={`/admin/organizations/${id}/locations`}>Locations</Link>
           </nav>
           <div className="flex items-center ml-auto mr-2">
