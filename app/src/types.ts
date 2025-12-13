@@ -130,3 +130,8 @@ export const Datasource = z.object({
 });
 
 export type Datasource = z.infer<typeof Datasource>;
+
+export const DatasourcePingStatus = z.object({
+  status: z.number(),
+  statusText: z.string(),
+});
