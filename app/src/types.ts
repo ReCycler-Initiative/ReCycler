@@ -120,7 +120,7 @@ export const CreateOrganizationResponse = z.object({
   useCase: UseCase,
 });
 
-export const Connector = z.object({
+export const Datasource = z.object({
   id: z.string().uuid(),
   name: z.string(),
   url: z.string(),
@@ -129,4 +129,4 @@ export const Connector = z.object({
   updated_at: z.coerce.date().optional(),
 });
 
-export type Connector = z.infer<typeof Connector>;
+export type Datasource = z.infer<typeof Datasource>;
