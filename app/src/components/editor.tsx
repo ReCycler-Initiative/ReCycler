@@ -75,7 +75,7 @@ export const EditorTemplate = <ApiData, FormData extends FieldValues>({
         onSubmit={form.handleSubmit((values) => mutation.mutateAsync(values))}
         className="space-y-4"
       >
-        <PageTemplate title="Organization Information">
+        <PageTemplate title="Organisaation tiedot2">
           <LoadingState isLoading={query.isLoading} error={!!query.error}>
             {children}
             <hr />
