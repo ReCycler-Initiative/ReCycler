@@ -2,9 +2,9 @@ import { PageTemplate } from "@/components/admin/page-template";
 
 const GeneralInfoPage = () => {
   return (
-    <PageTemplate title="Locations">
+    <PageTemplate title="Sijainnit">
       <p className="text-gray-600">
-        This page contains info about locations of the organization.
+        Tällä sivulla on käyttötapauksen sijannit tietoineen
       </p>
     </PageTemplate>
   );

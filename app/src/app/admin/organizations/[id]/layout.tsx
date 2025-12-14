@@ -56,11 +56,11 @@ const Content = ({ children }: { children: React.ReactNode }) => {
       >
         <div className="flex flex-1">
           <nav className="[&>a]:inline-block [&>a]:py-3 [&>a]:px-4 ml-4">
-            <Link href={`/admin/organizations/${id}/datasources`}>Data sources</Link>
-            <Link href={`/admin/organizations/${id}/locations`}>Locations</Link>
+            <Link href={`/admin/organizations/${id}/datasources`}>Datalähteet</Link>
+            <Link href={`/admin/organizations/${id}/locations`}>Sijainnit</Link>
           </nav>
           <div className="flex items-center ml-auto mr-2">
-            <Label className="mr-4">Use case</Label>
+            <Label className="mr-4">Käyttötapaus</Label>
             <Select
               defaultValue={useCasesQuery.data?.[0]?.id}
               value={selectedUseCaseId}
@@ -85,7 +85,7 @@ const Content = ({ children }: { children: React.ReactNode }) => {
             <DropdownMenuContent>
               <DropdownMenuItem asChild>
                 <Link href={`/admin/organizations/${id}/general_info`}>
-                  Organization Info
+                  Organisaation tiedot
                 </Link>
               </DropdownMenuItem>
               {selectedUseCaseId && (
@@ -93,7 +93,7 @@ const Content = ({ children }: { children: React.ReactNode }) => {
                   <Link
                     href={`/admin/organizations/${id}/use_cases/${selectedUseCaseId}`}
                   >
-                    Use Case Info
+                    Käyttötapauksen tiedot
                   </Link>
                 </DropdownMenuItem>
               )}
