@@ -1,6 +1,6 @@
 "use client";
 
-import { EditorTemplate, useEditor } from "@/components/editor";
+import { EditorTemplate, useEditor } from "@/components/editor-template";
 import FormInput from "@/components/form/form-input";
 import { FormTextArea } from "@/components/form/form-textarea";
 import { getUseCaseById, updateUseCase } from "@/services/api";
