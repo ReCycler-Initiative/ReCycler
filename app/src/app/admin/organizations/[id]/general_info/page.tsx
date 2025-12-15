@@ -25,7 +25,7 @@ const GeneralInfoPage = () => {
   });
 
   return (
-    <EditorTemplate {...editor}>
+    <EditorTemplate {...editor} title="Organisaation tiedot">
       <div className="my-2 max-w-xl">
         <FormInput label="Name" name="name" />
       </div>

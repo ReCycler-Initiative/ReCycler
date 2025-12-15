@@ -30,7 +30,7 @@ const UseCaseInfoPage = () => {
   });
 
   return (
-    <EditorTemplate {...editor}>
+    <EditorTemplate {...editor} title="Käyttötapauksen tiedot">
       <div className="my-2 max-w-xl space-y-4">
         <FormInput label="Name" name="name" />
         <FormTextArea label="Description" name="description" />
