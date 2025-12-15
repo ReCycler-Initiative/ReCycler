@@ -1,6 +1,6 @@
 "use client";
 
-import { EditorTemplate, useEditor } from "@/components/editor";
+import { EditorTemplate, useEditor } from "@/components/editor-template";
 import FormInput from "@/components/form/form-input";
 import { getOrganizationById, updateOrganization } from "@/services/api";
 import { Organization } from "@/types";
