@@ -1,6 +1,6 @@
 "use client";
 
-import { EditorTemplate, useEditor } from "@/components/editor";
+import { EditorTemplate, useEditor } from "@/components/editor-template";
 import FormInput from "@/components/form/form-input";
 import { getOrganizationById, updateOrganization } from "@/services/api";
 import { Organization } from "@/types";
@@ -25,7 +25,7 @@ const GeneralInfoPage = () => {
   });
 
   return (
-    <EditorTemplate {...editor}>
+    <EditorTemplate {...editor} title="Organisaation tiedot">
       <div className="my-2 max-w-xl">
         <FormInput label="Name" name="name" />
       </div>
