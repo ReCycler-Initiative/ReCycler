@@ -99,7 +99,7 @@ const DataSourcesPage = () => {
   };
 
   return (
-    <PageTemplate title={`Use case: ${mockUseCase.name}`}>
+    <PageTemplate title={`Datalähteet`}>
       <div className="flex flex-col gap-y-8 pb-24 lg:pb-0">
         {/* ----------------------------- */}
         {/* HEADER & SUMMARY               */}
@@ -130,13 +130,6 @@ const DataSourcesPage = () => {
                   {availableConnectors.length} muuta yhdistintä saatavilla
                 </span>
               </div>
-            </div>
-
-            {/* CTA esim. "Muokkaa use casen perustietoja" tms. */}
-            <div className="flex gap-2 self-end md:self-auto">
-              <Button variant="outline" size="sm">
-                Muokkaa use casen perustietoja
-              </Button>
             </div>
           </div>
         </section>
@@ -267,6 +260,20 @@ const DataSourcesPage = () => {
                 disabled={!selectedConnectorId}
               >
                 + Liitä use caseen
+              </Button>
+
+              {/* >>> UUSI: Luo uusi yhdistin -nappi <<< */}
+              <Button
+                asChild
+                type="button"
+                variant="outline"
+                size="sm"
+                className="md:ml-2 w-full md:w-auto"
+              >
+                {/* Vaihda href siihen reittiin, missä teidän "uusi connectori" -sivu on */}
+                <Link href="/admin/connectors/new">
+                  + Luo uusi yhdistin
+                </Link>
               </Button>
             </div>
           </div>
