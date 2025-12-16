@@ -14,7 +14,7 @@ type UseEditorProps<ApiData, FormData> = {
   mutationFn: (data: ApiData) => Promise<ApiData>;
   toFormState: (data: ApiData) => FormData;
   toApiData: (data: FormData) => ApiData;
-  onSuccess: () => void;
+  onSuccess?: () => void;
 };
 
 type UseEditorReturn<ApiData, FormData extends FieldValues> = {
@@ -68,14 +68,18 @@ export const EditorTemplate = <ApiData, FormData extends FieldValues>({
   form,
   query,
   mutation,
-}: { children: ReactNode } & UseEditorReturn<ApiData, FormData>) => {
+  title,
+}: { children: ReactNode; title: string } & UseEditorReturn<
+  ApiData,
+  FormData
+>) => {
   return (
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit((values) => mutation.mutateAsync(values))}
         className="space-y-4"
       >
-        <PageTemplate title="Organisaation tiedot2">
+        <PageTemplate title={title}>
           <LoadingState isLoading={query.isLoading} error={!!query.error}>
             {children}
             <hr />
