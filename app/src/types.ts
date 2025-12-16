@@ -99,6 +99,17 @@ export const UseCase = NewUseCase.merge(
   z.object({
     id: z.string().uuid(),
     created_at: z.coerce.date().optional(),
+    content: z.object({
+      intro: z.object({
+        cta: z.string(),
+        skip: z.string(),
+        text: z.string(),
+      }),
+      filters: z.object({
+        cta: z.string(),
+        text: z.string(),
+      }),
+    }),
     updated_at: z.coerce.date().optional(),
   })
 );
