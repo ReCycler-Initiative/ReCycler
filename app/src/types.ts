@@ -101,11 +101,13 @@ export const UseCase = NewUseCase.merge(
     created_at: z.coerce.date().optional(),
     content: z.object({
       intro: z.object({
+        title: z.string(),
         cta: z.string(),
         skip: z.string(),
         text: z.string(),
       }),
       filters: z.object({
+        title: z.string(),
         cta: z.string(),
         text: z.string(),
       }),
