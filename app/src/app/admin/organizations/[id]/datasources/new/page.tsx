@@ -90,7 +90,7 @@ const NewDataSourcePage = () => {
   const mappingDisabled = connectionStatus !== "success";
 
   return (
-    <PageTemplate title="Datalähteet">
+    <PageTemplate title="Uusi datalähde">
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
