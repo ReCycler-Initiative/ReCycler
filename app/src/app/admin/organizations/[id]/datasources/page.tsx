@@ -271,7 +271,7 @@ const DataSourcesPage = () => {
                 className="md:ml-2 w-full md:w-auto"
               >
                 {/* Vaihda href siihen reittiin, missä teidän "uusi connectori" -sivu on */}
-                <Link href="/admin/connectors/new">
+                <Link href="datasources/new">
                   + Luo uusi yhdistin
                 </Link>
               </Button>
