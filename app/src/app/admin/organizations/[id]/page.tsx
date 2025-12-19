@@ -47,7 +47,7 @@ const AdminHomePage = () => {
                 Voit aktivoida, disabloida ja muokata yhdistimien asetuksia.
               </p>
             </div>
-            <div className="mt-4 flex gap-2">
+            <div className="mt-4 flex flex-wrap gap-2">
               {/* Link to connector list page */}
               <Button asChild size="sm">
                 <Link href="/admin/connectors">Avaa yhdistimet</Link>
@@ -69,7 +69,7 @@ const AdminHomePage = () => {
                 indikaattoreita. Soveltuu operatiiviseen valvontaan.
               </p>
             </div>
-            <div className="mt-4 flex gap-2">
+            <div className="mt-4 flex flex-wrap gap-2">
               {/* Link to data sources / runs overview */}
               <Button asChild size="sm">
                 <Link href="/admin/data-sources">Näytä datalähteet</Link>
