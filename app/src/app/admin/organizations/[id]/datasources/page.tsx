@@ -11,12 +11,12 @@ type Connector = {
   id: string;
   name: string;
   status: ConnectorStatus;
-  type: string; // esim. "REST API", "Webhook", "Datavarasto"
+  type: string; // e.g. "REST API", "Webhook", "WMS", "Batch / CSV"
   description?: string;
   lastSyncAt?: string;
 };
 
-// Mockattu use case – hae oikeasti esim. API:sta tai server componentsista
+// Mock use case – in real implementation fetch from API or server components
 const mockUseCase = {
   id: "uc-123",
   name: "Kierrätyspisteiden haku",
@@ -24,7 +24,7 @@ const mockUseCase = {
     "Use case, joka hakee kierrätyspisteet eri datalähteistä ja näyttää ne loppukäyttäjälle kartalla.",
 };
 
-// Mockattu connector-lista – korvaa backend-haulla
+// Mock connector list – replace with backend fetch
 const allConnectors: Connector[] = [
   {
     id: "conn-1",
@@ -63,7 +63,7 @@ const statusBadgeClass: Record<ConnectorStatus, string> = {
 };
 
 const DataSourcesPage = () => {
-  // Oletus: use case käyttää aluksi vain yhtä yhdistintä
+  // Default: use case initially uses only one connector
   const [attachedConnectors, setAttachedConnectors] = useState<Connector[]>([
     allConnectors[0],
   ]);
@@ -74,6 +74,7 @@ const DataSourcesPage = () => {
 
   const [selectedConnectorId, setSelectedConnectorId] = useState<string>("");
 
+  // Attach connector to use case
   const handleAttachConnector = () => {
     if (!selectedConnectorId) return;
     const connector = availableConnectors.find(
@@ -86,24 +87,27 @@ const DataSourcesPage = () => {
       prev.filter((c) => c.id !== selectedConnectorId)
     );
     setSelectedConnectorId("");
-    // TODO: kutsu backend: POST /use-cases/:id/connectors
+
+    // TODO: call backend: POST /use-cases/:id/connectors
   };
 
+  // Detach connector from use case
   const handleDetachConnector = (id: string) => {
     const connector = attachedConnectors.find((c) => c.id === id);
     if (!connector) return;
 
     setAttachedConnectors((prev) => prev.filter((c) => c.id !== id));
     setAvailableConnectors((prev) => [...prev, connector]);
-    // TODO: kutsu backend: DELETE /use-cases/:id/connectors/:connectorId
+
+    // TODO: call backend: DELETE /use-cases/:id/connectors/:connectorId
   };
 
   return (
     <PageTemplate title={`Datalähteet`}>
       <div className="flex flex-col gap-y-8 pb-24 lg:pb-0">
-        {/* ----------------------------- */}
-        {/* HEADER & SUMMARY               */}
-        {/* ----------------------------- */}
+        {/* -------------------------------- */}
+        {/* HEADER & SUMMARY                  */}
+        {/* -------------------------------- */}
         <section className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
           <div className="flex flex-col justify-between gap-4 md:flex-row md:items-start">
             <div className="space-y-2">
@@ -134,9 +138,9 @@ const DataSourcesPage = () => {
           </div>
         </section>
 
-        {/* ----------------------------- */}
-        {/* ATTACHED CONNECTORS           */}
-        {/* ----------------------------- */}
+        {/* -------------------------------- */}
+        {/* ATTACHED CONNECTORS              */}
+        {/* -------------------------------- */}
         <section className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
           <div className="flex items-center justify-between gap-4">
             <div>
@@ -193,7 +197,7 @@ const DataSourcesPage = () => {
                 </div>
 
                 <div className="flex flex-wrap gap-2 md:justify-end">
-                  {/* Linkitä tänne teidän uusi connector-konffisivu */}
+                  {/* Link to connector configuration page */}
                   <Button asChild variant="outline" size="sm">
                     <Link href={`/admin/connectors/${connector.id}`}>
                       Avaa yhdistimen asetukset
@@ -215,9 +219,9 @@ const DataSourcesPage = () => {
           </div>
         </section>
 
-        {/* ----------------------------- */}
-        {/* ADD CONNECTOR TO USE CASE     */}
-        {/* ----------------------------- */}
+        {/* -------------------------------- */}
+        {/* ADD CONNECTOR TO USE CASE        */}
+        {/* -------------------------------- */}
         <section className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
           <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
             <div>
@@ -252,6 +256,7 @@ const DataSourcesPage = () => {
                 ))}
               </select>
 
+              {/* Button: attach selected connector */}
               <Button
                 type="button"
                 size="sm"
@@ -262,7 +267,7 @@ const DataSourcesPage = () => {
                 + Liitä use caseen
               </Button>
 
-              {/* >>> UUSI: Luo uusi yhdistin -nappi <<< */}
+              {/* Button: create a new connector */}
               <Button
                 asChild
                 type="button"
@@ -270,7 +275,7 @@ const DataSourcesPage = () => {
                 size="sm"
                 className="md:ml-2 w-full md:w-auto"
               >
-                {/* Vaihda href siihen reittiin, missä teidän "uusi connectori" -sivu on */}
+                {/* Replace href with your new connector page route */}
                 <Link href="/admin/connectors/new">
                   + Luo uusi yhdistin
                 </Link>
