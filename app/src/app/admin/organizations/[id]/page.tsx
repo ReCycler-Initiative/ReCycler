@@ -14,17 +14,14 @@ const AdminHomePage = () => {
         <section className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
           <div className="space-y-3">
             <h1 className="text-2xl font-semibold text-gray-900">
-              Recycler – pääkäyttäjän käyttöliittymä
+              Pääkäyttäjän käyttöliittymä
             </h1>
             <p className="text-sm text-gray-600">
-              Tervetuloa ylläpitämään kierrätyspisteiden datalähteitä,
-              yhdistimiä ja use caseja. Valitse alta, mitä haluat hallita.
+              Tervetuloa ylläpitämään käyttötapauksen datalähteitä ja
+              yhdistimiä. Valitse alta, mitä haluat hallita.
             </p>
 
             <div className="mt-3 flex flex-wrap gap-3 text-xs text-gray-600">
-              <span className="rounded-full bg-gray-50 px-3 py-1">
-                3 aktiivista use casea
-              </span>
               <span className="rounded-full bg-gray-50 px-3 py-1">
                 5 yhdistintä, joista 3 aktiivista
               </span>
@@ -39,28 +36,6 @@ const AdminHomePage = () => {
         {/* MAIN NAVIGATION CARDS           */}
         {/* -------------------------------- */}
         <section className="grid gap-6 md:grid-cols-3">
-          {/* Use caset -card */}
-          <div className="flex flex-col justify-between rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
-            <div>
-              <h2 className="text-lg font-medium text-gray-900">
-                Use caset
-              </h2>
-              <p className="mt-2 text-sm text-gray-600">
-                Hallinnoi käyttötilanteita, joissa kierrätyspisteiden dataa
-                näytetään loppukäyttäjille (esim. karttanäkymät).
-              </p>
-            </div>
-            <div className="mt-4 flex gap-2">
-              {/* Link to use case list page */}
-              <Button asChild size="sm">
-                <Link href="/admin/use-cases">Avaa use caset</Link>
-              </Button>
-              <Button asChild variant="outline" size="sm">
-                <Link href="/admin/use-cases/new">+ Luo uusi use case</Link>
-              </Button>
-            </div>
-          </div>
-
           {/* Connectors -card */}
           <div className="flex flex-col justify-between rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
             <div>
