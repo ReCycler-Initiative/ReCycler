@@ -3,6 +3,7 @@ import { UseCase } from "@/types";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { checkOrganizationAuthorization } from "@/lib/authorization";
+import { mapDbRowToUseCase } from "@/lib/mappers/use-case-mapper";
 
 export async function GET(
   request: NextRequest,
@@ -32,5 +33,6 @@ export async function GET(
     [organizationId]
   );
 
-  return NextResponse.json(z.array(UseCase).parse(result.rows));
+  const transformedRows = result.rows.map(mapDbRowToUseCase);
+  return NextResponse.json(z.array(UseCase).parse(transformedRows));
 }
