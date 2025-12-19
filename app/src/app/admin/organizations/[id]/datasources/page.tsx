@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { PageTemplate } from "@/components/admin/page-template";
 import { Button } from "@/components/ui/button";
+import { EditIcon, PlusIcon } from "lucide-react";
 
 type ConnectorStatus = "draft" | "active" | "disabled";
 
@@ -103,69 +104,28 @@ const DataSourcesPage = () => {
   };
 
   return (
-    <PageTemplate title={`Datalähteet`}>
+    <PageTemplate
+      title={`Datalähteet`}
+      actions={
+        <Button asChild type="button">
+          <Link href="datasources/new">
+            <PlusIcon className="mr-2" />Lisää datalähde
+          </Link>
+        </Button>
+      }
+    >
       <div className="flex flex-col gap-y-8 pb-24 lg:pb-0">
-        {/* -------------------------------- */}
-        {/* HEADER & SUMMARY                  */}
-        {/* -------------------------------- */}
-        <section className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
-          <div className="flex flex-col justify-between gap-4 md:flex-row md:items-start">
-            <div className="space-y-2">
-              <h1 className="text-xl font-semibold text-gray-900">
-                Use casen datalähteet
-              </h1>
-              <p className="text-sm text-gray-600">
-                Tältä sivulta näet, mitä yhdistimiä tämä use case käyttää, ja
-                voit lisätä tai poistaa datalähteitä.
-              </p>
-
-              {mockUseCase.description && (
-                <p className="text-xs text-gray-500">
-                  <span className="font-medium">Kuvaus:</span>{" "}
-                  {mockUseCase.description}
-                </p>
-              )}
-
-              <div className="mt-2 flex flex-wrap gap-3 text-xs text-gray-600">
-                <span className="rounded-full bg-gray-50 px-3 py-1">
-                  {attachedConnectors.length} yhdistintä liitetty
-                </span>
-                <span className="rounded-full bg-gray-50 px-3 py-1">
-                  {availableConnectors.length} muuta yhdistintä saatavilla
-                </span>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* -------------------------------- */}
-        {/* ATTACHED CONNECTORS              */}
-        {/* -------------------------------- */}
-        <section className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
-          <div className="flex items-center justify-between gap-4">
-            <div>
-              <h2 className="text-lg font-medium text-gray-900">
-                Liitetyt yhdistimet
-              </h2>
-              <p className="mt-1 text-sm text-gray-500">
-                Nämä yhdistimet toimittavat dataa tälle use caselle. Voit
-                avata yhdistimen muokkausnäkymän tai poistaa sen use casesta.
-              </p>
-            </div>
-          </div>
-
-          <div className="mt-6 space-y-3">
+        <section className="border border-gray-200 bg-white p-1 shadow-sm">
+          <div className="space-y-3">
             {attachedConnectors.length === 0 && (
-              <div className="rounded-lg border border-dashed border-gray-200 bg-gray-50 p-4 text-sm text-gray-600">
-                Tällä use casella ei ole vielä liitettyjä yhdistimiä. Lisää
-                yhdistin alta olevasta valikosta.
+              <div className="border border-dashed border-gray-200 bg-gray-50 p-4 text-sm text-gray-600">
+                Tällä use casella ei ole vielä datalähteitä.
               </div>
             )}
-
             {attachedConnectors.map((connector) => (
               <div
                 key={connector.id}
-                className="flex flex-col gap-3 rounded-lg border border-gray-200 bg-gray-50 p-4 text-sm md:flex-row md:items-center md:justify-between"
+                className="flex flex-col gap-3 border border-gray-200 bg-gray-50 p-4 text-sm md:flex-row md:items-center md:justify-between"
               >
                 <div className="space-y-1">
                   <div className="flex flex-wrap items-center gap-2">
@@ -197,90 +157,15 @@ const DataSourcesPage = () => {
                 </div>
 
                 <div className="flex flex-wrap gap-2 md:justify-end">
-                  {/* Link to connector configuration page */}
-                  <Button asChild variant="outline" size="sm">
-                    <Link href={`/admin/connectors/${connector.id}`}>
-                      Avaa yhdistimen asetukset
+                  <Button asChild variant="outline">
+                    <Link href={`datasources/${connector.id}/edit`}>
+                      <EditIcon className="mr-2" />
+                      <span>Muokkaa</span>
                     </Link>
-                  </Button>
-
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    className="text-red-600 hover:text-red-700"
-                    onClick={() => handleDetachConnector(connector.id)}
-                  >
-                    Poista use casesta
                   </Button>
                 </div>
               </div>
             ))}
-          </div>
-        </section>
-
-        {/* -------------------------------- */}
-        {/* ADD CONNECTOR TO USE CASE        */}
-        {/* -------------------------------- */}
-        <section className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
-          <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-            <div>
-              <h2 className="text-lg font-medium text-gray-900">
-                Lisää olemassa oleva yhdistin
-              </h2>
-              <p className="mt-1 text-sm text-gray-500">
-                Liitä olemassa olevia yhdistimiä tähän use caseen. Yhdistimen
-                tekniset asetukset muokataan omalla yhdistinsivullaan.
-              </p>
-            </div>
-
-            <div className="flex flex-col gap-2 md:flex-row md:items-center">
-              <select
-                className="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm shadow-sm 
-                           focus:border-black focus:outline-none focus:ring-1 focus:ring-black md:w-64"
-                value={selectedConnectorId}
-                onChange={(e) => setSelectedConnectorId(e.target.value)}
-              >
-                <option value="">
-                  {availableConnectors.length === 0
-                    ? "Ei muita yhdistimiä saatavilla"
-                    : "Valitse lisättävä yhdistin"}
-                </option>
-                {availableConnectors.map((connector) => (
-                  <option key={connector.id} value={connector.id}>
-                    {connector.name}{" "}
-                    {connector.status !== "active"
-                      ? `(${statusLabel[connector.status]})`
-                      : ""}
-                  </option>
-                ))}
-              </select>
-
-              {/* Button: attach selected connector */}
-              <Button
-                type="button"
-                size="sm"
-                className="md:ml-2"
-                onClick={handleAttachConnector}
-                disabled={!selectedConnectorId}
-              >
-                + Liitä use caseen
-              </Button>
-
-              {/* Button: create a new connector */}
-              <Button
-                asChild
-                type="button"
-                variant="outline"
-                size="sm"
-                className="md:ml-2 w-full md:w-auto"
-              >
-                {/* Replace href with your new connector page route */}
-                <Link href="/admin/connectors/new">
-                  + Luo uusi yhdistin
-                </Link>
-              </Button>
-            </div>
           </div>
         </section>
       </div>

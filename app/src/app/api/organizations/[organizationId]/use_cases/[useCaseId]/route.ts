@@ -3,6 +3,7 @@ import db from "@/services/db";
 import { UseCase } from "@/types";
 import { NextRequest, NextResponse } from "next/server";
 import { z, ZodError } from "zod";
+import { mapDbRowToUseCase } from "@/lib/mappers/use-case-mapper";
 
 const GetUseCaseRequest = z.object({
   organizationId: z.string().uuid(),
@@ -42,7 +43,7 @@ export async function GET(
       );
     }
 
-    return NextResponse.json(UseCase.parse(useCase));
+    return NextResponse.json(UseCase.parse(mapDbRowToUseCase(useCase)));
   } catch (error) {
     if (error instanceof ZodError) {
       return NextResponse.json({ error: error.errors }, { status: 400 });
@@ -82,6 +83,13 @@ export async function PUT(
       .update({
         name: body.name,
         description: body.description,
+        intro_title: body.content?.intro?.title,
+        intro_cta: body.content?.intro?.cta,
+        intro_skip: body.content?.intro?.skip,
+        intro_text: body.content?.intro?.text,
+        filters_title: body.content?.filters?.title,
+        filters_cta: body.content?.filters?.cta,
+        filters_text: body.content?.filters?.text,
         updated_at: new Date(),
       })
       .returning("*")
@@ -94,7 +102,7 @@ export async function PUT(
       );
     }
 
-    return NextResponse.json(UseCase.parse(updatedUseCase));
+    return NextResponse.json(UseCase.parse(mapDbRowToUseCase(updatedUseCase)));
   } catch (error) {
     if (error instanceof ZodError) {
       return NextResponse.json({ error: error.errors }, { status: 400 });
