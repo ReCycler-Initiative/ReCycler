@@ -32,8 +32,30 @@ const UseCaseInfoPage = () => {
   return (
     <EditorTemplate {...editor} title="Käyttötapauksen tiedot">
       <div className="my-2 max-w-xl space-y-4">
-        <FormInput label="Name" name="name" />
-        <FormTextArea label="Description" name="description" />
+        <div>
+          <h3 className="text-lg font-semibold mb-4">Yleiset tiedot</h3>
+          <div className="space-y-3">
+            <FormInput label="Name" name="name" />
+            <FormTextArea label="Description" name="description" />
+          </div>
+        </div>
+        <div>
+          <h3 className="text-lg font-semibold mb-4">Etusivu</h3>
+          <div className="space-y-3">
+            <FormInput label="Otsikko" name="content.intro.title" />
+            <FormInput label="CTA" name="content.intro.cta" />
+            <FormInput label="Ohita teksti" name="content.intro.skip" />
+            <FormTextArea label="Leipäteksti" name="content.intro.text" />
+          </div>
+        </div>
+        <div>
+          <h3 className="text-lg font-semibold mb-4">Filterit</h3>
+          <div className="space-y-3">
+            <FormInput label="Otsikko" name="content.filters.title" />
+            <FormInput label="CTA" name="content.filters.cta" />
+            <FormTextArea label="Leipäteksti" name="content.filters.text" />
+          </div>
+        </div>
       </div>
     </EditorTemplate>
   );
