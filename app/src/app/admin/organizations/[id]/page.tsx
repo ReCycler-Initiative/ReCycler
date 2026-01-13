@@ -53,9 +53,8 @@ const AdminHomePage = () => {
                 datalähde.
               </p>
             </div>
-
             <div className="mt-4 flex flex-wrap gap-2">
-              {/* Primary: connect/select data source for the use case */}
+              {/* Link to connector list page */}
               <Button asChild size="sm">
                 <Link href="/admin/data-source/connect">Liitä datalähde</Link>
               </Button>
@@ -73,6 +72,28 @@ const AdminHomePage = () => {
               {/* Optional: create new connector type */}
               <Button asChild variant="outline" size="sm">
                 <Link href="/admin/connectors/new">+ Luo uusi yhdistin</Link>
+              </Button>
+            </div>
+          </div>
+
+          {/* Data & runs -card */}
+          <div className="flex flex-col justify-between rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
+            <div>
+              <h2 className="text-lg font-medium text-gray-900">
+                Datalähteet ja ajot
+              </h2>
+              <p className="mt-2 text-sm text-gray-600">
+                Seuraa synkronointeja, tarkastele ajon tilaa ja datan laadun
+                indikaattoreita. Soveltuu operatiiviseen valvontaan.
+              </p>
+            </div>
+            <div className="mt-4 flex flex-wrap gap-2">
+              {/* Link to data sources / runs overview */}
+              <Button asChild size="sm">
+                <Link href="/admin/data-sources">Näytä datalähteet</Link>
+              </Button>
+              <Button asChild variant="outline" size="sm">
+                <Link href="/admin/runs">Ajot & lokit</Link>
               </Button>
             </div>
           </div>
