@@ -17,11 +17,15 @@ const AdminHomePage = () => {
               Pääkäyttäjän käyttöliittymä
             </h1>
             <p className="text-sm text-gray-600">
-              Tervetuloa ylläpitämään käyttötapauksen datalähteitä ja
-              yhdistimiä. Valitse alta, mitä haluat hallita.
+              Tervetuloa määrittämään käyttötapauksen datalähde ja hallitsemaan
+              siihen liittyvää yhdistintä. Yhdessä käyttötapauksessa on yksi
+              datalähde.
             </p>
 
             <div className="mt-3 flex flex-wrap gap-3 text-xs text-gray-600">
+              <span className="rounded-full bg-gray-50 px-3 py-1">
+                1 datalähde / käyttötapaus
+              </span>
               <span className="rounded-full bg-gray-50 px-3 py-1">
                 5 yhdistintä, joista 3 aktiivista
               </span>
@@ -36,46 +40,39 @@ const AdminHomePage = () => {
         {/* MAIN NAVIGATION CARDS           */}
         {/* -------------------------------- */}
         <section className="grid gap-6 md:grid-cols-3">
-          {/* Connectors -card */}
-          <div className="flex flex-col justify-between rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
+          {/* Data source & connector -card */}
+          <div className="flex flex-col justify-between rounded-xl border border-gray-200 bg-white p-5 shadow-sm md:col-span-2">
             <div>
               <h2 className="text-lg font-medium text-gray-900">
-                Yhdistimet
+                Datalähde ja yhdistin
               </h2>
               <p className="mt-2 text-sm text-gray-600">
-                Ylläpidä yhteyksiä eri datalähteisiin (REST API, CSV, WMS...).
-                Voit aktivoida, disabloida ja muokata yhdistimien asetuksia.
+                Liitä käyttötapaukseen datalähde (esim. REST API, CSV, WMS).
+                Jos datalähde on jo liitetty, voit muokata sen ominaisuuksia ja
+                yhdistimen asetuksia. Yhdessä käyttötapauksessa on yksi
+                datalähde.
               </p>
             </div>
-            <div className="mt-4 flex gap-2">
-              {/* Link to connector list page */}
+
+            <div className="mt-4 flex flex-wrap gap-2">
+              {/* Primary: connect/select data source for the use case */}
               <Button asChild size="sm">
-                <Link href="/admin/connectors">Avaa yhdistimet</Link>
+                <Link href="/admin/data-source/connect">Liitä datalähde</Link>
               </Button>
+
+              {/* Secondary: edit existing data source properties */}
+              <Button asChild variant="outline" size="sm">
+                <Link href="/admin/data-source">Muokkaa datalähdettä</Link>
+              </Button>
+
+              {/* Optional: manage connector templates / catalog */}
+              <Button asChild variant="outline" size="sm">
+                <Link href="/admin/connectors">Yhdistinkatalogi</Link>
+              </Button>
+
+              {/* Optional: create new connector type */}
               <Button asChild variant="outline" size="sm">
                 <Link href="/admin/connectors/new">+ Luo uusi yhdistin</Link>
-              </Button>
-            </div>
-          </div>
-
-          {/* Data & runs -card */}
-          <div className="flex flex-col justify-between rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
-            <div>
-              <h2 className="text-lg font-medium text-gray-900">
-                Datalähteet ja ajot
-              </h2>
-              <p className="mt-2 text-sm text-gray-600">
-                Seuraa synkronointeja, tarkastele ajon tilaa ja datan laadun
-                indikaattoreita. Soveltuu operatiiviseen valvontaan.
-              </p>
-            </div>
-            <div className="mt-4 flex gap-2">
-              {/* Link to data sources / runs overview */}
-              <Button asChild size="sm">
-                <Link href="/admin/data-sources">Näytä datalähteet</Link>
-              </Button>
-              <Button asChild variant="outline" size="sm">
-                <Link href="/admin/runs">Ajot & lokit</Link>
               </Button>
             </div>
           </div>
@@ -89,7 +86,6 @@ const AdminHomePage = () => {
             Pikalinkit
           </h3>
           <div className="flex flex-wrap gap-3 text-sm">
-            {/* Quick links – tune based on your needs */}
             <Link
               href="/admin/settings"
               className="inline-flex items-center rounded-full border border-gray-200 bg-gray-50 px-3 py-1 hover:bg-gray-100"
