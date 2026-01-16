@@ -4,127 +4,137 @@ import Link from "next/link";
 import { PageTemplate } from "@/components/admin/page-template";
 import { Button } from "@/components/ui/button";
 
+/**
+ * Temporary mock data.
+ * Replace with real backend data (per use case).
+ */
+type ConnectionStatus = "active" | "error" | "not_configured";
+
+type DataConnection = {
+  id: string;
+  name: string; // e.g. "Sijainnit", "Ominaisuudet"
+  status: ConnectionStatus;
+  lastSyncAt?: string; // formatted string for now
+};
+
+const connections: DataConnection[] = [
+  {
+    id: "loc",
+    name: "Sijainnit",
+    status: "active",
+    lastSyncAt: "10.12.2025 klo 09:30",
+  },
+  {
+    id: "attr",
+    name: "Ominaisuudet",
+    status: "error",
+    lastSyncAt: "09.12.2025 klo 22:14",
+  },
+  {
+    id: "ref",
+    name: "Viitetiedot",
+    status: "not_configured",
+  },
+];
+
+const statusLabel: Record<ConnectionStatus, string> = {
+  active: "Aktiivinen",
+  error: "Virhe",
+  not_configured: "Ei määritetty",
+};
+
+const statusPillClass: Record<ConnectionStatus, string> = {
+  active: "bg-green-100 text-green-800",
+  error: "bg-red-100 text-red-800",
+  not_configured: "bg-gray-200 text-gray-800",
+};
+
 const AdminHomePage = () => {
   return (
-    <PageTemplate title="Pääkäyttäjän etusivu">
-      <div className="min-h-[calc(100vh-120px)] flex flex-col gap-8 py-8">
+    <PageTemplate title="Datayhteydet">
+      <div className="min-h-[calc(100vh-120px)] flex flex-col gap-6 pb-8">
         {/* -------------------------------- */}
-        {/* HEADER                          */}
+        {/* HEADER                           */}
         {/* -------------------------------- */}
         <section className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
-          <div className="space-y-3">
-            <h1 className="text-2xl font-semibold text-gray-900">
-              Pääkäyttäjän käyttöliittymä
-            </h1>
+          <div className="space-y-4">
+            {/* PageTemplate is the only H1; keep intro minimal here */}
             <p className="text-sm text-gray-600">
-              Tervetuloa määrittämään käyttötapauksen datalähde ja hallitsemaan
-              siihen liittyvää yhdistintä. Yhdessä käyttötapauksessa on yksi
-              datalähde.
+              Liitä ja hallitse käyttötapauksen datayhteyksiä.
             </p>
 
-            <div className="mt-3 flex flex-wrap gap-3 text-xs text-gray-600">
-              <span className="rounded-full bg-gray-50 px-3 py-1">
-                1 datalähde / käyttötapaus
-              </span>
-              <span className="rounded-full bg-gray-50 px-3 py-1">
-                5 yhdistintä, joista 3 aktiivista
-              </span>
-              <span className="rounded-full bg-gray-50 px-3 py-1">
-                Viimeisin synkronointi: 10.12.2025 09:30
-              </span>
-            </div>
-          </div>
-        </section>
-
-        {/* -------------------------------- */}
-        {/* MAIN NAVIGATION CARDS           */}
-        {/* -------------------------------- */}
-        <section className="grid gap-6 md:grid-cols-3">
-          {/* Data source & connector -card */}
-          <div className="flex flex-col justify-between rounded-xl border border-gray-200 bg-white p-5 shadow-sm md:col-span-2">
-            <div>
-              <h2 className="text-lg font-medium text-gray-900">
-                Datalähde ja yhdistin
-              </h2>
-              <p className="mt-2 text-sm text-gray-600">
-                Liitä käyttötapaukseen datalähde (esim. REST API, CSV, WMS).
-                Jos datalähde on jo liitetty, voit muokata sen ominaisuuksia ja
-                yhdistimen asetuksia. Yhdessä käyttötapauksessa on yksi
-                datalähde.
-              </p>
-            </div>
-            <div className="mt-4 flex flex-wrap gap-2">
-              {/* Link to connector list page */}
+            <div className="flex flex-wrap gap-2">
               <Button asChild size="sm">
-                <Link href="/admin/data-source/connect">Liitä datalähde</Link>
+                <Link href="/admin/data-source/connect">+ Liitä datayhteys</Link>
               </Button>
 
-              {/* Secondary: edit existing data source properties */}
               <Button asChild variant="outline" size="sm">
-                <Link href="/admin/data-source">Muokkaa datalähdettä</Link>
-              </Button>
-
-              {/* Optional: manage connector templates / catalog */}
-              <Button asChild variant="outline" size="sm">
-                <Link href="/admin/connectors">Yhdistinkatalogi</Link>
-              </Button>
-
-              {/* Optional: create new connector type */}
-              <Button asChild variant="outline" size="sm">
-                <Link href="/admin/connectors/new">+ Luo uusi yhdistin</Link>
-              </Button>
-            </div>
-          </div>
-
-          {/* Data & runs -card */}
-          <div className="flex flex-col justify-between rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
-            <div>
-              <h2 className="text-lg font-medium text-gray-900">
-                Datalähteet ja ajot
-              </h2>
-              <p className="mt-2 text-sm text-gray-600">
-                Seuraa synkronointeja, tarkastele ajon tilaa ja datan laadun
-                indikaattoreita. Soveltuu operatiiviseen valvontaan.
-              </p>
-            </div>
-            <div className="mt-4 flex flex-wrap gap-2">
-              {/* Link to data sources / runs overview */}
-              <Button asChild size="sm">
-                <Link href="/admin/data-sources">Näytä datalähteet</Link>
-              </Button>
-              <Button asChild variant="outline" size="sm">
-                <Link href="/admin/runs">Ajot & lokit</Link>
+                <Link href="/admin/runs">Kaikki lokit</Link>
               </Button>
             </div>
           </div>
         </section>
 
         {/* -------------------------------- */}
-        {/* QUICK LINKS / SECONDARY AREA    */}
+        {/* CONNECTION LIST                  */}
         {/* -------------------------------- */}
-        <section className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
-          <h3 className="text-sm font-semibold text-gray-900 mb-3">
-            Pikalinkit
-          </h3>
-          <div className="flex flex-wrap gap-3 text-sm">
-            <Link
-              href="/admin/settings"
-              className="inline-flex items-center rounded-full border border-gray-200 bg-gray-50 px-3 py-1 hover:bg-gray-100"
-            >
-              Ylläpitoasetukset
-            </Link>
-            <Link
-              href="/admin/monitoring"
-              className="inline-flex items-center rounded-full border border-gray-200 bg-gray-50 px-3 py-1 hover:bg-gray-100"
-            >
-              Monitorointi & hälytykset
-            </Link>
-            <Link
-              href="/admin/docs"
-              className="inline-flex items-center rounded-full border border-gray-200 bg-gray-50 px-3 py-1 hover:bg-gray-100"
-            >
-              Dokumentaatio
-            </Link>
+        <section className="rounded-xl border border-gray-200 bg-white shadow-sm">
+          <div className="border-b border-gray-200 p-5">
+            <h2 className="text-lg font-medium text-gray-900">Datayhteydet</h2>
+            <p className="mt-1 text-sm text-gray-600">
+              Avaa datayhteys, selaa dataa tai tarkista lokit.
+            </p>
+          </div>
+
+          <div className="divide-y divide-gray-200">
+            {connections.map((c) => (
+              <div
+                key={c.id}
+                className="flex flex-col gap-3 p-5 md:flex-row md:items-center md:justify-between"
+              >
+                <div className="min-w-0">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <div className="text-base font-semibold text-gray-900">
+                      {c.name}
+                    </div>
+                    <span
+                      className={[
+                        "inline-flex rounded-full px-2.5 py-1 text-xs font-medium",
+                        statusPillClass[c.status],
+                      ].join(" ")}
+                    >
+                      {statusLabel[c.status]}
+                    </span>
+                  </div>
+
+                  <div className="mt-1 text-sm text-gray-600">
+                    Viimeisin synkronointi:{" "}
+                    <span className="font-medium text-gray-900">
+                      {c.lastSyncAt ?? "—"}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Per-connection actions */}
+                <div className="flex flex-wrap gap-2">
+                  <Button asChild size="sm">
+                    <Link href={`/admin/data-source?connection=${c.id}`}>
+                      Muokkaa
+                    </Link>
+                  </Button>
+
+                  <Button asChild variant="outline" size="sm">
+                    <Link href={`/admin/data-preview?connection=${c.id}`}>
+                      Selaa dataa
+                    </Link>
+                  </Button>
+
+                  <Button asChild variant="outline" size="sm">
+                    <Link href={`/admin/runs?connection=${c.id}`}>Lokit</Link>
+                  </Button>
+                </div>
+              </div>
+            ))}
           </div>
         </section>
       </div>
