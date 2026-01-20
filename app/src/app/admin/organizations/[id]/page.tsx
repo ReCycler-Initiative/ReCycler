@@ -2,12 +2,14 @@
 
 import Link from "next/link";
 import { PageTemplate } from "@/components/admin/page-template";
-import { Button } from "@/components/ui/button";
 
 /**
- * Admin landing / welcome page (polished)
- * - Mapbox-ish: subtle gradient backdrop, hero, quick actions, status snapshot
- * - Replace mock stats with real backend data later
+ * Admin landing / welcome page (polished dashboard)
+ * - No hero CTA buttons (actions live in navigation / other pages)
+ * - "Tilannekuva" kept
+ * - "Suositellut reitit" replaced with "Ohjeet ja dokumentaatio"
+ *
+ * NOTE: Update /docs/* links to match your actual docs routes (or external URL).
  */
 
 type StatItem = {
@@ -19,20 +21,20 @@ type StatItem = {
 const stats: StatItem[] = [
   { label: "Datayhteydet", value: "3", hint: "1 virhe vaatii huomion" },
   { label: "Viimeisin ajo", value: "09.12.2025 22:14", hint: "Ominaisuudet" },
-  { label: "Kohteet", value: "12", hint: "Aktiivista kohdetta" },
+  { label: "Virheet", value: "1", hint: "Tarkista lokit" },
 ];
 
 const QuickCard = ({
   title,
   description,
   href,
-  cta,
+  badge,
   tone = "light",
 }: {
   title: string;
   description: string;
   href: string;
-  cta: string;
+  badge: string;
   tone?: "light" | "dark";
 }) => {
   const base =
@@ -43,7 +45,10 @@ const QuickCard = ({
     "border-gray-200 bg-gray-900 text-white hover:shadow-md hover:-translate-y-0.5";
 
   return (
-    <Link href={href} className={[base, tone === "dark" ? dark : light].join(" ")}>
+    <Link
+      href={href}
+      className={[base, tone === "dark" ? dark : light].join(" ")}
+    >
       {/* subtle highlight */}
       <div
         className={[
@@ -80,7 +85,7 @@ const QuickCard = ({
                 : "bg-gray-100 text-gray-700",
             ].join(" ")}
           >
-            {cta}
+            {badge}
           </span>
         </div>
 
@@ -118,33 +123,42 @@ const AdminHomePage = () => {
           </div>
 
           <div className="relative p-6 md:p-8">
-            {/* HERO */}
-            <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
-              <div className="max-w-2xl">
+            {/* HERO + SNAPSHOT */}
+            <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
+              <div className="max-w-3xl">
                 <h2 className="text-2xl font-semibold tracking-tight text-gray-900 md:text-3xl">
-                  Hallitse käyttötapauksen dataa ja integraatioita – yhdestä näkymästä
+                  Yhtenäinen näkymä käyttötapauksen dataan ja integraatioihin
                 </h2>
+
                 <p className="mt-3 text-sm leading-6 text-gray-600 md:text-base">
-                  Tämä on hallintanäkymä, jossa liität datayhteydet, seuraat ajoja ja varmistat
-                  että kohteiden tiedot pysyvät ajantasaisina.
+                  Palvelu kokoaa datalähteet, synkronoinnit ja laadun seurannan
+                  samaan paikkaan. Näet nopeasti missä mennään, ja löydät
+                  poikkeamat ennen kuin ne näkyvät lopputuloksessa.
                 </p>
 
-                <div className="mt-5 flex flex-wrap gap-2">
-                  <Button asChild size="sm">
-                    <Link href="/admin/data-source/connect">+ Liitä datayhteys</Link>
-                  </Button>
-                  <Button asChild variant="outline" size="sm">
-                    <Link href="/admin/data-sources">Datayhteydet</Link>
-                  </Button>
-                  <Button asChild variant="outline" size="sm">
-                    <Link href="/admin/runs">Lokit</Link>
-                  </Button>
-                </div>
+                <ul className="mt-4 space-y-2 text-sm text-gray-700">
+                  <li className="flex gap-2">
+                    <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-gray-400" />
+                    Datayhteyksien tila ja viimeisimmät synkronoinnit yhdellä
+                    silmäyksellä
+                  </li>
+                  <li className="flex gap-2">
+                    <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-gray-400" />
+                    Lokit ja virheet suoraan ajokohtaisesti – helpottaa
+                    vianrajausta
+                  </li>
+                  <li className="flex gap-2">
+                    <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-gray-400" />
+                    Selkeä “tilannekuva” siitä, onko data tuotantokelpoinen nyt
+                  </li>
+                </ul>
               </div>
 
-              {/* MINI ILLUSTRATION (no external assets) */}
+              {/* SNAPSHOT */}
               <div className="rounded-2xl border border-gray-200 bg-white/60 p-4 shadow-sm backdrop-blur md:p-5 lg:w-[420px]">
-                <div className="text-sm font-medium text-gray-900">Tilannekuva</div>
+                <div className="text-sm font-medium text-gray-900">
+                  Tilannekuva
+                </div>
                 <p className="mt-1 text-sm text-gray-600">
                   Nopea yleiskuva: yhteydet, ajot ja mahdolliset virheet.
                 </p>
@@ -168,7 +182,7 @@ const AdminHomePage = () => {
 
                 <div className="mt-4 flex items-center justify-between rounded-xl border border-gray-200 bg-gray-50 px-3 py-2">
                   <div className="text-xs text-gray-600">
-                    Vinkki: tarkista virheet säännöllisesti
+                    Vinkki: jos jokin on pielessä, aloita lokeista.
                   </div>
                   <Link
                     href="/admin/runs"
@@ -182,33 +196,27 @@ const AdminHomePage = () => {
 
             {/* QUICK ACTIONS */}
             <div className="mt-8">
-              <div className="flex items-end justify-between gap-4">
-                <div>
-                  <h3 className="text-lg font-semibold text-gray-900">Pikatoiminnot</h3>
-                  <p className="mt-1 text-sm text-gray-600">
-                    Siirry suoraan yleisimpiin hallintatehtäviin.
-                  </p>
-                </div>
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900">
+                  Pikatoiminnot
+                </h3>
+                <p className="mt-1 text-sm text-gray-600">
+                  Siirry suoraan yleisimpiin hallintatehtäviin.
+                </p>
               </div>
 
-              <div className="mt-4 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+              <div className="mt-4 grid gap-4 md:grid-cols-2">
                 <QuickCard
                   title="Datayhteydet"
                   description="Liitä, muokkaa ja tarkista datayhteyksien tila."
-                  href="/admin/data-sources"
-                  cta="Yhteydet"
+                  href="/admin/data-source/connect"
+                  badge="Yhteydet"
                 />
                 <QuickCard
                   title="Ajot ja lokit"
                   description="Seuraa synkronointeja, virheitä ja suoritushistoriaa."
                   href="/admin/runs"
-                  cta="Lokit"
-                />
-                <QuickCard
-                  title="Kohteet"
-                  description="Hallinnoi kohteiden tietoja ja näkymää."
-                  href="/admin/targets"
-                  cta="Kohteet"
+                  badge="Lokit"
                   tone="dark"
                 />
               </div>
@@ -217,37 +225,70 @@ const AdminHomePage = () => {
             {/* SECONDARY CONTENT */}
             <div className="mt-8 grid gap-4 lg:grid-cols-2">
               <section className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
-                <h4 className="text-sm font-semibold text-gray-900">Mitä seuraavaksi?</h4>
-                <ul className="mt-3 space-y-2 text-sm text-gray-600">
-                  <li className="flex gap-2">
-                    <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-gray-400" />
-                    Liitä puuttuva datayhteys ja testaa ajo.
-                  </li>
-                  <li className="flex gap-2">
-                    <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-gray-400" />
-                    Tarkista lokit ja korjaa mahdolliset virheet.
-                  </li>
-                  <li className="flex gap-2">
-                    <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-gray-400" />
-                    Varmista, että kohteiden tiedot näkyvät oikein.
-                  </li>
-                </ul>
+                <h4 className="text-sm font-semibold text-gray-900">
+                  Mikä on “hyvä tila”?
+                </h4>
+                <p className="mt-2 text-sm text-gray-600">
+                  Kun datayhteydet ovat aktiivisia ja viimeisimmät ajot
+                  onnistuneita, käyttötapauksen data on käytettävissä ilman
+                  katkoksia.
+                </p>
+                <div className="mt-3 text-sm text-gray-600">
+                  Jos virheitä ilmenee, tarkista ensin ajon loki ja sen jälkeen
+                  kyseisen datayhteyden asetukset.
+                </div>
               </section>
 
+              {/* Docs section (replaces "Suositellut reitit") */}
               <section className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
-                <h4 className="text-sm font-semibold text-gray-900">Tuki ja ohjeet</h4>
+                <h4 className="text-sm font-semibold text-gray-900">
+                  Ohjeet ja dokumentaatio
+                </h4>
+
                 <p className="mt-2 text-sm text-gray-600">
-                  Jos jokin näyttää oudolta, aloita lokeista. Usein virheen syy löytyy
-                  viimeisimmästä ajosta.
+                  Löydät täältä ohjeet datayhteyksien hallintaan, ajovirheiden
+                  tulkintaan ja käyttötapauksen toimintaperiaatteisiin.
                 </p>
-                <div className="mt-4 flex flex-wrap gap-2">
-                  <Button asChild variant="outline" size="sm">
-                    <Link href="/admin/runs">Avaa lokit</Link>
-                  </Button>
-                  <Button asChild variant="outline" size="sm">
-                    <Link href="/admin/data-source/connect">Liitä yhteys</Link>
-                  </Button>
+
+                <ul className="mt-4 space-y-2 text-sm">
+                  <li>
+                    <Link
+                      href="/docs/datayhteydet"
+                      className="font-medium text-gray-900 hover:underline"
+                    >
+                      Datayhteydet – yleiskuva ja asetukset →
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      href="/docs/ajot-ja-lokit"
+                      className="font-medium text-gray-900 hover:underline"
+                    >
+                      Ajot ja lokit – virheiden tulkinta →
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      href="/docs/parhaat-kaytannot"
+                      className="font-medium text-gray-900 hover:underline"
+                    >
+                      Parhaat käytännöt hallintaan →
+                    </Link>
+                  </li>
+                </ul>
+
+                {/* Optional external docs link example:
+                <div className="mt-4">
+                  <Link
+                    href="https://docs.example.com"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sm font-medium text-gray-900 hover:underline"
+                  >
+                    Avaa dokumentaatio →
+                  </Link>
                 </div>
+                */}
               </section>
             </div>
           </div>
