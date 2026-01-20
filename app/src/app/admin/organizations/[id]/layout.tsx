@@ -56,15 +56,15 @@ const Content = ({ children }: { children: React.ReactNode }) => {
         logo={<p className="ml-2 font-bold">{organizationQuery.data?.name}</p>}
         toHomeHref={`/admin/organizations/${id}`}
       >
-        <div className="flex flex-1 h-full">
-          <nav className="flex ml-4 h-full">
+        <div className="flex flex-1 h-full items-center">
+          <nav className="flex h-full ml-4">
             <Link
               href={`/admin/organizations/${id}/datasources`}
               className={cn(
-                "inline-flex items-center px-4 -mb-px",
+                "inline-flex items-center px-4 -mb-px font-medium border-t-[3px] border-t-transparent border-b-[3px]",
                 pathname.startsWith(`/admin/organizations/${id}/datasources`)
-                  ? "border-b-2 border-primary font-semibold"
-                  : "text-gray-600 hover:text-gray-900"
+                  ? "border-b-primary text-gray-900"
+                  : "border-b-transparent text-gray-600 hover:text-gray-900"
               )}
             >
               Datalähteet
@@ -72,10 +72,10 @@ const Content = ({ children }: { children: React.ReactNode }) => {
             <Link
               href={`/admin/organizations/${id}/locations`}
               className={cn(
-                "inline-flex items-center px-4 -mb-px",
+                "inline-flex items-center px-4 -mb-px font-medium border-t-[3px] border-t-transparent border-b-[3px]",
                 pathname.startsWith(`/admin/organizations/${id}/locations`)
-                  ? "border-b-2 border-primary font-semibold"
-                  : "text-gray-600 hover:text-gray-900"
+                  ? "border-b-primary text-gray-900"
+                  : "border-b-transparent text-gray-600 hover:text-gray-900"
               )}
             >
               Kohteet
