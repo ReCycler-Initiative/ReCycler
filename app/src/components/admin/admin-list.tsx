@@ -4,6 +4,9 @@ import { cn } from "@/lib/utils";
 export type AdminListItem = {
   id: string;
   title: string;
+  description?: string;
+  badges?: ReactNode;
+  metadata?: ReactNode;
   actions?: ReactNode;
 };
 
@@ -31,11 +34,24 @@ export const AdminList = ({
         {items.map((item) => (
           <div
             key={item.id}
-            className="flex items-center justify-between border border-gray-200 bg-gray-50 p-4"
+            className="flex flex-col gap-3 border border-gray-200 bg-gray-50 p-4 text-sm md:flex-row md:items-center md:justify-between"
           >
-            <h3 className="text-sm font-semibold text-gray-900">{item.title}</h3>
+            <div className="space-y-1">
+              <div className="flex flex-wrap items-center gap-2">
+                <h3 className="text-sm font-semibold text-gray-900">
+                  {item.title}
+                </h3>
+                {item.badges}
+              </div>
+              {item.description && (
+                <p className="text-xs text-gray-600">{item.description}</p>
+              )}
+              {item.metadata}
+            </div>
             {item.actions && (
-              <div className="flex gap-2">{item.actions}</div>
+              <div className="flex flex-wrap gap-2 md:justify-end">
+                {item.actions}
+              </div>
             )}
           </div>
         ))}
