@@ -27,6 +27,11 @@ import Link from "next/link";
 import { useParams, usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
+type NavLink = {
+  href: string;
+  label: string;
+};
+
 const Content = ({ children }: { children: React.ReactNode }) => {
   const { id } = useParams<{ id: string }>();
   const pathname = usePathname();
@@ -50,6 +55,11 @@ const Content = ({ children }: { children: React.ReactNode }) => {
     }
   }, [useCasesQuery.data]);
 
+  const navLinks: NavLink[] = [
+    { href: `/admin/organizations/${id}/datasources`, label: "Datalähteet" },
+    { href: `/admin/organizations/${id}/locations`, label: "Kohteet" },
+  ];
+
   return (
     <div className="flex flex-col h-full">
       <TitleBar
@@ -67,7 +77,7 @@ const Content = ({ children }: { children: React.ReactNode }) => {
                   : "text-gray-600 hover:text-gray-900"
               )}
             >
-              Datayhteydet
+              Datalähteet
             </Link>
             <Link
               href={`/admin/organizations/${id}/locations`}
