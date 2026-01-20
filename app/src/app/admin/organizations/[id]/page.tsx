@@ -131,7 +131,7 @@ const AdminHomePage = () => {
                 </h2>
 
                 <p className="mt-3 text-sm leading-6 text-gray-600 md:text-base">
-                  Palvelu kokoaa datalähteet, synkronoinnit ja laadun seurannan
+                  Näkymä kokoaa datalähteet, synkronoinnit ja laadun seurannan
                   samaan paikkaan. Näet nopeasti missä mennään, ja löydät
                   poikkeamat ennen kuin ne näkyvät lopputuloksessa.
                 </p>
