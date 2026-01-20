@@ -67,7 +67,7 @@ const Content = ({ children }: { children: React.ReactNode }) => {
                   : "text-gray-600 hover:text-gray-900"
               )}
             >
-              Datalähteet
+              Datayhteydet
             </Link>
             <Link
               href={`/admin/organizations/${id}/locations`}
