@@ -1,111 +1,145 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
-import { AdminList } from "@/components/admin/admin-list";
 import { PageTemplate } from "@/components/admin/page-template";
 import { Button } from "@/components/ui/button";
-import { EditIcon, PlusIcon } from "lucide-react";
 
-type ConnectorStatus = "draft" | "active" | "disabled";
+/**
+ * Temporary mock data.
+ * Replace with real backend data (per use case).
+ */
+type ConnectionStatus = "active" | "error" | "not_configured";
 
-type Connector = {
+type DataConnection = {
   id: string;
-  name: string;
-  status: ConnectorStatus;
-  type: string;
-  description?: string;
-  lastSyncAt?: string;
+  name: string; // e.g. "Sijainnit", "Ominaisuudet"
+  status: ConnectionStatus;
+  lastSyncAt?: string; // formatted string for now
 };
 
-const allConnectors: Connector[] = [
+const connections: DataConnection[] = [
   {
-    id: "conn-1",
-    name: "Recycler 4.0 API",
+    id: "loc",
+    name: "Sijainnit",
     status: "active",
-    type: "REST API",
-    description: "Pääasiallinen kierrätyspisteiden datalähde.",
-    lastSyncAt: "2025-12-10T09:30:00Z",
+    lastSyncAt: "10.12.2025 klo 09:30",
   },
   {
-    id: "conn-2",
-    name: "Kaupunki A - avoin rajapinta",
-    status: "draft",
-    type: "REST API",
-    description: "Kaupunki A:n avoin keräyspiste-rajapinta.",
+    id: "attr",
+    name: "Ominaisuudet",
+    status: "error",
+    lastSyncAt: "09.12.2025 klo 22:14",
   },
   {
-    id: "conn-3",
-    name: "Sisäinen CSV-tuonti",
-    status: "disabled",
-    type: "Batch / CSV",
-    description: "Sisäinen CSV-tuonti taustajärjestelmästä.",
+    id: "ref",
+    name: "Viitetiedot",
+    status: "not_configured",
   },
 ];
 
-const statusLabel: Record<ConnectorStatus, string> = {
-  draft: "Luonnos",
+const statusLabel: Record<ConnectionStatus, string> = {
   active: "Aktiivinen",
-  disabled: "Poissa käytöstä",
+  error: "Virhe",
+  not_configured: "Ei määritetty",
 };
 
-const statusBadgeClass: Record<ConnectorStatus, string> = {
-  draft: "bg-yellow-50 text-yellow-800 border border-yellow-200",
-  active: "bg-green-50 text-green-800 border border-green-200",
-  disabled: "bg-gray-50 text-gray-700 border border-gray-200",
+const statusPillClass: Record<ConnectionStatus, string> = {
+  active: "bg-green-100 text-green-800",
+  error: "bg-red-100 text-red-800",
+  not_configured: "bg-gray-200 text-gray-800",
 };
 
-const DataSourcesPage = () => {
-  const [attachedConnectors] = useState<Connector[]>([allConnectors[0]]);
-
+const AdminHomePage = () => {
   return (
-    <PageTemplate
-      title="Datalähteet"
-      actions={
-        <Button asChild type="button">
-          <Link href="datasources/new">
-            <PlusIcon className="mr-2" />
-            Lisää datalähde
-          </Link>
-        </Button>
-      }
-    >
-      <AdminList
-        items={attachedConnectors.map((connector) => ({
-          id: connector.id,
-          title: connector.name,
-          description: connector.description,
-          badges: (
-            <>
-              <span
-                className={`inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-medium ${statusBadgeClass[connector.status]}`}
-              >
-                {statusLabel[connector.status]}
-              </span>
-              <span className="inline-flex items-center rounded-full bg-white px-2 py-0.5 text-[11px] font-medium text-gray-700">
-                {connector.type}
-              </span>
-            </>
-          ),
-          metadata: connector.lastSyncAt && (
-            <p className="text-xs text-gray-500">
-              Viimeisin ajo / synkronointi:{" "}
-              {new Date(connector.lastSyncAt).toLocaleString("fi-FI")}
+    <PageTemplate title="Datayhteydet">
+      <div className="min-h-[calc(100vh-120px)] flex flex-col gap-6 pb-8">
+        {/* -------------------------------- */}
+        {/* HEADER                           */}
+        {/* -------------------------------- */}
+        <section className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+          <div className="space-y-4">
+            {/* PageTemplate is the only H1; keep intro minimal here */}
+            <p className="text-sm text-gray-600">
+              Liitä ja hallitse käyttötapauksen datayhteyksiä.
             </p>
-          ),
-          actions: (
-            <Button asChild variant="outline">
-              <Link href={`datasources/${connector.id}/edit`}>
-                <EditIcon className="mr-2" />
-                <span>Muokkaa</span>
-              </Link>
-            </Button>
-          ),
-        }))}
-        emptyMessage="Tällä use casella ei ole vielä datalähteitä."
-      />
+
+            <div className="flex flex-wrap gap-2">
+              <Button asChild size="sm">
+                <Link href="/admin/data-source/connect">+ Liitä datayhteys</Link>
+              </Button>
+
+              <Button asChild variant="outline" size="sm">
+                <Link href="/admin/runs">Kaikki lokit</Link>
+              </Button>
+            </div>
+          </div>
+        </section>
+
+        {/* -------------------------------- */}
+        {/* CONNECTION LIST                  */}
+        {/* -------------------------------- */}
+        <section className="rounded-xl border border-gray-200 bg-white shadow-sm">
+          <div className="border-b border-gray-200 p-5">
+            <h2 className="text-lg font-medium text-gray-900">Datayhteydet</h2>
+            <p className="mt-1 text-sm text-gray-600">
+              Avaa datayhteys, selaa dataa tai tarkista lokit.
+            </p>
+          </div>
+
+          <div className="divide-y divide-gray-200">
+            {connections.map((c) => (
+              <div
+                key={c.id}
+                className="flex flex-col gap-3 p-5 md:flex-row md:items-center md:justify-between"
+              >
+                <div className="min-w-0">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <div className="text-base font-semibold text-gray-900">
+                      {c.name}
+                    </div>
+                    <span
+                      className={[
+                        "inline-flex rounded-full px-2.5 py-1 text-xs font-medium",
+                        statusPillClass[c.status],
+                      ].join(" ")}
+                    >
+                      {statusLabel[c.status]}
+                    </span>
+                  </div>
+
+                  <div className="mt-1 text-sm text-gray-600">
+                    Viimeisin synkronointi:{" "}
+                    <span className="font-medium text-gray-900">
+                      {c.lastSyncAt ?? "—"}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Per-connection actions */}
+                <div className="flex flex-wrap gap-2">
+                  <Button asChild size="sm">
+                    <Link href={`/admin/data-source?connection=${c.id}`}>
+                      Muokkaa
+                    </Link>
+                  </Button>
+
+                  <Button asChild variant="outline" size="sm">
+                    <Link href={`/admin/data-preview?connection=${c.id}`}>
+                      Selaa dataa
+                    </Link>
+                  </Button>
+
+                  <Button asChild variant="outline" size="sm">
+                    <Link href={`/admin/runs?connection=${c.id}`}>Lokit</Link>
+                  </Button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      </div>
     </PageTemplate>
   );
 };
 
-export default DataSourcesPage;
+export default AdminHomePage;
