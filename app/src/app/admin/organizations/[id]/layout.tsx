@@ -27,6 +27,11 @@ import Link from "next/link";
 import { useParams, usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
+type NavLink = {
+  href: string;
+  label: string;
+};
+
 const Content = ({ children }: { children: React.ReactNode }) => {
   const { id } = useParams<{ id: string }>();
   const pathname = usePathname();
@@ -50,6 +55,11 @@ const Content = ({ children }: { children: React.ReactNode }) => {
     }
   }, [useCasesQuery.data]);
 
+  const navLinks: NavLink[] = [
+    { href: `/admin/organizations/${id}/datasources`, label: "Datalähteet" },
+    { href: `/admin/organizations/${id}/locations`, label: "Kohteet" },
+  ];
+
   return (
     <div className="flex flex-col h-full">
       <TitleBar
@@ -58,28 +68,20 @@ const Content = ({ children }: { children: React.ReactNode }) => {
       >
         <div className="flex flex-1 h-full items-center">
           <nav className="flex h-full ml-4">
-            <Link
-              href={`/admin/organizations/${id}/datasources`}
-              className={cn(
-                "inline-flex items-center px-4 -mb-px font-medium border-t-[3px] border-t-transparent border-b-[3px]",
-                pathname.startsWith(`/admin/organizations/${id}/datasources`)
-                  ? "border-b-primary text-gray-900"
-                  : "border-b-transparent text-gray-600 hover:text-gray-900"
-              )}
-            >
-              Datalähteet
-            </Link>
-            <Link
-              href={`/admin/organizations/${id}/locations`}
-              className={cn(
-                "inline-flex items-center px-4 -mb-px font-medium border-t-[3px] border-t-transparent border-b-[3px]",
-                pathname.startsWith(`/admin/organizations/${id}/locations`)
-                  ? "border-b-primary text-gray-900"
-                  : "border-b-transparent text-gray-600 hover:text-gray-900"
-              )}
-            >
-              Kohteet
-            </Link>
+            {navLinks.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className={cn(
+                  "inline-flex items-center px-4 -mb-px border-t-[3px] border-t-transparent border-b-[3px]",
+                  pathname.startsWith(link.href)
+                    ? "border-b-primary text-gray-900 font-semibold"
+                    : "border-b-transparent text-gray-600 hover:text-gray-900 font-medium"
+                )}
+              >
+                {link.label}
+              </Link>
+            ))}
           </nav>
 
           <div className="flex items-center ml-auto mr-2">
