@@ -1,6 +1,6 @@
 import { PageTemplate } from "@/components/admin/page-template";
 
-const GeneralInfoPage = () => {
+const LocationsPage = () => {
   return (
     <PageTemplate title="Kohteet">
       <p className="text-gray-600">
@@ -9,4 +9,4 @@ const GeneralInfoPage = () => {
     </PageTemplate>
   );
 };
-export default GeneralInfoPage;
+export default LocationsPage;
