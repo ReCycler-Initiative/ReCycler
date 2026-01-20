@@ -15,14 +15,16 @@ const TitleBar = ({
   toHomeHref?: string;
 }) => {
   return (
-    <header className="h-16 pl-1 pr-3 border-b border-gray-400 sticky top-0 bg-white shadow-md z-50 flex items-center justify-between shrink-0">
-      <div className="flex items-center gap-2 flex-1">
+    <header className="h-16 pl-1 pr-3 border-b border-gray-400 sticky top-0 bg-white shadow-md z-50 flex items-stretch shrink-0">
+      <div className="flex items-center gap-2">
         <Link href={toHomeHref}>
           {logo}
         </Link>
-        {children}
       </div>
-      <Auth0Login />
+      {children}
+      <div className="flex items-center ml-auto">
+        <Auth0Login />
+      </div>
     </header>
   );
 };

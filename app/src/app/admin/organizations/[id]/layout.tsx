@@ -21,13 +21,15 @@ import {
   getUseCases,
 } from "@/services/api";
 import { useQuery } from "@tanstack/react-query";
+import { cn } from "@/lib/utils";
 import { SettingsIcon } from "lucide-react";
 import Link from "next/link";
-import { useParams, useRouter } from "next/navigation";
+import { useParams, usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 const Content = ({ children }: { children: React.ReactNode }) => {
   const { id } = useParams<{ id: string }>();
+  const pathname = usePathname();
   const [selectedUseCaseId, setSelectedUseCaseId] = useState<
     string | undefined
   >();
@@ -54,12 +56,30 @@ const Content = ({ children }: { children: React.ReactNode }) => {
         logo={<p className="ml-2 font-bold">{organizationQuery.data?.name}</p>}
         toHomeHref={`/admin/organizations/${id}`}
       >
-        <div className="flex flex-1">
-          <nav className="[&>a]:inline-block [&>a]:py-3 [&>a]:px-4 ml-4">
-            <Link href={`/admin/organizations/${id}/datasources`}>
+        <div className="flex flex-1 h-full">
+          <nav className="flex ml-4 h-full">
+            <Link
+              href={`/admin/organizations/${id}/datasources`}
+              className={cn(
+                "inline-flex items-center px-4 -mb-px",
+                pathname.startsWith(`/admin/organizations/${id}/datasources`)
+                  ? "border-b-2 border-primary font-semibold"
+                  : "text-gray-600 hover:text-gray-900"
+              )}
+            >
               Datalähteet
             </Link>
-            <Link href={`/admin/organizations/${id}/locations`}>Kohteet</Link>
+            <Link
+              href={`/admin/organizations/${id}/locations`}
+              className={cn(
+                "inline-flex items-center px-4 -mb-px",
+                pathname.startsWith(`/admin/organizations/${id}/locations`)
+                  ? "border-b-2 border-primary font-semibold"
+                  : "text-gray-600 hover:text-gray-900"
+              )}
+            >
+              Kohteet
+            </Link>
           </nav>
 
           <div className="flex items-center ml-auto mr-2">
