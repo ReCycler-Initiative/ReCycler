@@ -65,7 +65,9 @@ const AdminHomePage = () => {
 
             <div className="flex flex-wrap gap-2">
               <Button asChild size="sm">
-                <Link href="/admin/data-source/connect">+ Liitä datayhteys</Link>
+                <Link href="/admin/data-source/connect">
+                  + Liitä datayhteys
+                </Link>
               </Button>
 
               <Button asChild variant="outline" size="sm">
@@ -123,11 +125,7 @@ const AdminHomePage = () => {
                     </Link>
                   </Button>
 
-                  <Button asChild variant="outline" size="sm">
-                    <Link href={`/admin/data-preview?connection=${c.id}`}>
-                      Selaa dataa
-                    </Link>
-                  </Button>
+                  {/* "Selaa dataa" button removed */}
 
                   <Button asChild variant="outline" size="sm">
                     <Link href={`/admin/runs?connection=${c.id}`}>Lokit</Link>
