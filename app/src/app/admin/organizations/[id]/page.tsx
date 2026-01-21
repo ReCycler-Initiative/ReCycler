@@ -110,7 +110,7 @@ const QuickCard = ({
 
 const AdminHomePage = () => {
   return (
-    <PageTemplate>
+    <PageTemplate fullWidth>
       <div className="pb-8">
         {/* BACKDROP */}
         <div className="relative overflow-hidden rounded-2xl border border-gray-200 bg-white">
