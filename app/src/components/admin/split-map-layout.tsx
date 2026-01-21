@@ -44,17 +44,18 @@ export const SplitMapLayout = ({
         </Button>
       </div>
       {/* Split layout container */}
-      <div className="flex flex-1 flex-col lg:flex-row overflow-hidden gap-x-4">
-        {/* List panel */}
-        <div
-          className={cn(
-            "flex-1 overflow-y-auto lg:w-1/3 lg:max-w-md lg:flex-none",
-            mobileView === "list" ? "block" : "hidden lg:block"
-          )}
-        >
-          {children}
+      <div className="flex flex-1 gap-x-4">
+        <div className={cn(
+            "flex-1 flex-col lg:w-1/3 lg:max-w-md",
+            mobileView === "list" ? "flex" : "hidden lg:flex"
+          )}>
+          {/* List panel */}
+          <div
+            className={cn("basis-0 grow overflow-auto")}
+          >
+            {children}
+          </div>
         </div>
-
         {/* Map panel */}
         <div
           className={cn(
