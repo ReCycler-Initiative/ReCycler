@@ -49,10 +49,10 @@ const statusPillClass: Record<ConnectionStatus, string> = {
   not_configured: "bg-gray-200 text-gray-800",
 };
 
-const AdminHomePage = () => {
+const DatasourcesPage = () => {
   return (
-    <PageTemplate title="Datayhteydet">
-      <div className="min-h-[calc(100vh-120px)] flex flex-col gap-6 pb-8">
+    <PageTemplate title="Datayhteydet" fullWidth>
+      <div className="flex flex-col gap-6">
         {/* -------------------------------- */}
         {/* HEADER                           */}
         {/* -------------------------------- */}
@@ -140,4 +140,4 @@ const AdminHomePage = () => {
   );
 };
 
-export default AdminHomePage;
+export default DatasourcesPage;
