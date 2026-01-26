@@ -58,6 +58,7 @@ const Content = ({ children }: { children: React.ReactNode }) => {
   const navLinks: NavLink[] = [
     { href: `/admin/organizations/${id}/datasources`, label: "Datalähteet" },
     { href: `/admin/organizations/${id}/locations`, label: "Kohteet" },
+    { href: `/admin/organizations/${id}/runs`, label: "Lokit ja ajot" }, // lisätty
   ];
 
   return (
@@ -72,23 +73,36 @@ const Content = ({ children }: { children: React.ReactNode }) => {
               href={`/admin/organizations/${id}/datasources`}
               className={cn(
                 "inline-flex items-center px-4 -mb-px",
-                pathname.startsWith(`/admin/organizations/${id}/datasources`)
+                pathname?.startsWith(`/admin/organizations/${id}/datasources`)
                   ? "border-b-2 border-primary font-semibold"
                   : "text-gray-600 hover:text-gray-900"
               )}
             >
-              Datalähteet
+              Datayhteydet
             </Link>
             <Link
               href={`/admin/organizations/${id}/locations`}
               className={cn(
                 "inline-flex items-center px-4 -mb-px",
-                pathname.startsWith(`/admin/organizations/${id}/locations`)
+                pathname?.startsWith(`/admin/organizations/${id}/locations`)
                   ? "border-b-2 border-primary font-semibold"
                   : "text-gray-600 hover:text-gray-900"
               )}
             >
               Kohteet
+            </Link>
+
+            {/* Uusi linkki: Lokit ja ajot */}
+            <Link
+              href={`/admin/organizations/${id}/runs`}
+              className={cn(
+                "inline-flex items-center px-4 -mb-px",
+                pathname?.startsWith(`/admin/organizations/${id}/runs`)
+                  ? "border-b-2 border-primary font-semibold"
+                  : "text-gray-600 hover:text-gray-900"
+              )}
+            >
+              Lokit ja ajot
             </Link>
           </nav>
 
@@ -130,6 +144,10 @@ const Content = ({ children }: { children: React.ReactNode }) => {
                   </Link>
                 </DropdownMenuItem>
               )}
+              {/* Lisätään myös pikanappi organisaation lokkeihin dropdowniin (valinnainen) */}
+              <DropdownMenuItem asChild>
+                <Link href={`/admin/organizations/${id}/runs`}>Lokit ja ajot</Link>
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
