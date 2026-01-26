@@ -12,10 +12,20 @@ You can test the development version of ReCycler at: http://www.recyclerapp.fi. 
 ## Features
 ### User-friendly interface for smart recycling guidance
 ReCycler provides an intuitive interface featuring a map view that visualizes the locations of recommended recycling collection spots along with detailed information about each site. ReCycler can dynamically display the user’s current location on the map, so the user does not need to adjust the map while moving manually.
-### Multi-organization support and admin tools (to be released in 2025)
-A single instance of Recycler can be utilized by multiple organizations and multiple use cases, each with their own needs. While the current development demo (www.recyclerapp.fi) focuses on recycling collection points, the platform can be effortlessly adapted to support other use cases as well. A demo of the multi-organization development version will be released later, once the required user interface implementations have reached a sufficient level of readiness.
 
-The multi-organization model requires the development of user management and admin tools to enable flexible and secure access control, organization-specific configurations, and efficient oversight across different domains.
+### Multi-organization and multi–use case support - "ReCycler Platform" (Development)
+
+ReCycler Platform is designed to support multiple organizations and a wide range of use cases, each with their own requirements and operating models. The platform is not built for a specific domain or single use case, but as a generic foundation that can be configured and extended for virtually any purpose.
+The current development demo (www.recyclerapp.fi) showcases recycling collection points as one example use case, but the underlying platform is not limited to this domain. Core development focuses on building reusable tools and capabilities that enable the creation, configuration, and management of use cases independently of their content or context.
+
+The development of these capabilities is ongoing during H1/2026. This includes the implementation of comprehensive user management and administrative tools that allow organizations to:
+- create and manage their own use cases,
+- define organization- and use case–specific configurations,
+- manage users, roles, and access rights securely, and
+- ensure clear separation and governance across organizations and domains.
+
+A demo of the multi-organization and multi–use case development version will be released once the required user interface components supporting these generic management capabilities have reached a sufficient level of maturity.
+
 ## How to contribute
 We welcome contributions from developers, designers, and anyone passionate about sustainable practices. Please follow the guidelines outlined in our [contributing.md](contributing.md) file.
 ## Installation
