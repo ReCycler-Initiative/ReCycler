@@ -43,7 +43,11 @@ export default function Auth0Login() {
 
   return (
     <div className="relative">
-      <div className={cn("transition-opacity duration-700", { "opacity-0": !isLoading })}>
+      <div
+        className={cn("transition-opacity duration-700", {
+          "opacity-0": !isLoading,
+        })}
+      >
         <div className="h-12 w-12 rounded-full flex items-center justify-center bg-black/5 animate-pulse">
           <LoadingSpinner />
         </div>
@@ -79,7 +83,7 @@ export default function Auth0Login() {
                         className="h-full w-full object-cover"
                         referrerPolicy="no-referrer"
                       />
-                      <span className="h-full w-full absolute inset-0 group-hover:bg-black/50 transition bg-black/0" />
+                      <span className="h-full w-full absolute inset-0 group-hover:bg-black/50 transition" />
                       <span className="absolute inset-0 flex items-center justify-center">
                         <span className="text-xs font-semibold text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.7)] select-none">
                           {getInitials(user.name, user.email)}
@@ -98,9 +102,19 @@ export default function Auth0Login() {
                               </Link>
                             </DropdownMenuItem>
                           ))}
-                          <DropdownMenuSeparator />
                         </>
                       )}
+                    {organizationsQuery.isLoading && (
+                      <div className="flex items-center gap-2 p-2 text-sm">
+                        <LoadingSpinner />
+                        <span>Ladataan organisaatioita...</span>
+                      </div>
+                    )}
+                    {((organizationsQuery.data &&
+                      organizationsQuery.data.length > 0) ||
+                      organizationsQuery.isLoading) && (
+                      <DropdownMenuSeparator />
+                    )}
                     <DropdownMenuItem asChild>
                       <Link href="/user-settings">Asetukset</Link>
                     </DropdownMenuItem>
