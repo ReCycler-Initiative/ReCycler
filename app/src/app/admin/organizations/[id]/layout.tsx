@@ -57,8 +57,9 @@ const Content = ({
   }, [useCasesQuery.data]);
 
   const navLinks: NavLink[] = [
-    { href: `/admin/organizations/${id}/datasources`, label: "Datalähteet" },
+    { href: `/admin/organizations/${id}/datasources`, label: "Datayhteydet" },
     { href: `/admin/organizations/${id}/locations`, label: "Kohteet" },
+    { href: `/admin/organizations/${id}/runs`, label: "Lokit ja ajot" },
   ];
 
   return (
@@ -83,7 +84,6 @@ const Content = ({
               </Link>
             ))}
           </nav>
-
           <div className="flex items-center ml-auto mr-2">
             <Label className="mr-4">Käyttötapaus</Label>
             <Select
@@ -122,6 +122,10 @@ const Content = ({
                   </Link>
                 </DropdownMenuItem>
               )}
+              {/* Lisätään myös pikanappi organisaation lokkeihin dropdowniin (valinnainen) */}
+              <DropdownMenuItem asChild>
+                <Link href={`/admin/organizations/${id}/runs`}>Lokit ja ajot</Link>
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>

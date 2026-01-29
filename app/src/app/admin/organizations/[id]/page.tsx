@@ -1,16 +1,8 @@
 "use client";
 
 import Link from "next/link";
+import { useParams } from "next/navigation";
 import { PageTemplate } from "@/components/admin/page-template";
-
-/**
- * Admin landing / welcome page (polished dashboard)
- * - No hero CTA buttons (actions live in navigation / other pages)
- * - "Tilannekuva" kept
- * - "Suositellut reitit" replaced with "Ohjeet ja dokumentaatio"
- *
- * NOTE: Update /docs/* links to match your actual docs routes (or external URL).
- */
 
 type StatItem = {
   label: string;
@@ -109,6 +101,15 @@ const QuickCard = ({
 };
 
 const AdminHomePage = () => {
+  const params = useParams();
+  const orgId = params?.id as string | undefined;
+
+  // Jos orgId on käytettävissä, ohjataan organisaation datasourceseihin.
+  // Muuten fallback: yleinen connect-sivu.
+  const datasourcesHref = orgId
+    ? `/admin/organizations/${orgId}/datasources`
+    : "/admin/data-source/connect";
+
   return (
     <PageTemplate fullWidth>
       <div className="pb-8">
@@ -209,7 +210,7 @@ const AdminHomePage = () => {
                 <QuickCard
                   title="Datayhteydet"
                   description="Liitä, muokkaa ja tarkista datayhteyksien tila."
-                  href="/admin/data-source/connect"
+                  href={datasourcesHref}
                   badge="Yhteydet"
                 />
                 <QuickCard
@@ -276,19 +277,6 @@ const AdminHomePage = () => {
                     </Link>
                   </li>
                 </ul>
-
-                {/* Optional external docs link example:
-                <div className="mt-4">
-                  <Link
-                    href="https://docs.example.com"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-sm font-medium text-gray-900 hover:underline"
-                  >
-                    Avaa dokumentaatio →
-                  </Link>
-                </div>
-                */}
               </section>
             </div>
           </div>
