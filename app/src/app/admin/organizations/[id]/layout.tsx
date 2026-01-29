@@ -32,17 +32,18 @@ type NavLink = {
   label: string;
 };
 
-const Content = ({ children }: { children: React.ReactNode }) => {
+const Content = ({
+  children,
+  organization,
+}: {
+  children: React.ReactNode;
+  organization: any;
+}) => {
   const { id } = useParams<{ id: string }>();
   const pathname = usePathname();
   const [selectedUseCaseId, setSelectedUseCaseId] = useState<
     string | undefined
   >();
-
-  const organizationQuery = useQuery({
-    queryKey: ["organization", id],
-    queryFn: () => getOrganizationById(id),
-  });
 
   const useCasesQuery = useQuery({
     queryKey: ["use_cases", id],
@@ -63,33 +64,24 @@ const Content = ({ children }: { children: React.ReactNode }) => {
   return (
     <div className="flex flex-col h-full">
       <TitleBar
-        logo={<p className="ml-2 font-bold">{organizationQuery.data?.name}</p>}
+        logo={<p className="ml-2 font-bold">{organization.name}</p>}
         toHomeHref={`/admin/organizations/${id}`}
       >
         <div className="flex flex-1 h-full">
           <nav className="flex ml-4 h-full">
-            <Link
-              href={`/admin/organizations/${id}/datasources`}
-              className={cn(
-                "inline-flex items-center px-4 -mb-px",
-                pathname.startsWith(`/admin/organizations/${id}/datasources`)
-                  ? "border-b-2 border-primary font-semibold"
-                  : "text-gray-600 hover:text-gray-900"
-              )}
-            >
-              Datalähteet
-            </Link>
-            <Link
-              href={`/admin/organizations/${id}/locations`}
-              className={cn(
-                "inline-flex items-center px-4 -mb-px",
-                pathname.startsWith(`/admin/organizations/${id}/locations`)
-                  ? "border-b-2 border-primary font-semibold"
-                  : "text-gray-600 hover:text-gray-900"
-              )}
-            >
-              Kohteet
-            </Link>
+            {navLinks.map((link) => (
+              <Link
+                href={link.href}
+                className={cn(
+                  "inline-flex items-center px-4 -mb-px",
+                  pathname.startsWith(link.href)
+                    ? "border-b-2 border-primary font-semibold"
+                    : "text-gray-600 hover:text-gray-900"
+                )}
+              >
+                {link.label}
+              </Link>
+            ))}
           </nav>
 
           <div className="flex items-center ml-auto mr-2">
@@ -149,6 +141,12 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
     retry: false,
   });
 
+  const organizationQuery = useQuery({
+    queryKey: ["organization", id],
+    queryFn: () => getOrganizationById(id),
+    enabled: accessQuery.data?.hasAccess === true,
+  });
+
   useEffect(() => {
     if (accessQuery.error) {
       const error = accessQuery.error as any;
@@ -163,7 +161,7 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
     }
   }, [accessQuery.error, router]);
 
-  if (accessQuery.isLoading) {
+  if (accessQuery.isLoading || organizationQuery.isLoading) {
     return (
       <div className="flex items-center justify-center h-screen">
         <div className="text-lg">Loading...</div>
@@ -179,7 +177,7 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
     );
   }
 
-  return <Content>{children}</Content>;
+  return <Content organization={organizationQuery.data}>{children}</Content>;
 };
 
 export default AdminLayout;
