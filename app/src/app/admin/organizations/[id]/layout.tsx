@@ -27,17 +27,10 @@ import Link from "next/link";
 import { useParams, usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
-type NavLink = {
-  href: string;
-  label: string;
-};
-
 const Content = ({ children }: { children: React.ReactNode }) => {
   const { id } = useParams<{ id: string }>();
   const pathname = usePathname();
-  const [selectedUseCaseId, setSelectedUseCaseId] = useState<
-    string | undefined
-  >();
+  const [selectedUseCaseId, setSelectedUseCaseId] = useState<string | undefined>();
 
   const organizationQuery = useQuery({
     queryKey: ["organization", id],
@@ -55,52 +48,54 @@ const Content = ({ children }: { children: React.ReactNode }) => {
     }
   }, [useCasesQuery.data]);
 
-  const navLinks: NavLink[] = [
-    { href: `/admin/organizations/${id}/datasources`, label: "Datalähteet" },
-    { href: `/admin/organizations/${id}/locations`, label: "Kohteet" },
-    { href: `/admin/organizations/${id}/runs`, label: "Lokit ja ajot" }, // lisätty
-  ];
+  const orgRootPath = `/admin/organizations/${id}`;
+  const isOrgRoot = pathname === orgRootPath;
+
+  const isActiveSection = (segment: "datasources" | "locations" | "runs") =>
+    pathname?.startsWith(`${orgRootPath}/${segment}`) ?? false;
+
+  // Same visual style as "Avaa ReCycler-demo"
+  const navButtonClass = (isActive: boolean) =>
+    cn(
+      "inline-flex items-center rounded-full px-5 py-2 text-sm font-medium transition",
+      isActive
+        ? "bg-gradient-to-b from-slate-900 to-slate-800 text-white shadow-sm"
+        : "text-gray-700 hover:bg-gray-100"
+    );
+
+  // Organization name styling (NO bold)
+  const orgLogoClass = cn(
+    "ml-2 inline-flex items-center rounded-full px-4 py-2 transition text-sm",
+    isOrgRoot
+      ? "bg-gradient-to-b from-slate-900 to-slate-800 text-white shadow-sm"
+      : "text-slate-900 hover:bg-gray-100"
+  );
 
   return (
     <div className="flex flex-col h-full">
       <TitleBar
-        logo={<p className="ml-2 font-bold">{organizationQuery.data?.name}</p>}
-        toHomeHref={`/admin/organizations/${id}`}
+        logo={<span className={orgLogoClass}>{organizationQuery.data?.name}</span>}
+        toHomeHref={orgRootPath}
       >
-        <div className="flex flex-1 h-full">
-          <nav className="flex ml-4 h-full">
+        <div className="flex flex-1 h-full items-center">
+          <nav className="flex ml-4 h-full items-center gap-2">
             <Link
-              href={`/admin/organizations/${id}/datasources`}
-              className={cn(
-                "inline-flex items-center px-4 -mb-px",
-                pathname?.startsWith(`/admin/organizations/${id}/datasources`)
-                  ? "border-b-2 border-primary font-semibold"
-                  : "text-gray-600 hover:text-gray-900"
-              )}
+              href={`${orgRootPath}/datasources`}
+              className={navButtonClass(isActiveSection("datasources"))}
             >
               Datayhteydet
             </Link>
+
             <Link
-              href={`/admin/organizations/${id}/locations`}
-              className={cn(
-                "inline-flex items-center px-4 -mb-px",
-                pathname?.startsWith(`/admin/organizations/${id}/locations`)
-                  ? "border-b-2 border-primary font-semibold"
-                  : "text-gray-600 hover:text-gray-900"
-              )}
+              href={`${orgRootPath}/locations`}
+              className={navButtonClass(isActiveSection("locations"))}
             >
               Kohteet
             </Link>
 
-            {/* Uusi linkki: Lokit ja ajot */}
             <Link
-              href={`/admin/organizations/${id}/runs`}
-              className={cn(
-                "inline-flex items-center px-4 -mb-px",
-                pathname?.startsWith(`/admin/organizations/${id}/runs`)
-                  ? "border-b-2 border-primary font-semibold"
-                  : "text-gray-600 hover:text-gray-900"
-              )}
+              href={`${orgRootPath}/runs`}
+              className={navButtonClass(isActiveSection("runs"))}
             >
               Lokit ja ajot
             </Link>
@@ -125,33 +120,34 @@ const Content = ({ children }: { children: React.ReactNode }) => {
               </SelectContent>
             </Select>
           </div>
+
           <DropdownMenu>
             <DropdownMenuTrigger className="mr-1 px-3">
               <SettingsIcon />
             </DropdownMenuTrigger>
             <DropdownMenuContent>
               <DropdownMenuItem asChild>
-                <Link href={`/admin/organizations/${id}/general_info`}>
+                <Link href={`${orgRootPath}/general_info`}>
                   Organisaation tiedot
                 </Link>
               </DropdownMenuItem>
+
               {selectedUseCaseId && (
                 <DropdownMenuItem asChild>
-                  <Link
-                    href={`/admin/organizations/${id}/use_cases/${selectedUseCaseId}`}
-                  >
+                  <Link href={`${orgRootPath}/use_cases/${selectedUseCaseId}`}>
                     Käyttötapauksen tiedot
                   </Link>
                 </DropdownMenuItem>
               )}
-              {/* Lisätään myös pikanappi organisaation lokkeihin dropdowniin (valinnainen) */}
+
               <DropdownMenuItem asChild>
-                <Link href={`/admin/organizations/${id}/runs`}>Lokit ja ajot</Link>
+                <Link href={`${orgRootPath}/runs`}>Lokit ja ajot</Link>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
       </TitleBar>
+
       <main className="flex-1 flex flex-col bg-gray-100">{children}</main>
     </div>
   );
@@ -175,7 +171,6 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
       } else if (error.response?.status === 403) {
         router.push("/unauthorized");
       } else {
-        // For 404, 500 and other errors, redirect to 404 page
         router.push("/404");
       }
     }
