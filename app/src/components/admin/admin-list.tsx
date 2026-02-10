@@ -39,24 +39,23 @@ export const AdminList = ({
             onClick={() => onSelect?.(item.id)}
             className={cn(
               "flex flex-col gap-3 border border-gray-200 p-4 text-sm md:flex-row md:items-center md:justify-between rounded-xl bg-white",
-              onSelect && "cursor-pointer hover:bg-gray-100 transition-colors",
-              selectedId === item.id && "ring-2 ring-primary bg-primary/5"
+              onSelect && "cursor-pointer hover:bg-gray-50 transition-colors",
+              selectedId === item.id &&
+                "ring-2 ring-primary bg-primary text-white ring-inset hover:bg-primary/90"
             )}
           >
             <div className="space-y-1">
               <div className="flex flex-wrap items-center gap-2">
-                <h3 className="text-sm font-semibold text-gray-900">
-                  {item.title}
-                </h3>
+                <h3 className="text-sm font-semibold">{item.title}</h3>
                 {item.badges}
               </div>
               {item.description && (
-                <p className="text-xs text-gray-600">{item.description}</p>
+                <p className="text-xs">{item.description}</p>
               )}
               {item.metadata}
             </div>
             {item.actions && (
-              <div className="flex flex-wrap gap-2 md:justify-end">
+              <div className="flex flex-wrap gap-2 md:justify-end text-primary">
                 {item.actions}
               </div>
             )}

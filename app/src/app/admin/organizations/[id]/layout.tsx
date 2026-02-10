@@ -27,15 +27,22 @@ import Link from "next/link";
 import { useParams, usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
-const Content = ({ children }: { children: React.ReactNode }) => {
+type NavLink = {
+  exact?: boolean;
+  href: string;
+  label: string;
+};
+
+const Content = ({
+  children,
+  organization,
+}: {
+  children: React.ReactNode;
+  organization: any;
+}) => {
   const { id } = useParams<{ id: string }>();
   const pathname = usePathname();
   const [selectedUseCaseId, setSelectedUseCaseId] = useState<string | undefined>();
-
-  const organizationQuery = useQuery({
-    queryKey: ["organization", id],
-    queryFn: () => getOrganizationById(id),
-  });
 
   const useCasesQuery = useQuery({
     queryKey: ["use_cases", id],
@@ -51,8 +58,14 @@ const Content = ({ children }: { children: React.ReactNode }) => {
   const orgRootPath = `/admin/organizations/${id}`;
   const isOrgRoot = pathname === orgRootPath;
 
-  const isActiveSection = (segment: "datasources" | "locations" | "runs") =>
-    pathname?.startsWith(`${orgRootPath}/${segment}`) ?? false;
+  const isActiveSection = (segment: string, exact?: boolean) => {
+    if (exact) {
+      return pathname === segment;
+    }
+
+    return pathname?.startsWith(segment) ?? false;
+  }
+    
 
   // Same visual style as "Avaa ReCycler-demo"
   const navButtonClass = (isActive: boolean) =>
@@ -70,37 +83,31 @@ const Content = ({ children }: { children: React.ReactNode }) => {
       ? "bg-gradient-to-b from-slate-900 to-slate-800 text-white shadow-sm"
       : "text-slate-900 hover:bg-gray-100"
   );
+  const navLinks: NavLink[] = [
+    { exact: true, href: `${orgRootPath}`, label: organization.name },
+    { href: `${orgRootPath}/datasources`, label: "Datayhteydet" },
+    { href: `${orgRootPath}/locations`, label: "Kohteet" },
+    { href: `${orgRootPath}/runs`, label: "Lokit ja ajot" },
+  ];
 
   return (
     <div className="flex flex-col h-full">
       <TitleBar
-        logo={<span className={orgLogoClass}>{organizationQuery.data?.name}</span>}
-        toHomeHref={orgRootPath}
+        logo=""
+        toHomeHref={`/admin/organizations/${id}`}
       >
-        <div className="flex flex-1 h-full items-center">
-          <nav className="flex ml-4 h-full items-center gap-2">
-            <Link
-              href={`${orgRootPath}/datasources`}
-              className={navButtonClass(isActiveSection("datasources"))}
-            >
-              Datayhteydet
-            </Link>
-
-            <Link
-              href={`${orgRootPath}/locations`}
-              className={navButtonClass(isActiveSection("locations"))}
-            >
-              Kohteet
-            </Link>
-
-            <Link
-              href={`${orgRootPath}/runs`}
-              className={navButtonClass(isActiveSection("runs"))}
-            >
-              Lokit ja ajot
-            </Link>
+        <div className="flex flex-1 h-full items-center gap-x-4">
+          <nav className="flex ml-4 h-10">
+            {navLinks.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className={navButtonClass(isActiveSection(link.href, link.exact))}
+              >
+                {link.label}
+              </Link>
+            ))}
           </nav>
-
           <div className="flex items-center ml-auto mr-2">
             <Label className="mr-4">Käyttötapaus</Label>
             <Select
@@ -163,6 +170,12 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
     retry: false,
   });
 
+  const organizationQuery = useQuery({
+    queryKey: ["organization", id],
+    queryFn: () => getOrganizationById(id),
+    enabled: accessQuery.data?.hasAccess === true,
+  });
+
   useEffect(() => {
     if (accessQuery.error) {
       const error = accessQuery.error as any;
@@ -176,7 +189,7 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
     }
   }, [accessQuery.error, router]);
 
-  if (accessQuery.isLoading) {
+  if (accessQuery.isLoading || organizationQuery.isLoading) {
     return (
       <div className="flex items-center justify-center h-screen">
         <div className="text-lg">Loading...</div>
@@ -192,7 +205,7 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
     );
   }
 
-  return <Content>{children}</Content>;
+  return <Content organization={organizationQuery.data}>{children}</Content>;
 };
 
 export default AdminLayout;
