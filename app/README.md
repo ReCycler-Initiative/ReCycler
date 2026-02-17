@@ -47,6 +47,12 @@ Run migrations
 npm run migrate
 ```
 
+Run seeds
+
+```bash
+npm run seed
+```
+
 Run the development server:
 
 ```bash
@@ -71,4 +77,10 @@ To add new migration file
 
 ```bash
 npm run knex -- migrate:make
+```
+
+To add new seed file
+
+```bash
+npm run knex -- seed:make
 ```
