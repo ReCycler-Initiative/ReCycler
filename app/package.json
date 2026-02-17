@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "migrate": "npm run knex -- migrate:latest",
+    "seed": "npm run knex -- seed:run",
     "knex": "tsx ./node_modules/knex/bin/cli.js"
   },
   "dependencies": {
