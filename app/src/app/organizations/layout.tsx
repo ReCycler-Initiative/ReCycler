@@ -12,8 +12,10 @@ const OrganizationLayout = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     const onLoaded = () => setMapReady(true);
     const onUnloaded = () => setMapReady(false);
+
     window.addEventListener("map-loaded", onLoaded);
     window.addEventListener("map-unloaded", onUnloaded);
+
     return () => {
       window.removeEventListener("map-loaded", onLoaded);
       window.removeEventListener("map-unloaded", onUnloaded);
@@ -31,13 +33,12 @@ const OrganizationLayout = ({ children }: { children: React.ReactNode }) => {
           <Image className="pb-2" src={logo} alt="Recycler logo" width={150} />
         }
       >
-        {/* Contextual actions on the right side */}
-        <div className="flex items-center ml-auto">
+        <div className="flex w-full items-center justify-end">
           {mapReady && (
             <Button
               variant="outline"
               onClick={openOnboarding}
-              className="h-10 px-4 mr-2" // ← 2 px väli (vaihda tarvittaessa mr-1 = 4 px)
+              className="h-10 px-4 mr-3"
               aria-label="Open onboarding"
             >
               Ohjeet
