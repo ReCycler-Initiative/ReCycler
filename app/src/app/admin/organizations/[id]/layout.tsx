@@ -76,13 +76,6 @@ const Content = ({
         : "text-gray-700 hover:bg-gray-100"
     );
 
-  // Organization name styling (NO bold)
-  const orgLogoClass = cn(
-    "ml-2 inline-flex items-center rounded-full px-4 py-2 transition text-sm",
-    isOrgRoot
-      ? "bg-gradient-to-b from-slate-900 to-slate-800 text-white shadow-sm"
-      : "text-slate-900 hover:bg-gray-100"
-  );
   const navLinks: NavLink[] = [
     { exact: true, href: `${orgRootPath}`, label: organization.name },
     { href: `${orgRootPath}/datasources`, label: "Datayhteydet" },
@@ -93,11 +86,11 @@ const Content = ({
   return (
     <div className="flex flex-col h-full">
       <TitleBar
-        logo=""
-        toHomeHref={`/admin/organizations/${id}`}
+        logo={<p className="font-bold ml-2">ReCycler Platform</p>}
+        toHomeHref="/"
       >
         <div className="flex flex-1 h-full items-center gap-x-4">
-          <nav className="flex ml-4 h-10">
+          <nav className="flex ml-4 h-10 gap-1">
             {navLinks.map((link) => (
               <Link
                 key={link.href}
