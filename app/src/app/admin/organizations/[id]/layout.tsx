@@ -128,6 +128,17 @@ const Content = ({
             </Select>
           </div>
 
+          {selectedUseCaseId && (
+            <Link
+              href="/recycler"
+              className={navButtonClass(true)}
+              aria-label="Avaa valittu käyttötapaus"
+              title="Avaa valittu käyttötapaus"
+            >
+              Avaa
+            </Link>
+          )}
+
           <DropdownMenu>
             <DropdownMenuTrigger className="mr-1 px-3">
               <SettingsIcon />
