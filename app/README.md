@@ -72,3 +72,9 @@ To add new migration file
 ```bash
 npm run knex -- migrate:make
 ```
+
+To add new seed file
+
+```bash
+npm run knex -- seed:make
+```
