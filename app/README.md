@@ -47,6 +47,12 @@ Run migrations
 npm run migrate
 ```
 
+Run seeds
+
+```bash
+npm run seed
+```
+
 Run the development server:
 
 ```bash
