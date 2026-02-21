@@ -69,10 +69,6 @@ const DatasourcesPage = () => {
                   + Liitä datayhteys
                 </Link>
               </Button>
-
-              <Button asChild variant="outline" size="sm">
-                <Link href="/admin/runs">Kaikki lokit</Link>
-              </Button>
             </div>
           </div>
         </section>
@@ -126,10 +122,6 @@ const DatasourcesPage = () => {
                   </Button>
 
                   {/* "Selaa dataa" button removed */}
-
-                  <Button asChild variant="outline" size="sm">
-                    <Link href={`/admin/runs?connection=${c.id}`}>Lokit</Link>
-                  </Button>
                 </div>
               </div>
             ))}

@@ -101,14 +101,10 @@ const QuickCard = ({
 };
 
 const AdminHomePage = () => {
-  const params = useParams();
-  const orgId = params?.id as string | undefined;
+  const { id } = useParams<{ id: string }>();
 
-  // Jos orgId on käytettävissä, ohjataan organisaation datasourceseihin.
-  // Muuten fallback: yleinen connect-sivu.
-  const datasourcesHref = orgId
-    ? `/admin/organizations/${orgId}/datasources`
-    : "/admin/data-source/connect";
+  const datasourcesHref = `/admin/organizations/${id}/datasources`;
+  const runsHref = `/admin/organizations/${id}/runs`;
 
   return (
     <PageTemplate fullWidth>
@@ -154,45 +150,6 @@ const AdminHomePage = () => {
                   </li>
                 </ul>
               </div>
-
-              {/* SNAPSHOT */}
-              <div className="rounded-2xl border border-gray-200 bg-white/60 p-4 shadow-sm backdrop-blur md:p-5 lg:w-[420px]">
-                <div className="text-sm font-medium text-gray-900">
-                  Tilannekuva
-                </div>
-                <p className="mt-1 text-sm text-gray-600">
-                  Nopea yleiskuva: yhteydet, ajot ja mahdolliset virheet.
-                </p>
-
-                <div className="mt-4 grid grid-cols-3 gap-3">
-                  {stats.map((s) => (
-                    <div
-                      key={s.label}
-                      className="rounded-xl border border-gray-200 bg-white p-3"
-                    >
-                      <div className="text-xs text-gray-500">{s.label}</div>
-                      <div className="mt-1 text-sm font-semibold text-gray-900">
-                        {s.value}
-                      </div>
-                      <div className="mt-1 line-clamp-1 text-xs text-gray-500">
-                        {s.hint ?? "—"}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-
-                <div className="mt-4 flex items-center justify-between rounded-xl border border-gray-200 bg-gray-50 px-3 py-2">
-                  <div className="text-xs text-gray-600">
-                    Vinkki: jos jokin on pielessä, aloita lokeista.
-                  </div>
-                  <Link
-                    href="/admin/runs"
-                    className="text-xs font-medium text-gray-900 hover:underline"
-                  >
-                    Näytä lokit →
-                  </Link>
-                </div>
-              </div>
             </div>
 
             {/* QUICK ACTIONS */}
@@ -216,7 +173,7 @@ const AdminHomePage = () => {
                 <QuickCard
                   title="Ajot ja lokit"
                   description="Seuraa synkronointeja, virheitä ja suoritushistoriaa."
-                  href="/admin/runs"
+                  href={runsHref}
                   badge="Lokit"
                   tone="dark"
                 />
