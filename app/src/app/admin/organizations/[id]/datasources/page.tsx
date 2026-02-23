@@ -51,7 +51,7 @@ const statusPillClass: Record<ConnectionStatus, string> = {
 
 const DatasourcesPage = () => {
   return (
-    <PageTemplate title="Datayhteydet" fullWidth>
+    <PageTemplate title="Datayhteydet">
       <div className="flex flex-col gap-6">
         {/* -------------------------------- */}
         {/* HEADER                           */}

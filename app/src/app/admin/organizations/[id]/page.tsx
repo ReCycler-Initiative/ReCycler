@@ -107,7 +107,7 @@ const AdminHomePage = () => {
   const runsHref = `/admin/organizations/${id}/runs`;
 
   return (
-    <PageTemplate fullWidth>
+    <PageTemplate>
       <div className="pb-8">
         {/* BACKDROP */}
         <div className="relative overflow-hidden rounded-2xl border border-gray-200 bg-white">

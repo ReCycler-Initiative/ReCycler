@@ -60,7 +60,7 @@ export default function RunsPage() {
   const connection = searchParams.get("connection");
 
   return (
-    <PageTemplate title="Lokit ja ajot" fullWidth>
+    <PageTemplate title="Lokit ja ajot">
       <div className="flex flex-col gap-6">
         <section className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
           <div className="space-y-3">

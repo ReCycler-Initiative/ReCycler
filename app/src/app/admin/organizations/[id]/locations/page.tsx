@@ -46,7 +46,7 @@ const LocationsPage = () => {
           </Link>
         </Button>
       }
-      fullWidth
+      fullscreen
     >
       {isLoading && (
         <div className="flex items-center justify-center h-96">
