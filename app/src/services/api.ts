@@ -28,10 +28,11 @@ export const chat = async ({
     .then((response) => response.data);
 
 export const getLocations = (
-  organizationId: string
+  organizationId: string,
+  useCaseId: string
 ): Promise<z.infer<typeof LocationGeoJsonCollection>> =>
   axios
-    .get(`/api/organizations/${organizationId}/locations`)
+    .get(`/api/organizations/${organizationId}/use_cases/${useCaseId}/locations`)
     .then((response) => response.data);
 
 export const createOrganization = async (

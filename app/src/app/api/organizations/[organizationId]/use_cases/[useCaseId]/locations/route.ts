@@ -4,9 +4,9 @@ import { checkOrganizationAuthorization } from "@/lib/authorization";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: Promise<{ organizationId: string }> }
+  { params }: { params: Promise<{ organizationId: string, useCaseId: string }> }
 ) {
-  const { organizationId } = await params;
+  const { organizationId, useCaseId } = await params;
 
   const authResult = await checkOrganizationAuthorization(
     request,
@@ -25,10 +25,10 @@ export async function GET(
       ST_AsGeoJSON(l.geom)::jsonb as geom
     FROM recycler.locations l
     INNER JOIN recycler.use_cases uc ON l.use_case_id = uc.id
-    WHERE uc.organization_id = ?::uuid
+    WHERE uc.organization_id = ?::uuid AND uc.id = ?::uuid
     ORDER BY l.name
   `,
-    [organizationId]
+    [organizationId, useCaseId]
   );
 
   const features = result.rows.map((row: any) => ({

@@ -3,6 +3,7 @@
 import Container from "@/components/container";
 import GeocoderControl from "@/components/geocoder-control";
 import { MapStyleControl } from "@/components/map-style-control";
+import PopupEditText from "@/components/map/popup-edit-text";
 import { Materials } from "@/components/materials";
 import { SelectedMaterialsControl } from "@/components/selected-materials-control";
 import { Button } from "@/components/ui/button";
@@ -13,16 +14,16 @@ import {
   DrawerTitle,
 } from "@/components/ui/drawer";
 import { Form } from "@/components/ui/form";
-import { getCollectionSpots, getLocations } from "@/services/api";
+import OnboardingHint from "@/components/ui/onboarding-hint";
 import { Material } from "@/types";
+import { useUser } from "@auth0/nextjs-auth0";
 import { Loader2Icon, MapPinned } from "lucide-react";
 import { GeolocateControl as TGeolocateControl } from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import {
-  useParams,
   usePathname,
   useRouter,
-  useSearchParams,
+  useSearchParams
 } from "next/navigation";
 import { Suspense, useCallback, useEffect, useRef, useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
@@ -40,9 +41,6 @@ import Map, {
   SymbolLayer,
   useMap,
 } from "react-map-gl";
-import OnboardingHint from "@/components/ui/onboarding-hint";
-import PopupEditText from "@/components/map/popup-edit-text";
-import { useUser } from "@auth0/nextjs-auth0";
 
 // Custom icon loader for collection points
 const CollectionPointIcon = () => {
