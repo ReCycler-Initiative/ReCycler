@@ -47,6 +47,7 @@ const OrganizationLayout = ({ children }: { children: React.ReactNode }) => {
             {useCaseQuery.data?.name}
           </span>
         }
+        toHomeHref={`/organizations/${params.organizationId}/use_cases/${params.useCaseId}`}
       >
         <div className="flex w-full items-center justify-end">
           {mapReady && (
