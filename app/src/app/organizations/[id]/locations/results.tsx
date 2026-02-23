@@ -207,6 +207,7 @@ export default function Result() {
   });
 
   const formMaterials = useWatch({
+    control: form.control,
     name: "materials",
     defaultValue: {},
   });
