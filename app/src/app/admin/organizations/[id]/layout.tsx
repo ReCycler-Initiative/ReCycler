@@ -22,7 +22,7 @@ import {
 } from "@/services/api";
 import { useQuery } from "@tanstack/react-query";
 import { cn } from "@/lib/utils";
-import { SettingsIcon } from "lucide-react";
+import { ExternalLink, SettingsIcon } from "lucide-react";
 import Link from "next/link";
 import { useParams, usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -42,7 +42,9 @@ const Content = ({
 }) => {
   const { id } = useParams<{ id: string }>();
   const pathname = usePathname();
-  const [selectedUseCaseId, setSelectedUseCaseId] = useState<string | undefined>();
+  const [selectedUseCaseId, setSelectedUseCaseId] = useState<
+    string | undefined
+  >();
 
   const useCasesQuery = useQuery({
     queryKey: ["use_cases", id],
@@ -56,7 +58,6 @@ const Content = ({
   }, [useCasesQuery.data]);
 
   const orgRootPath = `/admin/organizations/${id}`;
-  const isOrgRoot = pathname === orgRootPath;
 
   const isActiveSection = (segment: string, exact?: boolean) => {
     if (exact) {
@@ -64,8 +65,7 @@ const Content = ({
     }
 
     return pathname?.startsWith(segment) ?? false;
-  }
-    
+  };
 
   // Same visual style as "Avaa ReCycler-demo"
   const navButtonClass = (isActive: boolean) =>
@@ -95,7 +95,9 @@ const Content = ({
               <Link
                 key={link.href}
                 href={link.href}
-                className={navButtonClass(isActiveSection(link.href, link.exact))}
+                className={navButtonClass(
+                  isActiveSection(link.href, link.exact)
+                )}
               >
                 {link.label}
               </Link>
@@ -123,12 +125,14 @@ const Content = ({
 
           {selectedUseCaseId && (
             <Link
-              href="/recycler"
+              href={`/organizations/${id}/use_cases/${selectedUseCaseId}`}
               className={navButtonClass(true)}
               aria-label="Avaa valittu käyttötapaus"
+              target="_blank"
               title="Avaa valittu käyttötapaus"
             >
               Avaa
+              <ExternalLink className="ml-2" size={16} />
             </Link>
           )}
 
