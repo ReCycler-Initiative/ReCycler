@@ -31,7 +31,10 @@ const HomePage = () => {
             </Link>
           </Button>
           <Button className="w-full max-w-96" asChild variant="secondary">
-            <Link className="no-underline" href="/recycler/results">
+            <Link
+              className="no-underline"
+              href={`/organizations/${params.organizationId}/use_cases/${params.useCaseId}/results`}
+            >
               Näytä lähimmät kierrätyspisteet
             </Link>
           </Button>
