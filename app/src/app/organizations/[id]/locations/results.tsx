@@ -13,16 +13,12 @@ import {
   DrawerTitle,
 } from "@/components/ui/drawer";
 import { Form } from "@/components/ui/form";
-import { getLocations } from "@/services/api";
+import { getCollectionSpots, getLocations } from "@/services/api";
 import { Material } from "@/types";
 import { Loader2Icon, MapPinned } from "lucide-react";
+import { GeolocateControl as TGeolocateControl } from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
-import {
-  useParams,
-  usePathname,
-  useRouter,
-  useSearchParams,
-} from "next/navigation";
+import { useParams, usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useCallback, useEffect, useRef, useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import Map, {
@@ -39,41 +35,48 @@ import Map, {
   SymbolLayer,
   useMap,
 } from "react-map-gl";
+import OnboardingHint from "@/components/ui/onboarding-hint";
+import PopupEditText from "@/components/map/popup-edit-text";
+import { useUser } from "@auth0/nextjs-auth0";
 
+// Custom icon loader for collection points
 const CollectionPointIcon = () => {
   const { current: map } = useMap();
 
   useEffect(() => {
-    if (map) {
-      const loadIcon = () => {
-        // Load icon only once per style
-        if (map.hasImage("collection-point")) return;
-        map.loadImage("../../images/collection-point.png", (error, image) => {
-          if (error) throw error;
-          if (!image) return;
-          if (!map.hasImage("collection-point")) {
-            map.addImage("collection-point", image);
-          }
-        });
-      };
+    if (!map) return;
 
-      map.on("styleimagemissing", () => {
-        loadIcon();
+    const loadIcon = () => {
+      // Load icon only once per style
+      if (map.hasImage("collection-point")) return;
+      map.loadImage("../images/collection-point.png", (error, image) => {
+        if (error) throw error;
+        if (!image) return;
+        if (!map.hasImage("collection-point")) {
+          map.addImage("collection-point", image);
+        }
       });
+    };
 
-      return () => {
-        map.off("styleimagemissing", loadIcon);
-      };
-    }
+    const onStyleImageMissing = () => loadIcon();
+
+    loadIcon();
+    map.on("styleimagemissing", onStyleImageMissing);
+    return () => {
+      map.off("styleimagemissing", onStyleImageMissing);
+    };
   }, [map]);
 
   return null;
 };
+
+// Bounding box to restrict map movement to Finland
 const finlandBounds = [
-  [10.0, 54.0], // Southwest
-  [40.0, 75.0], // Northeast
+  [10.0, 54.0], // Southwest corner
+  [40.0, 75.0], // Northeast corner
 ];
 
+// Style for rendering point features (icons)
 const layerStyle: SymbolLayer = {
   id: "point",
   type: "symbol",
@@ -84,6 +87,7 @@ const layerStyle: SymbolLayer = {
   },
 };
 
+// Style for highlighting features that match all selected materials
 const highlighLayer: CircleLayer = {
   id: "point2",
   type: "circle",
@@ -102,6 +106,7 @@ const highlighLayer: CircleLayer = {
   },
 };
 
+// Style for cluster circles
 const clusters: CircleLayer = {
   id: "clusters",
   type: "circle",
@@ -124,6 +129,7 @@ const clusters: CircleLayer = {
   },
 };
 
+// Style for displaying cluster counts (numbers inside clusters)
 const clusterCount: SymbolLayer = {
   id: "cluster-count",
   type: "symbol",
@@ -135,6 +141,7 @@ const clusterCount: SymbolLayer = {
   },
 };
 
+// Helper to filter features based on selected materials
 const filterFeaturesBySelectedMaterials = (
   materials: number[],
   collectionSpots: GeoJSON.FeatureCollection<GeoJSON.Geometry>
@@ -143,7 +150,7 @@ const filterFeaturesBySelectedMaterials = (
     return collectionSpots;
   }
 
-  let features = collectionSpots.features
+  const features = collectionSpots.features
     ?.filter((feature: any) => {
       const featureMaterials = JSON.parse(
         feature.properties.materials
@@ -175,7 +182,9 @@ const filterFeaturesBySelectedMaterials = (
 };
 
 export default function Result() {
+  const { user } = useUser();
   const [mapLoaded, setMapLoaded] = useState(false);
+  const [styleLoaded, setStyleLoaded] = useState(true);
   const [geojson, setGeojson] =
     useState<GeoJSON.FeatureCollection<GeoJSON.Geometry> | null>(null);
   const [details, setDetails] = useState<MapboxGeoJSONFeature | null>(null);
@@ -192,6 +201,8 @@ export default function Result() {
       .filter(Boolean)
       .map((code) => +code) || [];
   const [showMaterials, setShowMaterials] = useState(false);
+
+  // Setup form state for material selection
   const form = useForm({
     defaultValues: {
       materials: selectedMaterials.reduce(
@@ -210,56 +221,63 @@ export default function Result() {
     defaultValue: {},
   });
 
+  // Load collection points from API
   useEffect(() => {
     const fetchData = async () => {
       let response = await getLocations(params.id);
       setGeojson(response);
     };
-
     fetchData();
   }, []);
 
-  useEffect(() => {
-    const map = mapRef.current;
-    if (map) {
-      const showPointer = () => {
-        map.getCanvas().style.cursor = "pointer";
-      };
+  const geolocateControlRef = useRef<TGeolocateControl>(null);
 
-      const hidePointer = () => {
-        map.getCanvas().style.cursor = "";
-      };
+  // Track whether we've issued the first programmatic trigger
+  const initialGeolocate = useRef(true); // first camera ease only
 
-      map.on("mouseenter", "point", showPointer);
-      map.on("mouseleave", "point", hidePointer);
-      return () => {
-        map.off("mouseenter", "point", showPointer);
-        map.off("mouseleave", "point", hidePointer);
-      };
+  const onMapLoad = useCallback(() => {
+    const map = mapRef.current!;
+    const showPointer = () => {
+      map.getCanvas().style.cursor = "pointer";
+    };
+
+    const hidePointer = () => {
+      map.getCanvas().style.cursor = "";
+    };
+
+    const onStyleLoad = () => setStyleLoaded(true);
+
+    map.on("mouseenter", "point", showPointer);
+    map.on("mouseleave", "point", hidePointer);
+    map.on("style.load", onStyleLoad);
+
+    geolocateControlRef.current?.trigger();
+    setMapLoaded(true);
+
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(new Event("map-loaded"));
     }
-  }, [mapLoaded, geojson]);
+  }, []);
 
-  const geolocateControlRef = useRef<any>(null);
-  const initialGeolocate = useRef(true);
-  const [isTracking, setTracking] = useState(false);
-
+  // Camera: do a single initial ease to user position, then let GeolocateControl own the camera
   const handleGeolocateChange = useCallback((position: GeolocationPosition) => {
-    if (!isTracking) {
-      return;
-    }
-
-    mapRef.current?.flyTo({
+    if (!initialGeolocate.current) return;
+    mapRef.current?.easeTo({
       center: [position.coords.longitude, position.coords.latitude],
-      zoom: initialGeolocate ? 15 : mapRef.current?.getZoom(),
+      zoom: 15,
+      duration: 500,
     });
     initialGeolocate.current = false;
   }, []);
 
+  // On unmount, notify TitleBar
   useEffect(() => {
-    if (geolocateControlRef.current) {
-      geolocateControlRef.current?.trigger();
-    }
-  }, [geolocateControlRef.current]);
+    return () => {
+      if (typeof window !== "undefined") {
+        window.dispatchEvent(new Event("map-unloaded"));
+      }
+    };
+  }, []);
 
   return (
     <Suspense>
@@ -268,17 +286,15 @@ export default function Result() {
           ref={mapRef}
           mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_TOKEN}
           initialViewState={{
-            longitude: 24.94, // Suomen keskelle hieman länteen
-            latitude: 64.0, // Suomen keskelle hieman etelään
-            zoom: 4, // Sopiva zoom-taso kattamaan laaja alue
+            longitude: 24.94,
+            latitude: 64.0,
+            zoom: 4,
           }}
-          onLoad={() => {
-            setMapLoaded(true);
-          }}
+          onLoad={onMapLoad}
           mapStyle={
             mapStyle === "detail"
-              ? process.env.NEXT_PUBLIC_MAPBOX_STYLE
-              : "mapbox://styles/niilahti/clmt6xzzj00kq01qnb79e9a2l"
+              ? (process.env.NEXT_PUBLIC_MAPBOX_STYLE_DETAIL as string)
+              : (process.env.NEXT_PUBLIC_MAPBOX_STYLE_SATELLITE as string)
           }
           interactiveLayerIds={["point"]}
           onClick={(e) => {
@@ -295,53 +311,65 @@ export default function Result() {
           }}
           maxBounds={finlandBounds as any}
         >
+          <MapStyleControl
+            onToggle={(selected) => {
+              // Toggle style and force styleLoaded=false so we know when it finishes
+              setStyleLoaded(false);
+              setStyle(selected ? "satellite" : "detail");
+            }}
+            selected={mapStyle === "satellite"}
+          />
+
+          <GeolocateControl
+            ref={geolocateControlRef}
+            onGeolocate={handleGeolocateChange}
+            // IMPORTANT: do not flip tracking off here; Mapbox emits End on minor interactions
+            onTrackUserLocationEnd={() => {
+              // keep UI state; let the user decide to turn tracking off explicitly
+            }}
+            positionOptions={{ enableHighAccuracy: true }}
+            position="bottom-right"
+            trackUserLocation
+            showUserHeading
+          />
+
+          <OnboardingHint />
+
+          <SelectedMaterialsControl
+            amount={selectedMaterials.length}
+            onClick={() => setShowMaterials(true)}
+          />
+          <NavigationControl position="top-right" />
+          <FullscreenControl position="top-right" />
+          <ScaleControl position="bottom-left" />
+          <GeocoderControl
+            mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_TOKEN!}
+            position="top-left"
+            placeholder="Etsi"
+            bbox={[19.0, 59.0, 32.0, 71.0]}
+          />
+
           {geojson && (
             <>
-              <Source
-                id="collection_spots"
-                type="geojson"
-                data={filterFeaturesBySelectedMaterials(
-                  selectedMaterials,
-                  geojson
-                )}
-                cluster
-                clusterMaxZoom={14}
-                clusterRadius={50}
-              >
-                <Layer {...highlighLayer} />
-                <Layer {...layerStyle} />
-                <Layer {...clusters} />
-                <Layer {...clusterCount} />
-              </Source>
+              {styleLoaded && (
+                <Source
+                  id="collection_spots"
+                  type="geojson"
+                  data={filterFeaturesBySelectedMaterials(
+                    selectedMaterials,
+                    geojson
+                  )}
+                  cluster
+                  clusterMaxZoom={14}
+                  clusterRadius={50}
+                >
+                  <Layer {...highlighLayer} />
+                  <Layer {...layerStyle} />
+                  <Layer {...clusters} />
+                  <Layer {...clusterCount} />
+                </Source>
+              )}
               <CollectionPointIcon />
-              <MapStyleControl
-                onToggle={(selected) => {
-                  setStyle(selected ? "satellite" : "detail");
-                }}
-                selected={mapStyle === "satellite"}
-              />
-              <GeolocateControl
-                ref={geolocateControlRef}
-                onGeolocate={handleGeolocateChange}
-                onTrackUserLocationEnd={() => setTracking(false)}
-                onTrackUserLocationStart={() => setTracking(true)}
-                positionOptions={{ enableHighAccuracy: true }}
-                position="bottom-right"
-                trackUserLocation
-              />
-              <SelectedMaterialsControl
-                amount={selectedMaterials.length}
-                onClick={() => setShowMaterials(true)}
-              />
-              <NavigationControl position="top-right" />
-              <FullscreenControl position="top-right" />
-              <ScaleControl position="bottom-left" />
-              <GeocoderControl
-                mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_TOKEN!}
-                position="top-left"
-                placeholder="Etsi"
-                bbox={[19.0, 59.0, 32.0, 71.0]} //Search only from Finland bounds
-              />
               {details && (
                 <Popup
                   key={new Date().getTime()}
@@ -350,9 +378,9 @@ export default function Result() {
                   onClose={() => setDetails(null)}
                   anchor="bottom"
                   maxWidth="360px"
-                  className="[&_.mapboxgl-popup-content]:min-w-52 [&_.mapboxgl-popup-content]:px-0 [&_.mapboxgl-popup-content]:py-0 [&_.mapboxgl-popup-close-button]:right-1.5"
+                  className="[&_.mapboxgl-popup-content]:min-w-52 [&_.mapboxgl-popup-content]:p-0! [&_.mapboxgl-popup-close-button]:hidden"
                 >
-                  <div className="px-5 py-4 border-b">
+                  <div className="p-3 border-b">
                     <h2 className="text-base font-semibold mb-1">
                       {details.properties?.name}
                     </h2>
@@ -367,8 +395,8 @@ export default function Result() {
                     </div>
                   </div>
                   {details.properties?.opening_hours_fi && (
-                    <div className="px-5 py-4 border-b">
-                      <h3 className="sr-only">Aukioloajat</h3>
+                    <div className="p-3 border-b">
+                      <h3 className="sr-only">Opening hours</h3>
                       <div
                         dangerouslySetInnerHTML={{
                           __html: details.properties?.opening_hours_fi,
@@ -376,7 +404,7 @@ export default function Result() {
                       />
                     </div>
                   )}
-                  <ul className="text-sm px-5 py-4 leading-6 list-disc columns-2">
+                  <ul className="text-sm p-3 leading-6 list-disc columns-2">
                     {details.properties &&
                       JSON.parse(details.properties.materials)
                         .sort((a: Material, b: Material) =>
@@ -388,6 +416,11 @@ export default function Result() {
                           </li>
                         ))}
                   </ul>
+                  {user && (
+                    <div className="p-3 border-t">
+                      <PopupEditText />
+                    </div>
+                  )}
                   <div className="text-center border-t">
                     <Button
                       className="text-[#ff1312] text-sm w-full"
@@ -398,7 +431,7 @@ export default function Result() {
                         href={`https://www.google.com/maps/search/?api=1&query=${(details.geometry as GeoJSON.Point).coordinates[1]},${(details.geometry as GeoJSON.Point).coordinates[0]}`}
                         target="_blank"
                       >
-                        <span>Avaa Google Maps</span>
+                        <span>Open in Google Maps</span>
                         <MapPinned className="ml-2" size={18} />
                       </a>
                     </Button>
@@ -408,12 +441,15 @@ export default function Result() {
             </>
           )}
         </Map>
+
         {!mapLoaded && (
           <div className="fixed flex inset-0 items-center justify-center flex-col gap-6 text-black">
             <Loader2Icon className="animate-spin" />
-            Haetaan kierrätyspisteitä
+            Ladataan kierrätyspisteet kartalle
           </div>
         )}
+
+        {/* Drawer for selecting materials */}
         <Drawer
           open={showMaterials}
           onOpenChange={(open) => {
@@ -439,7 +475,7 @@ export default function Result() {
           <DrawerContent>
             <DrawerHeader>
               <DrawerTitle className="text-center">
-                Valitut materiaalit
+                Valitse materiaalit
               </DrawerTitle>
             </DrawerHeader>
             <div className="max-h-[500px] overflow-y-scroll max-w-2xl mx-auto">
