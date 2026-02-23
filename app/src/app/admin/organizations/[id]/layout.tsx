@@ -26,6 +26,7 @@ import { ExternalLink, SettingsIcon } from "lucide-react";
 import Link from "next/link";
 import { useParams, usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { PageLoadingSpinner } from "@/components/page-loading-spinner";
 
 type NavLink = {
   exact?: boolean;
@@ -198,11 +199,7 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
   }, [accessQuery.error, router]);
 
   if (accessQuery.isLoading || organizationQuery.isLoading) {
-    return (
-      <div className="flex items-center justify-center h-screen">
-        <div className="text-lg">Loading...</div>
-      </div>
-    );
+    return <PageLoadingSpinner />;
   }
 
   if (accessQuery.error || !accessQuery.data?.hasAccess) {

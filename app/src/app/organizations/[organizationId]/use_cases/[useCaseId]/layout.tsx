@@ -1,12 +1,21 @@
 "use client";
 
+import { PageLoadingSpinner } from "@/components/page-loading-spinner";
 import TitleBar from "@/components/title-bar";
 import { Button } from "@/components/ui/button";
-import Image from "next/image";
-import { useEffect, useState } from "react";
-import logo from "../recycler-logo.png";
+import { getUseCaseById } from "@/services/api";
+import { useQuery } from "@tanstack/react-query";
+import PageLoader from "next/dist/client/page-loader";
+import { useParams } from "next/navigation";
+import { use, useEffect, useState } from "react";
 
 const OrganizationLayout = ({ children }: { children: React.ReactNode }) => {
+  const params = useParams<{ organizationId: string; useCaseId: string }>();
+  const useCaseQuery = useQuery({
+    queryKey: ["use_case", params.organizationId, params.useCaseId],
+    queryFn: () => getUseCaseById(params.organizationId, params.useCaseId),
+  });
+
   const [mapReady, setMapReady] = useState(false);
 
   useEffect(() => {
@@ -26,11 +35,17 @@ const OrganizationLayout = ({ children }: { children: React.ReactNode }) => {
     window.dispatchEvent(new Event("open-onboarding"));
   };
 
+  if (useCaseQuery.isLoading) {
+    return <PageLoadingSpinner />;
+  }
+
   return (
     <>
       <TitleBar
         logo={
-          <Image className="pb-2" src={logo} alt="Recycler logo" width={150} />
+          <span className="font-bold ml-2 whitespace-nowrap">
+            {useCaseQuery.data?.name}
+          </span>
         }
       >
         <div className="flex w-full items-center justify-end">
