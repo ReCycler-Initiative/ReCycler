@@ -49,7 +49,7 @@ const CollectionPointIcon = () => {
     const loadIcon = () => {
       // Load icon only once per style
       if (map.hasImage("collection-point")) return;
-      map.loadImage("../images/collection-point.png", (error, image) => {
+      map.loadImage("/images/collection-point.png", (error, image) => {
         if (error) throw error;
         if (!image) return;
         if (!map.hasImage("collection-point")) {
