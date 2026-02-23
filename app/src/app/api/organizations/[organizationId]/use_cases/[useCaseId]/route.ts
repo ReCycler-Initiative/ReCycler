@@ -19,15 +19,15 @@ export async function GET(
   try {
     const { organizationId, useCaseId } = await params;
 
-    // Check authorization
-    const authResult = await checkOrganizationAuthorization(
-      request,
-      organizationId
-    );
+    // // Check authorization
+    // const authResult = await checkOrganizationAuthorization(
+    //   request,
+    //   organizationId
+    // );
 
-    if (!authResult.authorized) {
-      return authResult.response!;
-    }
+    // if (!authResult.authorized) {
+    //   return authResult.response!;
+    // }
 
     const useCase = await db
       .select("*")

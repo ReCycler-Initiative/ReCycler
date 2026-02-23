@@ -1,4 +1,4 @@
-import Layout from "@/app/organizations/layout";
+import Layout from "@/app/organizations/wizard/layout";
 import Script from "next/script";
 import { ReactNode } from "react";
 

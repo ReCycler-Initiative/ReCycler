@@ -11,13 +11,6 @@ const HomePage = () => {
 
   return (
     <>
-      {/*<div className="h-48 bg-gray-400 w-full border-b border-b-gray-400">
-        <Image
-          alt=""
-          className="object-cover w-full h-full object-center"
-          src={hero}
-      </div>
-         */}
       <Container className="flex-1 max-w-4xl">
         <h1 className="text-2xl font-medium mb-4 font-sans">
           Tervetuloa ReCycleriin
