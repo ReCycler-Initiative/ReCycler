@@ -19,97 +19,12 @@ const FeatureCard = ({ title, description }: FeatureCardProps) => {
   );
 };
 
-type ActionCardProps = {
-  title: string;
-  description: string;
-  href: string;
-  badge: string;
-  tone?: "light" | "dark";
-};
-
-const ActionCard = ({
-  title,
-  description,
-  href,
-  badge,
-  tone = "light",
-}: ActionCardProps) => {
-  const base =
-    "group relative overflow-hidden rounded-2xl border shadow-sm transition-all";
-  const light =
-    "border-gray-200 bg-white hover:shadow-md hover:-translate-y-0.5";
-  const dark =
-    "border-gray-200 bg-gray-900 text-white hover:shadow-md hover:-translate-y-0.5";
-
-  return (
-    <Link
-      href={href}
-      className={[base, tone === "dark" ? dark : light].join(" ")}
-    >
-      <div
-        className={[
-          "pointer-events-none absolute -top-24 right-0 h-56 w-56 rounded-full blur-3xl opacity-40",
-          tone === "dark" ? "bg-blue-500" : "bg-blue-200",
-        ].join(" ")}
-      />
-      <div className="relative p-5">
-        <div className="flex items-start justify-between gap-4">
-          <div className="min-w-0">
-            <h3
-              className={[
-                "text-base font-semibold",
-                tone === "dark" ? "text-white" : "text-gray-900",
-              ].join(" ")}
-            >
-              {title}
-            </h3>
-            <p
-              className={[
-                "mt-1 text-sm",
-                tone === "dark" ? "text-gray-200" : "text-gray-600",
-              ].join(" ")}
-            >
-              {description}
-            </p>
-          </div>
-
-          <span
-            className={[
-              "shrink-0 rounded-full px-2.5 py-1 text-xs font-medium",
-              tone === "dark"
-                ? "bg-white/10 text-white"
-                : "bg-gray-100 text-gray-700",
-            ].join(" ")}
-          >
-            {badge}
-          </span>
-        </div>
-
-        <div className="mt-4 flex items-center gap-2 text-sm font-medium">
-          <span className={tone === "dark" ? "text-white" : "text-gray-900"}>
-            Avaa
-          </span>
-          <span
-            className={[
-              "transition-transform group-hover:translate-x-0.5",
-              tone === "dark" ? "text-white" : "text-gray-900",
-            ].join(" ")}
-            aria-hidden="true"
-          >
-            →
-          </span>
-        </div>
-      </div>
-    </Link>
-  );
-};
-
 const HomePage = () => {
   return (
     <>
       <TitleBarService />
       <PageTemplate title="">
-        <div className="mx-auto max-w-7xl px-4 pb-8">
+        <div className="px-4 py-8">
           {/* HERO SECTION */}
           <div className="relative overflow-hidden rounded-2xl border border-gray-200 bg-white">
             {/* Gradient background */}
@@ -127,10 +42,10 @@ const HomePage = () => {
                 </h1>
 
                 <p className="mt-3 text-sm leading-6 text-gray-600 md:text-base">
-                  ReCycler Platform on moderni, skaalautuva alusta sijaintitietoon
-                  ja ominaisuuksiin perustuvien sovellusten rakentamiseen. Luo
-                  nopeasti hakupalveluita, karttanäkymiä ja tietopohjia – yhdellä
-                  yhtenäisellä järjestelmällä.
+                  ReCycler Platform on moderni, skaalautuva alusta
+                  sijaintitietoon ja ominaisuuksiin perustuvien sovellusten
+                  rakentamiseen. Luo nopeasti hakupalveluita, karttanäkymiä ja
+                  tietopohjia – yhdellä yhtenäisellä järjestelmällä.
                 </p>
 
                 <ul className="mt-4 space-y-2 text-sm text-gray-700">
@@ -172,7 +87,9 @@ const HomePage = () => {
 
               {/* Hint */}
               <div className="mt-4 flex items-center gap-2 rounded-xl border border-gray-200 bg-gray-50 px-3 py-2 text-xs text-gray-600">
-                <span>Kirjautuminen tapahtuu Auth0:n kautta (Google, O365 ym.)</span>
+                <span>
+                  Kirjautuminen tapahtuu Auth0:n kautta (Google, O365 ym.)
+                </span>
               </div>
             </div>
           </div>
@@ -184,7 +101,8 @@ const HomePage = () => {
                 Alustan ominaisuudet
               </h2>
               <p className="mt-1 text-sm text-gray-600">
-                Kaikki mitä tarvitset sijaintipohjaisten palveluiden rakentamiseen.
+                Kaikki mitä tarvitset sijaintipohjaisten palveluiden
+                rakentamiseen.
               </p>
             </div>
 
@@ -240,7 +158,8 @@ const HomePage = () => {
               <p className="mt-2 text-sm text-gray-600">
                 ReCycler Platform on avoimen lähdekoodin projekti GitHubissa.
                 Projektiin voi osallistua kuka tahansa, ja lähdekoodi on
-                läpinäkyvää ja vapaasti hyödynnettävissä Apache 2.0 -lisenssillä.
+                läpinäkyvää ja vapaasti hyödynnettävissä Apache 2.0
+                -lisenssillä.
               </p>
               <div className="mt-3">
                 <a
