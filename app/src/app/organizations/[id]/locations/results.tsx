@@ -46,14 +46,12 @@ const CollectionPointIcon = () => {
   useEffect(() => {
     if (map) {
       const loadIcon = () => {
-        map.loadImage("/collection-point.png", (error, image) => {
+        // Load icon only once per style
+        if (map.hasImage("collection-point")) return;
+        map.loadImage("../../images/collection-point.png", (error, image) => {
           if (error) throw error;
-
-          if (map.hasImage("collection-point")) {
-            return;
-          }
-
-          if (image) {
+          if (!image) return;
+          if (!map.hasImage("collection-point")) {
             map.addImage("collection-point", image);
           }
         });
