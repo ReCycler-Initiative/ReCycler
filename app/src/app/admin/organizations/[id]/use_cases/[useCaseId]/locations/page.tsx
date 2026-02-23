@@ -16,13 +16,13 @@ import Link from "next/link";
 import { getLocations } from "@/services/api";
 
 const LocationsPage = () => {
-  const params = useParams<{ id: string }>();
+  const params = useParams<{ id: string; useCaseId: string }>();
   const organizationId = params.id;
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
   const { data, isLoading, isError } = useQuery({
-    queryKey: ["locations", organizationId],
-    queryFn: () => getLocations(organizationId),
+    queryKey: ["locations", organizationId, params.useCaseId],
+    queryFn: () => getLocations(organizationId, params.useCaseId),
   });
 
   // Transform GeoJSON data to LocationMarker format
@@ -40,7 +40,7 @@ const LocationsPage = () => {
       title="Kohteet"
       actions={
         <Button asChild>
-          <Link href="locations/new">
+          <Link href={`locations/new`}>
             <Plus className="h-4 w-4" />
             Lisää kohde
           </Link>

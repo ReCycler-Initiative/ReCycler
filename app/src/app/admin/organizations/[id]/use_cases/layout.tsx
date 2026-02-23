@@ -37,28 +37,22 @@ type NavLink = {
 const Content = ({
   children,
   organization,
+  selectedUseCaseId,
 }: {
   children: React.ReactNode;
   organization: any;
+  selectedUseCaseId: string;
 }) => {
   const { id } = useParams<{ id: string }>();
   const pathname = usePathname();
-  const [selectedUseCaseId, setSelectedUseCaseId] = useState<
-    string | undefined
-  >();
+  const router = useRouter();
 
   const useCasesQuery = useQuery({
     queryKey: ["use_cases", id],
     queryFn: () => getUseCases(id),
   });
 
-  useEffect(() => {
-    if (useCasesQuery.data && useCasesQuery.data.length > 0) {
-      setSelectedUseCaseId(useCasesQuery.data[0].id);
-    }
-  }, [useCasesQuery.data]);
-
-  const orgRootPath = `/admin/organizations/${id}`;
+  const orgRootPath = `/admin/organizations/${id}/use_cases/${selectedUseCaseId}`;
 
   const isActiveSection = (segment: string, exact?: boolean) => {
     if (exact) {
@@ -109,7 +103,11 @@ const Content = ({
             <Select
               defaultValue={useCasesQuery.data?.[0]?.id}
               value={selectedUseCaseId}
-              onValueChange={setSelectedUseCaseId}
+              onValueChange={() => {
+                router.push(
+                  `/admin/organizations/${id}/use_cases/${selectedUseCaseId}`
+                );
+              }}
             >
               <SelectTrigger className="w-[180px]">
                 <SelectValue />
@@ -150,7 +148,7 @@ const Content = ({
 
               {selectedUseCaseId && (
                 <DropdownMenuItem asChild>
-                  <Link href={`${orgRootPath}/use_cases/${selectedUseCaseId}`}>
+                  <Link href={`${orgRootPath}/use_cases/${selectedUseCaseId}/edit`}>
                     Käyttötapauksen tiedot
                   </Link>
                 </DropdownMenuItem>
@@ -170,7 +168,7 @@ const Content = ({
 };
 
 const AdminLayout = ({ children }: { children: React.ReactNode }) => {
-  const { id } = useParams<{ id: string }>();
+  const { id, useCaseId } = useParams<{ id: string; useCaseId: string }>();
   const router = useRouter();
 
   const accessQuery = useQuery({
@@ -210,7 +208,14 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
     );
   }
 
-  return <Content organization={organizationQuery.data}>{children}</Content>;
+  return (
+    <Content
+      organization={organizationQuery.data}
+      selectedUseCaseId={useCaseId}
+    >
+      {children}
+    </Content>
+  );
 };
 
 export default AdminLayout;
