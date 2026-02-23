@@ -5,9 +5,8 @@ import TitleBar from "@/components/title-bar";
 import { Button } from "@/components/ui/button";
 import { getUseCaseById } from "@/services/api";
 import { useQuery } from "@tanstack/react-query";
-import PageLoader from "next/dist/client/page-loader";
 import { useParams } from "next/navigation";
-import { use, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 const OrganizationLayout = ({ children }: { children: React.ReactNode }) => {
   const params = useParams<{ organizationId: string; useCaseId: string }>();
