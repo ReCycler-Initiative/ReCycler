@@ -148,7 +148,7 @@ const Content = ({
 
               {selectedUseCaseId && (
                 <DropdownMenuItem asChild>
-                  <Link href={`${orgRootPath}/use_cases/${selectedUseCaseId}/edit`}>
+                  <Link href={`${orgRootPath}/edit`}>
                     Käyttötapauksen tiedot
                   </Link>
                 </DropdownMenuItem>
