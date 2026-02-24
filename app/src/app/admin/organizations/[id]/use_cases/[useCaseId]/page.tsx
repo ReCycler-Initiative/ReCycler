@@ -101,10 +101,10 @@ const QuickCard = ({
 };
 
 const UseCaseHomePage = () => {
-  const { id } = useParams<{ id: string }>();
+  const { id, useCaseId } = useParams<{ id: string; useCaseId: string }>();
 
-  const datasourcesHref = `/admin/organizations/${id}/datasources`;
-  const runsHref = `/admin/organizations/${id}/runs`;
+  const datasourcesHref = `/admin/organizations/${id}/use_cases/${useCaseId}/datasources`;
+  const runsHref = `/admin/organizations/${id}/use_cases/${useCaseId}/runs`;
 
   return (
     <PageTemplate>
