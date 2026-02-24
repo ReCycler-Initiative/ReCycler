@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { PageTemplate } from "@/components/admin/page-template";
 import TitleBarService from "@/components/title-bar-service";
+import { ExternalLink } from "lucide-react";
 
 type FeatureCardProps = {
   title: string;
@@ -165,10 +166,9 @@ const HomePage = () => {
                 <a
                   href="https://github.com/ReCycler-Initiative/ReCycler"
                   className="text-sm font-medium text-blue-600 hover:text-blue-700 hover:underline"
-                  target="_blank"
-                  rel="noopener noreferrer"
                 >
-                  Tutustu projektiin GitHubissa →
+                  Tutustu projektiin GitHubissa{" "}
+                  <ExternalLink className="ml-1 inline" size={16} />
                 </a>
               </div>
             </section>
