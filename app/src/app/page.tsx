@@ -77,6 +77,7 @@ const HomePage = () => {
                   className="inline-flex items-center justify-center rounded-xl bg-gray-900 px-6 py-3 text-sm font-medium text-white transition hover:bg-gray-800 sm:w-auto"
                 >
                   Avaa ReCycler-demo
+                  <ExternalLink className="ml-2 inline" size={20} />
                 </Link>
                 <Link
                   href="/api/auth/login?screen_hint=signup"
