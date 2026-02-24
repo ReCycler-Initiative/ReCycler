@@ -2,6 +2,7 @@
 
 import Container from "@/components/container";
 import { Button } from "@/components/ui/button";
+import { ExternalLink } from "lucide-react";
 import Link from "next/link";
 //import hero from "./recycle.png"; //let´s place when suitable photo
 
@@ -38,8 +39,8 @@ const HomePage = () => {
         </div>
       </Container>
       {/* Footer */}
-      <footer className="w-full mt-16 bg-gray-200 py-4 text-center">
-        <p className="text-xs">
+      <footer className="w-full mt-16 bg-gray-200 py-4 text-center text-xs">
+        <p className="mb-2">
           ReCycler on Github-projekti. Lähdekoodi ja lisenssitiedot löytyvät
           projektin{" "}
           <a
@@ -48,9 +49,12 @@ const HomePage = () => {
             target="_blank"
             rel="noopener noreferrer"
           >
-            Github-sivuilta
+            Github-sivuilta <ExternalLink className="ml-1 inline" size={16} />
           </a>
-          . Projekti on lisensoitu Apache 2.0 -lisenssillä. Projektissa käytetty
+          .{" "}
+        </p>
+        <p>
+          Projekti on lisensoitu Apache 2.0 -lisenssillä. Projektissa käytetty
           kierrätyspisteiden sijainti- ja ominaisuustiedot ovat peräisin
           Kierrätys.info-palvelun rajapinnasta (API). Kaikki oikeudet
           Kierrätys.info-palveluun ja sen dataan omistaa KIVO ry.
