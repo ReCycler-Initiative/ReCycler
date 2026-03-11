@@ -43,17 +43,25 @@ const UseCaseInfoPage = () => {
           <h3 className="text-lg font-semibold mb-4">Etusivu</h3>
           <div className="space-y-3">
             <FormInput label="Otsikko" name="content.intro.title" />
+            <FormTextArea label="Leipäteksti" name="content.intro.text" />
             <FormInput label="CTA" name="content.intro.cta" />
             <FormInput label="Ohita teksti" name="content.intro.skip" />
-            <FormTextArea label="Leipäteksti" name="content.intro.text" />
           </div>
         </div>
         <div>
           <h3 className="text-lg font-semibold mb-4">Filterit</h3>
           <div className="space-y-3">
             <FormInput label="Otsikko" name="content.filters.title" />
-            <FormInput label="CTA" name="content.filters.cta" />
             <FormTextArea label="Leipäteksti" name="content.filters.text" />
+            <FormInput
+              label="AI-välilehti teksti"
+              name="content.filters.tab_ai"
+            />
+            <FormInput
+              label="Manuaali-välilehti teksti"
+              name="content.filters.tab_manual"
+            />
+            <FormInput label="CTA" name="content.filters.cta" />
           </div>
         </div>
       </div>

@@ -12,6 +12,8 @@ export function mapDbRowToUseCase(row: any) {
         title: row.filters_title || "",
         cta: row.filters_cta || "",
         text: row.filters_text || "",
+        tab_ai: row.filters_tab_ai || "",
+        tab_manual: row.filters_tab_manual || "",
       },
     },
   };

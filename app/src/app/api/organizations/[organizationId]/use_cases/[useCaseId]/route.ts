@@ -90,6 +90,8 @@ export async function PUT(
         filters_title: body.content?.filters?.title,
         filters_cta: body.content?.filters?.cta,
         filters_text: body.content?.filters?.text,
+        filters_tab_ai: body.content?.filters?.tab_ai,
+        filters_tab_manual: body.content?.filters?.tab_manual,
         updated_at: new Date(),
       })
       .returning("*")
