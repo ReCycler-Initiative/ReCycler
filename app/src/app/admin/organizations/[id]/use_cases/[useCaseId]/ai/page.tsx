@@ -3,8 +3,10 @@
 import { PageTemplate } from "@/components/admin/page-template";
 import { Button } from "@/components/ui/button";
 import {
+  deleteUseCaseTrainingMaterial,
   getUseCaseOpenAiTokenStatus,
   listUseCaseTrainingMaterials,
+  type UseCaseTrainingMaterialListItem,
   setUseCaseOpenAiToken,
   uploadUseCaseTrainingMaterial,
 } from "@/services/api";
@@ -29,7 +31,7 @@ export default function AiPage() {
     [id, useCaseId]
   );
 
-  const trainingMaterialsQuery = useQuery({
+  const trainingMaterialsQuery = useQuery<UseCaseTrainingMaterialListItem[]>({
     queryKey: trainingMaterialsQueryKey,
     queryFn: () => listUseCaseTrainingMaterials(id, useCaseId),
     enabled: !!id && !!useCaseId,
@@ -48,6 +50,14 @@ export default function AiPage() {
       if (fileInputRef.current) {
         fileInputRef.current.value = "";
       }
+    },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: (materialId: string) =>
+      deleteUseCaseTrainingMaterial(id, useCaseId, materialId),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: trainingMaterialsQueryKey });
     },
   });
 
@@ -129,11 +139,33 @@ export default function AiPage() {
                 !trainingMaterialsQuery.isError &&
                 (trainingMaterialsQuery.data?.length ? (
                   trainingMaterialsQuery.data.map((m) => (
-                    <div key={m.id} className="px-4 py-3">
-                      <div className="text-sm font-medium text-gray-900">{m.filename}</div>
-                      <div className="mt-0.5 text-xs text-gray-600">
-                        {m.mimeType} · {new Date(m.createdAt).toLocaleString()}
+                    <div
+                      key={m.id}
+                      className="flex flex-col gap-2 px-4 py-3 sm:flex-row sm:items-center sm:justify-between"
+                    >
+                      <div className="min-w-0">
+                        <div className="text-sm font-medium text-gray-900">
+                          {m.filename}
+                        </div>
+                        <div className="mt-0.5 text-xs text-gray-600">
+                          {m.mimeType} · {new Date(m.createdAt).toLocaleString()}
+                        </div>
                       </div>
+
+                      <Button
+                        size="sm"
+                        variant="destructive"
+                        isLoading={deleteMutation.isPending}
+                        onClick={() => {
+                          const ok = window.confirm(
+                            `Poistetaanko opetusmateriaali "${m.filename}"?`
+                          );
+                          if (!ok) return;
+                          deleteMutation.mutate(m.id);
+                        }}
+                      >
+                        Poista
+                      </Button>
                     </div>
                   ))
                 ) : (
@@ -141,6 +173,12 @@ export default function AiPage() {
                 ))}
             </div>
           </div>
+
+          {deleteMutation.isError && (
+            <div className="mt-3 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800">
+              Poisto epäonnistui.
+            </div>
+          )}
         </section>
 
         <section className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
