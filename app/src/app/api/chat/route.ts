@@ -1,26 +1,41 @@
+import { decryptSecret } from "@/lib/crypto";
 import db from "@/services/db";
 import { Material } from "@/types";
-import fs from "fs";
 import { NextRequest, NextResponse } from "next/server";
 import OpenAI from "openai";
-import path from "path";
 
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+async function loadTrainingMaterials(useCaseId: string): Promise<string> {
+  const rows: { filename: string; content_text: string }[] = await db
+    .select("filename", "content_text")
+    .from("recycler.use_case_training_materials")
+    .where("use_case_id", useCaseId)
+    .orderBy("created_at", "asc");
 
-function loadTrainingMaterials(): string {
-  const dir = path.join(process.cwd(), "src/data/training-materials");
-  const files = fs.readdirSync(dir).filter((f) => f.endsWith(".txt"));
-  return files
-    .map((file) => {
-      const content = fs.readFileSync(path.join(dir, file), "utf-8");
-      return `=== ${file.replace(".txt", "")} ===\n${content}`;
-    })
+  return rows
+    .map((row) => `=== ${row.filename} ===\n${row.content_text}`)
     .join("\n\n");
+}
+
+class MissingApiKeyError extends Error {}
+
+async function getOpenAiClient(useCaseId: string): Promise<OpenAI> {
+  const secret = await db
+    .select("openai_api_key_ciphertext")
+    .from("recycler.use_case_secrets")
+    .where("use_case_id", useCaseId)
+    .first();
+
+  if (secret?.openai_api_key_ciphertext) {
+    const apiKey = decryptSecret(secret.openai_api_key_ciphertext);
+    return new OpenAI({ apiKey });
+  }
+
+  throw new MissingApiKeyError("No OpenAI API key configured for this use case");
 }
 
 export async function POST(req: NextRequest) {
   try {
-    const { message, history = [], imageBase64, imageMimeType } = await req.json();
+    const { message, history = [], imageBase64, imageMimeType, useCaseId } = await req.json();
 
     const materials: Material[] = await db("recycler.materials").orderBy(
       "name"
@@ -29,7 +44,9 @@ export async function POST(req: NextRequest) {
       .map((m) => `- ${m.name} (koodi: ${m.code})`)
       .join("\n");
 
-    const trainingContext = loadTrainingMaterials();
+    const trainingContext = useCaseId
+      ? await loadTrainingMaterials(useCaseId)
+      : "";
 
     const systemPrompt = `Olet ReCycler-palvelun kierrätysneuvoja. Käyt keskustelua käyttäjän kanssa ja autat heitä selvittämään mihin kierrätyskategorioihin heidän tavaransa kuuluvat.
 
@@ -61,6 +78,15 @@ Tärkeää:
 - Vastaa aina suomeksi`;
 
     const recentHistory = (history as { role: string; content: string }[]).slice(-10);
+
+    if (!useCaseId) {
+      return NextResponse.json(
+        { error: "Palvelu ei ole tällä hetkellä käytettävissä" },
+        { status: 503 }
+      );
+    }
+
+    const openai = await getOpenAiClient(useCaseId);
 
     const completion = await openai.chat.completions.create({
       model: "gpt-4o-mini",
@@ -117,6 +143,13 @@ Tärkeää:
       preparationTips: parsed.preparationTips ?? [],
     });
   } catch (err) {
+    if (err instanceof MissingApiKeyError) {
+      console.error("Chat API key not configured:", err.message);
+      return NextResponse.json(
+        { error: "Palvelu ei ole tällä hetkellä käytettävissä" },
+        { status: 503 }
+      );
+    }
     console.error("Chat API error:", err);
     return NextResponse.json(
       { error: "Virhe kierrätysneuvonnassa" },

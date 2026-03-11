@@ -22,14 +22,18 @@ export const chat = async ({
   history,
   imageBase64,
   imageMimeType,
+  organizationId,
+  useCaseId,
 }: {
   message: string;
   history: { role: "user" | "assistant"; content: string }[];
   imageBase64?: string;
   imageMimeType?: string;
+  organizationId?: string;
+  useCaseId?: string;
 }): Promise<ChatResponse> =>
   axios
-    .post("/api/chat", { message, history, imageBase64, imageMimeType })
+    .post("/api/chat", { message, history, imageBase64, imageMimeType, useCaseId })
     .then((response) => response.data);
 
 export const getLocations = (
