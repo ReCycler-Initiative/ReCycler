@@ -25,7 +25,7 @@ import { cn } from "@/lib/utils";
 import { ExternalLink, SettingsIcon } from "lucide-react";
 import Link from "next/link";
 import { useParams, usePathname, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { PageLoadingSpinner } from "@/components/page-loading-spinner";
 
 type NavLink = {

@@ -14,7 +14,13 @@ type Message = { role: "user" | "assistant"; content: string; imagePreview?: str
 type CartMaterial = Material & { baseHex?: string; icon?: React.ReactNode };
 type PendingImage = { base64: string; mimeType: string; previewUrl: string };
 
-export const AiMaterialPrompt = () => {
+export const AiMaterialPrompt = ({
+  organizationId,
+  useCaseId,
+}: {
+  organizationId?: string;
+  useCaseId?: string;
+}) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
@@ -63,7 +69,7 @@ export const AiMaterialPrompt = () => {
     initialized.current = true;
 
     setLoading(true);
-    chat({ message: "", history: [] })
+    chat({ message: "", history: [], organizationId, useCaseId })
       .then((res) => {
         setMessages([{ role: "assistant", content: res.reply }]);
         setCartCodes(res.suggestedCodes);
@@ -193,6 +199,8 @@ export const AiMaterialPrompt = () => {
         history: messages,
         imageBase64: imageToSend?.base64,
         imageMimeType: imageToSend?.mimeType,
+        organizationId,
+        useCaseId,
       });
       setMessages([...newMessages, { role: "assistant", content: res.reply }]);
       setCartCodes(res.suggestedCodes);
