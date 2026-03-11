@@ -1,4 +1,5 @@
 import {
+  ChatResponse,
   CreateOrganizationRequest,
   CreateOrganizationResponse,
   LocationGeoJsonCollection,
@@ -17,14 +18,18 @@ export const getMaterials = (): Promise<Array<Material>> =>
   axios.get("/api/materials").then((response) => response.data);
 
 export const chat = async ({
-  conversationId,
   message,
+  history,
+  imageBase64,
+  imageMimeType,
 }: {
-  conversationId: string;
   message: string;
-}): Promise<string> =>
+  history: { role: "user" | "assistant"; content: string }[];
+  imageBase64?: string;
+  imageMimeType?: string;
+}): Promise<ChatResponse> =>
   axios
-    .post("api/chat", { conversationId, message })
+    .post("/api/chat", { message, history, imageBase64, imageMimeType })
     .then((response) => response.data);
 
 export const getLocations = (
