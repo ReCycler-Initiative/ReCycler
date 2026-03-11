@@ -17,9 +17,13 @@ type PendingImage = { base64: string; mimeType: string; previewUrl: string };
 export const AiMaterialPrompt = ({
   organizationId,
   useCaseId,
+  ctaText = "Näytä kohteet",
+  resultsBasePath,
 }: {
   organizationId?: string;
   useCaseId?: string;
+  ctaText?: string;
+  resultsBasePath?: string;
 }) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
@@ -51,7 +55,7 @@ export const AiMaterialPrompt = ({
       return { ...m, baseHex: match?.baseHex, icon: match?.icon };
     });
 
-  const resultsHref = `/recycler/results?materials=${encodeURIComponent(
+  const resultsHref = `${resultsBasePath ?? "/recycler/results"}?materials=${encodeURIComponent(
     cartCodes.join(",")
   )}`;
 
@@ -416,7 +420,7 @@ export const AiMaterialPrompt = ({
         {cartCodes.length > 0 && (
           <Button asChild size="lg" className="w-full mt-1">
             <Link href={resultsHref}>
-              Lähde kierrättämään
+              {ctaText}
               <ArrowRight className="ml-2 h-4 w-4" />
             </Link>
           </Button>

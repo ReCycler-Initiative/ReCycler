@@ -12,9 +12,19 @@ import { useForm, useWatch } from "react-hook-form";
 export const MaterialsPageContent = ({
   organizationId,
   useCaseId,
+  title = "Mitäs tänään kierrätetään?",
+  description,
+  ctaText = "Näytä kierrätyspisteet",
+  tabAiText = "Chat",
+  tabManualText = "Valitse itse",
 }: {
   organizationId?: string;
   useCaseId?: string;
+  title?: string;
+  description?: string;
+  ctaText?: string;
+  tabAiText?: string;
+  tabManualText?: string;
 }) => {
   const form = useForm();
   const materialValues = useWatch({
@@ -28,15 +38,18 @@ export const MaterialsPageContent = ({
   return (
     <Container className="max-w-2xl pt-7 lg:pt-14">
       <h1 className="text-xl font-medium mb-4 font-sans">
-        Mitäs tänään kierrätetään?
+        {title}
       </h1>
+      {description && (
+        <p className="mb-4 font-sans">{description}</p>
+      )}
       <Tabs defaultValue="ai">
         <TabsList className="w-full mb-6">
           <TabsTrigger value="ai" className="flex-1">
-            Kerro mitä kierrätät
+            {tabAiText}
           </TabsTrigger>
           <TabsTrigger value="manual" className="flex-1">
-            Valitse itse
+            {tabManualText}
           </TabsTrigger>
         </TabsList>
 
@@ -44,6 +57,12 @@ export const MaterialsPageContent = ({
           <AiMaterialPrompt
             organizationId={organizationId}
             useCaseId={useCaseId}
+            ctaText={ctaText}
+            resultsBasePath={
+              organizationId && useCaseId
+                ? `/organizations/${organizationId}/use_cases/${useCaseId}/results`
+                : undefined
+            }
           />
         </TabsContent>
 
@@ -53,14 +72,14 @@ export const MaterialsPageContent = ({
               <Materials />
             </div>
             <div className="fixed lg:static bottom-0 bg-white lg:bg-transparent border lg:border-none p-4 lg:p-0 left-0 right-0 border-gray-400 flex flex-col items-center gap-y-4">
-              Materiaaleja valittu {selectedMaterials.length} kpl
+              Valitut ({selectedMaterials.length})
               <Button asChild className="w-full max-w-96 lg:mb-6" size="lg">
                 <Link
                   href={`/recycler/results?materials=${encodeURIComponent(
                     selectedMaterials.map(([key]) => key).join(",")
                   )}`}
                 >
-                  Näytä kierrätyspisteet
+                  {ctaText}
                 </Link>
               </Button>
             </div>

@@ -63,6 +63,10 @@ export const POST = withZodPost(
           useCase: {
             ...useCase,
             id: useCaseRow.id,
+            content: {
+              intro: { title: "", cta: "", skip: "", text: "" },
+              filters: { title: "", cta: "", text: "", tab_ai: "", tab_manual: "" },
+            },
           },
         };
 

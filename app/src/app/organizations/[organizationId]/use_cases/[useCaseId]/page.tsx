@@ -2,6 +2,8 @@
 
 import Container from "@/components/container";
 import { Button } from "@/components/ui/button";
+import { getUseCaseById } from "@/services/api";
+import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 //import hero from "./recycle.png"; //let´s place when suitable photo
@@ -9,25 +11,26 @@ import { useParams } from "next/navigation";
 const HomePage = () => {
   const params = useParams<{ organizationId: string; useCaseId: string }>();
 
+  const { data: useCase } = useQuery({
+    queryKey: ["use_case", params.organizationId, params.useCaseId],
+    queryFn: () => getUseCaseById(params.organizationId, params.useCaseId),
+  });
+
   return (
     <>
       <Container className="flex-1 max-w-4xl">
         <h1 className="text-2xl font-medium mb-4 font-sans">
-          Tervetuloa ReCycleriin
+          {useCase?.content.intro.title}
         </h1>
         <p className="mb-12 font-sans">
-          Tervetuloa ReCycler-sovellukseen! ReCycler auttaa sinua löytämään
-          helposti lähimmät kierrätyspisteet kotitalousjätteillesi kaikkialla
-          Suomessa. Olipa kyseessä mikä tahansa kierrätysmateriaali, ReCycler
-          opastaa sinut oikeaan paikkaan. Tee ympäristöystävällisiä päätöksiä jo
-          tänään!
+          {useCase?.content.intro.text}
         </p>
         <div className="flex flex-col gap-4 items-center">
           <Button className="w-full max-w-96" asChild size="lg">
             <Link
               href={`/organizations/${params.organizationId}/use_cases/${params.useCaseId}/materials`}
             >
-              Lähde kierrättämään
+              {useCase?.content.intro.cta}
             </Link>
           </Button>
           <Button className="w-full max-w-96" asChild variant="secondary">
@@ -35,7 +38,7 @@ const HomePage = () => {
               className="no-underline"
               href={`/organizations/${params.organizationId}/use_cases/${params.useCaseId}/results`}
             >
-              Näytä lähimmät kierrätyspisteet
+              {useCase?.content.intro.skip}
             </Link>
           </Button>
         </div>

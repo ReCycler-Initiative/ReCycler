@@ -108,6 +108,8 @@ export const UseCase = NewUseCase.merge(
         title: z.string(),
         cta: z.string(),
         text: z.string(),
+        tab_ai: z.string(),
+        tab_manual: z.string(),
       }),
     }),
     updated_at: z.coerce.date().optional(),
