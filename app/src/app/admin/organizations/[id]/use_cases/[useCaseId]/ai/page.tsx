@@ -2,6 +2,7 @@
 
 import { PageTemplate } from "@/components/admin/page-template";
 import { Button } from "@/components/ui/button";
+import { FileText, Files, HardDrive, Save, Trash2, Upload } from "lucide-react";
 import {
   deleteUseCaseTrainingMaterial,
   getUseCaseOpenAiTokenStatus,
@@ -133,6 +134,7 @@ export default function AiPage() {
                 onClick={() => setTokenMutation.mutate()}
                 disabled={setTokenMutation.isPending || tokenDraft.trim().length === 0}
               >
+                <Save className="mr-2 h-4 w-4" />
                 Tallenna
               </Button>
             </div>
@@ -157,6 +159,36 @@ export default function AiPage() {
             Lataa käyttötapaukseen omia tekstitiedostoja (.txt / .md).
           </p>
 
+          <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-3">
+            <div className="rounded-lg border border-gray-200 bg-white p-4">
+              <div className="flex items-center gap-2 text-sm font-medium text-gray-900">
+                <Files className="h-4 w-4 text-gray-600" />
+                Opetusmateriaalit
+              </div>
+              <div className="mt-1 text-2xl font-semibold text-gray-900">
+                {trainingMaterialsQuery.isLoading
+                  ? "…"
+                  : (trainingMaterialsQuery.data?.length ?? 0)}
+              </div>
+            </div>
+
+            <div className="rounded-lg border border-gray-200 bg-white p-4">
+              <div className="flex items-center gap-2 text-sm font-medium text-gray-900">
+                <FileText className="h-4 w-4 text-gray-600" />
+                Sallitut muodot
+              </div>
+              <div className="mt-1 text-sm text-gray-700">.txt, .md</div>
+            </div>
+
+            <div className="rounded-lg border border-gray-200 bg-white p-4">
+              <div className="flex items-center gap-2 text-sm font-medium text-gray-900">
+                <HardDrive className="h-4 w-4 text-gray-600" />
+                Max koko
+              </div>
+              <div className="mt-1 text-sm text-gray-700">512 KB / tiedosto</div>
+            </div>
+          </div>
+
           <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center">
             <input
               ref={fileInputRef}
@@ -176,6 +208,7 @@ export default function AiPage() {
               onClick={() => fileInputRef.current?.click()}
               disabled={uploadMutation.isPending}
             >
+              <Upload className="mr-2 h-4 w-4" />
               Valitse tiedosto
             </Button>
 
@@ -196,6 +229,7 @@ export default function AiPage() {
               }}
               disabled={uploadMutation.isPending || !selectedFile}
             >
+              <Upload className="mr-2 h-4 w-4" />
               Lataa
             </Button>
           </div>
@@ -208,9 +242,8 @@ export default function AiPage() {
 
           <div className="mt-5 rounded-lg border border-gray-200">
             <div className="border-b border-gray-200 px-4 py-3">
-              <div className="text-sm font-medium text-gray-900">Ladatut materiaalit</div>
-              <div className="mt-1 text-xs text-gray-600">
-                Näkyy tässä listana (MVP). Kytkentä chattiin voidaan tehdä seuraavaksi.
+              <div className="text-sm font-medium text-gray-900">
+                Ladatut opetusmateriaalit
               </div>
             </div>
 
@@ -234,8 +267,9 @@ export default function AiPage() {
                       className="flex flex-col gap-2 px-4 py-3 sm:flex-row sm:items-center sm:justify-between"
                     >
                       <div className="min-w-0">
-                        <div className="text-sm font-medium text-gray-900">
-                          {m.filename}
+                        <div className="flex items-center gap-2 text-sm font-medium text-gray-900">
+                          <FileText className="h-4 w-4 text-gray-600" />
+                          <span className="truncate">{m.filename}</span>
                         </div>
                         <div className="mt-0.5 text-xs text-gray-600">
                           {m.mimeType} · {new Date(m.createdAt).toLocaleString()}
@@ -254,6 +288,7 @@ export default function AiPage() {
                           deleteMutation.mutate(m.id);
                         }}
                       >
+                        <Trash2 className="mr-2 h-4 w-4" />
                         Poista
                       </Button>
                     </div>
