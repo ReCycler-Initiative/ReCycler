@@ -1,5 +1,4 @@
 import Layout from "@/app/organizations/wizard/layout";
-import Script from "next/script";
 import { ReactNode } from "react";
 
 export async function generateMetadata() {
@@ -9,21 +8,7 @@ export async function generateMetadata() {
 }
 
 const RecyclerLayout = ({ children }: { children: ReactNode }) => {
-  return (
-    <>
-      <Script id="chatling">
-        {`window.chtlConfig = { chatbotId: "3433989154" }`}
-      </Script>
-      <Script
-        async
-        data-id="3433989154"
-        id="chatling-embed-script"
-        type="text/javascript"
-        src="https://chatling.ai/js/embed.js"
-      ></Script>
-      <Layout>{children}</Layout>
-    </>
-  );
+  return <Layout>{children}</Layout>;
 };
 
 export default RecyclerLayout;

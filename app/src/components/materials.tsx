@@ -25,7 +25,7 @@ import Wood from "./icons/Wood";
 import LoadingSpinner from "./loading-spinner";
 
 // HEX → rgba
-const hexToRgba = (hex: string, alpha: number): string => {
+export const hexToRgba = (hex: string, alpha: number): string => {
   if (!hex) return "transparent";
   const sanitized = hex.replace("#", "");
   const bigint = parseInt(sanitized, 16);
@@ -35,7 +35,7 @@ const hexToRgba = (hex: string, alpha: number): string => {
   return `rgba(${r},${g},${b},${alpha})`;
 };
 
-const iconMap: {
+export const iconMap: {
   code: number;
   baseHex?: string;
   icon?: ReactNode;
@@ -108,17 +108,7 @@ const CustomCheckbox = ({
 export const Materials = () => {
   const { data: materials, isFetching } = useQuery({
     queryKey: ["materials"],
-    queryFn: () =>
-      getMaterials().then((res) =>
-        res.map((m) => {
-          const match = iconMap.find((i) => i.code === m.code);
-          return {
-            ...m,
-            baseHex: match?.baseHex,
-            icon: match?.icon,
-          };
-        })
-      ),
+    queryFn: getMaterials,
     staleTime: Infinity,
   });
 
@@ -133,15 +123,18 @@ export const Materials = () => {
 
   return (
     <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
-      {materials?.map((material) => (
-        <CustomCheckbox
-          key={material.code}
-          baseHex={material.baseHex}
-          label={material.name}
-          name={`materials.${material.code}`}
-          icon={material.icon}
-        />
-      ))}
+      {materials?.map((m) => {
+        const match = iconMap.find((i) => i.code === m.code);
+        return (
+          <CustomCheckbox
+            key={m.code}
+            baseHex={match?.baseHex}
+            label={m.name}
+            name={`materials.${m.code}`}
+            icon={match?.icon}
+          />
+        );
+      })}
     </div>
   );
 };

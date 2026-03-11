@@ -18,11 +18,9 @@ export type Material = {
 export type Modify<T, R> = Omit<T, keyof R> & R;
 
 export type ChatResponse = {
-  status: string;
-  data: {
-    conversation_id: string;
-    response: string;
-  };
+  reply: string;
+  suggestedCodes: number[];
+  preparationTips: { materialName: string; tip: string }[];
 };
 
 export const FieldType = z.union([
