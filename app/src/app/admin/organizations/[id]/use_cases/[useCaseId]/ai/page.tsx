@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import {
   deleteUseCaseTrainingMaterial,
   getUseCaseOpenAiTokenStatus,
+  deleteUseCaseOpenAiToken,
   listUseCaseTrainingMaterials,
   type UseCaseTrainingMaterialListItem,
   setUseCaseOpenAiToken,
@@ -19,6 +20,7 @@ export default function AiPage() {
   const queryClient = useQueryClient();
 
   const [tokenDraft, setTokenDraft] = useState("");
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const trainingMaterialsQueryKey = useMemo(
@@ -50,6 +52,7 @@ export default function AiPage() {
       if (fileInputRef.current) {
         fileInputRef.current.value = "";
       }
+      setSelectedFile(null);
     },
   });
 
@@ -63,6 +66,14 @@ export default function AiPage() {
 
   const setTokenMutation = useMutation({
     mutationFn: () => setUseCaseOpenAiToken(id, useCaseId, tokenDraft),
+    onSuccess: async () => {
+      setTokenDraft("");
+      await queryClient.invalidateQueries({ queryKey: tokenStatusQueryKey });
+    },
+  });
+
+  const deleteTokenMutation = useMutation({
+    mutationFn: () => deleteUseCaseOpenAiToken(id, useCaseId),
     onSuccess: async () => {
       setTokenDraft("");
       await queryClient.invalidateQueries({ queryKey: tokenStatusQueryKey });
@@ -94,9 +105,31 @@ export default function AiPage() {
               ref={fileInputRef}
               type="file"
               accept=".txt,.md,text/plain,text/markdown"
-              className="block w-full text-sm"
+              className="hidden"
               disabled={uploadMutation.isPending}
+              onChange={() => {
+                const file = fileInputRef.current?.files?.[0] ?? null;
+                setSelectedFile(file);
+              }}
             />
+
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => fileInputRef.current?.click()}
+              disabled={uploadMutation.isPending}
+            >
+              Valitse tiedosto
+            </Button>
+
+            <div className="min-w-0 text-sm text-gray-700">
+              {selectedFile ? (
+                <span className="truncate">{selectedFile.name}</span>
+              ) : (
+                <span className="text-gray-500">Ei tiedostoa valittuna</span>
+              )}
+            </div>
+
             <Button
               size="sm"
               onClick={() => {
@@ -104,7 +137,7 @@ export default function AiPage() {
                 if (!file) return;
                 uploadMutation.mutate(file);
               }}
-              disabled={uploadMutation.isPending}
+              disabled={uploadMutation.isPending || !selectedFile}
             >
               Lataa
             </Button>
@@ -188,36 +221,63 @@ export default function AiPage() {
             eikä sitä palauteta API:sta selväkielisenä.
           </p>
 
-          <div className="mt-3 text-sm text-gray-700">
-            Tila:{" "}
-            {tokenStatusQuery.isLoading
-              ? "Ladataan…"
-              : tokenStatusQuery.data?.configured
-                ? `Asetettu (••••${tokenStatusQuery.data.last4 ?? ""})`
-                : "Ei asetettu"}
+          <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+            <div className="text-sm text-gray-700">
+              Tila:{" "}
+              {tokenStatusQuery.isLoading
+                ? "Ladataan…"
+                : tokenStatusQuery.data?.configured
+                  ? `Asetettu (••••${tokenStatusQuery.data.last4 ?? ""})`
+                  : "Ei asetettu"}
+            </div>
+
+            {tokenStatusQuery.data?.configured && (
+              <Button
+                size="sm"
+                variant="destructive"
+                isLoading={deleteTokenMutation.isPending}
+                onClick={() => {
+                  const ok = window.confirm(
+                    "Poistetaanko OpenAI token tältä käyttötapaukselta?"
+                  );
+                  if (!ok) return;
+                  deleteTokenMutation.mutate();
+                }}
+              >
+                Poista
+              </Button>
+            )}
           </div>
 
-          <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center">
-            <input
-              type="password"
-              value={tokenDraft}
-              onChange={(e) => setTokenDraft(e.target.value)}
-              placeholder="sk-…"
-              className="h-10 w-full rounded-md border border-gray-200 bg-white px-3 text-sm"
-              autoComplete="off"
-            />
-            <Button
-              size="sm"
-              onClick={() => setTokenMutation.mutate()}
-              disabled={setTokenMutation.isPending || tokenDraft.trim().length === 0}
-            >
-              Tallenna
-            </Button>
-          </div>
+          {!tokenStatusQuery.isLoading && !tokenStatusQuery.data?.configured && (
+            <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center">
+              <input
+                type="password"
+                value={tokenDraft}
+                onChange={(e) => setTokenDraft(e.target.value)}
+                placeholder="sk-…"
+                className="h-10 w-full rounded-md border border-gray-200 bg-white px-3 text-sm"
+                autoComplete="off"
+              />
+              <Button
+                size="sm"
+                onClick={() => setTokenMutation.mutate()}
+                disabled={setTokenMutation.isPending || tokenDraft.trim().length === 0}
+              >
+                Tallenna
+              </Button>
+            </div>
+          )}
 
           {setTokenMutation.isError && (
             <div className="mt-3 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800">
               Tallennus epäonnistui. Tarkista että `APP_SECRETS_KEY` on asetettu.
+            </div>
+          )}
+
+          {deleteTokenMutation.isError && (
+            <div className="mt-3 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800">
+              Tokenin poisto epäonnistui.
             </div>
           )}
         </section>
