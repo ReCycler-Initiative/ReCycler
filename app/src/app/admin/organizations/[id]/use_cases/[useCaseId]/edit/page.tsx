@@ -50,7 +50,7 @@ const UseCaseInfoPage = () => {
         </TabsContent>
 
         <TabsContent value="sisaltosivut">
-          <div className="space-y-4">
+          <div className="space-y-12">
             <div>
               <h3 className="text-lg font-semibold mb-4">Etusivu</h3>
               <div className="space-y-3">
