@@ -18,19 +18,25 @@ async function loadTrainingMaterials(useCaseId: string): Promise<string> {
 
 class MissingApiKeyError extends Error {}
 
-async function getOpenAiClient(useCaseId: string): Promise<OpenAI> {
-  const secret = await db
-    .select("openai_api_key_ciphertext")
-    .from("recycler.use_case_secrets")
-    .where("use_case_id", useCaseId)
-    .first();
+async function getOpenAiClient(useCaseId?: string): Promise<OpenAI> {
+  if (useCaseId) {
+    const secret = await db
+      .select("openai_api_key_ciphertext")
+      .from("recycler.use_case_secrets")
+      .where("use_case_id", useCaseId)
+      .first();
 
-  if (secret?.openai_api_key_ciphertext) {
-    const apiKey = decryptSecret(secret.openai_api_key_ciphertext);
-    return new OpenAI({ apiKey });
+    if (secret?.openai_api_key_ciphertext) {
+      const apiKey = decryptSecret(secret.openai_api_key_ciphertext);
+      return new OpenAI({ apiKey });
+    }
   }
 
-  throw new MissingApiKeyError("No OpenAI API key configured for this use case");
+  if (process.env.OPENAI_API_KEY) {
+    return new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+  }
+
+  throw new MissingApiKeyError("No OpenAI API key available");
 }
 
 export async function POST(req: NextRequest) {
@@ -78,13 +84,6 @@ Tärkeää:
 - Vastaa aina suomeksi`;
 
     const recentHistory = (history as { role: string; content: string }[]).slice(-10);
-
-    if (!useCaseId) {
-      return NextResponse.json(
-        { error: "Palvelu ei ole tällä hetkellä käytettävissä" },
-        { status: 503 }
-      );
-    }
 
     const openai = await getOpenAiClient(useCaseId);
 
