@@ -4,6 +4,21 @@ import { Material } from "@/types";
 import { NextRequest, NextResponse } from "next/server";
 import OpenAI from "openai";
 
+async function loadUseCaseInfo(
+  useCaseId: string
+): Promise<{ name: string; description: string } | null> {
+  const row = await db
+    .select("name", "description")
+    .from("recycler.use_cases")
+    .where("id", useCaseId)
+    .first();
+  if (!row) return null;
+  const name = (row.name ?? "").trim();
+  const description = (row.description ?? "").trim();
+  if (!name && !description) return null;
+  return { name, description };
+}
+
 async function loadTrainingMaterials(useCaseId: string): Promise<string> {
   const rows: { filename: string; content_text: string }[] = await db
     .select("filename", "content_text")
@@ -50,11 +65,23 @@ export async function POST(req: NextRequest) {
       .map((m) => `- ${m.name} (koodi: ${m.code})`)
       .join("\n");
 
-    const trainingContext = useCaseId
-      ? await loadTrainingMaterials(useCaseId)
+    const [trainingContext, useCaseInfo] = await Promise.all([
+      useCaseId ? loadTrainingMaterials(useCaseId) : Promise.resolve(""),
+      useCaseId ? loadUseCaseInfo(useCaseId) : Promise.resolve(null),
+    ]);
+
+    const useCaseContextBlock = useCaseInfo
+      ? [
+          useCaseInfo.name ? `Käyttötapauksen nimi: ${useCaseInfo.name}` : "",
+          useCaseInfo.description
+            ? `Käyttötapauksen kuvaus: ${useCaseInfo.description}`
+            : "",
+        ]
+          .filter(Boolean)
+          .join("\n")
       : "";
 
-    const systemPrompt = `Olet ReCycler-palvelun kierrätysneuvoja. Käyt keskustelua käyttäjän kanssa ja autat heitä selvittämään mihin kierrätyskategorioihin heidän tavaransa kuuluvat.
+    const systemPrompt = `${useCaseContextBlock ? useCaseContextBlock + "\n\n" : ""}Olet ReCycler-palvelun kierrätysneuvoja. Käyt keskustelua käyttäjän kanssa ja autat heitä selvittämään mihin kierrätyskategorioihin heidän tavaransa kuuluvat.
 
 Alla on ohjeistukset eri jätelajeille:
 
@@ -73,6 +100,7 @@ Vastaa AINA seuraavassa JSON-muodossa:
 }
 
 Tärkeää:
+- Jos tämä on ensimmäinen viesti (historia on tyhjä eikä käyttäjältä ole tullut viestiä), avaa keskustelu kontekstuaalisella tervehdyksellä${useCaseInfo?.name ? " joka viittaa käyttötapaukseen '" + useCaseInfo.name + "'" : ""} ja pyydä kertomaan mitä halutaan kierrättää
 - Jos käyttäjä sanoo ensimmäistä kertaa "Hei" tai tervehtii, pyydä heitä kertomaan mitä haluavat kierrättää
 - materialNames on kumulatiivinen: sisällytä kaikki kategoriat mitä käyttäjä on maininnut tässä keskustelussa
 - Jos käyttäjä sanoo ettei jokin tavara kuulukaan mukaan, poista se materialNames-listasta
