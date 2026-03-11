@@ -84,14 +84,71 @@ export default function AiPage() {
     <PageTemplate title="Tekoäly">
       <div className="flex flex-col gap-6">
         <section className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
-          <p className="text-sm text-gray-600">
-            Tämä on mockup-sivu käyttötapauksen tekoälytoiminnoille.
+          <h2 className="text-lg font-medium text-gray-900">OpenAI token</h2>
+          <p className="mt-2 text-sm text-gray-600">
+            Tallenna OpenAI API key käyttötapaukselle. Avain tallennetaan salattuna,
+            eikä sitä palauteta API:sta selväkielisenä.
           </p>
-          <ul className="mt-3 list-disc pl-5 text-sm text-gray-700">
-            <li>Ehdotukset datayhteyksien mappauksiin</li>
-            <li>Poikkeamien tunnistus ajohistoriasta</li>
-            <li>Yhteenvedot ja selitteet virheistä</li>
-          </ul>
+
+          <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+            <div className="text-sm text-gray-700">
+              Tila:{" "}
+              {tokenStatusQuery.isLoading
+                ? "Ladataan…"
+                : tokenStatusQuery.data?.configured
+                  ? `Asetettu (••••${tokenStatusQuery.data.last4 ?? ""})`
+                  : "Ei asetettu"}
+            </div>
+
+            {tokenStatusQuery.data?.configured && (
+              <Button
+                size="sm"
+                variant="destructive"
+                isLoading={deleteTokenMutation.isPending}
+                onClick={() => {
+                  const ok = window.confirm(
+                    "Poistetaanko OpenAI token tältä käyttötapaukselta?"
+                  );
+                  if (!ok) return;
+                  deleteTokenMutation.mutate();
+                }}
+              >
+                Poista
+              </Button>
+            )}
+          </div>
+
+          {!tokenStatusQuery.isLoading && !tokenStatusQuery.data?.configured && (
+            <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center">
+              <input
+                type="password"
+                value={tokenDraft}
+                onChange={(e) => setTokenDraft(e.target.value)}
+                placeholder="sk-…"
+                className="h-10 w-full rounded-md border border-gray-200 bg-white px-3 text-sm"
+                autoComplete="off"
+              />
+              <Button
+                size="sm"
+                onClick={() => setTokenMutation.mutate()}
+                disabled={setTokenMutation.isPending || tokenDraft.trim().length === 0}
+              >
+                Tallenna
+              </Button>
+            </div>
+          )}
+
+          {setTokenMutation.isError && (
+            <div className="mt-3 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800">
+              Tallennus epäonnistui. Tarkista että `APP_SECRETS_KEY` on asetettu.
+            </div>
+          )}
+
+          {deleteTokenMutation.isError && (
+            <div className="mt-3 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800">
+              Tokenin poisto epäonnistui.
+            </div>
+          )}
         </section>
 
         <section className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
@@ -212,82 +269,6 @@ export default function AiPage() {
               Poisto epäonnistui.
             </div>
           )}
-        </section>
-
-        <section className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
-          <h2 className="text-lg font-medium text-gray-900">OpenAI token</h2>
-          <p className="mt-2 text-sm text-gray-600">
-            Tallenna OpenAI API key käyttötapaukselle. Avain tallennetaan salattuna,
-            eikä sitä palauteta API:sta selväkielisenä.
-          </p>
-
-          <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-            <div className="text-sm text-gray-700">
-              Tila:{" "}
-              {tokenStatusQuery.isLoading
-                ? "Ladataan…"
-                : tokenStatusQuery.data?.configured
-                  ? `Asetettu (••••${tokenStatusQuery.data.last4 ?? ""})`
-                  : "Ei asetettu"}
-            </div>
-
-            {tokenStatusQuery.data?.configured && (
-              <Button
-                size="sm"
-                variant="destructive"
-                isLoading={deleteTokenMutation.isPending}
-                onClick={() => {
-                  const ok = window.confirm(
-                    "Poistetaanko OpenAI token tältä käyttötapaukselta?"
-                  );
-                  if (!ok) return;
-                  deleteTokenMutation.mutate();
-                }}
-              >
-                Poista
-              </Button>
-            )}
-          </div>
-
-          {!tokenStatusQuery.isLoading && !tokenStatusQuery.data?.configured && (
-            <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center">
-              <input
-                type="password"
-                value={tokenDraft}
-                onChange={(e) => setTokenDraft(e.target.value)}
-                placeholder="sk-…"
-                className="h-10 w-full rounded-md border border-gray-200 bg-white px-3 text-sm"
-                autoComplete="off"
-              />
-              <Button
-                size="sm"
-                onClick={() => setTokenMutation.mutate()}
-                disabled={setTokenMutation.isPending || tokenDraft.trim().length === 0}
-              >
-                Tallenna
-              </Button>
-            </div>
-          )}
-
-          {setTokenMutation.isError && (
-            <div className="mt-3 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800">
-              Tallennus epäonnistui. Tarkista että `APP_SECRETS_KEY` on asetettu.
-            </div>
-          )}
-
-          {deleteTokenMutation.isError && (
-            <div className="mt-3 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800">
-              Tokenin poisto epäonnistui.
-            </div>
-          )}
-        </section>
-
-        <section className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
-          <h2 className="text-lg font-medium text-gray-900">Seuraavaksi</h2>
-          <p className="mt-2 text-sm text-gray-600">
-            Kun tekoälypalvelu on määritelty, tähän voidaan lisätä oikeat
-            syötteet, tulokset ja käyttöoikeusrajaukset.
-          </p>
         </section>
       </div>
     </PageTemplate>
