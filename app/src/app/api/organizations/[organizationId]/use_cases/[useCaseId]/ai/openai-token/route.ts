@@ -92,3 +92,24 @@ export async function PUT(
 
   return NextResponse.json({ configured: true, last4 });
 }
+
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: Promise<z.infer<typeof ParamsSchema>> }
+) {
+  const { organizationId, useCaseId } = ParamsSchema.parse(await params);
+
+  const authResult = await checkOrganizationAuthorization(request, organizationId);
+  if (!authResult.authorized) {
+    return authResult.response!;
+  }
+
+  const allowed = await assertUseCaseInOrg(organizationId, useCaseId);
+  if (!allowed) {
+    return NextResponse.json({ error: "Use case not found" }, { status: 404 });
+  }
+
+  await db("recycler.use_case_secrets").where("use_case_id", useCaseId).del();
+
+  return new NextResponse(null, { status: 204 });
+}

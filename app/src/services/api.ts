@@ -172,3 +172,13 @@ export const setUseCaseOpenAiToken = (
       { token }
     )
     .then((response) => response.data);
+
+export const deleteUseCaseOpenAiToken = (
+  organizationId: string,
+  useCaseId: string
+): Promise<void> =>
+  axios
+    .delete(
+      `/api/organizations/${organizationId}/use_cases/${useCaseId}/ai/openai-token`
+    )
+    .then(() => undefined);
