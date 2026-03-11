@@ -134,6 +134,17 @@ export const uploadUseCaseTrainingMaterial = async (
     .then((response) => response.data);
 };
 
+export const deleteUseCaseTrainingMaterial = (
+  organizationId: string,
+  useCaseId: string,
+  materialId: string
+): Promise<void> =>
+  axios
+    .delete(
+      `/api/organizations/${organizationId}/use_cases/${useCaseId}/ai/training-materials/${materialId}`
+    )
+    .then(() => undefined);
+
 export type UseCaseOpenAiTokenStatus = {
   configured: boolean;
   last4?: string;
