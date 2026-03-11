@@ -100,3 +100,64 @@ export const getUserOrganizations = (): Promise<
   axios
     .get("/api/users/me/organizations")
     .then((response) => response.data.map((org: any) => Organization.parse(org)));
+
+export type UseCaseTrainingMaterialListItem = {
+  id: string;
+  filename: string;
+  mimeType: string;
+  createdAt: string;
+};
+
+export const listUseCaseTrainingMaterials = (
+  organizationId: string,
+  useCaseId: string
+): Promise<UseCaseTrainingMaterialListItem[]> =>
+  axios
+    .get(
+      `/api/organizations/${organizationId}/use_cases/${useCaseId}/ai/training-materials`
+    )
+    .then((response) => response.data);
+
+export const uploadUseCaseTrainingMaterial = async (
+  organizationId: string,
+  useCaseId: string,
+  file: File
+): Promise<UseCaseTrainingMaterialListItem> => {
+  const formData = new FormData();
+  formData.append("file", file);
+
+  return axios
+    .post(
+      `/api/organizations/${organizationId}/use_cases/${useCaseId}/ai/training-materials`,
+      formData
+    )
+    .then((response) => response.data);
+};
+
+export type UseCaseOpenAiTokenStatus = {
+  configured: boolean;
+  last4?: string;
+  updatedAt?: string;
+};
+
+export const getUseCaseOpenAiTokenStatus = (
+  organizationId: string,
+  useCaseId: string
+): Promise<UseCaseOpenAiTokenStatus> =>
+  axios
+    .get(
+      `/api/organizations/${organizationId}/use_cases/${useCaseId}/ai/openai-token`
+    )
+    .then((response) => response.data);
+
+export const setUseCaseOpenAiToken = (
+  organizationId: string,
+  useCaseId: string,
+  token: string
+): Promise<{ configured: true; last4: string }> =>
+  axios
+    .put(
+      `/api/organizations/${organizationId}/use_cases/${useCaseId}/ai/openai-token`,
+      { token }
+    )
+    .then((response) => response.data);
