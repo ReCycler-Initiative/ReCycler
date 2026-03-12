@@ -63,7 +63,7 @@ For any inquiries or suggestions, please reach out to us through GitHub. You can
 
 ## ReCycler Platform screenshots 
 
-### 2026-03-12 (Development)
+### 2026-03-12 (Development version)
 
 <img src="images/Recycler-ui-2026-03-12.png" alt="ReCycler UI (2026-03-12)" width="60%" />
 
