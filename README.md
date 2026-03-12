@@ -61,12 +61,18 @@ Usage of Mapbox is subject to their [Terms of Service](https://www.mapbox.com/le
 ## Contact
 For any inquiries or suggestions, please reach out to us through GitHub. You can contact us by creating an issue in the repository, participating in discussions, or submitting pull requests. We value and welcome your contributions and feedback.
 
-## ReCycler Platform screenshots 
+## ReCycler Platform screenshots (currently in Finnish)
 
 ### 2026-03-12 (Development version)
 
+#### Map user interface:
+
 <img src="images/Recycler-ui-2026-03-12.png" alt="ReCycler UI (2026-03-12)" width="60%" />
 
+#### AI image recognition:
+
 <img src="images/AI-image-recognition-2026-03-12.png" alt="AI image recognition (2026-03-12)" width="60%" />
+
+#### AI text recognition, speech-to-text feature also available:
 
 <img src="images/Ai-text-recognition-2026-03-12.png" alt="AI text recognition (2026-03-12)" width="60%" />
