@@ -63,4 +63,10 @@ For any inquiries or suggestions, please reach out to us through GitHub. You can
 
 ## ReCycler Platform screenshots 
 
+### 2026-03-12 (Development)
 
+![ReCycler UI (2026-03-12)](images/Recycler-ui-2026-03-12.png)
+
+![AI image recognition (2026-03-12)](images/AI-image-recognition-2026-03-12.png)
+
+![AI text recognition (2026-03-12)](images/Ai-text-recognition-2026-03-12.png)
