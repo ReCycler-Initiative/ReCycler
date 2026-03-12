@@ -65,8 +65,8 @@ For any inquiries or suggestions, please reach out to us through GitHub. You can
 
 ### 2026-03-12 (Development)
 
-![ReCycler UI (2026-03-12)](images/Recycler-ui-2026-03-12.png)
+<img src="images/Recycler-ui-2026-03-12.png" alt="ReCycler UI (2026-03-12)" width="60%" />
 
-![AI image recognition (2026-03-12)](images/AI-image-recognition-2026-03-12.png)
+<img src="images/AI-image-recognition-2026-03-12.png" alt="AI image recognition (2026-03-12)" width="60%" />
 
-![AI text recognition (2026-03-12)](images/Ai-text-recognition-2026-03-12.png)
+<img src="images/Ai-text-recognition-2026-03-12.png" alt="AI text recognition (2026-03-12)" width="60%" />
