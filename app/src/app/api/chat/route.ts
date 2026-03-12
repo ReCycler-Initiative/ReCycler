@@ -1,4 +1,3 @@
-import { decryptSecret } from "@/lib/crypto";
 import db from "@/services/db";
 import { Material } from "@/types";
 import { NextRequest, NextResponse } from "next/server";
@@ -33,20 +32,7 @@ async function loadTrainingMaterials(useCaseId: string): Promise<string> {
 
 class MissingApiKeyError extends Error {}
 
-async function getOpenAiClient(useCaseId?: string): Promise<OpenAI> {
-  if (useCaseId) {
-    const secret = await db
-      .select("openai_api_key_ciphertext")
-      .from("recycler.use_case_secrets")
-      .where("use_case_id", useCaseId)
-      .first();
-
-    if (secret?.openai_api_key_ciphertext) {
-      const apiKey = decryptSecret(secret.openai_api_key_ciphertext);
-      return new OpenAI({ apiKey });
-    }
-  }
-
+async function getOpenAiClient(): Promise<OpenAI> {
   if (process.env.OPENAI_API_KEY) {
     return new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
   }
@@ -113,7 +99,7 @@ Tärkeää:
 
     const recentHistory = (history as { role: string; content: string }[]).slice(-10);
 
-    const openai = await getOpenAiClient(useCaseId);
+    const openai = await getOpenAiClient();
 
     const completion = await openai.chat.completions.create({
       model: "gpt-4o-mini",

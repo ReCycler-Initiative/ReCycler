@@ -149,40 +149,4 @@ export const deleteUseCaseTrainingMaterial = (
     )
     .then(() => undefined);
 
-export type UseCaseOpenAiTokenStatus = {
-  configured: boolean;
-  last4?: string;
-  updatedAt?: string;
-};
 
-export const getUseCaseOpenAiTokenStatus = (
-  organizationId: string,
-  useCaseId: string
-): Promise<UseCaseOpenAiTokenStatus> =>
-  axios
-    .get(
-      `/api/organizations/${organizationId}/use_cases/${useCaseId}/ai/openai-token`
-    )
-    .then((response) => response.data);
-
-export const setUseCaseOpenAiToken = (
-  organizationId: string,
-  useCaseId: string,
-  token: string
-): Promise<{ configured: true; last4: string }> =>
-  axios
-    .put(
-      `/api/organizations/${organizationId}/use_cases/${useCaseId}/ai/openai-token`,
-      { token }
-    )
-    .then((response) => response.data);
-
-export const deleteUseCaseOpenAiToken = (
-  organizationId: string,
-  useCaseId: string
-): Promise<void> =>
-  axios
-    .delete(
-      `/api/organizations/${organizationId}/use_cases/${useCaseId}/ai/openai-token`
-    )
-    .then(() => undefined);
