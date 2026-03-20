@@ -104,24 +104,23 @@ export default function OnboardingHint() {
         imageAlt: "Taustakartan vaihtopainike",
       },
       {
-        title: "Valitse materiaalit",
+        title: "Valitse hakuehdot",
         body: (
           <>
-            Valitse haluamasi materiaalit painikkeesta.
+            Valitse haluamasi hakuehdot painikkeesta.
             <br />
-            Numerokuvake <b>(0 → 1, 2…)</b> kertoo, montako materiaalia on
+            Numerokuvake <b>(0 → 1, 2…)</b> kertoo, montako hakuehtoa on
             valittuna.
             <br />
             <br />
             <small>
-              Vinkki: Kartalla korostetaan ne keltaisella reunuksella
-              keräyspisteet, jotka ottavat vastaan kaikki valitsemasi
-              materiaalit.
+              Vinkki: Kartalla korostetaan ne keltaisella reunuksella kohteet,
+              jotka täyttävät kaikki valitsemasi hakuehdot.
             </small>
           </>
         ),
         imageSrc: "/images/materialSelectorOnBoarding.png",
-        imageAlt: "Materiaalivalintapainike",
+        imageAlt: "Hakuehtojen valintapainike",
       },
       {
         title: "ReCycler-avustaja",
