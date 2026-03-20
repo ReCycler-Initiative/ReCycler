@@ -67,33 +67,27 @@ export async function POST(req: NextRequest) {
           .join("\n")
       : "";
 
-    const systemPrompt = `${useCaseContextBlock ? useCaseContextBlock + "\n\n" : ""}Olet ReCycler-palvelun kierrätysneuvoja. Käyt keskustelua käyttäjän kanssa ja autat heitä selvittämään mihin kierrätyskategorioihin heidän tavaransa kuuluvat.
-
-Alla on ohjeistukset eri jätelajeille:
-
-${trainingContext}
-
+    const systemPrompt = `${useCaseContextBlock ? useCaseContextBlock + "\n\n" : ""}${trainingContext ? "Ohjeistukset ja taustamateriaalit:\n\n" + trainingContext + "\n\n" : ""}
 Käytettävissä olevat materiaalikategoriat (käytä näitä nimiä täsmälleen):
 ${materialList}
 
 Vastaa AINA seuraavassa JSON-muodossa:
 {
-  "reply": "Vapaamuotoinen, ystävällinen ja lyhyt suomenkielinen vastausviesti käyttäjälle.",
-  "materialNames": ["KAIKKI ne materiaalikategorioiden nimet joita käyttäjä on maininnut koko keskustelun aikana ja jotka kuuluvat kierrätykseen — päivitä tämä lista koko ajan"],
+  "reply": "Vapaamuotoinen, ystävällinen ja lyhyt vastausviesti käyttäjälle.",
+  "materialNames": ["Kaikki ne materiaalikategorioiden nimet joita käyttäjä on maininnut koko keskustelun aikana — päivitä tämä lista koko ajan"],
   "preparationTips": [
-    { "materialName": "Kategorian nimi TÄSMÄLLEEN kuten yllä listassa", "tip": "Yksi lause: miten tämä materiaali kannattaa valmistella ennen viemistä kierrätyspisteelle." }
+    { "materialName": "Kategorian nimi TÄSMÄLLEEN kuten yllä listassa", "tip": "Yksi lause: miten tämä materiaali kannattaa valmistella." }
   ]
 }
 
 Tärkeää:
-- Jos tämä on ensimmäinen viesti (historia on tyhjä eikä käyttäjältä ole tullut viestiä), avaa keskustelu kontekstuaalisella tervehdyksellä${useCaseInfo?.name ? " joka viittaa käyttötapaukseen '" + useCaseInfo.name + "'" : ""} ja pyydä kertomaan mitä halutaan kierrättää
-- Jos käyttäjä sanoo ensimmäistä kertaa "Hei" tai tervehtii, pyydä heitä kertomaan mitä haluavat kierrättää
+- Jos tämä on ensimmäinen viesti (historia on tyhjä eikä käyttäjältä ole tullut viestiä), avaa keskustelu kontekstuaalisella tervehdyksellä${useCaseInfo?.name ? " joka viittaa käyttötapaukseen '" + useCaseInfo.name + "'" : ""} ja pyydä käyttäjää kertomaan tarpeestaan
+- Jos käyttäjä tervehtii, pyydä häntä kertomaan tarpeestaan
 - materialNames on kumulatiivinen: sisällytä kaikki kategoriat mitä käyttäjä on maininnut tässä keskustelussa
 - Jos käyttäjä sanoo ettei jokin tavara kuulukaan mukaan, poista se materialNames-listasta
 - preparationTips sisältää vihjeen jokaiselle materialNames-kategorialle
-- Jos esivalmistelua ei tarvita, mainitse se lyhyesti
-- Jos käyttäjä lähettää kuvan, tunnista kuvasta kierrätettävät tavarat ja neuvoo mihin kategorioihin ne kuuluvat
-- Jos kuva on epäselvä tai et pysty tunnistamaan tavaroita, kysy tarkentavia kysymyksiä
+- Jos käyttäjä lähettää kuvan, tunnista kuvasta materiaalit ja neuvoo mihin kategorioihin ne kuuluvat
+- Jos kuva on epäselvä tai et pysty tunnistamaan sisältöä, kysy tarkentavia kysymyksiä
 - reply saa olla 1–3 lausetta, keskusteleva sävy
 - Vastaa aina suomeksi`;
 
@@ -123,7 +117,7 @@ Tärkeää:
                   },
                   {
                     type: "text" as const,
-                    text: message || "Mitä tässä kuvassa on ja mihin se kierrätetään?",
+                    text: message || "Mitä tässä kuvassa on?",
                   },
                 ],
               },
@@ -165,7 +159,7 @@ Tärkeää:
     }
     console.error("Chat API error:", err);
     return NextResponse.json(
-      { error: "Virhe kierrätysneuvonnassa" },
+      { error: "Virhe chat-palvelussa" },
       { status: 500 }
     );
   }
