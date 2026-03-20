@@ -123,46 +123,6 @@ export default function OnboardingHint() {
         imageAlt: "Hakuehtojen valintapainike",
       },
       {
-        title: "ReCycler-avustaja",
-        body: (
-          <>
-            Kysy kierrätysasioista ReCycler-avustajalta selkokielellä – sinun ei
-            tarvitse tuntea virallisia termejä.
-            <br />
-            <br />
-            Voit esimerkiksi kysyä:
-            <small>
-              <span className="inline-flex gap-2 flex-wrap">
-                <span className="px-2 py-1 rounded-full bg-gray-100">
-                  Mihin laitan rikkinäisen paistinpannun?
-                </span>
-                <br />
-                <span className="px-2 py-1 rounded-full bg-gray-100">
-                  Voiko pizzalaatikon kierrättää?
-                </span>
-                <br />
-                <span className="px-2 py-1 rounded-full bg-gray-100">
-                  Miten paristot ja akut pitää pakata?
-                </span>
-              </span>
-            </small>
-            <br />
-            <br />
-            Avustaja antaa lajitteluohjeet ja kertoo, mihin jätelajiin
-            materiaali kuuluu.
-            <br />
-            <br />
-            <small>
-              Vinkki: ReCycler-avustaja ei näe (toistaiseksi) karttaa eikä
-              paikanna pisteitä. Löydät keräyspisteet haulla tai
-              materiaalivalinnalla.
-            </small>
-          </>
-        ),
-        imageSrc: "/images/chatbotOnBoarding.png",
-        imageAlt: "ReCycler-avustaja",
-      },
-      {
         title: "Kaikki valmista!",
         body: <>Oikein mukavia kierrätyshetkiä!</>,
         imageSrc: null,
