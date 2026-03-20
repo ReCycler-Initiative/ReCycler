@@ -63,7 +63,7 @@ export default function OnboardingHint() {
         title: "Ota paikannus käyttöön",
         body: (
           <>
-            Napsauta sijaintipainiketta. Ensimmäisellä kerralla ReCycler-sovellusta käytettäessä verkkoselain kysyy luvan sijainnin käyttöön – hyväksy,
+            Napsauta sijaintipainiketta. Ensimmäisellä kerralla sovellusta käytettäessä verkkoselain kysyy luvan sijainnin käyttöön – hyväksy,
             niin karttaikkuna keskittyy nykyiseen sijaintiisi.
             <br />
             <br />
@@ -104,68 +104,27 @@ export default function OnboardingHint() {
         imageAlt: "Taustakartan vaihtopainike",
       },
       {
-        title: "Valitse materiaalit",
+        title: "Valitse hakuehdot",
         body: (
           <>
-            Valitse haluamasi materiaalit painikkeesta.
+            Valitse haluamasi hakuehdot painikkeesta.
             <br />
-            Numerokuvake <b>(0 → 1, 2…)</b> kertoo, montako materiaalia on
+            Numerokuvake <b>(0 → 1, 2…)</b> kertoo, montako hakuehtoa on
             valittuna.
             <br />
             <br />
             <small>
-              Vinkki: Kartalla korostetaan ne keltaisella reunuksella
-              keräyspisteet, jotka ottavat vastaan kaikki valitsemasi
-              materiaalit.
+              Vinkki: Kartalla korostetaan ne keltaisella reunuksella kohteet,
+              jotka täyttävät kaikki valitsemasi hakuehdot.
             </small>
           </>
         ),
         imageSrc: "/images/materialSelectorOnBoarding.png",
-        imageAlt: "Materiaalivalintapainike",
-      },
-      {
-        title: "ReCycler-avustaja",
-        body: (
-          <>
-            Kysy kierrätysasioista ReCycler-avustajalta selkokielellä – sinun ei
-            tarvitse tuntea virallisia termejä.
-            <br />
-            <br />
-            Voit esimerkiksi kysyä:
-            <small>
-              <span className="inline-flex gap-2 flex-wrap">
-                <span className="px-2 py-1 rounded-full bg-gray-100">
-                  Mihin laitan rikkinäisen paistinpannun?
-                </span>
-                <br />
-                <span className="px-2 py-1 rounded-full bg-gray-100">
-                  Voiko pizzalaatikon kierrättää?
-                </span>
-                <br />
-                <span className="px-2 py-1 rounded-full bg-gray-100">
-                  Miten paristot ja akut pitää pakata?
-                </span>
-              </span>
-            </small>
-            <br />
-            <br />
-            Avustaja antaa lajitteluohjeet ja kertoo, mihin jätelajiin
-            materiaali kuuluu.
-            <br />
-            <br />
-            <small>
-              Vinkki: ReCycler-avustaja ei näe (toistaiseksi) karttaa eikä
-              paikanna pisteitä. Löydät keräyspisteet haulla tai
-              materiaalivalinnalla.
-            </small>
-          </>
-        ),
-        imageSrc: "/images/chatbotOnBoarding.png",
-        imageAlt: "ReCycler-avustaja",
+        imageAlt: "Hakuehtojen valintapainike",
       },
       {
         title: "Kaikki valmista!",
-        body: <>Oikein mukavia kierrätyshetkiä!</>,
+        body: <></>,
         imageSrc: null,
         imageAlt: null,
         ctaLabel: "Aloita",
