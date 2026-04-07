@@ -3,7 +3,7 @@
 import TitleBar from "./title-bar";
 
 const TitleBarService = () => {
-  return <TitleBar logo={<p className="font-bold ml-2">ReCycler Platform</p>} toHomeHref="/" />;
+  return <TitleBar logo={null} toHomeHref="/" />;
 };
 
 export default TitleBarService;

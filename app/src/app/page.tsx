@@ -10,12 +10,9 @@ type FeatureCardProps = {
 
 const FeatureCard = ({ title, description }: FeatureCardProps) => {
   return (
-    <div className="group relative overflow-hidden rounded-2xl border border-gray-200 bg-white p-5 shadow-sm transition-all hover:shadow-md hover:-translate-y-0.5">
-      <div className="pointer-events-none absolute -top-24 right-0 h-56 w-56 rounded-full bg-blue-200 blur-3xl opacity-40" />
-      <div className="relative">
-        <h3 className="text-base font-semibold text-gray-900">{title}</h3>
-        <p className="mt-2 text-sm text-gray-600">{description}</p>
-      </div>
+    <div className="rounded-2xl border border-gray-200 bg-white p-5 transition hover:bg-gray-50">
+      <h3 className="text-base font-semibold text-gray-900">{title}</h3>
+      <p className="mt-2 text-sm leading-6 text-gray-600">{description}</p>
     </div>
   );
 };
@@ -25,120 +22,96 @@ const HomePage = () => {
     <>
       <TitleBarService />
       <PageTemplate title="">
-        <div className="px-4 py-8">
+        <div className="px-4 py-10">
           {/* HERO SECTION */}
-          <div className="relative overflow-hidden rounded-2xl border border-gray-200 bg-white">
-            {/* Gradient background */}
-            <div className="pointer-events-none absolute inset-0">
-              <div className="absolute -top-24 left-1/2 h-64 w-[42rem] -translate-x-1/2 rounded-full bg-gradient-to-r from-blue-200 via-indigo-200 to-cyan-200 blur-3xl opacity-70" />
-              <div className="absolute inset-0 opacity-[0.06]">
-                <div className="h-full w-full bg-[linear-gradient(to_right,#111827_1px,transparent_1px),linear-gradient(to_bottom,#111827_1px,transparent_1px)] bg-[size:32px_32px]" />
-              </div>
-            </div>
-
-            <div className="relative p-6 md:p-8">
-              <div className="max-w-3xl">
-                <h1 className="text-2xl font-semibold tracking-tight text-gray-900 md:text-3xl">
-                  ReCycler Platform – Sijaintipohjaisten palveluiden alusta
+          <div className="rounded-2xl border border-gray-200 bg-white">
+            <div className="p-6 md:p-10">
+              <div className="mx-auto max-w-3xl">
+                <h1 className="mt-4 text-3xl font-semibold tracking-tight text-gray-900 md:text-5xl">
+                  Sijaintipohjaisten palveluiden alusta
                 </h1>
 
-                <p className="mt-3 text-sm leading-6 text-gray-600 md:text-base">
-                  ReCycler Platform on moderni, skaalautuva alusta
-                  sijaintitietoon ja ominaisuuksiin perustuvien sovellusten
-                  rakentamiseen. Luo nopeasti hakupalveluita, karttanäkymiä ja
-                  tietopohjia – yhdellä yhtenäisellä järjestelmällä.
+                <p className="mt-4 text-sm leading-6 text-gray-600 md:text-base">
+                  ReCycler Platform on moderni, skaalautuva alusta sijaintitietoon
+                  ja ominaisuuksiin perustuvien sovellusten rakentamiseen. Luo
+                  nopeasti hakupalveluita, karttanäkymiä ja tietopohjia – yhdellä
+                  yhtenäisellä järjestelmällä.
                 </p>
 
-                <ul className="mt-4 space-y-2 text-sm text-gray-700">
-                  <li className="flex gap-2">
-                    <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-blue-500" />
+                <div className="mt-6 grid gap-2 text-sm text-gray-700 sm:grid-cols-2">
+                  <div className="flex gap-2">
+                    <span className="mt-2 h-1 w-1 shrink-0 rounded-full bg-gray-900" />
                     Sijaintipohjainen haku ja karttaintegraatiot valmiina
-                  </li>
-                  <li className="flex gap-2">
-                    <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-blue-500" />
-                    Joustava tietomalli erilaisten kohteiden ja ominaisuuksien
-                    hallintaan
-                  </li>
-                  <li className="flex gap-2">
-                    <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-blue-500" />
+                  </div>
+                  <div className="flex gap-2">
+                    <span className="mt-2 h-1 w-1 shrink-0 rounded-full bg-gray-900" />
+                    Joustava tietomalli erilaisten kohteiden ja ominaisuuksien hallintaan
+                  </div>
+                  <div className="flex gap-2">
+                    <span className="mt-2 h-1 w-1 shrink-0 rounded-full bg-gray-900" />
                     ETL-integraatiot ulkoisiin tietolähteisiin
-                  </li>
-                  <li className="flex gap-2">
-                    <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-blue-500" />
+                  </div>
+                  <div className="flex gap-2">
+                    <span className="mt-2 h-1 w-1 shrink-0 rounded-full bg-gray-900" />
                     Mobiiliystävällinen käyttöliittymä ja moderni teknologia
-                  </li>
-                </ul>
-              </div>
+                  </div>
+                </div>
 
-              {/* CTA Buttons */}
-              <div className="mt-8 flex flex-col gap-4 sm:flex-row">
-                <Link
-                  href="/recycler"
-                  className="inline-flex items-center justify-center rounded-xl bg-gray-900 px-6 py-3 text-sm font-medium text-white transition hover:bg-gray-800 sm:w-auto"
-                >
-                  Avaa ReCycler-demo
-                  <ExternalLink className="ml-2 inline" size={20} />
-                </Link>
-                <Link
-                  href="/api/auth/login?screen_hint=signup"
-                  className="inline-flex items-center justify-center rounded-xl border border-gray-200 bg-white px-6 py-3 text-sm font-medium text-gray-900 transition hover:bg-gray-50 sm:w-auto"
-                >
-                  Luo tunnus
-                </Link>
-              </div>
+                <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+                  <Link
+                    href="/recycler"
+                    className="inline-flex items-center justify-center rounded-full bg-gray-900 px-6 py-3 text-sm font-medium text-white transition hover:bg-gray-800 sm:w-auto"
+                  >
+                    Avaa ReCycler-demo
+                    <ExternalLink className="ml-2 inline" size={18} />
+                  </Link>
+                  <Link
+                    href="/api/auth/login?screen_hint=signup"
+                    className="inline-flex items-center justify-center rounded-full border border-gray-200 bg-white px-6 py-3 text-sm font-medium text-gray-900 transition hover:bg-gray-50 sm:w-auto"
+                  >
+                    Luo tunnus
+                  </Link>
+                </div>
 
-              {/* Hint */}
-              <div className="mt-4 flex items-center gap-2 rounded-xl border border-gray-200 bg-gray-50 px-3 py-2 text-xs text-gray-600">
-                <span>
+                <div className="mt-4 text-xs text-gray-600">
                   Kirjautuminen tapahtuu Auth0:n kautta (Google, O365 ym.)
-                </span>
+                </div>
               </div>
             </div>
           </div>
 
           {/* FEATURES SECTION */}
-          <div className="mt-8">
-            <div>
-              <h2 className="text-lg font-semibold text-gray-900">
-                Alustan ominaisuudet
-              </h2>
-              <p className="mt-1 text-sm text-gray-600">
-                Kaikki mitä tarvitset sijaintipohjaisten palveluiden
-                rakentamiseen.
-              </p>
-            </div>
+          <div className="mt-10">
+            <h2 className="text-base font-semibold text-gray-900">
+              Ominaisuudet
+            </h2>
+            <p className="mt-1 text-sm text-gray-600">
+              Kaikki olennaiset rakennuspalikat yhdessä alustassa.
+            </p>
 
-            <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="mt-4 grid gap-4 sm:grid-cols-2">
               <FeatureCard
                 title="Sijaintipohjainen haku"
                 description="PostGIS-pohjainen geospatiaalinen tietokanta mahdollistaa tehokkaan etäisyys- ja aluepohjaisen haun."
-              />
-              <FeatureCard
-                title="ETL-integraatiot"
-                description="Tuo dataa ulkoisista lähteistä automaattisesti configuroitavien ETL-prosessien kautta."
               />
               <FeatureCard
                 title="Joustava tietomalli"
                 description="Määrittele omia kohdetyyppejä, kenttiä ja ominaisuuksia ilman koodausta."
               />
               <FeatureCard
-                title="Responsiivinen UI"
+                title="ETL-integraatiot"
+                description="Tuo dataa ulkoisista lähteistä automaattisesti configuroitavien ETL-prosessien kautta."
+              />
+              <FeatureCard
+                title="Mobiiliystävällinen UI"
                 description="Next.js ja React-pohjainen käyttöliittymä toimii saumattomasti mobiilissa ja työpöydällä."
-              />
-              <FeatureCard
-                title="Organisaatiomallin tuki"
-                description="Hallitse useita organisaatioita ja niiden dataa keskitetysti yhdessä järjestelmässä."
-              />
-              <FeatureCard
-                title="Avoin lähdekoodi"
-                description="Apache 2.0 -lisenssi, GitHub-pohjainen kehitys ja läpinäkyvä arkkitehtuuri."
               />
             </div>
           </div>
 
           {/* INFO SECTION */}
           <div className="mt-8 grid gap-4 lg:grid-cols-2">
-            <section className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+            <section className="rounded-2xl border border-gray-200 bg-white p-6">
               <h3 className="text-sm font-semibold text-gray-900">
                 Teknologia ja arkkitehtuuri
               </h3>
@@ -153,7 +126,7 @@ const HomePage = () => {
               </div>
             </section>
 
-            <section className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+            <section className="rounded-2xl border border-gray-200 bg-white p-6">
               <h3 className="text-sm font-semibold text-gray-900">
                 Avoin lähdekoodi ja kehitys
               </h3>
@@ -166,58 +139,13 @@ const HomePage = () => {
               <div className="mt-3">
                 <a
                   href="https://github.com/ReCycler-Initiative/ReCycler"
-                  className="text-sm font-medium text-blue-600 hover:text-blue-700 hover:underline"
+                  className="text-sm font-medium text-gray-900 underline underline-offset-4 hover:text-gray-700"
                 >
                   Tutustu projektiin GitHubissa{" "}
                   <ExternalLink className="ml-1 inline" size={16} />
                 </a>
               </div>
             </section>
-          </div>
-
-          {/* USE CASES */}
-          <div className="mt-8 rounded-2xl border border-gray-200 bg-gradient-to-br from-gray-50 to-white p-6 shadow-sm">
-            <h3 className="text-base font-semibold text-gray-900">
-              Käyttötapauksia
-            </h3>
-            <p className="mt-2 text-sm text-gray-600">
-              ReCycler Platform soveltuu monenlaisiin sijaintipohjaisiin
-              palveluihin, kuten:
-            </p>
-            <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-              <div className="rounded-lg border border-gray-200 bg-white p-3">
-                <div className="text-xs font-medium text-gray-900">
-                  Palvelupisteet
-                </div>
-                <div className="mt-1 text-xs text-gray-600">
-                  Liikkeet, toimipisteet
-                </div>
-              </div>
-              <div className="rounded-lg border border-gray-200 bg-white p-3">
-                <div className="text-xs font-medium text-gray-900">
-                  Julkiset palvelut
-                </div>
-                <div className="mt-1 text-xs text-gray-600">
-                  Kirjastot, virastot
-                </div>
-              </div>
-              <div className="rounded-lg border border-gray-200 bg-white p-3">
-                <div className="text-xs font-medium text-gray-900">
-                  Infrastruktuuri
-                </div>
-                <div className="mt-1 text-xs text-gray-600">
-                  Latauspisteet, huoltoasemat
-                </div>
-              </div>
-              <div className="rounded-lg border border-gray-200 bg-white p-3">
-                <div className="text-xs font-medium text-gray-900">
-                  Kierrätys
-                </div>
-                <div className="mt-1 text-xs text-gray-600">
-                  Kierrätyspisteet, ekopisteet
-                </div>
-              </div>
-            </div>
           </div>
         </div>
       </PageTemplate>
