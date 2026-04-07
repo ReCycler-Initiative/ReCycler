@@ -82,7 +82,7 @@ const Content = ({
   return (
     <div className="flex flex-col h-full">
       <TitleBar
-        logo={<p className="font-bold ml-2">ReCycler Platform</p>}
+        logo={null}
         toHomeHref="/"
       >
         <div className="flex flex-1 h-full items-center gap-x-4">
