@@ -1,19 +1,15 @@
 "use client";
 
-import Container from "@/components/container";
 import GeocoderControl from "@/components/geocoder-control";
 import { MapStyleControl } from "@/components/map-style-control";
 import PopupEditText from "@/components/map/popup-edit-text";
-import { Materials } from "@/components/materials";
+import { MaterialsPageContent } from "@/components/materials-page";
 import { SelectedMaterialsControl } from "@/components/selected-materials-control";
 import { Button } from "@/components/ui/button";
 import {
   Drawer,
   DrawerContent,
-  DrawerHeader,
-  DrawerTitle,
 } from "@/components/ui/drawer";
-import { Form } from "@/components/ui/form";
 import OnboardingHint from "@/components/ui/onboarding-hint";
 import { Material } from "@/types";
 import { useUser } from "@auth0/nextjs-auth0";
@@ -22,11 +18,10 @@ import { GeolocateControl as TGeolocateControl } from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import {
   usePathname,
-  useRouter,
+  useParams,
   useSearchParams
 } from "next/navigation";
 import { Suspense, useCallback, useEffect, useRef, useState } from "react";
-import { useForm, useWatch } from "react-hook-form";
 import Map, {
   CircleLayer,
   FullscreenControl,
@@ -195,35 +190,18 @@ export default function LocationsMap({ geoJson }: LocationsMapProps) {
   const [details, setDetails] = useState<MapboxGeoJSONFeature | null>(null);
   const [mapStyle, setStyle] = useState<"detail" | "satellite">("detail");
   const mapRef = useRef<MapRef>(null);
-  const router = useRouter();
   const pathname = usePathname();
+  const params = useParams<{ organizationId?: string; useCaseId?: string }>();
   const searchParams = useSearchParams();
+  const materialsParam = searchParams.get("materials") ?? "";
   const selectedMaterials =
-    searchParams
-      .get("materials")
-      ?.split(",")
-      .filter(Boolean)
-      .map((code) => +code) || [];
+    materialsParam.split(",").filter(Boolean).map((code) => +code) || [];
   const [showMaterials, setShowMaterials] = useState(false);
 
-  // Setup form state for material selection
-  const form = useForm({
-    defaultValues: {
-      materials: selectedMaterials.reduce(
-        (acc, material) => {
-          acc[material] = true;
-          return acc;
-        },
-        {} as Record<string, boolean>
-      ),
-    },
-  });
-
-  const formMaterials = useWatch({
-    control: form.control,
-    name: "materials",
-    defaultValue: {},
-  });
+  useEffect(() => {
+    if (showMaterials) setShowMaterials(false);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [materialsParam]);
 
   const geolocateControlRef = useRef<TGeolocateControl>(null);
 
@@ -447,38 +425,16 @@ export default function LocationsMap({ geoJson }: LocationsMapProps) {
         {/* Drawer for selecting materials */}
         <Drawer
           open={showMaterials}
-          onOpenChange={(open) => {
-            if (!open) {
-              const current = new URLSearchParams(
-                Array.from(searchParams.entries())
-              );
-              current.set(
-                "materials",
-                Object.entries(formMaterials)
-                  .filter(([, value]) => value)
-                  .map(([key]) => key)
-                  .join(",")
-              );
-              const search = current.toString();
-              const query = search ? `?${search}` : "";
-
-              router.push(pathname + query);
-            }
-            setShowMaterials(open);
-          }}
+          onOpenChange={setShowMaterials}
         >
           <DrawerContent>
-            <DrawerHeader>
-              <DrawerTitle className="text-center">
-                Valitse materiaalit
-              </DrawerTitle>
-            </DrawerHeader>
-            <div className="max-h-[500px] overflow-y-scroll max-w-2xl mx-auto">
-              <Form {...form}>
-                <Container>
-                  <Materials />
-                </Container>
-              </Form>
+            <div className="max-h-[500px] overflow-y-auto">
+              <MaterialsPageContent
+                organizationId={params.organizationId}
+                useCaseId={params.useCaseId}
+                resultsBasePath={pathname}
+                embedded
+              />
             </div>
           </DrawerContent>
         </Drawer>
