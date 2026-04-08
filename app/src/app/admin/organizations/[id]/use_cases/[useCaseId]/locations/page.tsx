@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useMemo, useState } from "react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
 import { AdminList } from "@/components/admin/admin-list";
 import {
@@ -11,39 +11,93 @@ import {
 import { SplitMapLayout } from "@/components/admin/split-map-layout";
 import { PageTemplate } from "@/components/admin/page-template";
 import { Button } from "@/components/ui/button";
-import { Pencil, Plus } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Pencil, Plus, X } from "lucide-react";
 import Link from "next/link";
-import { getLocations } from "@/services/api";
+import { createLocation, getLocations } from "@/services/api";
 
 const LocationsPage = () => {
   const params = useParams<{ id: string; useCaseId: string }>();
   const organizationId = params.id;
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const queryClient = useQueryClient();
+
+  const [addMode, setAddMode] = useState(false);
+  const [draftLngLat, setDraftLngLat] = useState<
+    { longitude: number; latitude: number } | null
+  >(null);
+  const [draftName, setDraftName] = useState("");
+  const [dialogOpen, setDialogOpen] = useState(false);
 
   const { data, isLoading, isError } = useQuery({
     queryKey: ["locations", organizationId, params.useCaseId],
     queryFn: () => getLocations(organizationId, params.useCaseId),
   });
 
+  const createMutation = useMutation({
+    mutationFn: (args: {
+      lngLat: { longitude: number; latitude: number };
+      name: string;
+    }) => {
+      return createLocation(organizationId, params.useCaseId, {
+        name: args.name.trim(),
+        longitude: args.lngLat.longitude,
+        latitude: args.lngLat.latitude,
+      });
+    },
+    onSuccess: async (created) => {
+      await queryClient.invalidateQueries({
+        queryKey: ["locations", organizationId, params.useCaseId],
+      });
+      setDialogOpen(false);
+      setDraftLngLat(null);
+      setDraftName("");
+      setAddMode(false);
+      if (created?.properties?.id) setSelectedId(created.properties.id);
+    },
+  });
+
   // Transform GeoJSON data to LocationMarker format
-  const locations: (LocationMarker & { title: string })[] =
-    data?.features.map((feature) => ({
-      id: feature.properties.id,
-      name: feature.properties.name,
-      title: feature.properties.name,
-      longitude: feature.geometry.coordinates[0],
-      latitude: feature.geometry.coordinates[1],
-    })) ?? [];
+  const locations: (LocationMarker & { title: string })[] = useMemo(
+    () =>
+      data?.features.map((feature) => ({
+        id: feature.properties.id,
+        name: feature.properties.name,
+        title: feature.properties.name,
+        longitude: feature.geometry.coordinates[0],
+        latitude: feature.geometry.coordinates[1],
+      })) ?? [],
+    [data]
+  );
 
   return (
     <PageTemplate
       title="Kohteet"
       actions={
-        <Button asChild>
-          <Link href={`locations/new`}>
-            <Plus className="h-4 w-4" />
-            Lisää kohde
-          </Link>
+        <Button
+          type="button"
+          onClick={() => setAddMode((v) => !v)}
+          disabled={createMutation.isPending}
+          variant={addMode ? "outline" : "default"}
+        >
+          {addMode ? (
+            <>
+              <X className="h-4 w-4" />
+              Peruuta lisääminen
+            </>
+          ) : (
+            <>
+              <Plus className="h-4 w-4" />
+              Lisää kohde
+            </>
+          )}
         </Button>
       }
       mode="fullScreen"
@@ -67,6 +121,20 @@ const LocationsPage = () => {
               locations={locations}
               selectedId={selectedId}
               onMarkerClick={setSelectedId}
+              addMode={addMode}
+              onMapClick={(lngLat) => {
+                if (!addMode) return;
+
+                const now = new Date();
+                const defaultName = `Uusi kohde ${now
+                  .toISOString()
+                  .slice(0, 16)
+                  .replace("T", " ")}`;
+
+                setDraftLngLat(lngLat);
+                setDraftName(defaultName);
+                setDialogOpen(true);
+              }}
             />
           }
         >
@@ -89,6 +157,64 @@ const LocationsPage = () => {
           />
         </SplitMapLayout>
       )}
+
+      <Dialog
+        open={dialogOpen}
+        onOpenChange={(open) => {
+          setDialogOpen(open);
+          if (!open) {
+            setDraftLngLat(null);
+            setDraftName("");
+          }
+        }}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Lisää kohde</DialogTitle>
+          </DialogHeader>
+
+          {draftLngLat && (
+            <div className="text-xs text-gray-600">
+              Sijainti: {draftLngLat.latitude.toFixed(6)}, {draftLngLat.longitude.toFixed(6)}
+            </div>
+          )}
+
+          <div className="space-y-2">
+            <Label htmlFor="location-name">Kohteen nimi</Label>
+            <input
+              id="location-name"
+              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+              value={draftName}
+              onChange={(e) => setDraftName(e.target.value)}
+              placeholder="Esim. Uusi palvelupiste"
+              autoFocus
+            />
+          </div>
+
+          <DialogFooter>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setDialogOpen(false)}
+              disabled={createMutation.isPending}
+            >
+              Peruuta
+            </Button>
+            <Button
+              type="button"
+              disabled={
+                createMutation.isPending || !draftLngLat || !draftName.trim()
+              }
+              onClick={() => {
+                if (!draftLngLat) return;
+                createMutation.mutate({ lngLat: draftLngLat, name: draftName });
+              }}
+            >
+              {createMutation.isPending ? "Tallennetaan…" : "Tallenna"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </PageTemplate>
   );
 };

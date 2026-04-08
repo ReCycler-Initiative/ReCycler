@@ -22,6 +22,8 @@ export interface AdminMapViewProps {
   locations: LocationMarker[];
   selectedId?: string | null;
   onMarkerClick?: (id: string) => void;
+  addMode?: boolean;
+  onMapClick?: (lngLat: { longitude: number; latitude: number }) => void;
   className?: string;
 }
 
@@ -35,9 +37,20 @@ export const AdminMapView = ({
   locations,
   selectedId,
   onMarkerClick,
+  addMode,
+  onMapClick,
   className,
 }: AdminMapViewProps) => {
   const mapRef = useRef<MapRef>(null);
+
+  useEffect(() => {
+    const map = mapRef.current?.getMap();
+    if (!map) return;
+    map.getCanvas().style.cursor = addMode ? "crosshair" : "";
+    return () => {
+      map.getCanvas().style.cursor = "";
+    };
+  }, [addMode]);
 
   // Fly to selected location when it changes
   useEffect(() => {
@@ -72,6 +85,10 @@ export const AdminMapView = ({
         }}
         mapStyle={process.env.NEXT_PUBLIC_MAPBOX_STYLE_DETAIL as string}
         maxBounds={finlandBounds}
+        onClick={(e) => {
+          if (!addMode) return;
+          onMapClick?.({ longitude: e.lngLat.lng, latitude: e.lngLat.lat });
+        }}
         style={{ width: "100%", height: "100%", borderRadius: "0.75rem" }}
       >
         <NavigationControl position="top-right" />

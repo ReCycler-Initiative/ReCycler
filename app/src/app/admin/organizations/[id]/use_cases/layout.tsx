@@ -76,7 +76,7 @@ const Content = ({
     { href: `${orgRootPath}/datasources`, label: "Datayhteydet" },
     { href: `${orgRootPath}/locations`, label: "Kohteet" },
     { href: `${orgRootPath}/ai`, label: "Tekoäly" },
-    { href: `${orgRootPath}/runs`, label: "Lokit ja ajot" },
+    { href: `${orgRootPath}/runs`, label: "Lokit" },
   ];
 
   return (
@@ -156,7 +156,7 @@ const Content = ({
               )}
 
               <DropdownMenuItem asChild>
-                <Link href={`${orgRootPath}/runs`}>Lokit ja ajot</Link>
+                <Link href={`${orgRootPath}/runs`}>Lokit</Link>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
