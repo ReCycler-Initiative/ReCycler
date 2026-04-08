@@ -129,9 +129,37 @@ export const AiMaterialPrompt = ({
     setShowCamera(false);
   };
 
+  type SpeechRecognitionEventLike = {
+    resultIndex: number;
+    results: {
+      length: number;
+      [index: number]: {
+        0: { transcript: string };
+        isFinal: boolean;
+      };
+    };
+  };
+
+  type SpeechRecognitionLike = {
+    lang: string;
+    continuous: boolean;
+    interimResults: boolean;
+    onstart: null | (() => void);
+    onresult: null | ((e: SpeechRecognitionEventLike) => void);
+    onend: null | (() => void);
+    onerror: null | (() => void);
+    start: () => void;
+    stop: () => void;
+  };
+
+  type SpeechRecognitionCtorLike = new () => SpeechRecognitionLike;
+
   const toggleListening = () => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const w = window as any;
+    const w = window as Window & {
+      SpeechRecognition?: SpeechRecognitionCtorLike;
+      webkitSpeechRecognition?: SpeechRecognitionCtorLike;
+    };
+
     const SR = w.SpeechRecognition ?? w.webkitSpeechRecognition;
     if (!SR) return;
 
@@ -148,7 +176,7 @@ export const AiMaterialPrompt = ({
 
     let finalTranscript = "";
     recognition.onstart = () => setIsListening(true);
-    recognition.onresult = (e: any) => {
+    recognition.onresult = (e) => {
       let interim = "";
       for (let i = e.resultIndex; i < e.results.length; i++) {
         const t = e.results[i][0].transcript;
