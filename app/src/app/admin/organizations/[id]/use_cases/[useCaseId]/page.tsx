@@ -37,7 +37,7 @@ const UseCaseHomePage = () => {
               </div>
               <div className="flex gap-2">
                 <span className="mt-2 h-1 w-1 shrink-0 rounded-full bg-gray-900" />
-                Tarkista ajot ja lokit, kun tuot uutta dataa tai teet muutoksia
+                  Tarkista lokit, kun tuot uutta dataa tai teet muutoksia
               </div>
             </div>
           </div>

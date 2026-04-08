@@ -1,11 +1,18 @@
 "use client";
 
-import dynamic from "next/dynamic";
+import { useParams, useRouter } from "next/navigation";
+import { useEffect } from "react";
 
-const DynamicHeader = dynamic(() => import("./results"), {
-  ssr: false,
-});
+export default function LocationsPage() {
+  const router = useRouter();
+  const params = useParams<{ organizationId: string; useCaseId: string }>();
 
-export default function HomePage() {
-  return <DynamicHeader />;
+  useEffect(() => {
+    if (!params?.organizationId || !params?.useCaseId) return;
+    router.replace(
+      `/organizations/${params.organizationId}/use_cases/${params.useCaseId}/results`
+    );
+  }, [params?.organizationId, params?.useCaseId, router]);
+
+  return null;
 }

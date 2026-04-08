@@ -60,14 +60,14 @@ export default function RunsPage() {
   const connection = searchParams.get("connection");
 
   return (
-    <PageTemplate title="Lokit ja ajot">
+    <PageTemplate title="Lokit">
       <div className="flex flex-col gap-6">
         <section className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
           <div className="space-y-3">
             <p className="text-sm text-gray-600">
-              Tässä näkymässä seurataan synkronointeja (ajot), niiden tilaa ja
-              virheitä. Tämä on toistaiseksi sivupohja/mockup – tänne voidaan
-              myöhemmin kytkeä oikea ajohistoria ja lokit.
+                Tässä näkymässä seurataan synkronointien tilaa ja mahdollisia
+                virheitä. Tämä on toistaiseksi sivupohja/mockup – tänne voidaan
+                myöhemmin kytkeä oikea synkronointihistoria ja lokit.
             </p>
 
             {connection && (
@@ -91,7 +91,7 @@ export default function RunsPage() {
           <div className="border-b border-gray-200 p-5">
             <h2 className="text-lg font-medium text-gray-900">Ajohistoria</h2>
             <p className="mt-1 text-sm text-gray-600">
-              Viimeisimmät ajot ja niiden lopputulos.
+                Viimeisimmät synkronoinnit ja niiden lopputulos.
             </p>
           </div>
 

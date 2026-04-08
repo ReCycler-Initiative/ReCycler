@@ -44,6 +44,15 @@ export const getLocations = (
     .get(`/api/organizations/${organizationId}/use_cases/${useCaseId}/locations`)
     .then((response) => response.data);
 
+export const createLocation = (
+  organizationId: string,
+  useCaseId: string,
+  body: { name: string; longitude: number; latitude: number }
+): Promise<any> =>
+  axios
+    .post(`/api/organizations/${organizationId}/use_cases/${useCaseId}/locations`, body)
+    .then((response) => response.data);
+
 export const createOrganization = async (
   request: z.infer<typeof CreateOrganizationRequest>
 ) =>
