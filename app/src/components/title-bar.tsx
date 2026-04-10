@@ -2,7 +2,7 @@
 "use client";
 
 import Link from "next/link";
-import { ReactNode, Suspense } from "react";
+import { ReactNode } from "react";
 import Auth0Login from "./auth0-login"; // <-- tuotu tänne
 
 const TitleBar = ({
@@ -23,9 +23,7 @@ const TitleBar = ({
       </div>
       {children}
       <div className="flex items-center ml-auto">
-        <Suspense fallback={<div className="h-12 w-12" />}>
-          <Auth0Login />
-        </Suspense>
+        <Auth0Login />
       </div>
     </header>
   );

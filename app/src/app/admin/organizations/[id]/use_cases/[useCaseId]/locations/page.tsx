@@ -19,9 +19,9 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-import { Pencil, Plus, X } from "lucide-react";
+import { Pencil, Plus, Trash2, X } from "lucide-react";
 import Link from "next/link";
-import { createLocation, getLocations } from "@/services/api";
+import { createLocation, deleteLocation, getLocations } from "@/services/api";
 
 const LocationsPage = () => {
   const params = useParams<{ id: string; useCaseId: string }>();
@@ -35,6 +35,11 @@ const LocationsPage = () => {
   >(null);
   const [draftName, setDraftName] = useState("");
   const [dialogOpen, setDialogOpen] = useState(false);
+
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState<
+    { id: string; name: string } | null
+  >(null);
 
   const { data, isLoading, isError } = useQuery({
     queryKey: ["locations", organizationId, params.useCaseId],
@@ -61,6 +66,20 @@ const LocationsPage = () => {
       setDraftName("");
       setAddMode(false);
       if (created?.properties?.id) setSelectedId(created.properties.id);
+    },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: (locationId: string) =>
+      deleteLocation(organizationId, params.useCaseId, locationId),
+    onSuccess: async () => {
+      const deletedId = deleteTarget?.id;
+      await queryClient.invalidateQueries({
+        queryKey: ["locations", organizationId, params.useCaseId],
+      });
+      setDeleteDialogOpen(false);
+      setDeleteTarget(null);
+      if (deletedId && selectedId === deletedId) setSelectedId(null);
     },
   });
 
@@ -143,12 +162,27 @@ const LocationsPage = () => {
               id: location.id,
               title: location.title,
               actions: (
-                <Button asChild variant="outline" size="icon">
-                  <Link href={`locations/${location.id}/edit`}>
-                    <Pencil className="h-4 w-4" />
-                    <span className="sr-only">Muokkaa</span>
-                  </Link>
-                </Button>
+                <div className="flex items-center gap-2">
+                  <Button asChild variant="outline" size="icon">
+                    <Link href={`locations/${location.id}/edit`}>
+                      <Pencil className="h-4 w-4" />
+                      <span className="sr-only">Muokkaa</span>
+                    </Link>
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="icon"
+                    onClick={() => {
+                      setDeleteTarget({ id: location.id, name: location.name });
+                      setDeleteDialogOpen(true);
+                    }}
+                    disabled={deleteMutation.isPending}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                    <span className="sr-only">Poista</span>
+                  </Button>
+                </div>
               ),
             }))}
             emptyMessage="Tällä organisaatiolla ei ole vielä kohteita."
@@ -211,6 +245,49 @@ const LocationsPage = () => {
               }}
             >
               {createMutation.isPending ? "Tallennetaan…" : "Tallenna"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog
+        open={deleteDialogOpen}
+        onOpenChange={(open) => {
+          setDeleteDialogOpen(open);
+          if (!open) setDeleteTarget(null);
+        }}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Poistetaanko kohde?</DialogTitle>
+          </DialogHeader>
+
+          <div className="text-sm text-muted-foreground">
+            {deleteTarget?.name
+              ? `Oletko varma, että haluat poistaa kohteen "${deleteTarget.name}"? Tätä ei voi perua.`
+              : "Oletko varma, että haluat poistaa tämän kohteen? Tätä ei voi perua."}
+          </div>
+
+          <DialogFooter>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setDeleteDialogOpen(false)}
+              disabled={deleteMutation.isPending}
+            >
+              Peruuta
+            </Button>
+            <Button
+              type="button"
+              variant="destructive"
+              isLoading={deleteMutation.isPending}
+              disabled={!deleteTarget?.id || deleteMutation.isPending}
+              onClick={() => {
+                if (!deleteTarget?.id) return;
+                deleteMutation.mutate(deleteTarget.id);
+              }}
+            >
+              Poista
             </Button>
           </DialogFooter>
         </DialogContent>
