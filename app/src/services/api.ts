@@ -53,6 +53,17 @@ export const createLocation = (
     .post(`/api/organizations/${organizationId}/use_cases/${useCaseId}/locations`, body)
     .then((response) => response.data);
 
+export const deleteLocation = (
+  organizationId: string,
+  useCaseId: string,
+  locationId: string
+): Promise<void> =>
+  axios
+    .delete(
+      `/api/organizations/${organizationId}/use_cases/${useCaseId}/locations/${locationId}`
+    )
+    .then(() => undefined);
+
 export const createOrganization = async (
   request: z.infer<typeof CreateOrganizationRequest>
 ) =>
