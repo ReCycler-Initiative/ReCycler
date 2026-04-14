@@ -143,6 +143,7 @@ const LocationsPage = () => {
               onMarkerClick={(id) => { setSelectedId(id); setEditId(id); }}
               addMode={addMode || relocateMode}
               ghostMarker={ghostMarker}
+              draftMarker={addDraft ?? undefined}
               onMapClick={(lngLat) => {
                 if (relocateMode) {
                   setPickedLngLat(lngLat);
