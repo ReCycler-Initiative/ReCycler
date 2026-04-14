@@ -19,9 +19,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Label } from "@/components/ui/label";
 import { Pencil, Plus, Trash2, X } from "lucide-react";
-import { createLocation, deleteLocation, getLocations } from "@/services/api";
+import { deleteLocation, getLocations } from "@/services/api";
 
 const LocationsPage = () => {
   const params = useParams<{ id: string; useCaseId: string }>();
@@ -30,11 +29,10 @@ const LocationsPage = () => {
   const queryClient = useQueryClient();
 
   const [addMode, setAddMode] = useState(false);
-  const [draftLngLat, setDraftLngLat] = useState<
-    { longitude: number; latitude: number } | null
-  >(null);
-  const [draftName, setDraftName] = useState("");
-  const [dialogOpen, setDialogOpen] = useState(false);
+  const [addDraft, setAddDraft] = useState<{
+    longitude: number;
+    latitude: number;
+  } | null>(null);
 
   const [editId, setEditId] = useState<string | null>(null);
 
@@ -46,29 +44,6 @@ const LocationsPage = () => {
   const { data, isLoading, isError } = useQuery({
     queryKey: ["locations", organizationId, params.useCaseId],
     queryFn: () => getLocations(organizationId, params.useCaseId),
-  });
-
-  const createMutation = useMutation({
-    mutationFn: (args: {
-      lngLat: { longitude: number; latitude: number };
-      name: string;
-    }) => {
-      return createLocation(organizationId, params.useCaseId, {
-        name: args.name.trim(),
-        longitude: args.lngLat.longitude,
-        latitude: args.lngLat.latitude,
-      });
-    },
-    onSuccess: async (created) => {
-      await queryClient.invalidateQueries({
-        queryKey: ["locations", organizationId, params.useCaseId],
-      });
-      setDialogOpen(false);
-      setDraftLngLat(null);
-      setDraftName("");
-      setAddMode(false);
-      if (created?.properties?.id) setSelectedId(created.properties.id);
-    },
   });
 
   const deleteMutation = useMutation({
@@ -105,7 +80,6 @@ const LocationsPage = () => {
         <Button
           type="button"
           onClick={() => setAddMode((v) => !v)}
-          disabled={createMutation.isPending}
           variant={addMode ? "outline" : "default"}
         >
           {addMode ? (
@@ -145,32 +119,33 @@ const LocationsPage = () => {
               addMode={addMode}
               onMapClick={(lngLat) => {
                 if (!addMode) return;
-
-                const now = new Date();
-                const defaultName = `Uusi kohde ${now
-                  .toISOString()
-                  .slice(0, 16)
-                  .replace("T", " ")}`;
-
-                setDraftLngLat(lngLat);
-                setDraftName(defaultName);
-                setDialogOpen(true);
+                setEditId(null);
+                setAddDraft(lngLat);
               }}
             />
           }
           rightPanel={
-            editId ? (
+            addDraft ? (
               <LocationEditPanel
+                mode="add"
+                lngLat={addDraft}
+                organizationId={organizationId}
+                useCaseId={params.useCaseId}
+                onClose={() => { setAddDraft(null); setAddMode(false); }}
+                onSaved={(newId) => {
+                  setAddDraft(null);
+                  setAddMode(false);
+                  if (newId) setSelectedId(newId);
+                }}
+              />
+            ) : editId ? (
+              <LocationEditPanel
+                mode="edit"
                 locationId={editId}
                 organizationId={organizationId}
                 useCaseId={params.useCaseId}
                 onClose={() => setEditId(null)}
-                onSaved={() => {
-                  queryClient.invalidateQueries({
-                    queryKey: ["locations", organizationId, params.useCaseId],
-                  });
-                  setEditId(null);
-                }}
+                onSaved={() => setEditId(null)}
               />
             ) : undefined
           }
@@ -216,64 +191,6 @@ const LocationsPage = () => {
           />
         </SplitMapLayout>
       )}
-
-      <Dialog
-        open={dialogOpen}
-        onOpenChange={(open) => {
-          setDialogOpen(open);
-          if (!open) {
-            setDraftLngLat(null);
-            setDraftName("");
-          }
-        }}
-      >
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Lisää kohde</DialogTitle>
-          </DialogHeader>
-
-          {draftLngLat && (
-            <div className="text-xs text-gray-600">
-              Sijainti: {draftLngLat.latitude.toFixed(6)}, {draftLngLat.longitude.toFixed(6)}
-            </div>
-          )}
-
-          <div className="space-y-2">
-            <Label htmlFor="location-name">Kohteen nimi</Label>
-            <input
-              id="location-name"
-              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-              value={draftName}
-              onChange={(e) => setDraftName(e.target.value)}
-              placeholder="Esim. Uusi palvelupiste"
-              autoFocus
-            />
-          </div>
-
-          <DialogFooter>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => setDialogOpen(false)}
-              disabled={createMutation.isPending}
-            >
-              Peruuta
-            </Button>
-            <Button
-              type="button"
-              disabled={
-                createMutation.isPending || !draftLngLat || !draftName.trim()
-              }
-              onClick={() => {
-                if (!draftLngLat) return;
-                createMutation.mutate({ lngLat: draftLngLat, name: draftName });
-              }}
-            >
-              {createMutation.isPending ? "Tallennetaan…" : "Tallenna"}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
 
       <Dialog
         open={deleteDialogOpen}

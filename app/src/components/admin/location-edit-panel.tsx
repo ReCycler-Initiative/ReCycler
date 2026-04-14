@@ -2,60 +2,84 @@
 
 import { useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { getLocation, updateLocation } from "@/services/api";
+import { createLocation, getLocation, updateLocation } from "@/services/api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { X } from "lucide-react";
 
-export interface LocationEditPanelProps {
+type AddProps = {
+  mode: "add";
+  lngLat: { longitude: number; latitude: number };
+  onSaved: (newId: string) => void;
+};
+
+type EditProps = {
+  mode: "edit";
   locationId: string;
+  onSaved: () => void;
+};
+
+export type LocationEditPanelProps = {
   organizationId: string;
   useCaseId: string;
   onClose: () => void;
-  onSaved: () => void;
-}
+} & (AddProps | EditProps);
 
-export const LocationEditPanel = ({
-  locationId,
-  organizationId,
-  useCaseId,
-  onClose,
-  onSaved,
-}: LocationEditPanelProps) => {
+export const LocationEditPanel = (props: LocationEditPanelProps) => {
+  const { organizationId, useCaseId, onClose } = props;
   const queryClient = useQueryClient();
+
+  const locationId = props.mode === "edit" ? props.locationId : undefined;
 
   const { data, isLoading, isError } = useQuery({
     queryKey: ["location", organizationId, useCaseId, locationId],
-    queryFn: () => getLocation(organizationId, useCaseId, locationId),
+    queryFn: () => getLocation(organizationId, useCaseId, locationId!),
+    enabled: props.mode === "edit",
   });
 
   const [name, setName] = useState("");
-  const [longitude, setLongitude] = useState("");
-  const [latitude, setLatitude] = useState("");
+  const [longitude, setLongitude] = useState(
+    props.mode === "add" ? String(props.lngLat.longitude) : ""
+  );
+  const [latitude, setLatitude] = useState(
+    props.mode === "add" ? String(props.lngLat.latitude) : ""
+  );
 
   useEffect(() => {
-    if (!data) return;
+    if (props.mode !== "edit" || !data) return;
     setName(data.properties.name);
     setLongitude(String(data.geometry.coordinates[0]));
     setLatitude(String(data.geometry.coordinates[1]));
-  }, [data]);
+  }, [data, props.mode]);
 
   const mutation = useMutation({
-    mutationFn: () =>
-      updateLocation(organizationId, useCaseId, locationId, {
+    mutationFn: () => {
+      if (props.mode === "add") {
+        return createLocation(organizationId, useCaseId, {
+          name: name.trim(),
+          longitude: parseFloat(longitude),
+          latitude: parseFloat(latitude),
+        });
+      }
+      return updateLocation(organizationId, useCaseId, locationId!, {
         name: name.trim(),
         longitude: parseFloat(longitude),
         latitude: parseFloat(latitude),
-      }),
-    onSuccess: async () => {
+      });
+    },
+    onSuccess: async (result) => {
       await queryClient.invalidateQueries({
         queryKey: ["locations", organizationId, useCaseId],
       });
-      await queryClient.invalidateQueries({
-        queryKey: ["location", organizationId, useCaseId, locationId],
-      });
-      onSaved();
+      if (props.mode === "add") {
+        props.onSaved(result?.properties?.id ?? "");
+      } else {
+        await queryClient.invalidateQueries({
+          queryKey: ["location", organizationId, useCaseId, locationId],
+        });
+        props.onSaved();
+      }
     },
   });
 
@@ -64,13 +88,22 @@ export const LocationEditPanel = ({
     !isNaN(parseFloat(longitude)) &&
     !isNaN(parseFloat(latitude));
 
+  const isLoading_ = props.mode === "edit" && isLoading;
+  const isError_ = props.mode === "edit" && isError;
+  const isReady = props.mode === "add" || (!isLoading_ && !isError_ && !!data);
+
+  const title =
+    props.mode === "add"
+      ? "Lisää kohde"
+      : isLoading_
+      ? "Ladataan..."
+      : (data?.properties.name ?? "Muokkaa kohdetta");
+
   return (
     <div className="flex flex-col h-full bg-white border border-gray-200 rounded-xl overflow-hidden">
       {/* Header */}
       <div className="flex items-center justify-between gap-2 px-4 py-3 border-b border-gray-200 shrink-0">
-        <h2 className="text-sm font-semibold truncate flex-1">
-          {isLoading ? "Ladataan..." : (data?.properties.name ?? "Muokkaa kohdetta")}
-        </h2>
+        <h2 className="text-sm font-semibold truncate flex-1">{title}</h2>
         <button
           type="button"
           onClick={onClose}
@@ -83,39 +116,37 @@ export const LocationEditPanel = ({
 
       {/* Body */}
       <div className="flex-1 overflow-y-auto">
-        {isLoading && (
+        {isLoading_ && (
           <div className="flex items-center justify-center h-32">
             <p className="text-sm text-muted-foreground">Ladataan...</p>
           </div>
         )}
-
-        {isError && (
+        {isError_ && (
           <div className="flex items-center justify-center h-32">
             <p className="text-sm text-destructive">Virhe kohteen lataamisessa</p>
           </div>
         )}
-
-        {!isLoading && !isError && data && (
+        {isReady && (
           <div className="p-4 space-y-5">
             <div className="space-y-1.5">
-              <Label htmlFor="edit-location-name">Nimi</Label>
+              <Label htmlFor="panel-location-name">Nimi</Label>
               <Input
-                id="edit-location-name"
+                id="panel-location-name"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="Kohteen nimi"
+                autoFocus={props.mode === "add"}
               />
             </div>
-
             <div className="space-y-1.5">
               <Label>Koordinaatit</Label>
               <div className="grid grid-cols-2 gap-2">
                 <div className="space-y-1">
-                  <Label htmlFor="edit-longitude" className="text-xs text-muted-foreground">
+                  <Label htmlFor="panel-longitude" className="text-xs text-muted-foreground">
                     Longitude
                   </Label>
                   <Input
-                    id="edit-longitude"
+                    id="panel-longitude"
                     type="number"
                     step="any"
                     value={longitude}
@@ -123,11 +154,11 @@ export const LocationEditPanel = ({
                   />
                 </div>
                 <div className="space-y-1">
-                  <Label htmlFor="edit-latitude" className="text-xs text-muted-foreground">
+                  <Label htmlFor="panel-latitude" className="text-xs text-muted-foreground">
                     Latitude
                   </Label>
                   <Input
-                    id="edit-latitude"
+                    id="panel-latitude"
                     type="number"
                     step="any"
                     value={latitude}
@@ -141,7 +172,7 @@ export const LocationEditPanel = ({
       </div>
 
       {/* Footer */}
-      {!isLoading && !isError && data && (
+      {isReady && (
         <div className="shrink-0 border-t border-gray-200 p-4">
           {mutation.isError && (
             <p className="text-xs text-destructive mb-2">
