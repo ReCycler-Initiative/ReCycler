@@ -11,7 +11,7 @@ const Input = ({
   type,
   ...props
 }: InputProps & {
-  ref: React.RefCallback<HTMLInputElement>;
+  ref?: React.RefCallback<HTMLInputElement>;
 }) => {
   return (
     <input

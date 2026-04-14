@@ -10,6 +10,7 @@ import {
 } from "@/components/admin/admin-map-view";
 import { SplitMapLayout } from "@/components/admin/split-map-layout";
 import { PageTemplate } from "@/components/admin/page-template";
+import { LocationEditPanel } from "@/components/admin/location-edit-panel";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -20,7 +21,6 @@ import {
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Pencil, Plus, Trash2, X } from "lucide-react";
-import Link from "next/link";
 import { createLocation, deleteLocation, getLocations } from "@/services/api";
 
 const LocationsPage = () => {
@@ -35,6 +35,8 @@ const LocationsPage = () => {
   >(null);
   const [draftName, setDraftName] = useState("");
   const [dialogOpen, setDialogOpen] = useState(false);
+
+  const [editId, setEditId] = useState<string | null>(null);
 
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<
@@ -156,6 +158,22 @@ const LocationsPage = () => {
               }}
             />
           }
+          rightPanel={
+            editId ? (
+              <LocationEditPanel
+                locationId={editId}
+                organizationId={organizationId}
+                useCaseId={params.useCaseId}
+                onClose={() => setEditId(null)}
+                onSaved={() => {
+                  queryClient.invalidateQueries({
+                    queryKey: ["locations", organizationId, params.useCaseId],
+                  });
+                  setEditId(null);
+                }}
+              />
+            ) : undefined
+          }
         >
           <AdminList
             items={locations.map((location) => ({
@@ -163,11 +181,18 @@ const LocationsPage = () => {
               title: location.title,
               actions: (
                 <div className="flex items-center gap-2">
-                  <Button asChild variant="outline" size="icon">
-                    <Link href={`locations/${location.id}/edit`}>
-                      <Pencil className="h-4 w-4" />
-                      <span className="sr-only">Muokkaa</span>
-                    </Link>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="icon"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setSelectedId(location.id);
+                      setEditId(location.id);
+                    }}
+                  >
+                    <Pencil className="h-4 w-4" />
+                    <span className="sr-only">Muokkaa</span>
                   </Button>
                   <Button
                     type="button"

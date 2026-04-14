@@ -84,6 +84,15 @@ export const LocationGeoJsonCollection = z.object({
   features: z.array(LocationGeoJson),
 });
 
+export const LocationDetail = z.object({
+  type: z.literal("Feature"),
+  geometry: Point,
+  properties: z.object({
+    id: z.string().uuid(),
+    name: z.string(),
+  }),
+});
+
 export const NewOrganization = z.object({
   name: z.string(),
 });
