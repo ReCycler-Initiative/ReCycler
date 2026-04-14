@@ -1,12 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createLocation, getLocation, updateLocation } from "@/services/api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { X } from "lucide-react";
+import { Crosshair, X } from "lucide-react";
 
 type AddProps = {
   mode: "add";
@@ -24,10 +24,15 @@ export type LocationEditPanelProps = {
   organizationId: string;
   useCaseId: string;
   onClose: () => void;
+  relocateMode?: boolean;
+  onToggleRelocate?: () => void;
+  onConfirmRelocate?: () => void;
+  onCancelRelocate?: () => void;
+  pickedLngLat?: { longitude: number; latitude: number };
 } & (AddProps | EditProps);
 
 export const LocationEditPanel = (props: LocationEditPanelProps) => {
-  const { organizationId, useCaseId, onClose } = props;
+  const { organizationId, useCaseId, onClose, relocateMode, onToggleRelocate, onConfirmRelocate, onCancelRelocate, pickedLngLat } = props;
   const queryClient = useQueryClient();
 
   const locationId = props.mode === "edit" ? props.locationId : undefined;
@@ -45,6 +50,22 @@ export const LocationEditPanel = (props: LocationEditPanelProps) => {
   const [latitude, setLatitude] = useState(
     props.mode === "add" ? String(props.lngLat.latitude) : ""
   );
+
+  // Snapshot coords when relocate activates so cancel can restore them
+  const savedLngLat = useRef<{ longitude: string; latitude: string } | null>(null);
+  const prevRelocateMode = useRef(false);
+  useEffect(() => {
+    if (relocateMode && !prevRelocateMode.current) {
+      savedLngLat.current = { longitude, latitude };
+    }
+    prevRelocateMode.current = !!relocateMode;
+  });
+
+  useEffect(() => {
+    if (!pickedLngLat) return;
+    setLongitude(String(pickedLngLat.longitude));
+    setLatitude(String(pickedLngLat.latitude));
+  }, [pickedLngLat]);
 
   useEffect(() => {
     if (props.mode !== "edit" || !data) return;
@@ -167,6 +188,48 @@ export const LocationEditPanel = (props: LocationEditPanelProps) => {
                 </div>
               </div>
             </div>
+
+            {onToggleRelocate && !relocateMode && (
+              <button
+                type="button"
+                onClick={onToggleRelocate}
+                className="flex items-center gap-2 text-sm px-3 py-2 rounded-md border transition-colors w-full border-gray-200 bg-white text-muted-foreground hover:text-foreground hover:border-gray-400"
+              >
+                <Crosshair className="h-4 w-4 shrink-0" />
+                Päivitä sijainti valitsemalla kartalta uusi
+              </button>
+            )}
+
+            {relocateMode && (
+              <div className="space-y-2">
+                <div className="flex items-center gap-2 text-sm px-3 py-2 rounded-md border border-primary bg-primary text-primary-foreground">
+                  <Crosshair className="h-4 w-4 shrink-0" />
+                  <span>Klikkaa karttaa valitaksesi sijainti</span>
+                </div>
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (savedLngLat.current) {
+                        setLongitude(savedLngLat.current.longitude);
+                        setLatitude(savedLngLat.current.latitude);
+                      }
+                      onCancelRelocate?.();
+                    }}
+                    className="flex-1 text-sm px-3 py-1.5 rounded-md border border-gray-200 bg-white hover:bg-gray-50 transition-colors"
+                  >
+                    Kumoa
+                  </button>
+                  <button
+                    type="button"
+                    onClick={onConfirmRelocate}
+                    className="flex-1 text-sm px-3 py-1.5 rounded-md bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
+                  >
+                    Vahvista sijainti
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         )}
       </div>
@@ -179,14 +242,25 @@ export const LocationEditPanel = (props: LocationEditPanelProps) => {
               Tallennus epäonnistui. Yritä uudelleen.
             </p>
           )}
-          <Button
-            type="button"
-            className="w-full"
-            disabled={!isValid || mutation.isPending}
-            onClick={() => mutation.mutate()}
-          >
-            {mutation.isPending ? "Tallennetaan..." : "Tallenna"}
-          </Button>
+          <div className="flex gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              className="flex-1"
+              disabled={mutation.isPending}
+              onClick={onClose}
+            >
+              Peruuta
+            </Button>
+            <Button
+              type="button"
+              className="flex-1"
+              disabled={!isValid || mutation.isPending}
+              onClick={() => mutation.mutate()}
+            >
+              {mutation.isPending ? "Tallennetaan..." : "Tallenna"}
+            </Button>
+          </div>
         </div>
       )}
     </div>

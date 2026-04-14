@@ -35,6 +35,11 @@ const LocationsPage = () => {
   } | null>(null);
 
   const [editId, setEditId] = useState<string | null>(null);
+  const [relocateMode, setRelocateMode] = useState(false);
+  const [pickedLngLat, setPickedLngLat] = useState<{
+    longitude: number;
+    latitude: number;
+  } | null>(null);
 
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<
@@ -72,6 +77,23 @@ const LocationsPage = () => {
       })) ?? [],
     [data]
   );
+
+  // When relocating, replace the edited location's coords with pickedLngLat on the map
+  const displayLocations = useMemo(() => {
+    if (!pickedLngLat || !editId) return locations;
+    return locations.map((l) =>
+      l.id === editId
+        ? { ...l, longitude: pickedLngLat.longitude, latitude: pickedLngLat.latitude }
+        : l
+    );
+  }, [locations, pickedLngLat, editId]);
+
+  // Ghost marker = original position of the location being relocated
+  const ghostMarker = useMemo(() => {
+    if (!pickedLngLat || !editId) return undefined;
+    const orig = locations.find((l) => l.id === editId);
+    return orig ? { longitude: orig.longitude, latitude: orig.latitude } : undefined;
+  }, [pickedLngLat, editId, locations]);
 
   return (
     <PageTemplate
@@ -113,11 +135,16 @@ const LocationsPage = () => {
         <SplitMapLayout
           map={
             <AdminMapView
-              locations={locations}
+              locations={displayLocations}
               selectedId={selectedId}
               onMarkerClick={setSelectedId}
-              addMode={addMode}
+              addMode={addMode || relocateMode}
+              ghostMarker={ghostMarker}
               onMapClick={(lngLat) => {
+                if (relocateMode) {
+                  setPickedLngLat(lngLat);
+                  return;
+                }
                 if (!addMode) return;
                 setEditId(null);
                 setAddDraft(lngLat);
@@ -144,8 +171,13 @@ const LocationsPage = () => {
                 locationId={editId}
                 organizationId={organizationId}
                 useCaseId={params.useCaseId}
-                onClose={() => setEditId(null)}
-                onSaved={() => setEditId(null)}
+                onClose={() => { setEditId(null); setRelocateMode(false); setPickedLngLat(null); }}
+                onSaved={() => { setEditId(null); setRelocateMode(false); setPickedLngLat(null); }}
+                relocateMode={relocateMode}
+                onToggleRelocate={() => setRelocateMode((v) => !v)}
+                onConfirmRelocate={() => setRelocateMode(false)}
+                onCancelRelocate={() => { setRelocateMode(false); setPickedLngLat(null); }}
+                pickedLngLat={pickedLngLat ?? undefined}
               />
             ) : undefined
           }
