@@ -221,45 +221,49 @@ export const LocationEditPanel = (props: LocationEditPanelProps) => {
               </div>
             </div>
 
-            {onToggleRelocate && !relocateMode && (
-              <button
-                type="button"
-                onClick={onToggleRelocate}
-                className="flex items-center gap-2 text-sm px-3 py-2 rounded-md border transition-colors w-full border-gray-200 bg-white text-muted-foreground hover:text-foreground hover:border-gray-400"
-              >
-                <Crosshair className="h-4 w-4 shrink-0" />
-                Päivitä sijainti valitsemalla kartalta uusi
-              </button>
-            )}
-
-            {relocateMode && (
+            {onToggleRelocate && (
               <div className="space-y-2">
-                <div className="flex items-center gap-2 text-sm px-3 py-2 rounded-md border border-primary bg-primary text-primary-foreground">
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (!relocateMode) onToggleRelocate();
+                  }}
+                  className={`flex items-center gap-2 text-sm px-3 py-2 rounded-md border transition-colors w-full ${
+                    relocateMode
+                      ? "border-primary bg-primary text-primary-foreground"
+                      : "border-gray-200 bg-white text-muted-foreground hover:text-foreground hover:border-gray-400"
+                  }`}
+                >
                   <Crosshair className="h-4 w-4 shrink-0" />
-                  <span>Klikkaa karttaa valitaksesi sijainti</span>
-                </div>
-                <div className="flex gap-2">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      if (savedLngLat.current) {
-                        setLongitude(savedLngLat.current.longitude);
-                        setLatitude(savedLngLat.current.latitude);
-                      }
-                      onCancelRelocate?.();
-                    }}
-                    className="flex-1 text-sm px-3 py-1.5 rounded-md border border-gray-200 bg-white hover:bg-gray-50 transition-colors"
-                  >
-                    Kumoa
-                  </button>
-                  <button
-                    type="button"
-                    onClick={onConfirmRelocate}
-                    className="flex-1 text-sm px-3 py-1.5 rounded-md bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
-                  >
-                    Vahvista sijainti
-                  </button>
-                </div>
+                  {relocateMode
+                    ? "Klikkaa karttaa valitaksesi sijainti"
+                    : "Päivitä sijainti valitsemalla kartalta uusi"}
+                </button>
+
+                {relocateMode && (
+                  <div className="flex gap-2">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (savedLngLat.current) {
+                          setLongitude(savedLngLat.current.longitude);
+                          setLatitude(savedLngLat.current.latitude);
+                        }
+                        onCancelRelocate?.();
+                      }}
+                      className="flex-1 text-sm px-3 py-1.5 rounded-md border border-gray-200 bg-white hover:bg-gray-50 transition-colors"
+                    >
+                      Palauta alkuperäinen
+                    </button>
+                    <button
+                      type="button"
+                      onClick={onConfirmRelocate}
+                      className="flex-1 text-sm px-3 py-1.5 rounded-md border border-gray-200 bg-white hover:bg-gray-50 transition-colors"
+                    >
+                      Lopeta päivitys
+                    </button>
+                  </div>
+                )}
               </div>
             )}
           </div>
