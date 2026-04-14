@@ -19,7 +19,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Pencil, Plus, Trash2, X } from "lucide-react";
+import { Plus, Trash2, X } from "lucide-react";
 import { deleteLocation, getLocations } from "@/services/api";
 
 const LocationsPage = () => {
@@ -137,7 +137,7 @@ const LocationsPage = () => {
             <AdminMapView
               locations={displayLocations}
               selectedId={selectedId}
-              onMarkerClick={setSelectedId}
+              onMarkerClick={(id) => { setSelectedId(id); setEditId(id); }}
               addMode={addMode || relocateMode}
               ghostMarker={ghostMarker}
               onMapClick={(lngLat) => {
@@ -188,19 +188,6 @@ const LocationsPage = () => {
               title: location.title,
               actions: (
                 <div className="flex items-center gap-2">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="icon"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setSelectedId(location.id);
-                      setEditId(location.id);
-                    }}
-                  >
-                    <Pencil className="h-4 w-4" />
-                    <span className="sr-only">Muokkaa</span>
-                  </Button>
                   <Button
                     type="button"
                     variant="outline"
