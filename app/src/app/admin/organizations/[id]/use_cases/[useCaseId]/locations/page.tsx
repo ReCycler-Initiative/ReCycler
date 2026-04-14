@@ -140,7 +140,15 @@ const LocationsPage = () => {
             <AdminMapView
               locations={displayLocations}
               selectedId={selectedId}
-              onMarkerClick={(id) => { setSelectedId(id); setEditId(id); }}
+              onMarkerClick={(id) => {
+                if (addMode) {
+                  if (addDraft) toast("Uuden kohteen luonti peruttu");
+                  setAddMode(false);
+                  setAddDraft(null);
+                }
+                setSelectedId(id);
+                setEditId(id);
+              }}
               addMode={addMode || relocateMode}
               ghostMarker={ghostMarker}
               draftMarker={addDraft ?? undefined}
@@ -199,7 +207,15 @@ const LocationsPage = () => {
             }))}
             emptyMessage="Tällä organisaatiolla ei ole vielä kohteita."
             selectedId={selectedId}
-            onSelect={(id) => { setSelectedId(id); setEditId(id); }}
+            onSelect={(id) => {
+              if (addMode) {
+                if (addDraft) toast("Uuden kohteen luonti peruttu");
+                setAddMode(false);
+                setAddDraft(null);
+              }
+              setSelectedId(id);
+              setEditId(id);
+            }}
           />
         </SplitMapLayout>
       )}
