@@ -6,7 +6,13 @@ import { createLocation, getLocation, updateLocation } from "@/services/api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Crosshair, X } from "lucide-react";
+import { Crosshair, MoreHorizontal, Trash2, X } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 type AddProps = {
   mode: "add";
@@ -18,6 +24,7 @@ type EditProps = {
   mode: "edit";
   locationId: string;
   onSaved: () => void;
+  onDelete?: () => void;
 };
 
 export type LocationEditPanelProps = {
@@ -125,6 +132,28 @@ export const LocationEditPanel = (props: LocationEditPanelProps) => {
       {/* Header */}
       <div className="flex items-center justify-between gap-2 px-4 py-3 border-b border-gray-200 shrink-0">
         <h2 className="text-sm font-semibold truncate flex-1">{title}</h2>
+        {props.mode === "edit" && props.onDelete && (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button
+                type="button"
+                className="text-muted-foreground hover:text-foreground transition-colors"
+                aria-label="Lisää toimintoja"
+              >
+                <MoreHorizontal className="h-4 w-4" />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem
+                className="text-destructive focus:text-destructive"
+                onClick={props.onDelete}
+              >
+                <Trash2 className="h-4 w-4 mr-2 text-destructive" />
+                Poista kohde
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )}
         <button
           type="button"
           onClick={onClose}

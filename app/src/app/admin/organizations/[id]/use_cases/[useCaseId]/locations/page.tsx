@@ -19,7 +19,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Plus, Trash2, X } from "lucide-react";
+import { Plus, X } from "lucide-react";
 import { deleteLocation, getLocations } from "@/services/api";
 
 const LocationsPage = () => {
@@ -61,6 +61,7 @@ const LocationsPage = () => {
       });
       setDeleteDialogOpen(false);
       setDeleteTarget(null);
+      setEditId(null);
       if (deletedId && selectedId === deletedId) setSelectedId(null);
     },
   });
@@ -173,6 +174,11 @@ const LocationsPage = () => {
                 useCaseId={params.useCaseId}
                 onClose={() => { setEditId(null); setRelocateMode(false); setPickedLngLat(null); }}
                 onSaved={() => { setEditId(null); setRelocateMode(false); setPickedLngLat(null); }}
+                onDelete={() => {
+                  const loc = locations.find((l) => l.id === editId);
+                  if (loc) setDeleteTarget({ id: loc.id, name: loc.name });
+                  setDeleteDialogOpen(true);
+                }}
                 relocateMode={relocateMode}
                 onToggleRelocate={() => setRelocateMode((v) => !v)}
                 onConfirmRelocate={() => setRelocateMode(false)}
@@ -186,23 +192,7 @@ const LocationsPage = () => {
             items={locations.map((location) => ({
               id: location.id,
               title: location.title,
-              actions: (
-                <div className="flex items-center gap-2">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="icon"
-                    onClick={() => {
-                      setDeleteTarget({ id: location.id, name: location.name });
-                      setDeleteDialogOpen(true);
-                    }}
-                    disabled={deleteMutation.isPending}
-                  >
-                    <Trash2 className="h-4 w-4" />
-                    <span className="sr-only">Poista</span>
-                  </Button>
-                </div>
-              ),
+              actions: undefined,
             }))}
             emptyMessage="Tällä organisaatiolla ei ole vielä kohteita."
             selectedId={selectedId}
