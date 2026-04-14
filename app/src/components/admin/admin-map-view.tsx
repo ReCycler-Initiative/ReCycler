@@ -24,6 +24,7 @@ export interface AdminMapViewProps {
   onMarkerClick?: (id: string) => void;
   addMode?: boolean;
   onMapClick?: (lngLat: { longitude: number; latitude: number }) => void;
+  ghostMarker?: { longitude: number; latitude: number };
   className?: string;
 }
 
@@ -39,6 +40,7 @@ export const AdminMapView = ({
   onMarkerClick,
   addMode,
   onMapClick,
+  ghostMarker,
   className,
 }: AdminMapViewProps) => {
   const mapRef = useRef<MapRef>(null);
@@ -93,6 +95,18 @@ export const AdminMapView = ({
       >
         <NavigationControl position="top-right" />
         <FullscreenControl position="top-right" />
+
+        {ghostMarker && (
+          <Marker
+            longitude={ghostMarker.longitude}
+            latitude={ghostMarker.latitude}
+            anchor="bottom"
+          >
+            <div className="flex items-center justify-center w-8 h-8 rounded-full border-2 border-dashed border-gray-500 bg-gray-300 text-gray-600 opacity-80">
+              <MapPin className="h-4 w-4" />
+            </div>
+          </Marker>
+        )}
 
         {locations.map((location) => (
           <Marker
