@@ -196,7 +196,7 @@ const LocationsPage = () => {
             }))}
             emptyMessage="Tällä organisaatiolla ei ole vielä kohteita."
             selectedId={selectedId}
-            onSelect={setSelectedId}
+            onSelect={(id) => { setSelectedId(id); setEditId(id); }}
           />
         </SplitMapLayout>
       )}
