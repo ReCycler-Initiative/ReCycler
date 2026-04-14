@@ -21,6 +21,7 @@ import {
 } from "@/components/ui/dialog";
 import { Plus, X } from "lucide-react";
 import { deleteLocation, getLocations } from "@/services/api";
+import { toast } from "sonner";
 
 const LocationsPage = () => {
   const params = useParams<{ id: string; useCaseId: string }>();
@@ -63,6 +64,7 @@ const LocationsPage = () => {
       setDeleteTarget(null);
       setEditId(null);
       if (deletedId && selectedId === deletedId) setSelectedId(null);
+      toast.success("Kohde poistettu");
     },
   });
 
