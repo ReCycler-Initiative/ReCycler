@@ -2,6 +2,7 @@ import {
   ChatResponse,
   CreateOrganizationRequest,
   CreateOrganizationResponse,
+  LocationDetail,
   LocationGeoJsonCollection,
   Material,
   Organization,
@@ -52,6 +53,35 @@ export const createLocation = (
   axios
     .post(`/api/organizations/${organizationId}/use_cases/${useCaseId}/locations`, body)
     .then((response) => response.data);
+
+export const getLocation = (
+  organizationId: string,
+  useCaseId: string,
+  locationId: string
+): Promise<z.infer<typeof LocationDetail>> =>
+  axios
+    .get(
+      `/api/organizations/${organizationId}/use_cases/${useCaseId}/locations/${locationId}`
+    )
+    .then((response) => response.data);
+
+export const updateLocation = (
+  organizationId: string,
+  useCaseId: string,
+  locationId: string,
+  body: {
+    name: string;
+    longitude: number;
+    latitude: number;
+    fieldValues?: { fieldId: string; values: string[] }[];
+  }
+): Promise<void> =>
+  axios
+    .put(
+      `/api/organizations/${organizationId}/use_cases/${useCaseId}/locations/${locationId}`,
+      body
+    )
+    .then(() => undefined);
 
 export const deleteLocation = (
   organizationId: string,
