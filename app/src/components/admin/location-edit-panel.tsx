@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createLocation, getLocation, updateLocation } from "@/services/api";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -101,11 +102,13 @@ export const LocationEditPanel = (props: LocationEditPanelProps) => {
         queryKey: ["locations", organizationId, useCaseId],
       });
       if (props.mode === "add") {
+        toast.success("Kohde lisätty");
         props.onSaved(result?.properties?.id ?? "");
       } else {
         await queryClient.invalidateQueries({
           queryKey: ["location", organizationId, useCaseId, locationId],
         });
+        toast.success("Kohde tallennettu");
         props.onSaved();
       }
     },
