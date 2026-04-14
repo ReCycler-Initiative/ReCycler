@@ -25,6 +25,7 @@ export interface AdminMapViewProps {
   addMode?: boolean;
   onMapClick?: (lngLat: { longitude: number; latitude: number }) => void;
   ghostMarker?: { longitude: number; latitude: number };
+  draftMarker?: { longitude: number; latitude: number };
   className?: string;
 }
 
@@ -41,6 +42,7 @@ export const AdminMapView = ({
   addMode,
   onMapClick,
   ghostMarker,
+  draftMarker,
   className,
 }: AdminMapViewProps) => {
   const mapRef = useRef<MapRef>(null);
@@ -67,6 +69,16 @@ export const AdminMapView = ({
       });
     }
   }, [selectedId, locations]);
+
+  // Fly to draft marker when it's placed or moved
+  useEffect(() => {
+    if (!draftMarker || !mapRef.current) return;
+    mapRef.current.flyTo({
+      center: [draftMarker.longitude, draftMarker.latitude],
+      zoom: 15,
+      duration: 400,
+    });
+  }, [draftMarker]);
 
   const handleMarkerClick = useCallback(
     (id: string) => {
@@ -95,6 +107,18 @@ export const AdminMapView = ({
       >
         <NavigationControl position="top-right" />
         <FullscreenControl position="top-right" />
+
+        {draftMarker && (
+          <Marker
+            longitude={draftMarker.longitude}
+            latitude={draftMarker.latitude}
+            anchor="bottom"
+          >
+            <div className="flex items-center justify-center w-8 h-8 rounded-full bg-emerald-500 text-white border-2 border-emerald-600 scale-125 shadow-lg">
+              <MapPin className="h-6 w-6" />
+            </div>
+          </Marker>
+        )}
 
         {ghostMarker && (
           <Marker
