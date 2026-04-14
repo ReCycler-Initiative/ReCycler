@@ -46,6 +46,10 @@ export const AdminMapView = ({
   className,
 }: AdminMapViewProps) => {
   const mapRef = useRef<MapRef>(null);
+  const locationsRef = useRef(locations);
+  locationsRef.current = locations;
+  const prevSelectedId = useRef<string | null | undefined>(null);
+  const prevDraftMarker = useRef<{ longitude: number; latitude: number } | undefined>(undefined);
 
   useEffect(() => {
     const map = mapRef.current?.getMap();
@@ -56,11 +60,13 @@ export const AdminMapView = ({
     };
   }, [addMode]);
 
-  // Fly to selected location when it changes
+  // Fly to selected location only when selectedId actually changes
   useEffect(() => {
     if (!selectedId || !mapRef.current) return;
+    if (selectedId === prevSelectedId.current) return;
+    prevSelectedId.current = selectedId;
 
-    const location = locations.find((l) => l.id === selectedId);
+    const location = locationsRef.current.find((l) => l.id === selectedId);
     if (location) {
       mapRef.current.flyTo({
         center: [location.longitude, location.latitude],
@@ -68,11 +74,13 @@ export const AdminMapView = ({
         duration: 500,
       });
     }
-  }, [selectedId, locations]);
+  }, [selectedId]);
 
-  // Fly to draft marker when it's placed or moved
+  // Fly to draft marker only on first placement
   useEffect(() => {
     if (!draftMarker || !mapRef.current) return;
+    if (prevDraftMarker.current) { prevDraftMarker.current = draftMarker; return; }
+    prevDraftMarker.current = draftMarker;
     mapRef.current.flyTo({
       center: [draftMarker.longitude, draftMarker.latitude],
       zoom: 15,
