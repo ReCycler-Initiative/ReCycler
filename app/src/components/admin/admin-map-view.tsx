@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useCallback } from "react";
+import { useEffect, useRef, useCallback, useState } from "react";
 import Map, {
   Marker,
   MapRef,
@@ -46,6 +46,7 @@ export const AdminMapView = ({
   className,
 }: AdminMapViewProps) => {
   const mapRef = useRef<MapRef>(null);
+  const [mapLoaded, setMapLoaded] = useState(false);
   const locationsRef = useRef(locations);
   locationsRef.current = locations;
   const prevSelectedId = useRef<string | null | undefined>(null);
@@ -92,6 +93,7 @@ export const AdminMapView = ({
   // Auto-fit map to the current locations so the view isn't stuck on all of Finland.
   useEffect(() => {
     if (selectedId) return;
+    if (!mapLoaded) return;
 
     const map = mapRef.current?.getMap();
     if (!map) return;
@@ -137,7 +139,7 @@ export const AdminMapView = ({
         maxZoom: 16,
       }
     );
-  }, [locations, selectedId]);
+  }, [locations, selectedId, mapLoaded]);
 
   const handleMarkerClick = useCallback(
     (id: string) => {
@@ -157,6 +159,7 @@ export const AdminMapView = ({
           zoom: 5,
         }}
         mapStyle={process.env.NEXT_PUBLIC_MAPBOX_STYLE_DETAIL as string}
+        onLoad={() => setMapLoaded(true)}
         maxBounds={finlandBounds}
         onClick={(e) => {
           if (!addMode) return;
