@@ -50,6 +50,7 @@ export const AdminMapView = ({
   locationsRef.current = locations;
   const prevSelectedId = useRef<string | null | undefined>(null);
   const prevDraftMarker = useRef<{ longitude: number; latitude: number } | undefined>(undefined);
+  const lastAutoFitKeyRef = useRef<string | null>(null);
 
   useEffect(() => {
     const map = mapRef.current?.getMap();
@@ -87,6 +88,56 @@ export const AdminMapView = ({
       duration: 400,
     });
   }, [draftMarker]);
+
+  // Auto-fit map to the current locations so the view isn't stuck on all of Finland.
+  useEffect(() => {
+    if (selectedId) return;
+
+    const map = mapRef.current?.getMap();
+    if (!map) return;
+
+    const points = locations
+      .map((l) => [l.longitude, l.latitude] as const)
+      .filter(([lng, lat]) => Number.isFinite(lng) && Number.isFinite(lat));
+
+    if (points.length === 0) return;
+
+    let minLng = points[0][0];
+    let maxLng = points[0][0];
+    let minLat = points[0][1];
+    let maxLat = points[0][1];
+    for (const [lng, lat] of points) {
+      if (lng < minLng) minLng = lng;
+      if (lng > maxLng) maxLng = lng;
+      if (lat < minLat) minLat = lat;
+      if (lat > maxLat) maxLat = lat;
+    }
+
+    const key = `${points.length}:${minLng.toFixed(6)},${minLat.toFixed(6)}:${maxLng.toFixed(6)},${maxLat.toFixed(6)}`;
+    if (lastAutoFitKeyRef.current === key) return;
+    lastAutoFitKeyRef.current = key;
+
+    if (points.length === 1) {
+      mapRef.current?.flyTo({
+        center: [points[0][0], points[0][1]],
+        zoom: 14,
+        duration: 500,
+      });
+      return;
+    }
+
+    map.fitBounds(
+      [
+        [minLng, minLat],
+        [maxLng, maxLat],
+      ],
+      {
+        padding: 60,
+        duration: 500,
+        maxZoom: 16,
+      }
+    );
+  }, [locations, selectedId]);
 
   const handleMarkerClick = useCallback(
     (id: string) => {
