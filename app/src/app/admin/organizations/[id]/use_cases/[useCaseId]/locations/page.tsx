@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
 import { AdminList } from "@/components/admin/admin-list";
@@ -12,6 +12,7 @@ import { SplitMapLayout } from "@/components/admin/split-map-layout";
 import { PageTemplate } from "@/components/admin/page-template";
 import { LocationEditPanel } from "@/components/admin/location-edit-panel";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
   Dialog,
   DialogContent,
@@ -23,11 +24,15 @@ import { Plus, X } from "lucide-react";
 import { deleteLocation, getLocations } from "@/services/api";
 import { toast } from "sonner";
 
+const ITEMS_PER_PAGE = 15;
+
 const LocationsPage = () => {
   const params = useParams<{ id: string; useCaseId: string }>();
   const organizationId = params.id;
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const queryClient = useQueryClient();
+  const [searchQuery, setSearchQuery] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
 
   const [addMode, setAddMode] = useState(false);
   const [addDraft, setAddDraft] = useState<{
@@ -80,6 +85,49 @@ const LocationsPage = () => {
       })) ?? [],
     [data]
   );
+
+  const filteredLocations = useMemo(() => {
+    const normalizedQuery = searchQuery.trim().toLocaleLowerCase("fi");
+    if (!normalizedQuery) return locations;
+
+    return locations.filter((location) =>
+      location.title.toLocaleLowerCase("fi").includes(normalizedQuery)
+    );
+  }, [locations, searchQuery]);
+
+  const totalPages = Math.max(
+    1,
+    Math.ceil(filteredLocations.length / ITEMS_PER_PAGE)
+  );
+
+  const paginatedLocations = useMemo(() => {
+    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+    return filteredLocations.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+  }, [currentPage, filteredLocations]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery]);
+
+  useEffect(() => {
+    setCurrentPage((page) => Math.min(page, totalPages));
+  }, [totalPages]);
+
+  const selectLocation = (id: string) => {
+    if (addMode) {
+      if (addDraft) toast("Uuden kohteen luonti peruttu");
+      setAddMode(false);
+      setAddDraft(null);
+    }
+
+    const filteredIndex = filteredLocations.findIndex((location) => location.id === id);
+    if (filteredIndex >= 0) {
+      setCurrentPage(Math.floor(filteredIndex / ITEMS_PER_PAGE) + 1);
+    }
+
+    setSelectedId(id);
+    setEditId(id);
+  };
 
   // When relocating, replace the edited location's coords with pickedLngLat on the map
   const displayLocations = useMemo(() => {
@@ -140,15 +188,7 @@ const LocationsPage = () => {
             <AdminMapView
               locations={displayLocations}
               selectedId={selectedId}
-              onMarkerClick={(id) => {
-                if (addMode) {
-                  if (addDraft) toast("Uuden kohteen luonti peruttu");
-                  setAddMode(false);
-                  setAddDraft(null);
-                }
-                setSelectedId(id);
-                setEditId(id);
-              }}
+              onMarkerClick={selectLocation}
               addMode={addMode || relocateMode}
               ghostMarker={ghostMarker}
               draftMarker={addDraft ?? undefined}
@@ -199,24 +239,67 @@ const LocationsPage = () => {
             ) : undefined
           }
         >
-          <AdminList
-            items={locations.map((location) => ({
-              id: location.id,
-              title: location.title,
-              actions: undefined,
-            }))}
-            emptyMessage="Tällä organisaatiolla ei ole vielä kohteita."
-            selectedId={selectedId}
-            onSelect={(id) => {
-              if (addMode) {
-                if (addDraft) toast("Uuden kohteen luonti peruttu");
-                setAddMode(false);
-                setAddDraft(null);
+          <div className="space-y-4 p-1">
+            <div className="space-y-3 rounded-xl border border-gray-200 bg-white p-4">
+              <Input
+                value={searchQuery}
+                onChange={(event) => setSearchQuery(event.target.value)}
+                placeholder="Hae kohdetta nimellä"
+                aria-label="Hae kohdetta nimellä"
+              />
+              <div className="flex items-center justify-between text-xs text-muted-foreground">
+                <span>
+                  {filteredLocations.length === 0
+                    ? "Ei hakutuloksia"
+                    : `Näytetään ${Math.min((currentPage - 1) * ITEMS_PER_PAGE + 1, filteredLocations.length)}-${Math.min(currentPage * ITEMS_PER_PAGE, filteredLocations.length)} / ${filteredLocations.length}`}
+                </span>
+                <span>Sivu {currentPage} / {totalPages}</span>
+              </div>
+            </div>
+
+            <AdminList
+              items={paginatedLocations.map((location) => ({
+                id: location.id,
+                title: location.title,
+                actions: undefined,
+              }))}
+              emptyMessage={
+                searchQuery.trim()
+                  ? "Hakuehdoilla ei löytynyt kohteita."
+                  : "Tällä organisaatiolla ei ole vielä kohteita."
               }
-              setSelectedId(id);
-              setEditId(id);
-            }}
-          />
+              selectedId={selectedId}
+              onSelect={selectLocation}
+            />
+
+            {filteredLocations.length > ITEMS_PER_PAGE && (
+              <div className="flex items-center justify-between gap-3 rounded-xl border border-gray-200 bg-white p-3">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  disabled={currentPage === 1}
+                  onClick={() => setCurrentPage((page) => Math.max(1, page - 1))}
+                >
+                  Edellinen
+                </Button>
+                <div className="text-sm text-muted-foreground">
+                  Sivu {currentPage} / {totalPages}
+                </div>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  disabled={currentPage === totalPages}
+                  onClick={() =>
+                    setCurrentPage((page) => Math.min(totalPages, page + 1))
+                  }
+                >
+                  Seuraava
+                </Button>
+              </div>
+            )}
+          </div>
         </SplitMapLayout>
       )}
 
