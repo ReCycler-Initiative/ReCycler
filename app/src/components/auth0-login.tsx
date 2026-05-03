@@ -119,7 +119,7 @@ export default function Auth0Login() {
                       <Link href="/user-settings">Asetukset</Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>
-                      <Link href="/auth/logout">Kirjaudu ulos</Link>
+                      <a href="/auth/logout">Kirjaudu ulos</a>
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>

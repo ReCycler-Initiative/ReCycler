@@ -1,19 +1,84 @@
 import Link from "next/link";
 import { PageTemplate } from "@/components/admin/page-template";
+import { PricingAiChat } from "@/components/pricing-ai-chat";
 import TitleBarService from "@/components/title-bar-service";
 import { ExternalLink } from "lucide-react";
+import { ReactNode } from "react";
 
-type FeatureCardProps = {
-  title: string;
+type PricingCardProps = {
+  name: string;
+  audience: string;
+  price: string;
   description: string;
+  highlights: string[];
+  ctaLabel?: string;
+  ctaHref?: string;
+  ctaNode?: ReactNode;
+  featured?: boolean;
 };
 
-const FeatureCard = ({ title, description }: FeatureCardProps) => {
+const PricingCard = ({
+  name,
+  audience,
+  price,
+  description,
+  highlights,
+  ctaLabel,
+  ctaHref,
+  ctaNode,
+  featured = false,
+}: PricingCardProps) => {
   return (
-    <div className="rounded-2xl border border-gray-200 bg-white p-5 transition hover:bg-gray-50">
-      <h3 className="text-base font-semibold text-gray-900">{title}</h3>
-      <p className="mt-2 text-sm leading-6 text-gray-600">{description}</p>
-    </div>
+    <section
+      className={[
+        "rounded-2xl border bg-white p-6",
+        featured
+          ? "border-gray-900 shadow-sm ring-1 ring-gray-900"
+          : "border-gray-200",
+      ].join(" ")}
+    >
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <div className="text-xs font-medium uppercase tracking-[0.18em] text-gray-500">
+            {audience}
+          </div>
+          <h3 className="mt-2 text-xl font-semibold text-gray-900">{name}</h3>
+        </div>
+        {featured && (
+          <span className="rounded-full bg-gray-900 px-3 py-1 text-xs font-medium text-white">
+            Suositeltu
+          </span>
+        )}
+      </div>
+
+      <div className="mt-5 text-3xl font-semibold tracking-tight text-gray-900">
+        {price}
+      </div>
+      <p className="mt-3 text-sm leading-6 text-gray-600">{description}</p>
+
+      <ul className="mt-5 space-y-3 text-sm text-gray-700">
+        {highlights.map((highlight) => (
+          <li key={highlight} className="flex gap-3">
+            <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-gray-900" />
+            <span>{highlight}</span>
+          </li>
+        ))}
+      </ul>
+
+      {ctaNode ?? (
+        <Link
+          href={ctaHref ?? "/api/auth/login?screen_hint=signup"}
+          className={[
+            "mt-6 inline-flex w-full items-center justify-center rounded-full px-5 py-3 text-sm font-medium transition",
+            featured
+              ? "bg-gray-900 text-white hover:bg-gray-800"
+              : "border border-gray-200 bg-white text-gray-900 hover:bg-gray-50",
+          ].join(" ")}
+        >
+          {ctaLabel}
+        </Link>
+      )}
+    </section>
   );
 };
 
@@ -32,30 +97,34 @@ const HomePage = () => {
                 </h1>
 
                 <p className="mt-4 text-sm leading-6 text-gray-600 md:text-base">
-                  ReCycler Platform on moderni, skaalautuva alusta sijaintitietoon
-                  ja ominaisuuksiin perustuvien sovellusten rakentamiseen. Luo
-                  nopeasti hakupalveluita, karttanäkymiä ja tietopohjia – yhdellä
-                  yhtenäisellä järjestelmällä.
+                  ReCycler auttaa rakentamaan palveluita, joissa ihmiset löytävät
+                  oikeat paikat, palvelupisteet tai keräyskohteet helposti.
+                  Samalla sama järjestelmä auttaa ylläpitämään kohteita,
+                  tuomaan tietoa muista järjestelmistä ja julkaisemaan palvelun
+                  verkkoon ilman raskasta omaa kehitysprojektia.
                 </p>
 
-                <div className="mt-6 grid gap-2 text-sm text-gray-700 sm:grid-cols-2">
-                  <div className="flex gap-2">
-                    <span className="mt-2 h-1 w-1 shrink-0 rounded-full bg-gray-900" />
-                    Sijaintipohjainen haku ja karttaintegraatiot valmiina
+                <div className="mt-6 grid gap-3 text-sm text-gray-700 sm:grid-cols-2">
+                  <div className="rounded-xl border border-gray-200 bg-gray-50 p-4">
+                    Ihmiset löytävät oikean kohteen hakemalla tai kartalta.
                   </div>
-                  <div className="flex gap-2">
-                    <span className="mt-2 h-1 w-1 shrink-0 rounded-full bg-gray-900" />
-                    Joustava tietomalli erilaisten kohteiden ja ominaisuuksien hallintaan
+                  <div className="rounded-xl border border-gray-200 bg-gray-50 p-4">
+                    Kohteita ja niiden tietoja voi päivittää helposti yhdessä paikassa.
                   </div>
-                  <div className="flex gap-2">
-                    <span className="mt-2 h-1 w-1 shrink-0 rounded-full bg-gray-900" />
-                    ETL-integraatiot ulkoisiin tietolähteisiin
+                  <div className="rounded-xl border border-gray-200 bg-gray-50 p-4">
+                    Tietoa voidaan tuoda muista järjestelmistä automaattisesti.
                   </div>
-                  <div className="flex gap-2">
-                    <span className="mt-2 h-1 w-1 shrink-0 rounded-full bg-gray-900" />
-                    Mobiiliystävällinen käyttöliittymä ja moderni teknologia
+                  <div className="rounded-xl border border-gray-200 bg-gray-50 p-4">
+                    Käyttäjät voidaan tunnistaa organisaation nykyisillä
+                    tunnuksilla, kuten Microsoft- tai Google-kirjautumisella.
                   </div>
                 </div>
+
+                <p className="mt-6 text-sm leading-6 text-gray-600">
+                  Käytännössä tämä tarkoittaa, että sama alusta sopii esimerkiksi
+                  kierrätyspisteiden, asiointipaikkojen, palveluverkkojen tai muiden
+                  sijaintiin perustuvien palveluiden julkaisuun ja ylläpitoon.
+                </p>
 
                 <div className="mt-8 flex flex-col gap-3 sm:flex-row">
                   <Link
@@ -65,48 +134,71 @@ const HomePage = () => {
                     Avaa ReCycler-demo
                     <ExternalLink className="ml-2 inline" size={18} />
                   </Link>
-                  <Link
-                    href="/api/auth/login?screen_hint=signup"
-                    className="inline-flex items-center justify-center rounded-full border border-gray-200 bg-white px-6 py-3 text-sm font-medium text-gray-900 transition hover:bg-gray-50 sm:w-auto"
-                  >
-                    Luo tunnus
-                  </Link>
-                </div>
-
-                <div className="mt-4 text-xs text-gray-600">
-                  Kirjautuminen tapahtuu Auth0:n kautta (Google, O365 ym.)
                 </div>
               </div>
             </div>
           </div>
 
-          {/* FEATURES SECTION */}
+          {/* PRICING SECTION */}
           <div className="mt-10">
-            <h2 className="text-base font-semibold text-gray-900">
-              Ominaisuudet
-            </h2>
-            <p className="mt-1 text-sm text-gray-600">
-              Kaikki olennaiset rakennuspalikat yhdessä alustassa.
-            </p>
+            <div className="max-w-3xl">
+              <h2 className="text-base font-semibold text-gray-900">
+                Hinnoittelu ja käyttöönotto
+              </h2>
+              <p className="mt-1 text-sm leading-6 text-gray-600">
+                ReCycler voidaan ottaa käyttöön kevyenä pilotointina tai laajempana
+                jatkuvana palveluna. Hinnoittelu rakentuu tyypillisesti
+                käyttötapausten, datalähteiden, integraatioiden ja ylläpidon
+                tarpeen mukaan.
+              </p>
+            </div>
 
-            <div className="mt-4 grid gap-4 sm:grid-cols-2">
-              <FeatureCard
-                title="Sijaintipohjainen haku"
-                description="PostGIS-pohjainen geospatiaalinen tietokanta mahdollistaa tehokkaan etäisyys- ja aluepohjaisen haun."
+            <div className="mt-4 grid gap-4 xl:grid-cols-3">
+              <PricingCard
+                name="Pilotti"
+                audience="Nopea kokeilu"
+                price="690 €/kk"
+                description="Sopii ensimmäiseen tuotantokelpoiseen kokeiluun, kun halutaan nopeasti näkyviin yksi palvelu ja todentaa arvo oikealla datalla."
+                highlights={[
+                  "1 käyttötapaus ja yksi julkaistava palvelunäkymä",
+                  "1-2 datalähdettä tai kevyt ETL-tuonti",
+                  "Perusbrändäys ja valmiit kartta- sekä hakunäkymät",
+                  "Palveluun sisältyvä tekoälyavustin perusohjaukseen ja neuvontaan",
+                  "Kevyt käyttöönotto ja sparraus aloitukseen",
+                ]}
+                ctaNode={<PricingAiChat />}
               />
-              <FeatureCard
-                title="Joustava tietomalli"
-                description="Määrittele omia kohdetyyppejä, kenttiä ja ominaisuuksia ilman koodausta."
+              <PricingCard
+                name="Kasvu"
+                audience="Organisaatiokäyttö"
+                price="1 290-1 990 €/kk"
+                description="Tarkoitettu kunnille, palveluorganisaatioille ja tiimeille, jotka haluavat useampia palveluita saman alustan päälle jatkuvalla ylläpidolla."
+                highlights={[
+                  "Useampi käyttötapaus samalla alustalla",
+                  "Useita tietolähteitä ja automatisoituja ETL-ajastuksia",
+                  "Tekoälyavustin osana palvelua käyttäjien ohjaukseen ja sisällön tukeen",
+                  "Laajempi ylläpito, kehitysjono ja käyttöoikeushallinta",
+                  "Tuki sisällön, kohteiden ja datamallin jatkokehitykseen",
+                ]}
+                ctaNode={<PricingAiChat />}
+                featured
               />
-              <FeatureCard
-                title="ETL-integraatiot"
-                description="Tuo dataa ulkoisista lähteistä automaattisesti configuroitavien ETL-prosessien kautta."
-              />
-              <FeatureCard
-                title="Mobiiliystävällinen UI"
-                description="Next.js ja React-pohjainen käyttöliittymä toimii saumattomasti mobiilissa ja työpöydällä."
+              <PricingCard
+                name="Räätälöity"
+                audience="Laajat tarpeet"
+                price="Tarjouskohtainen"
+                description="Kun mukana on oma ympäristö, erityisiä integraatioita, SLA-vaatimuksia tai useita organisaatioita, ratkaisu rakennetaan tapauskohtaisesti."
+                highlights={[
+                  "Oma ympäristö tai asiakkaan hallinnoima hosting",
+                  "Räätälöidyt integraatiot, tunnistautuminen ja datamallit",
+                  "Tekoälyavustin voidaan sovittaa organisaation omiin prosesseihin",
+                  "Projektikohtainen käyttöönotto, koulutus ja palvelunhallinta",
+                  "SLA, tuki- ja ylläpitomallit sekä jatkokehitys",
+                ]}
+                ctaNode={<PricingAiChat />}
               />
             </div>
+
           </div>
 
           {/* INFO SECTION */}
