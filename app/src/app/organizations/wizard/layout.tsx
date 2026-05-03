@@ -32,7 +32,6 @@ const OrganizationLayout = ({ children }: { children: React.ReactNode }) => {
         logo={
           <Image className="pb-2" src={logo} alt="Recycler logo" width={150} />
         }
-        toHomeHref="/"
       >
         <div className="flex w-full items-center justify-end">
           {mapReady && (
