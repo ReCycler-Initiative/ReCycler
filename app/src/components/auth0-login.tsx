@@ -14,7 +14,7 @@ import {
 import { useQuery } from "@tanstack/react-query";
 import { getUserOrganizations } from "@/services/api";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { LogInIcon } from "lucide-react";
+import { HomeIcon, LogInIcon, LogOutIcon, SettingsIcon } from "lucide-react";
 import { cn } from "@/utils/shadcn";
 
 // Extracts initials: "Joe Doe" -> "JD", "joe@..." -> "J"
@@ -36,6 +36,7 @@ export default function Auth0Login() {
 
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const shouldShowMarketingHomeLink = pathname !== "/";
 
   // Rebuild full path with query params
   const currentUrl =
@@ -116,10 +117,24 @@ export default function Auth0Login() {
                       <DropdownMenuSeparator />
                     )}
                     <DropdownMenuItem asChild>
-                      <Link href="/user-settings">Asetukset</Link>
+                      <Link href="/user-settings" className="flex items-center gap-2">
+                        <SettingsIcon size={14} />
+                        <span>Asetukset</span>
+                      </Link>
                     </DropdownMenuItem>
+                    {shouldShowMarketingHomeLink && (
+                      <DropdownMenuItem asChild>
+                        <Link href="/" className="flex items-center gap-2">
+                          <HomeIcon size={14} />
+                          <span>Palaa etusivulle</span>
+                        </Link>
+                      </DropdownMenuItem>
+                    )}
                     <DropdownMenuItem asChild>
-                      <a href="/auth/logout">Kirjaudu ulos</a>
+                      <a href="/auth/logout" className="flex items-center gap-2">
+                        <LogOutIcon size={14} />
+                        <span>Kirjaudu ulos</span>
+                      </a>
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>

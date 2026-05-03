@@ -81,10 +81,7 @@ const Content = ({
 
   return (
     <div className="flex flex-col h-full">
-      <TitleBar
-        logo={null}
-        toHomeHref="/"
-      >
+      <TitleBar logo={null} toHomeHref="/">
         <div className="flex flex-1 h-full items-center gap-x-4">
           <nav className="flex ml-4 h-10 gap-1">
             {navLinks.map((link) => (
