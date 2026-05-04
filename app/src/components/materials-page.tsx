@@ -4,10 +4,9 @@ import Container from "@/components/container";
 import { AiMaterialPrompt } from "@/components/ai-material-prompt";
 import { Materials } from "@/components/materials";
 import { Button } from "@/components/ui/button";
-import { Form } from "@/components/ui/form";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Link from "next/link";
-import { useForm, useWatch } from "react-hook-form";
+import { useState } from "react";
 
 export const MaterialsPageContent = ({
   organizationId,
@@ -30,20 +29,12 @@ export const MaterialsPageContent = ({
   tabAiText?: string;
   tabManualText?: string;
 }) => {
+  const [selectedCodes, setSelectedCodes] = useState<number[]>([]);
   const resolvedResultsBasePath =
     resultsBasePath ??
     (organizationId && useCaseId
       ? `/organizations/${organizationId}/use_cases/${useCaseId}/results`
       : "/recycler/results");
-
-  const form = useForm();
-  const materialValues = useWatch({
-    control: form.control,
-    name: "materials",
-    defaultValue: {},
-  });
-  const materials: [string, boolean][] = Object.entries(materialValues);
-  const selectedMaterials = materials.filter(([, value]) => value);
 
   return (
     <Container className={`max-w-2xl ${embedded ? "pt-4" : "pt-7 lg:pt-14"}`}>
@@ -65,6 +56,8 @@ export const MaterialsPageContent = ({
 
         <TabsContent value="ai">
           <AiMaterialPrompt
+            selectedCodes={selectedCodes}
+            onSelectedCodesChange={setSelectedCodes}
             organizationId={organizationId}
             useCaseId={useCaseId}
             ctaText={ctaText}
@@ -73,29 +66,30 @@ export const MaterialsPageContent = ({
         </TabsContent>
 
         <TabsContent value="manual">
-          <Form {...form}>
-            <div className={embedded ? "mb-6" : "mb-28 lg:mb-6"}>
-              <Materials />
-            </div>
-            <div
-              className={
-                embedded
-                  ? "static bg-white p-4 flex flex-col items-center gap-y-4"
-                  : "fixed lg:static bottom-0 bg-white lg:bg-transparent border lg:border-none p-4 lg:p-0 left-0 right-0 border-gray-400 flex flex-col items-center gap-y-4"
-              }
-            >
-              Valitut ({selectedMaterials.length})
-              <Button asChild className="w-full max-w-96 lg:mb-6" size="lg">
-                <Link
-                  href={`${resolvedResultsBasePath}?materials=${encodeURIComponent(
-                    selectedMaterials.map(([key]) => key).join(",")
-                  )}`}
-                >
-                  {ctaText}
-                </Link>
-              </Button>
-            </div>
-          </Form>
+          <div className={embedded ? "mb-6" : "mb-28 lg:mb-6"}>
+            <Materials
+              selectedCodes={selectedCodes}
+              onSelectionChange={setSelectedCodes}
+            />
+          </div>
+          <div
+            className={
+              embedded
+                ? "static bg-white p-4 flex flex-col items-center gap-y-4"
+                : "fixed lg:static bottom-0 bg-white lg:bg-transparent border lg:border-none p-4 lg:p-0 left-0 right-0 border-gray-400 flex flex-col items-center gap-y-4"
+            }
+          >
+            Valitut ({selectedCodes.length})
+            <Button asChild className="w-full max-w-96 lg:mb-6" size="lg">
+              <Link
+                href={`${resolvedResultsBasePath}?materials=${encodeURIComponent(
+                  selectedCodes.join(",")
+                )}`}
+              >
+                {ctaText}
+              </Link>
+            </Button>
+          </div>
         </TabsContent>
       </Tabs>
     </Container>
