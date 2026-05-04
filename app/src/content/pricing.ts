@@ -42,7 +42,7 @@ export const pricingPlans: PricingPlan[] = [
     audience: "Laajat tarpeet",
     price: "Tarjouskohtainen",
     description:
-      "Kun mukana on oma ympäristö, erityisiä integraatioita, SLA-vaatimuksia tai useita organisaatioita, ratkaisu rakennetaan tapauskohtaisesti.",
+      "Kun mukana on oma ympäristö, erityisiä integraatioita, SLA-vaatimuksia tai useita organisaatioita, ratkaisu rakennetaan tapauskohtaisesti. Palvelu voidaan myös sovittaa asiakkaan omaan verkkopalveluun ja ulkoasuun.",
     highlights: [
       "Oma ympäristö tai asiakkaan hallinnoima hosting",
       "Räätälöidyt integraatiot, tunnistautuminen ja datamallit",
