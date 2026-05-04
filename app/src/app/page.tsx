@@ -107,10 +107,12 @@ const HomePage = () => {
 
                 <div className="mt-6 grid gap-3 text-sm text-gray-700 sm:grid-cols-2">
                   <div className="rounded-xl border border-gray-200 bg-gray-50 p-4">
-                    Ihmiset löytävät oikean kohteen hakemalla tai kartalta.
+                    Asiakaslähtöinen palvelu tekee asioinnista nopeampaa,
+                    selkeämpää ja helpompaa.
                   </div>
                   <div className="rounded-xl border border-gray-200 bg-gray-50 p-4">
-                    Kohteita ja niiden tietoja voi päivittää helposti yhdessä paikassa.
+                    Käyttäjä löytää oikean palvelun helpommin ja saa heti
+                    vastauksia selkokieliseltä AI-avustajalta.
                   </div>
                   <div className="rounded-xl border border-gray-200 bg-gray-50 p-4">
                     Tietoa voidaan tuoda muista järjestelmistä automaattisesti.
@@ -119,6 +121,21 @@ const HomePage = () => {
                     Käyttäjät voidaan tunnistaa organisaation nykyisillä
                     tunnuksilla, kuten Microsoft- tai Google-kirjautumisella.
                   </div>
+                </div>
+
+                <div className="mt-6 rounded-xl border border-gray-200 bg-gray-50 p-4">
+                  <h2 className="text-xl font-semibold text-gray-900">
+                    Esimerkki käyttötapauksesta
+                  </h2>
+                  <p className="mt-2 text-sm leading-6 text-gray-600">
+                    Esimerkiksi kunta voi toteuttaa palvelun, jossa asukas
+                    löytää helposti alueen päiväkodit kartalta, vertailee
+                    vaihtoehtoja ja saa AI-avustajalta nopeasti vastauksia
+                    käytännön kysymyksiin. Käyttäjä näkee myös helposti, mistä
+                    palvelu löytyy, ja voi tarkistaa nopeasti esimerkiksi,
+                    löytyykö alueelta englanninkielinen päiväkoti tai
+                    ympärivuorokautinen päiväkoti.
+                  </p>
                 </div>
 
                 <p className="mt-6 text-sm leading-6 text-gray-600">
