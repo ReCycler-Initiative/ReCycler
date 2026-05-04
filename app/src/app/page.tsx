@@ -209,6 +209,49 @@ const HomePage = () => {
               </div>
             </section>
           </div>
+
+          <footer className="mt-10 rounded-2xl border border-gray-200 bg-gray-900 px-6 py-8 text-white">
+            <div className="grid gap-8 md:grid-cols-3">
+              <div>
+                <h3 className="text-sm font-semibold uppercase tracking-[0.18em] text-gray-300">
+                  Yhteystiedot
+                </h3>
+                <p className="mt-3 text-lg font-semibold text-white">
+                  Yritys Oy
+                </p>
+                <p className="mt-2 text-sm leading-6 text-gray-300">
+                  ReCycler-palvelun käyttöönotto, pilotointi ja jatkuva kehitys
+                  organisaatioille.
+                </p>
+              </div>
+
+              <div>
+                <h4 className="text-sm font-semibold text-white">Osoite</h4>
+                <p className="mt-3 text-sm leading-6 text-gray-300">
+                  Kuvitteellinenkatu 12 A
+                  <br />
+                  00100 Helsinki
+                  <br />
+                  Suomi
+                </p>
+              </div>
+
+              <div>
+                <h4 className="text-sm font-semibold text-white">Ota yhteyttä</h4>
+                <div className="mt-3 space-y-2 text-sm text-gray-300">
+                  <p>
+                    Sähköposti: info@yritys.fi
+                  </p>
+                  <p>
+                    Puhelin: 010 123 4567
+                  </p>
+                  <p>
+                    Y-tunnus: 1234567-8
+                  </p>
+                </div>
+              </div>
+            </div>
+          </footer>
         </div>
       </PageTemplate>
     </>
