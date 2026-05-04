@@ -2,7 +2,6 @@ import { getMaterials } from "@/services/api";
 import { useQuery } from "@tanstack/react-query";
 import { RecycleIcon } from "lucide-react";
 import { ReactNode } from "react";
-import { useFormContext, useWatch } from "react-hook-form";
 import BioWaste from "./icons/BioWaste";
 import Construction from "./icons/Building";
 import CarBattery from "./icons/CarBattery";
@@ -65,18 +64,17 @@ export const iconMap: {
 
 const CustomCheckbox = ({
   baseHex,
+  checked,
   icon,
   label,
-  name,
+  onToggle,
 }: {
   baseHex?: string;
+  checked: boolean;
   icon?: ReactNode;
   label: string;
-  name: string;
+  onToggle: () => void;
 }) => {
-  const { register } = useFormContext();
-  const checked: boolean = useWatch({ name });
-
   const backgroundColor = baseHex
     ? hexToRgba(baseHex, checked ? 1 : 0.85)
     : "transparent";
@@ -95,8 +93,8 @@ const CustomCheckbox = ({
         {icon ?? <RecycleIcon className="text-red-600" />}
       </div>
       <input
-        {...register(name)}
-        checked={checked || false}
+        checked={checked}
+        onChange={onToggle}
         type="checkbox"
         className="hidden"
       />
@@ -105,7 +103,13 @@ const CustomCheckbox = ({
   );
 };
 
-export const Materials = () => {
+export const Materials = ({
+  selectedCodes,
+  onSelectionChange,
+}: {
+  selectedCodes: number[];
+  onSelectionChange: (codes: number[]) => void;
+}) => {
   const { data: materials, isFetching } = useQuery({
     queryKey: ["materials"],
     queryFn: getMaterials,
@@ -125,13 +129,21 @@ export const Materials = () => {
     <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
       {materials?.map((m) => {
         const match = iconMap.find((i) => i.code === m.code);
+        const checked = selectedCodes.includes(m.code);
         return (
           <CustomCheckbox
             key={m.code}
             baseHex={match?.baseHex}
+            checked={checked}
             label={m.name}
-            name={`materials.${m.code}`}
             icon={match?.icon}
+            onToggle={() => {
+              onSelectionChange(
+                checked
+                  ? selectedCodes.filter((code) => code !== m.code)
+                  : [...selectedCodes, m.code]
+              );
+            }}
           />
         );
       })}

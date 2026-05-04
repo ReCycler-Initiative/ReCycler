@@ -3,7 +3,15 @@
 import { chat, getMaterials } from "@/services/api";
 import { Material } from "@/types";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowRight, Camera, Mic, MicOff, RecycleIcon, SendHorizonal, X } from "lucide-react";
+import {
+  ArrowRight,
+  Camera,
+  Mic,
+  MicOff,
+  RecycleIcon,
+  SendHorizonal,
+  X,
+} from "lucide-react";
 import Link from "next/link";
 import { FormEvent, useEffect, useRef, useState } from "react";
 import { hexToRgba, iconMap } from "./materials";
@@ -15,11 +23,15 @@ type CartMaterial = Material & { baseHex?: string; icon?: React.ReactNode };
 type PendingImage = { base64: string; mimeType: string; previewUrl: string };
 
 export const AiMaterialPrompt = ({
+  selectedCodes,
+  onSelectedCodesChange,
   organizationId,
   useCaseId,
   ctaText = "Näytä kohteet",
   resultsBasePath,
 }: {
+  selectedCodes: number[];
+  onSelectedCodesChange: (codes: number[]) => void;
   organizationId?: string;
   useCaseId?: string;
   ctaText?: string;
@@ -28,7 +40,6 @@ export const AiMaterialPrompt = ({
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
-  const [cartCodes, setCartCodes] = useState<number[]>([]);
   const [preparationTips, setPreparationTips] = useState<
     { materialName: string; tip: string }[]
   >([]);
@@ -41,6 +52,7 @@ export const AiMaterialPrompt = ({
   const streamRef = useRef<MediaStream | null>(null);
   const recognitionRef = useRef<any>(null);
   const initialized = useRef(false);
+  const selectedCodesRef = useRef(selectedCodes);
 
   const { data: materials } = useQuery({
     queryKey: ["materials"],
@@ -48,16 +60,32 @@ export const AiMaterialPrompt = ({
     staleTime: Infinity,
   });
 
+  useEffect(() => {
+    selectedCodesRef.current = selectedCodes;
+  }, [selectedCodes]);
+
   const cartMaterials: CartMaterial[] = (materials ?? [])
-    .filter((m) => cartCodes.includes(m.code))
+    .filter((m) => selectedCodes.includes(m.code))
     .map((m) => {
       const match = iconMap.find((i) => i.code === m.code);
       return { ...m, baseHex: match?.baseHex, icon: match?.icon };
     });
 
   const resultsHref = `${resultsBasePath ?? "/recycler/results"}?materials=${encodeURIComponent(
-    cartCodes.join(",")
+    selectedCodes.join(",")
   )}`;
+
+  const removeCartMaterial = (materialCode: number) => {
+    onSelectedCodesChange(
+      selectedCodes.filter((code) => code !== materialCode)
+    );
+    setPreparationTips((currentTips) =>
+      currentTips.filter((tip) => {
+        const material = materials?.find((item) => item.code === materialCode);
+        return tip.materialName !== material?.name;
+      })
+    );
+  };
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -76,7 +104,9 @@ export const AiMaterialPrompt = ({
     chat({ message: "", history: [], organizationId, useCaseId })
       .then((res) => {
         setMessages([{ role: "assistant", content: res.reply }]);
-        setCartCodes(res.suggestedCodes);
+        if (selectedCodesRef.current.length === 0) {
+          onSelectedCodesChange(res.suggestedCodes);
+        }
         setPreparationTips(res.preparationTips);
       })
       .catch(() => {
@@ -235,7 +265,7 @@ export const AiMaterialPrompt = ({
         useCaseId,
       });
       setMessages([...newMessages, { role: "assistant", content: res.reply }]);
-      setCartCodes(res.suggestedCodes);
+      onSelectedCodesChange(res.suggestedCodes);
       setPreparationTips(res.preparationTips);
     } catch {
       setMessages([
@@ -415,13 +445,22 @@ export const AiMaterialPrompt = ({
             {cartMaterials.map((m) => (
               <div
                 key={m.code}
-                className="flex aspect-square flex-col items-center justify-center rounded-sm px-2 py-2 text-center text-white ring-4 ring-yellow-400"
+                className="relative flex aspect-square flex-col items-center justify-center rounded-sm px-2 py-2 text-center text-white ring-4 ring-yellow-400"
                 style={{
                   backgroundColor: m.baseHex
                     ? hexToRgba(m.baseHex, 1)
                     : "#4b5563",
                 }}
               >
+                <button
+                  type="button"
+                  onClick={() => removeCartMaterial(m.code)}
+                  className="absolute right-1 top-1 rounded-full bg-black/45 p-1 text-white transition hover:bg-black/70"
+                  aria-label={`Poista materiaali ${m.name}`}
+                  title={`Poista ${m.name}`}
+                >
+                  <X className="h-3 w-3" />
+                </button>
                 <div className="mb-2 transform scale-125">
                   {m.icon ?? <RecycleIcon />}
                 </div>
@@ -445,7 +484,7 @@ export const AiMaterialPrompt = ({
           </ul>
         )}
 
-        {cartCodes.length > 0 && (
+        {selectedCodes.length > 0 && (
           <Button asChild size="lg" className="w-full mt-1">
             <Link href={resultsHref}>
               {ctaText}
