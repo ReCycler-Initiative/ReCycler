@@ -71,9 +71,12 @@ export const AiMaterialPrompt = ({
       return { ...m, baseHex: match?.baseHex, icon: match?.icon };
     });
 
-  const resultsHref = `${resultsBasePath ?? "/recycler/results"}?materials=${encodeURIComponent(
-    selectedCodes.join(",")
-  )}`;
+  const resultsBaseHref = resultsBasePath ?? "/recycler/results";
+  const resultsHref = selectedCodes.length
+    ? `${resultsBaseHref}?materials=${encodeURIComponent(
+        selectedCodes.join(",")
+      )}`
+    : resultsBaseHref;
 
   const removeCartMaterial = (materialCode: number) => {
     onSelectedCodesChange(
@@ -428,12 +431,7 @@ export const AiMaterialPrompt = ({
       {/* Valitut materiaalit */}
       <div className="rounded-lg border border-gray-200 bg-gray-50 p-4 flex flex-col gap-3">
         <p className="text-sm font-medium text-gray-700">
-          Valitut materiaalit{" "}
-          {cartMaterials.length > 0 && (
-            <span className="ml-1 rounded-full bg-yellow-400 text-black text-xs font-bold px-2 py-0.5">
-              {cartMaterials.length}
-            </span>
-          )}
+          Valitut ({cartMaterials.length})
         </p>
 
         {cartMaterials.length === 0 ? (
@@ -484,14 +482,12 @@ export const AiMaterialPrompt = ({
           </ul>
         )}
 
-        {selectedCodes.length > 0 && (
-          <Button asChild size="lg" className="w-full mt-1">
-            <Link href={resultsHref}>
-              {ctaText}
-              <ArrowRight className="ml-2 h-4 w-4" />
-            </Link>
-          </Button>
-        )}
+        <Button asChild size="lg" className="w-full mt-1">
+          <Link href={resultsHref}>
+            {ctaText}
+            <ArrowRight className="ml-2 h-4 w-4" />
+          </Link>
+        </Button>
       </div>
     </div>
   );

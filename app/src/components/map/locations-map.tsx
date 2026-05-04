@@ -140,6 +140,27 @@ const clusterCount: SymbolLayer = {
 };
 
 // Helper to filter features based on selected materials
+const parseFeatureMaterials = (rawMaterials: unknown): Material[] => {
+  if (!rawMaterials) {
+    return [];
+  }
+
+  if (Array.isArray(rawMaterials)) {
+    return rawMaterials as Material[];
+  }
+
+  if (typeof rawMaterials !== "string") {
+    return [];
+  }
+
+  try {
+    const parsed = JSON.parse(rawMaterials);
+    return Array.isArray(parsed) ? (parsed as Material[]) : [];
+  } catch {
+    return [];
+  }
+};
+
 const filterFeaturesBySelectedMaterials = (
   materials: number[],
   collectionSpots: GeoJSON.FeatureCollection<GeoJSON.Geometry>
@@ -150,17 +171,17 @@ const filterFeaturesBySelectedMaterials = (
 
   const features = collectionSpots.features
     ?.filter((feature: any) => {
-      const featureMaterials = JSON.parse(
-        feature.properties.materials
-      ) as Material[];
+      const featureMaterials = parseFeatureMaterials(
+        feature.properties?.materials
+      );
       return featureMaterials.some((material) =>
         materials.includes(material.code)
       );
     })
     .map((feature: any) => {
-      const featureMaterials = JSON.parse(
-        feature.properties.materials
-      ) as Material[];
+      const featureMaterials = parseFeatureMaterials(
+        feature.properties?.materials
+      );
 
       return {
         ...feature,
@@ -378,16 +399,15 @@ export default function LocationsMap({ geoJson }: LocationsMapProps) {
                     </div>
                   )}
                   <ul className="text-sm p-3 leading-6 list-disc columns-2">
-                    {details.properties &&
-                      JSON.parse(details.properties.materials)
-                        .sort((a: Material, b: Material) =>
-                          a.name.localeCompare(b.name)
-                        )
-                        .map((material: Material) => (
-                          <li key={material.code} className="ml-4">
-                            {material.name}
-                          </li>
-                        ))}
+                    {parseFeatureMaterials(details.properties?.materials)
+                      .sort((a: Material, b: Material) =>
+                        a.name.localeCompare(b.name)
+                      )
+                      .map((material: Material) => (
+                        <li key={material.code} className="ml-4">
+                          {material.name}
+                        </li>
+                      ))}
                   </ul>
                   {user && (
                     <div className="p-3 border-t">
@@ -430,6 +450,7 @@ export default function LocationsMap({ geoJson }: LocationsMapProps) {
           <DrawerContent>
             <div className="max-h-[500px] overflow-y-auto">
               <MaterialsPageContent
+                initialSelectedCodes={selectedMaterials}
                 organizationId={params.organizationId}
                 useCaseId={params.useCaseId}
                 resultsBasePath={pathname}

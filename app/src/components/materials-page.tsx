@@ -6,9 +6,10 @@ import { Materials } from "@/components/materials";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export const MaterialsPageContent = ({
+  initialSelectedCodes = [],
   organizationId,
   useCaseId,
   resultsBasePath,
@@ -19,6 +20,7 @@ export const MaterialsPageContent = ({
   tabAiText = "Chat",
   tabManualText = "Valitse itse",
 }: {
+  initialSelectedCodes?: number[];
   organizationId?: string;
   useCaseId?: string;
   resultsBasePath?: string;
@@ -29,12 +31,24 @@ export const MaterialsPageContent = ({
   tabAiText?: string;
   tabManualText?: string;
 }) => {
-  const [selectedCodes, setSelectedCodes] = useState<number[]>([]);
+  const [selectedCodes, setSelectedCodes] = useState<number[]>(
+    initialSelectedCodes
+  );
   const resolvedResultsBasePath =
     resultsBasePath ??
     (organizationId && useCaseId
       ? `/organizations/${organizationId}/use_cases/${useCaseId}/results`
       : "/recycler/results");
+
+  useEffect(() => {
+    setSelectedCodes(initialSelectedCodes);
+  }, [initialSelectedCodes]);
+
+  const resultsHref = selectedCodes.length
+    ? `${resolvedResultsBasePath}?materials=${encodeURIComponent(
+        selectedCodes.join(",")
+      )}`
+    : resolvedResultsBasePath;
 
   return (
     <Container className={`max-w-2xl ${embedded ? "pt-4" : "pt-7 lg:pt-14"}`}>
@@ -81,11 +95,7 @@ export const MaterialsPageContent = ({
           >
             Valitut ({selectedCodes.length})
             <Button asChild className="w-full max-w-96 lg:mb-6" size="lg">
-              <Link
-                href={`${resolvedResultsBasePath}?materials=${encodeURIComponent(
-                  selectedCodes.join(",")
-                )}`}
-              >
+              <Link href={resultsHref}>
                 {ctaText}
               </Link>
             </Button>
