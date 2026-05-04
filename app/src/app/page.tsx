@@ -125,7 +125,7 @@ const HomePage = () => {
 
                 <div className="mt-6 rounded-xl border border-gray-200 bg-gray-50 p-4">
                   <h2 className="text-xl font-semibold text-gray-900">
-                    Esimerkki käyttötapauksesta
+                    Esimerkkejä käytöstä
                   </h2>
                   <p className="mt-2 text-sm leading-6 text-gray-600">
                     Esimerkiksi kunta voi toteuttaa palvelun, jossa asukas
@@ -136,13 +136,14 @@ const HomePage = () => {
                     löytyykö alueelta englanninkielinen päiväkoti tai
                     ympärivuorokautinen päiväkoti.
                   </p>
+                  <p className="mt-4 border-t border-gray-200 pt-4 text-sm leading-6 text-gray-600">
+                    Yritys voi vastaavasti toteuttaa palvelun, jossa asiakas
+                    löytää helposti oikean myymälän tai palvelupisteen,
+                    vertailee vaihtoehtoja kartalla ja saa nopeasti vastauksen
+                    esimerkiksi siihen, missä on esteetön toimipiste tai
+                    viikonloppuna avoinna oleva palvelupiste.
+                  </p>
                 </div>
-
-                <p className="mt-6 text-sm leading-6 text-gray-600">
-                  Käytännössä tämä tarkoittaa, että sama alusta sopii esimerkiksi
-                  kierrätyspisteiden, asiointipaikkojen, palveluverkkojen tai muiden
-                  sijaintiin perustuvien palveluiden julkaisuun ja ylläpitoon.
-                </p>
 
                 <div className="mt-8 flex flex-col gap-3 sm:flex-row">
                   <Link
