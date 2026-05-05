@@ -87,6 +87,16 @@ export const LocationGeoJsonCollection = z.object({
   features: z.array(LocationGeoJson),
 });
 
+export const LocationDetailField = z.object({
+  id: z.string().uuid(),
+  name: z.string(),
+  field_type: FieldType,
+  options: FieldOptions.nullable().optional(),
+  required: z.boolean().optional(),
+  order: z.number().nullable(),
+  value: FieldValue,
+});
+
 export const LocationDetail = z.object({
   type: z.literal("Feature"),
   geometry: Point,
