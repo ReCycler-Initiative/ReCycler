@@ -1,4 +1,5 @@
 import db from "@/services/db";
+import { DbLocation } from "@/types";
 import { NextRequest, NextResponse } from "next/server";
 import { checkOrganizationAuthorization } from "@/lib/authorization";
 import { z } from "zod";
@@ -19,35 +20,52 @@ export async function GET(
   }
 
   const result = await db.raw(
-    `
-    SELECT 
-      l.id,
-      l.name,
-      ST_AsGeoJSON(l.geom)::jsonb as geom
-    FROM recycler.locations l
-    INNER JOIN recycler.use_cases uc ON l.use_case_id = uc.id
-    WHERE uc.organization_id = ?::uuid AND uc.id = ?::uuid
-    ORDER BY l.name
-  `,
-    [organizationId, useCaseId]
+    `SELECT * FROM recycler.get_locations(?::uuid)`,
+    [useCaseId]
   );
 
-  const features = result.rows.map((row: any) => ({
+  const rows = z.array(DbLocation).parse(result.rows);
+
+  // get_locations returns one row per field (LEFT JOIN) — group by location
+  const locationMap = new Map<
+    string,
+    { id: string; name: string; geom: unknown; fields: typeof rows }
+  >();
+
+  for (const row of rows) {
+    if (!locationMap.has(row.location_id)) {
+      locationMap.set(row.location_id, {
+        id: row.location_id,
+        name: row.location_name,
+        geom: row.location_geom,
+        fields: [],
+      });
+    }
+    if (row.field_id) {
+      locationMap.get(row.location_id)!.fields.push(row);
+    }
+  }
+
+  const features = Array.from(locationMap.values()).map((loc) => ({
     type: "Feature" as const,
-    geometry: row.geom,
+    geometry: loc.geom,
     properties: {
-      id: row.id,
-      name: row.name,
-      fields: [],
+      id: loc.id,
+      name: loc.name,
+      fields: loc.fields.map((f) => ({
+        id: f.field_id,
+        name: f.field_name,
+        field_type: f.field_type,
+        order: f.field_order,
+        value: f.field_values ?? [],
+      })),
     },
   }));
 
-  const response = {
+  return NextResponse.json({
     type: "FeatureCollection" as const,
     features,
-  };
-
-  return NextResponse.json(response);
+  });
 }
 
 const CreateLocationBody = z.object({

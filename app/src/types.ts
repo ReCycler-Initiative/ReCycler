@@ -28,20 +28,25 @@ export const FieldType = z.union([
   z.literal("text_input"),
 ]);
 
-export const FieldValue = z.union([z.string(), z.array(z.string())]);
+export const FieldValue = z.array(z.string());
 
-export const FieldDataType = z.union([
-  z.literal("array"),
-  z.literal("boolean"),
-  z.literal("number"),
-  z.literal("string"),
-]);
+export const FieldOptions = z.object({
+  choices: z.array(z.string()).optional(),
+  placeholder: z.string().optional(),
+  helpText: z.string().optional(),
+});
 
 export const Field = z.object({
-  data_type: FieldDataType,
   field_type: FieldType,
   name: z.string(),
-  order: z.number(),
+  order: z.number().nullable(),
+  options: FieldOptions.nullable().optional(),
+  required: z.boolean().optional(),
+});
+
+export const FieldRecord = Field.extend({
+  id: z.string().uuid(),
+  use_case_id: z.string().uuid(),
 });
 
 export const Point = z.object({
@@ -50,11 +55,11 @@ export const Point = z.object({
 });
 
 export const DbLocation = z.object({
-  field_data_type: FieldDataType,
-  field_name: z.string(),
-  field_order: z.number(),
-  field_type: FieldType,
-  field_values: FieldValue,
+  field_id: z.string().uuid().nullable(),
+  field_name: z.string().nullable(),
+  field_order: z.number().nullable(),
+  field_type: FieldType.nullable(),
+  field_values: FieldValue.nullable(),
   location_geom: Point,
   location_id: z.string().uuid(),
   location_name: z.string(),
@@ -64,12 +69,10 @@ export const LocationProperties = z.object({
   id: z.string().uuid(),
   name: z.string(),
   fields: z.array(
-    z.intersection(
-      Field,
-      z.object({
-        value: FieldValue,
-      })
-    )
+    Field.extend({
+      id: z.string().uuid(),
+      value: FieldValue,
+    })
   ),
 });
 
