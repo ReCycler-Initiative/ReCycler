@@ -50,12 +50,13 @@ export const FieldMaterials = ({
             )}
             <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
               {choices.map((choice, choiceIndex) => {
+                const color = field.options?.choiceColors?.[choice] ?? nameIconMap[choice.toLowerCase()]?.baseHex;
                 const iconEntry = nameIconMap[choice.toLowerCase()];
                 const checked = fieldSelected.includes(choiceIndex);
                 return (
                   <CustomCheckbox
                     key={choice}
-                    baseHex={iconEntry?.baseHex}
+                    baseHex={color}
                     checked={checked}
                     label={choice}
                     icon={iconEntry?.icon}

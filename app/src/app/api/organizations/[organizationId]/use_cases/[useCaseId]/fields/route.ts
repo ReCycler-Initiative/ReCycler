@@ -13,6 +13,7 @@ const CreateFieldBody = z.object({
       choices: z.array(z.string()).optional(),
       placeholder: z.string().optional(),
       helpText: z.string().optional(),
+      choiceColors: z.record(z.string()).optional(),
     })
     .nullable()
     .optional(),

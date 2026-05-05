@@ -33,6 +33,7 @@ export const FieldValue = z.array(z.string());
 
 export const FieldOptions = z.object({
   choices: z.array(z.string()).optional(),
+  choiceColors: z.record(z.string()).optional(),
   placeholder: z.string().optional(),
   helpText: z.string().optional(),
 });
