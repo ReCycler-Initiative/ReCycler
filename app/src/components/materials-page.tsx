@@ -3,6 +3,7 @@
 import Container from "@/components/container";
 import { AiMaterialPrompt } from "@/components/ai-material-prompt";
 import { Materials } from "@/components/materials";
+import { FieldMaterials, FieldSelections } from "@/components/field-materials";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Link from "next/link";
@@ -10,6 +11,7 @@ import { useEffect, useState } from "react";
 
 export const MaterialsPageContent = ({
   initialSelectedCodes = [],
+  initialSelectedFieldValues = {},
   organizationId,
   useCaseId,
   resultsBasePath,
@@ -21,6 +23,7 @@ export const MaterialsPageContent = ({
   tabManualText = "Valitse itse",
 }: {
   initialSelectedCodes?: number[];
+  initialSelectedFieldValues?: FieldSelections;
   organizationId?: string;
   useCaseId?: string;
   resultsBasePath?: string;
@@ -31,9 +34,9 @@ export const MaterialsPageContent = ({
   tabAiText?: string;
   tabManualText?: string;
 }) => {
-  const [selectedCodes, setSelectedCodes] = useState<number[]>(
-    initialSelectedCodes
-  );
+  const [selectedCodes, setSelectedCodes] = useState<number[]>(initialSelectedCodes);
+  const [selectedFieldValues, setSelectedFieldValues] = useState<FieldSelections>(initialSelectedFieldValues);
+
   const resolvedResultsBasePath =
     resultsBasePath ??
     (organizationId && useCaseId
@@ -44,11 +47,31 @@ export const MaterialsPageContent = ({
     setSelectedCodes(initialSelectedCodes);
   }, [initialSelectedCodes]);
 
-  const resultsHref = selectedCodes.length
-    ? `${resolvedResultsBasePath}?materials=${encodeURIComponent(
-        selectedCodes.join(",")
-      )}`
-    : resolvedResultsBasePath;
+  useEffect(() => {
+    setSelectedFieldValues(initialSelectedFieldValues);
+  }, [initialSelectedFieldValues]);
+
+  const buildResultsHref = () => {
+    const params = new URLSearchParams();
+    if (selectedCodes.length) {
+      params.set("materials", selectedCodes.join(","));
+    }
+    for (const [fieldId, values] of Object.entries(selectedFieldValues)) {
+      if (values.length) {
+        params.set(`field_${fieldId}`, values.join(","));
+      }
+    }
+    const query = params.toString();
+    return query ? `${resolvedResultsBasePath}?${query}` : resolvedResultsBasePath;
+  };
+
+  const resultsHref = buildResultsHref();
+
+  const totalSelected =
+    selectedCodes.length +
+    Object.values(selectedFieldValues).reduce((sum, vals) => sum + vals.length, 0);
+
+  const showFieldMaterials = !!(organizationId && useCaseId);
 
   return (
     <Container className={`max-w-2xl ${embedded ? "pt-4" : "pt-7 lg:pt-14"}`}>
@@ -81,10 +104,19 @@ export const MaterialsPageContent = ({
 
         <TabsContent value="manual">
           <div className={embedded ? "mb-6" : "mb-28 lg:mb-6"}>
-            <Materials
-              selectedCodes={selectedCodes}
-              onSelectionChange={setSelectedCodes}
-            />
+            {showFieldMaterials ? (
+              <FieldMaterials
+                organizationId={organizationId}
+                useCaseId={useCaseId}
+                selectedValues={selectedFieldValues}
+                onSelectionChange={setSelectedFieldValues}
+              />
+            ) : (
+              <Materials
+                selectedCodes={selectedCodes}
+                onSelectionChange={setSelectedCodes}
+              />
+            )}
           </div>
           <div
             className={
@@ -93,7 +125,7 @@ export const MaterialsPageContent = ({
                 : "fixed lg:static bottom-0 bg-white lg:bg-transparent border lg:border-none p-4 lg:p-0 left-0 right-0 border-gray-400 flex flex-col items-center gap-y-4"
             }
           >
-            Valitut ({selectedCodes.length})
+            Valitut ({totalSelected})
             <Button asChild className="w-full max-w-96 lg:mb-6" size="lg">
               <Link href={resultsHref}>
                 {ctaText}

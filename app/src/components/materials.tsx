@@ -62,7 +62,32 @@ export const iconMap: {
   { code: 108, baseHex: "#d9001e", icon: <Dangerous /> },
 ];
 
-const CustomCheckbox = ({
+// Name-based icon lookup (lowercase) for use with field string values
+export const nameIconMap: Record<string, { baseHex: string; icon: ReactNode }> = {
+  "ajoneuvoakut": { baseHex: "#d9001e", icon: <CarBattery /> },
+  "energiajäte": { baseHex: "#000000", icon: <EnergyWaste /> },
+  "kannettavat akut ja paristot": { baseHex: "#d9001e", icon: <SmallBattery /> },
+  "kartonki": { baseHex: "#176eb1", icon: <Carton /> },
+  "kyllästetty puu": { baseHex: "#d9001e", icon: <Wood /> },
+  "lamput": { baseHex: "#d9001e", icon: <Lamp /> },
+  "lasi": { baseHex: "#21a07b", icon: <Glass /> },
+  "metalli": { baseHex: "#485b66", icon: <Metal /> },
+  "muovi": { baseHex: "#820f71", icon: <Plastic /> },
+  "sähkölaitteet (ser)": { baseHex: "#d9001e", icon: <ElectricWaste /> },
+  "sekajäte": { baseHex: "#000000", icon: <WasteBin /> },
+  "biojäte": { baseHex: "#139339", icon: <BioWaste /> },
+  "muu jäte": { baseHex: "#000000", icon: <WasteBin /> },
+  "pahvi": { baseHex: "#176eb1", icon: <CardBoard /> },
+  "paperi": { baseHex: "#176eb1", icon: <Paper /> },
+  "tekstiili": { baseHex: "#6b9030", icon: <Textile /> },
+  "puu": { baseHex: "#d9001e", icon: <Wood /> },
+  "puutarhajäte": { baseHex: "#139339", icon: <Garden /> },
+  "rakennus- ja purkujäte": { baseHex: "#0c3a6f", icon: <Construction /> },
+  "poistotekstiili": { baseHex: "#6b9030", icon: <TextileReuse /> },
+  "vaarallinen jäte": { baseHex: "#d9001e", icon: <Dangerous /> },
+};
+
+export const CustomCheckbox = ({
   baseHex,
   checked,
   icon,
