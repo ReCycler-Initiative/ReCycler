@@ -224,7 +224,7 @@ const LocationsPage = () => {
                 organizationId={organizationId}
                 useCaseId={params.useCaseId}
                 onClose={() => { setEditId(null); setRelocateMode(false); setPickedLngLat(null); }}
-                onSaved={() => { setEditId(null); setRelocateMode(false); setPickedLngLat(null); }}
+                onSaved={() => { setRelocateMode(false); setPickedLngLat(null); }}
                 onDelete={() => {
                   const loc = locations.find((l) => l.id === editId);
                   if (loc) setDeleteTarget({ id: loc.id, name: loc.name });
