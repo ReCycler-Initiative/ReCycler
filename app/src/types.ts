@@ -20,6 +20,7 @@ export type Modify<T, R> = Omit<T, keyof R> & R;
 export type ChatResponse = {
   reply: string;
   suggestedCodes: number[];
+  suggestedFieldValues: Record<string, number[]>;
   preparationTips: { materialName: string; tip: string }[];
 };
 

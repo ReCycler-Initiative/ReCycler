@@ -3,6 +3,26 @@ import { Material } from "@/types";
 import { NextRequest, NextResponse } from "next/server";
 import OpenAI from "openai";
 
+type MultiSelectField = {
+  id: string;
+  name: string;
+  choices: string[];
+};
+
+async function loadMultiSelectFields(useCaseId: string): Promise<MultiSelectField[]> {
+  const rows: { id: string; name: string; options: any }[] = await db
+    .select("id", "name", "options")
+    .from("recycler.fields")
+    .where("use_case_id", useCaseId)
+    .where("field_type", "multi_select")
+    .orderByRaw("\"order\" ASC NULLS LAST, created_at ASC");
+  return rows.map((r) => ({
+    id: r.id,
+    name: r.name,
+    choices: r.options?.choices ?? [],
+  }));
+}
+
 async function loadUseCaseInfo(
   useCaseId: string
 ): Promise<{ name: string; description: string } | null> {
@@ -42,7 +62,7 @@ async function getOpenAiClient(): Promise<OpenAI> {
 
 export async function POST(req: NextRequest) {
   try {
-    const { message, history = [], imageBase64, imageMimeType, useCaseId } = await req.json();
+    const { message, history = [], imageBase64, imageMimeType, useCaseId, organizationId } = await req.json();
 
     const materials: Material[] = await db("recycler.materials").orderBy(
       "name"
@@ -51,10 +71,26 @@ export async function POST(req: NextRequest) {
       .map((m) => `- ${m.name} (koodi: ${m.code})`)
       .join("\n");
 
-    const [trainingContext, useCaseInfo] = await Promise.all([
+    const [trainingContext, useCaseInfo, multiSelectFields] = await Promise.all([
       useCaseId ? loadTrainingMaterials(useCaseId) : Promise.resolve(""),
       useCaseId ? loadUseCaseInfo(useCaseId) : Promise.resolve(null),
+      useCaseId ? loadMultiSelectFields(useCaseId) : Promise.resolve([]),
     ]);
+
+    const fieldsBlock = multiSelectFields.length > 0
+      ? "\n\nKäyttötapauksen valintakentät (käytä näitä arvoja täsmälleen fieldSelections-vastauksessa):\n" +
+        multiSelectFields.map((f) =>
+          `- Kenttä "${f.name}" (id: ${f.id}):\n  Vaihtoehdot: ${f.choices.join(", ")}`
+        ).join("\n")
+      : "";
+
+    const fieldsInstruction = multiSelectFields.length > 0
+      ? `\n- fieldSelections on kumulatiivinen: sisällytä kaikki valinnat mitä käyttäjä on maininnut. Jos käyttäjä sanoo ettei jokin kuulu, poista se. Käytä täsmälleen yllä listattuja kenttien id-arvoja ja vaihtoehtoja.`
+      : "";
+
+    const fieldSelectionsFormat = multiSelectFields.length > 0
+      ? `,\n  "fieldSelections": [{ "fieldId": "<kentän id>", "values": ["<valittu arvo>"] }]`
+      : "";
 
     const useCaseContextBlock = useCaseInfo
       ? [
@@ -69,12 +105,12 @@ export async function POST(req: NextRequest) {
 
     const systemPrompt = `${useCaseContextBlock ? useCaseContextBlock + "\n\n" : ""}${trainingContext ? "Ohjeistukset ja taustamateriaalit:\n\n" + trainingContext + "\n\n" : ""}
 Käytettävissä olevat materiaalikategoriat (käytä näitä nimiä täsmälleen):
-${materialList}
+${materialList}${fieldsBlock}
 
 Vastaa AINA seuraavassa JSON-muodossa:
 {
   "reply": "Vapaamuotoinen, ystävällinen ja lyhyt vastausviesti käyttäjälle.",
-  "materialNames": ["Kaikki ne materiaalikategorioiden nimet joita käyttäjä on maininnut koko keskustelun aikana — päivitä tämä lista koko ajan"],
+  "materialNames": ["Kaikki ne materiaalikategorioiden nimet joita käyttäjä on maininnut koko keskustelun aikana — päivitä tämä lista koko ajan"]${fieldSelectionsFormat},
   "preparationTips": [
     { "materialName": "Kategorian nimi TÄSMÄLLEEN kuten yllä listassa", "tip": "Yksi lause: miten tämä materiaali kannattaa valmistella." }
   ]
@@ -84,7 +120,7 @@ Tärkeää:
 - Jos tämä on ensimmäinen viesti (historia on tyhjä eikä käyttäjältä ole tullut viestiä), avaa keskustelu kontekstuaalisella tervehdyksellä${useCaseInfo?.name ? " joka viittaa käyttötapaukseen '" + useCaseInfo.name + "'" : ""} ja pyydä käyttäjää kertomaan tarpeestaan
 - Jos käyttäjä tervehtii, pyydä häntä kertomaan tarpeestaan
 - materialNames on kumulatiivinen: sisällytä kaikki kategoriat mitä käyttäjä on maininnut tässä keskustelussa
-- Jos käyttäjä sanoo ettei jokin tavara kuulukaan mukaan, poista se materialNames-listasta
+- Jos käyttäjä sanoo ettei jokin tavara kuulukaan mukaan, poista se materialNames-listasta${fieldsInstruction}
 - preparationTips sisältää vihjeen jokaiselle materialNames-kategorialle
 - Jos käyttäjä lähettää kuvan, tunnista kuvasta materiaalit ja neuvoo mihin kategorioihin ne kuuluvat
 - Jos kuva on epäselvä tai et pysty tunnistamaan sisältöä, kysy tarkentavia kysymyksiä
@@ -133,6 +169,7 @@ Tärkeää:
     const parsed = JSON.parse(raw) as {
       reply: string;
       materialNames: string[];
+      fieldSelections?: { fieldId: string; values: string[] }[];
       preparationTips: { materialName: string; tip: string }[];
     };
 
@@ -144,9 +181,23 @@ Tärkeää:
       )
       .map((m) => m.code);
 
+    // Resolve field string values → indices
+    const suggestedFieldValues: Record<string, number[]> = {};
+    for (const sel of parsed.fieldSelections ?? []) {
+      const field = multiSelectFields.find((f) => f.id === sel.fieldId);
+      if (!field) continue;
+      const indices = sel.values
+        .map((v) => field.choices.findIndex(
+          (c) => c.toLowerCase().trim() === v.toLowerCase().trim()
+        ))
+        .filter((i) => i >= 0);
+      if (indices.length > 0) suggestedFieldValues[sel.fieldId] = indices;
+    }
+
     return NextResponse.json({
       reply: parsed.reply ?? "",
       suggestedCodes,
+      suggestedFieldValues,
       preparationTips: parsed.preparationTips ?? [],
     });
   } catch (err) {
