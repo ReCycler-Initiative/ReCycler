@@ -26,34 +26,58 @@ export async function GET(
     return authResult.response!;
   }
 
-  const row = (
+  const rows = (
     await db.raw(
       `
         SELECT
           l.id,
           l.name,
-          ST_AsGeoJSON(l.geom)::jsonb as geom
+          ST_AsGeoJSON(l.geom)::jsonb as geom,
+          f.id         AS field_id,
+          f.name       AS field_name,
+          f.field_type,
+          f.options,
+          f.required,
+          f.order      AS field_order,
+          lf.value     AS field_value
         FROM recycler.locations l
         INNER JOIN recycler.use_cases uc ON l.use_case_id = uc.id
+        LEFT JOIN recycler.fields f ON f.use_case_id = uc.id
+        LEFT JOIN recycler.location_fields lf
+          ON lf.location_id = l.id AND lf.field_id = f.id
         WHERE uc.organization_id = ?::uuid
           AND uc.id = ?::uuid
           AND l.id = ?::uuid
-        LIMIT 1;
+        ORDER BY f.order;
       `,
       [organizationId, useCaseId, locationId]
     )
-  ).rows[0];
+  ).rows;
 
-  if (!row) {
+  if (!rows.length) {
     return NextResponse.json({ error: "Location not found" }, { status: 404 });
   }
 
+  const first = rows[0];
+  const fields = rows
+    .filter((r: any) => r.field_id)
+    .map((r: any) => ({
+      id: r.field_id,
+      name: r.field_name,
+      field_type: r.field_type,
+      options: r.options,
+      required: r.required ?? false,
+      order: r.field_order,
+      value: r.field_value ?? [],
+    }));
+
   return NextResponse.json({
     type: "Feature" as const,
-    geometry: row.geom,
+    geometry: first.geom,
     properties: {
-      id: row.id,
-      name: row.name,
+      id: first.id,
+      name: first.name,
+      fields,
     },
   });
 }

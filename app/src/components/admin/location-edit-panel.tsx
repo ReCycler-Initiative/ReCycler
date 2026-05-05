@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Crosshair, MoreHorizontal, Trash2, X } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -58,6 +59,7 @@ export const LocationEditPanel = (props: LocationEditPanelProps) => {
   const [latitude, setLatitude] = useState(
     props.mode === "add" ? String(props.lngLat.latitude) : ""
   );
+  const [fieldValues, setFieldValues] = useState<Record<string, string[]>>({});
 
   // Snapshot coords when relocate activates so cancel can restore them
   const savedLngLat = useRef<{ longitude: string; latitude: string } | null>(null);
@@ -80,6 +82,11 @@ export const LocationEditPanel = (props: LocationEditPanelProps) => {
     setName(data.properties.name);
     setLongitude(String(data.geometry.coordinates[0]));
     setLatitude(String(data.geometry.coordinates[1]));
+    const initial: Record<string, string[]> = {};
+    for (const f of data.properties.fields) {
+      initial[f.id] = f.value;
+    }
+    setFieldValues(initial);
   }, [data, props.mode]);
 
   const mutation = useMutation({
@@ -95,6 +102,10 @@ export const LocationEditPanel = (props: LocationEditPanelProps) => {
         name: name.trim(),
         longitude: parseFloat(longitude),
         latitude: parseFloat(latitude),
+        fieldValues: Object.entries(fieldValues).map(([fieldId, values]) => ({
+          fieldId,
+          values,
+        })),
       });
     },
     onSuccess: async (result) => {
@@ -220,6 +231,61 @@ export const LocationEditPanel = (props: LocationEditPanelProps) => {
                 </div>
               </div>
             </div>
+
+            {props.mode === "edit" && data?.properties.fields.map((field) => (
+              <div key={field.id} className="space-y-2">
+                <Label>
+                  {field.name}
+                  {field.required && <span className="text-destructive ml-1">*</span>}
+                </Label>
+
+                {field.field_type === "multi_select" && (
+                  <div className="space-y-1.5">
+                    {field.options?.choices?.map((choice) => {
+                      const checked = (fieldValues[field.id] ?? []).includes(choice);
+                      return (
+                        <div key={choice} className="flex items-center gap-2">
+                          <Checkbox
+                            id={`${field.id}-${choice}`}
+                            checked={checked}
+                            onCheckedChange={(v) =>
+                              setFieldValues((prev) => {
+                                const current = prev[field.id] ?? [];
+                                return {
+                                  ...prev,
+                                  [field.id]: v
+                                    ? [...current, choice]
+                                    : current.filter((c) => c !== choice),
+                                };
+                              })
+                            }
+                          />
+                          <label
+                            htmlFor={`${field.id}-${choice}`}
+                            className="text-sm cursor-pointer"
+                          >
+                            {choice}
+                          </label>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+
+                {field.field_type === "text_input" && (
+                  <Input
+                    value={(fieldValues[field.id] ?? [])[0] ?? ""}
+                    placeholder={field.options?.placeholder ?? ""}
+                    onChange={(e) =>
+                      setFieldValues((prev) => ({
+                        ...prev,
+                        [field.id]: e.target.value ? [e.target.value] : [],
+                      }))
+                    }
+                  />
+                )}
+              </div>
+            ))}
 
             {onToggleRelocate && (
               <div className="space-y-2">
