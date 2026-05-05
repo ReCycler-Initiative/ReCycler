@@ -25,6 +25,8 @@ type PendingImage = { base64: string; mimeType: string; previewUrl: string };
 export const AiMaterialPrompt = ({
   selectedCodes,
   onSelectedCodesChange,
+  selectedFieldValues = {},
+  onSelectedFieldValuesChange,
   organizationId,
   useCaseId,
   ctaText = "Näytä kohteet",
@@ -32,6 +34,8 @@ export const AiMaterialPrompt = ({
 }: {
   selectedCodes: number[];
   onSelectedCodesChange: (codes: number[]) => void;
+  selectedFieldValues?: Record<string, number[]>;
+  onSelectedFieldValuesChange?: (values: Record<string, number[]>) => void;
   organizationId?: string;
   useCaseId?: string;
   ctaText?: string;
@@ -72,11 +76,18 @@ export const AiMaterialPrompt = ({
     });
 
   const resultsBaseHref = resultsBasePath ?? "/recycler/results";
-  const resultsHref = selectedCodes.length
-    ? `${resultsBaseHref}?materials=${encodeURIComponent(
-        selectedCodes.join(",")
-      )}`
-    : resultsBaseHref;
+
+  const buildResultsHref = () => {
+    const params = new URLSearchParams();
+    if (selectedCodes.length) params.set("materials", selectedCodes.join(","));
+    for (const [fieldId, indices] of Object.entries(selectedFieldValues)) {
+      if (indices.length) params.set(`field_${fieldId}`, indices.join(","));
+    }
+    const query = params.toString();
+    return query ? `${resultsBaseHref}?${query}` : resultsBaseHref;
+  };
+
+  const resultsHref = buildResultsHref();
 
   const removeCartMaterial = (materialCode: number) => {
     onSelectedCodesChange(
@@ -109,6 +120,9 @@ export const AiMaterialPrompt = ({
         setMessages([{ role: "assistant", content: res.reply }]);
         if (selectedCodesRef.current.length === 0) {
           onSelectedCodesChange(res.suggestedCodes);
+        }
+        if (onSelectedFieldValuesChange && Object.keys(res.suggestedFieldValues ?? {}).length > 0) {
+          onSelectedFieldValuesChange(res.suggestedFieldValues);
         }
         setPreparationTips(res.preparationTips);
       })
@@ -269,6 +283,9 @@ export const AiMaterialPrompt = ({
       });
       setMessages([...newMessages, { role: "assistant", content: res.reply }]);
       onSelectedCodesChange(res.suggestedCodes);
+      if (onSelectedFieldValuesChange) {
+        onSelectedFieldValuesChange(res.suggestedFieldValues ?? {});
+      }
       setPreparationTips(res.preparationTips);
     } catch {
       setMessages([

@@ -95,6 +95,8 @@ export const MaterialsPageContent = ({
           <AiMaterialPrompt
             selectedCodes={selectedCodes}
             onSelectedCodesChange={setSelectedCodes}
+            selectedFieldValues={selectedFieldValues}
+            onSelectedFieldValuesChange={setSelectedFieldValues}
             organizationId={organizationId}
             useCaseId={useCaseId}
             ctaText={ctaText}

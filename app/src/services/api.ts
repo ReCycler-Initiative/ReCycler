@@ -35,7 +35,7 @@ export const chat = async ({
   useCaseId?: string;
 }): Promise<ChatResponse> =>
   axios
-    .post("/api/chat", { message, history, imageBase64, imageMimeType, useCaseId })
+    .post("/api/chat", { message, history, imageBase64, imageMimeType, organizationId, useCaseId })
     .then((response) => response.data);
 
 export const getLocations = (
