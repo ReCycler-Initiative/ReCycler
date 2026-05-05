@@ -20,6 +20,8 @@ import {
   useSearchParams
 } from "next/navigation";
 import { Suspense, useCallback, useEffect, useRef, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { getFields } from "@/services/api";
 import Map, {
   CircleLayer,
   FullscreenControl,
@@ -212,6 +214,40 @@ const filterFeaturesBySelectedMaterials = (
   };
 };
 
+// Filter features by field-based selections — indices resolved to string values via fieldChoices
+const filterFeaturesByFieldValues = (
+  fieldFilters: Record<string, number[]>,
+  fieldChoices: Record<string, string[]>,
+  collectionSpots: GeoJSON.FeatureCollection<GeoJSON.Geometry>
+): GeoJSON.FeatureCollection<GeoJSON.Geometry> => {
+  const activeFilters = Object.entries(fieldFilters).filter(([, indices]) => indices.length > 0);
+  if (activeFilters.length === 0) return collectionSpots;
+
+  const features = collectionSpots.features?.filter((feature: any) => {
+    const fields = parseFeatureFields(feature.properties?.fields);
+    return activeFilters.every(([fieldId, selectedIndices]) => {
+      const field = fields.find((f) => f.id === fieldId);
+      if (!field) return false;
+      const choices = fieldChoices[fieldId] ?? [];
+      const selectedValues = selectedIndices.map((i) => choices[i]).filter(Boolean);
+      return selectedValues.some((v) => field.value.includes(v));
+    });
+  });
+
+  return { ...collectionSpots, features };
+};
+
+// Apply both legacy material filter and field-based filter (AND between the two)
+const applyAllFilters = (
+  materials: number[],
+  fieldFilters: Record<string, number[]>,
+  fieldChoices: Record<string, string[]>,
+  geoJson: GeoJSON.FeatureCollection<GeoJSON.Geometry>
+): GeoJSON.FeatureCollection<GeoJSON.Geometry> => {
+  const afterMaterials = filterFeaturesBySelectedMaterials(materials, geoJson);
+  return filterFeaturesByFieldValues(fieldFilters, fieldChoices, afterMaterials);
+};
+
 type LocationsMapProps = {
   geoJson: GeoJSON.FeatureCollection<GeoJSON.Geometry> | null;
 };
@@ -228,6 +264,30 @@ export default function LocationsMap({ geoJson }: LocationsMapProps) {
   const materialsParam = searchParams.get("materials") ?? "";
   const selectedMaterials =
     materialsParam.split(",").filter(Boolean).map((code) => +code) || [];
+
+  // Parse field_<fieldId> URL params into a Record (values are indices)
+  const selectedFieldFilters: Record<string, number[]> = {};
+  searchParams.forEach((value, key) => {
+    if (key.startsWith("field_")) {
+      const fieldId = key.slice("field_".length);
+      selectedFieldFilters[fieldId] = value.split(",").filter(Boolean).map(Number);
+    }
+  });
+
+  const { data: fieldsData } = useQuery({
+    queryKey: ["fields", params.organizationId, params.useCaseId],
+    queryFn: () => getFields(params.organizationId!, params.useCaseId!),
+    enabled: !!(params.organizationId && params.useCaseId),
+    staleTime: Infinity,
+  });
+
+  const fieldChoices: Record<string, string[]> = {};
+  for (const f of fieldsData ?? []) {
+    if (f.field_type === "multi_select") {
+      fieldChoices[f.id] = f.options?.choices ?? [];
+    }
+  }
+
   const [showMaterials, setShowMaterials] = useState(false);
 
   useEffect(() => {
@@ -341,7 +401,10 @@ export default function LocationsMap({ geoJson }: LocationsMapProps) {
           <OnboardingHint />
 
           <SelectedMaterialsControl
-            amount={selectedMaterials.length}
+            amount={
+              selectedMaterials.length +
+              Object.values(selectedFieldFilters).reduce((sum, vals) => sum + vals.length, 0)
+            }
             onClick={() => setShowMaterials(true)}
           />
           <NavigationControl position="top-right" />
@@ -360,8 +423,10 @@ export default function LocationsMap({ geoJson }: LocationsMapProps) {
                 <Source
                   id="collection_spots"
                   type="geojson"
-                  data={filterFeaturesBySelectedMaterials(
+                  data={applyAllFilters(
                     selectedMaterials,
+                    selectedFieldFilters,
+                    fieldChoices,
                     geoJson
                   )}
                   cluster
@@ -480,6 +545,7 @@ export default function LocationsMap({ geoJson }: LocationsMapProps) {
             <div className="max-h-[500px] overflow-y-auto">
               <MaterialsPageContent
                 initialSelectedCodes={selectedMaterials}
+                initialSelectedFieldValues={selectedFieldFilters}
                 organizationId={params.organizationId}
                 useCaseId={params.useCaseId}
                 resultsBasePath={pathname}
