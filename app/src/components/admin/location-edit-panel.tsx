@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { createLocation, getLocation, updateLocation } from "@/services/api";
+import { createLocation, getFields, getLocation, updateLocation } from "@/services/api";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -52,6 +52,12 @@ export const LocationEditPanel = (props: LocationEditPanelProps) => {
     enabled: props.mode === "edit",
   });
 
+  const { data: fieldsDefinitions } = useQuery({
+    queryKey: ["fields", organizationId, useCaseId],
+    queryFn: () => getFields(organizationId, useCaseId),
+    staleTime: Infinity,
+  });
+
   const [name, setName] = useState("");
   const [longitude, setLongitude] = useState(
     props.mode === "add" ? String(props.lngLat.longitude) : ""
@@ -90,13 +96,27 @@ export const LocationEditPanel = (props: LocationEditPanelProps) => {
   }, [data, props.mode]);
 
   const mutation = useMutation({
-    mutationFn: () => {
+    mutationFn: async () => {
       if (props.mode === "add") {
-        return createLocation(organizationId, useCaseId, {
+        const created = await createLocation(organizationId, useCaseId, {
           name: name.trim(),
           longitude: parseFloat(longitude),
           latitude: parseFloat(latitude),
         });
+        const newId = created?.properties?.id;
+        const hasFieldValues = Object.values(fieldValues).some((v) => v.length > 0);
+        if (newId && hasFieldValues) {
+          await updateLocation(organizationId, useCaseId, newId, {
+            name: name.trim(),
+            longitude: parseFloat(longitude),
+            latitude: parseFloat(latitude),
+            fieldValues: Object.entries(fieldValues).map(([fieldId, values]) => ({
+              fieldId,
+              values,
+            })),
+          });
+        }
+        return created;
       }
       return updateLocation(organizationId, useCaseId, locationId!, {
         name: name.trim(),
@@ -232,16 +252,21 @@ export const LocationEditPanel = (props: LocationEditPanelProps) => {
               </div>
             </div>
 
-            {props.mode === "edit" && data?.properties.fields.map((field) => (
+            {(fieldsDefinitions ?? []).map((field) => {
+              const existingField = data?.properties.fields.find((f) => f.id === field.id);
+              const choices = existingField?.options?.choices ?? field.options?.choices ?? [];
+              const placeholder = existingField?.options?.placeholder ?? field.options?.placeholder ?? "";
+              const required = existingField?.required ?? field.required;
+              return (
               <div key={field.id} className="space-y-2">
                 <Label>
                   {field.name}
-                  {field.required && <span className="text-destructive ml-1">*</span>}
+                  {required && <span className="text-destructive ml-1">*</span>}
                 </Label>
 
                 {field.field_type === "multi_select" && (
                   <div className="space-y-1.5">
-                    {field.options?.choices?.map((choice) => {
+                    {choices.map((choice) => {
                       const checked = (fieldValues[field.id] ?? []).includes(choice);
                       return (
                         <div key={choice} className="flex items-center gap-2">
@@ -275,7 +300,7 @@ export const LocationEditPanel = (props: LocationEditPanelProps) => {
                 {field.field_type === "text_input" && (
                   <Input
                     value={(fieldValues[field.id] ?? [])[0] ?? ""}
-                    placeholder={field.options?.placeholder ?? ""}
+                    placeholder={placeholder}
                     onChange={(e) =>
                       setFieldValues((prev) => ({
                         ...prev,
@@ -285,7 +310,8 @@ export const LocationEditPanel = (props: LocationEditPanelProps) => {
                   />
                 )}
               </div>
-            ))}
+              );
+            })}
 
             {onToggleRelocate && (
               <div className="space-y-2">
