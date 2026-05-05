@@ -2,7 +2,6 @@
 
 import GeocoderControl from "@/components/geocoder-control";
 import { MapStyleControl } from "@/components/map-style-control";
-import PopupEditText from "@/components/map/popup-edit-text";
 import { MaterialsPageContent } from "@/components/materials-page";
 import { SelectedMaterialsControl } from "@/components/selected-materials-control";
 import { Button } from "@/components/ui/button";
@@ -12,7 +11,6 @@ import {
 } from "@/components/ui/drawer";
 import OnboardingHint from "@/components/ui/onboarding-hint";
 import { Material } from "@/types";
-import { useUser } from "@auth0/nextjs-auth0";
 import { Loader2Icon, MapPinned } from "lucide-react";
 import { GeolocateControl as TGeolocateControl } from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
@@ -139,6 +137,20 @@ const clusterCount: SymbolLayer = {
   },
 };
 
+type PopupField = { id: string; name: string; field_type: string; order: number | null; value: string[] };
+
+const parseFeatureFields = (rawFields: unknown): PopupField[] => {
+  if (!rawFields) return [];
+  if (Array.isArray(rawFields)) return rawFields as PopupField[];
+  if (typeof rawFields !== "string") return [];
+  try {
+    const parsed = JSON.parse(rawFields);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+};
+
 // Helper to filter features based on selected materials
 const parseFeatureMaterials = (rawMaterials: unknown): Material[] => {
   if (!rawMaterials) {
@@ -205,7 +217,6 @@ type LocationsMapProps = {
 };
 
 export default function LocationsMap({ geoJson }: LocationsMapProps) {
-  const { user } = useUser();
   const [mapLoaded, setMapLoaded] = useState(false);
   const [styleLoaded, setStyleLoaded] = useState(true);
   const [details, setDetails] = useState<MapboxGeoJSONFeature | null>(null);
@@ -378,15 +389,17 @@ export default function LocationsMap({ geoJson }: LocationsMapProps) {
                     <h2 className="text-base font-semibold mb-1">
                       {details.properties?.name}
                     </h2>
-                    <div className="flex gap-2 justify-between">
-                      <address className="text-sm text-gray-900 not-italic flex flex-col leading-5 ">
-                        {details.properties?.address}
-                        <span>
-                          {details.properties?.postal_code}{" "}
-                          {details.properties?.post_office}
-                        </span>
-                      </address>
-                    </div>
+                    {(details.properties?.address || details.properties?.postal_code || details.properties?.post_office) && (
+                      <div className="flex gap-2 justify-between">
+                        <address className="text-sm text-gray-900 not-italic flex flex-col leading-5 ">
+                          {details.properties?.address}
+                          <span>
+                            {details.properties?.postal_code}{" "}
+                            {details.properties?.post_office}
+                          </span>
+                        </address>
+                      </div>
+                    )}
                   </div>
                   {details.properties?.opening_hours_fi && (
                     <div className="p-3 border-b">
@@ -398,22 +411,38 @@ export default function LocationsMap({ geoJson }: LocationsMapProps) {
                       />
                     </div>
                   )}
-                  <ul className="text-sm p-3 leading-6 list-disc columns-2">
-                    {parseFeatureMaterials(details.properties?.materials)
-                      .sort((a: Material, b: Material) =>
-                        a.name.localeCompare(b.name)
-                      )
-                      .map((material: Material) => (
-                        <li key={material.code} className="ml-4">
-                          {material.name}
-                        </li>
-                      ))}
-                  </ul>
-                  {user && (
-                    <div className="p-3 border-t">
-                      <PopupEditText />
-                    </div>
+                  {parseFeatureMaterials(details.properties?.materials).length > 0 && (
+                    <ul className="text-sm p-3 leading-6 list-disc columns-2">
+                      {parseFeatureMaterials(details.properties?.materials)
+                        .sort((a: Material, b: Material) =>
+                          a.name.localeCompare(b.name)
+                        )
+                        .map((material: Material) => (
+                          <li key={material.code} className="ml-4">
+                            {material.name}
+                          </li>
+                        ))}
+                    </ul>
                   )}
+                  {parseFeatureFields(details.properties?.fields)
+                    .sort((a, b) => (a.order ?? 999) - (b.order ?? 999))
+                    .filter((field) => field.value.length > 0)
+                    .map((field) => (
+                      <div key={field.id} className="p-3 border-b">
+                        <h3 className="text-xs font-medium text-muted-foreground mb-1">{field.name}</h3>
+                        {field.field_type === "multi_select" ? (
+                          <ul className="text-sm leading-6 list-disc columns-2">
+                            {[...field.value]
+                              .sort((a, b) => a.localeCompare(b, "fi"))
+                              .map((v) => (
+                                <li key={v} className="ml-4">{v}</li>
+                              ))}
+                          </ul>
+                        ) : (
+                          <p className="text-sm">{field.value.join(", ")}</p>
+                        )}
+                      </div>
+                    ))}
                   <div className="text-center border-t">
                     <Button
                       className="text-[#ff1312] text-sm w-full"
