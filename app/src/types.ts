@@ -93,6 +93,7 @@ export const LocationDetail = z.object({
   properties: z.object({
     id: z.string().uuid(),
     name: z.string(),
+    fields: z.array(LocationDetailField),
   }),
 });
 
