@@ -2,6 +2,7 @@ import {
   ChatResponse,
   CreateOrganizationRequest,
   CreateOrganizationResponse,
+  FieldRecord,
   LocationDetail,
   LocationGeoJsonCollection,
   Material,
@@ -199,4 +200,83 @@ export const deleteUseCaseTrainingMaterial = (
     )
     .then(() => undefined);
 
+type FieldBody = {
+  name: string;
+  field_type: string;
+  required: boolean;
+  options?: {
+    choices?: string[];
+    placeholder?: string;
+    helpText?: string;
+  } | null;
+};
+
+export const getFields = (
+  organizationId: string,
+  useCaseId: string
+): Promise<z.infer<typeof FieldRecord>[]> =>
+  axios
+    .get(
+      `/api/organizations/${organizationId}/use_cases/${useCaseId}/fields`
+    )
+    .then((response) => z.array(FieldRecord).parse(response.data));
+
+export const getField = (
+  organizationId: string,
+  useCaseId: string,
+  fieldId: string
+): Promise<z.infer<typeof FieldRecord>> =>
+  axios
+    .get(
+      `/api/organizations/${organizationId}/use_cases/${useCaseId}/fields/${fieldId}`
+    )
+    .then((response) => FieldRecord.parse(response.data));
+
+export const createField = (
+  organizationId: string,
+  useCaseId: string,
+  data: FieldBody
+): Promise<z.infer<typeof FieldRecord>> =>
+  axios
+    .post(
+      `/api/organizations/${organizationId}/use_cases/${useCaseId}/fields`,
+      data
+    )
+    .then((response) => FieldRecord.parse(response.data));
+
+export const updateField = (
+  organizationId: string,
+  useCaseId: string,
+  fieldId: string,
+  data: FieldBody
+): Promise<z.infer<typeof FieldRecord>> =>
+  axios
+    .put(
+      `/api/organizations/${organizationId}/use_cases/${useCaseId}/fields/${fieldId}`,
+      data
+    )
+    .then((response) => FieldRecord.parse(response.data));
+
+export const deleteField = (
+  organizationId: string,
+  useCaseId: string,
+  fieldId: string
+): Promise<void> =>
+  axios
+    .delete(
+      `/api/organizations/${organizationId}/use_cases/${useCaseId}/fields/${fieldId}`
+    )
+    .then(() => undefined);
+
+export const reorderFields = (
+  organizationId: string,
+  useCaseId: string,
+  order: { id: string; order: number }[]
+): Promise<void> =>
+  axios
+    .patch(
+      `/api/organizations/${organizationId}/use_cases/${useCaseId}/fields/reorder`,
+      order
+    )
+    .then(() => undefined);
 
