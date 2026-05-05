@@ -130,20 +130,14 @@ export async function PUT(
       [locationId]
     );
 
-    const insertRows = fieldValues.flatMap(({ fieldId, values }) =>
-      values.map((value) => ({ fieldId, value }))
+    await db("recycler.location_fields").insert(
+      fieldValues.map(({ fieldId, values }) => ({
+        id: db.raw("uuid_generate_v4()"),
+        location_id: locationId,
+        field_id: fieldId,
+        value: JSON.stringify(values),
+      }))
     );
-
-    if (insertRows.length > 0) {
-      await db("recycler.location_fields").insert(
-        insertRows.map(({ fieldId, value }) => ({
-          id: db.raw("uuid_generate_v4()"),
-          location_id: locationId,
-          field_id: fieldId,
-          value,
-        }))
-      );
-    }
   }
 
   return NextResponse.json({ ok: true });
