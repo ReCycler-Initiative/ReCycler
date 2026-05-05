@@ -5,6 +5,11 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import {
   Select,
   SelectContent,
   SelectItem,
@@ -14,7 +19,9 @@ import {
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Plus, Trash2 } from "lucide-react";
 import Link from "next/link";
-import { useFieldArray, useForm } from "react-hook-form";
+import { useEffect, useRef, useState } from "react";
+import { HexColorPicker } from "react-colorful";
+import { useFieldArray, useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
 
 const FieldFormSchema = z.object({
@@ -22,6 +29,7 @@ const FieldFormSchema = z.object({
   field_type: z.union([z.literal("multi_select"), z.literal("text_input")]),
   required: z.boolean(),
   choices: z.array(z.object({ value: z.string() })),
+  choiceColors: z.record(z.string()),
   placeholder: z.string(),
   helpText: z.string(),
 });
@@ -33,6 +41,7 @@ export type FieldFormDefaultValues = {
   field_type?: "multi_select" | "text_input";
   required?: boolean;
   choices?: string[];
+  choiceColors?: Record<string, string>;
   placeholder?: string;
   helpText?: string;
 };
@@ -45,6 +54,9 @@ export const toApiData = (values: FieldFormValues) => ({
     values.field_type === "multi_select"
       ? {
           choices: values.choices.map((c) => c.value).filter(Boolean),
+          ...(Object.keys(values.choiceColors).length
+            ? { choiceColors: values.choiceColors }
+            : {}),
           ...(values.placeholder ? { placeholder: values.placeholder } : {}),
           ...(values.helpText ? { helpText: values.helpText } : {}),
         }
@@ -62,10 +74,92 @@ export const useFieldForm = (defaults?: FieldFormDefaultValues) =>
       field_type: defaults?.field_type ?? "text_input",
       required: defaults?.required ?? false,
       choices: (defaults?.choices ?? []).map((v) => ({ value: v })),
+      choiceColors: defaults?.choiceColors ?? {},
       placeholder: defaults?.placeholder ?? "",
       helpText: defaults?.helpText ?? "",
     },
   });
+
+const ColorPickerPopover = ({
+  currentColor,
+  containerRef,
+  onColorChange,
+  onRemove,
+}: {
+  currentColor: string;
+  containerRef: React.RefObject<HTMLDivElement | null>;
+  onColorChange: (color: string) => void;
+  onRemove?: () => void;
+}) => {
+  const [open, setOpen] = useState(false);
+  const [localColor, setLocalColor] = useState(currentColor || "#000000");
+
+  // Sync local color when popover opens or currentColor changes externally
+  useEffect(() => {
+    setLocalColor(currentColor || "#000000");
+  }, [currentColor, open]);
+
+  return (
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <button
+          type="button"
+          title={currentColor || "Valitse v\u00e4ri"}
+          className="w-7 h-7 rounded-full border-2 shrink-0 transition-transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-ring"
+          style={{
+            backgroundColor: currentColor || "#e5e7eb",
+            borderColor: currentColor || "#d1d5db",
+          }}
+        />
+      </PopoverTrigger>
+      <PopoverContent
+        className="w-auto p-3 space-y-3"
+        align="start"
+        container={containerRef.current}
+        onInteractOutside={(e) => e.preventDefault()}
+      >
+        <div onPointerDown={(e) => e.stopPropagation()}>
+          <HexColorPicker color={localColor} onChange={setLocalColor} />
+        </div>
+        <div className="flex items-center gap-2">
+          <div
+            className="w-6 h-6 rounded-full border shrink-0"
+            style={{ backgroundColor: localColor }}
+          />
+          <span className="text-xs font-mono text-muted-foreground">
+            {localColor}
+          </span>
+          {onRemove && (
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              className="ml-auto text-muted-foreground h-7 px-2"
+              onClick={() => {
+                onRemove();
+                setOpen(false);
+              }}
+            >
+              Poista
+            </Button>
+          )}
+        </div>
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          className="w-full"
+          onClick={() => {
+            onColorChange(localColor);
+            setOpen(false);
+          }}
+        >
+          Valmis
+        </Button>
+      </PopoverContent>
+    </Popover>
+  );
+};
 
 export const FieldFormContent = ({
   form,
@@ -80,17 +174,33 @@ export const FieldFormContent = ({
   isPending: boolean;
   onSubmit: (values: FieldFormValues) => void;
 }) => {
-  const { register, watch, setValue, control, handleSubmit, formState } = form;
-  const fieldType = watch("field_type");
-  const required = watch("required");
+  const {
+    register,
+    setValue,
+    getValues,
+    control,
+    handleSubmit,
+    formState,
+  } = form;
 
-  const { fields: choiceFields, append, remove } = useFieldArray({
+  const fieldType = useWatch({ control, name: "field_type" });
+  const required = useWatch({ control, name: "required" });
+  const choiceColors = useWatch({ control, name: "choiceColors" }) ?? {};
+  const choices = useWatch({ control, name: "choices" }) ?? [];
+  const popoverContainerRef = useRef<HTMLDivElement>(null);
+
+  const {
+    fields: choiceFields,
+    append,
+    remove,
+  } = useFieldArray({
     control,
     name: "choices",
   });
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 max-w-xl">
+      <div ref={popoverContainerRef} />
       {/* Name */}
       <div className="space-y-1.5">
         <Label htmlFor="field-name">Nimi</Label>
@@ -143,24 +253,68 @@ export const FieldFormContent = ({
         <div className="space-y-2">
           <Label>Vaihtoehdot</Label>
           <div className="space-y-2">
-            {choiceFields.map((field, index) => (
-              <div key={field.id} className="flex gap-2">
-                <Input
-                  {...register(`choices.${index}.value`)}
-                  placeholder={`Vaihtoehto ${index + 1}`}
-                />
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon"
-                  className="shrink-0 text-muted-foreground hover:text-destructive"
-                  onClick={() => remove(index)}
-                  aria-label="Poista vaihtoehto"
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
-              </div>
-            ))}
+            {choiceFields.map((field, index) => {
+              const choiceValue = choices[index]?.value ?? "";
+              const currentColor = choiceColors[choiceValue] ?? "";
+
+              return (
+                <div key={field.id} className="flex gap-2 items-center">
+                  <Input
+                    {...register(`choices.${index}.value`)}
+                    placeholder={`Vaihtoehto ${index + 1}`}
+                  />
+                  <ColorPickerPopover
+                    currentColor={currentColor}
+                    containerRef={popoverContainerRef}
+                    onColorChange={(color) => {
+                      if (!choiceValue) return;
+                      const current = getValues("choiceColors") ?? {};
+                      
+                      setValue(
+                        "choiceColors",
+                        {
+                          ...current,
+                          [choiceValue]: color,
+                        },
+                        { shouldDirty: true }
+                      );
+                    }}
+                    onRemove={
+                      currentColor
+                        ? () => {
+                            if (!choiceValue) return;
+                            const current = getValues("choiceColors") ?? {};
+                            const next = { ...current };
+                            delete next[choiceValue];
+                            setValue("choiceColors", next, {
+                              shouldDirty: true,
+                            });
+                          }
+                        : undefined
+                    }
+                  />
+
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    className="shrink-0 text-muted-foreground hover:text-destructive"
+                    onClick={() => {
+                      const key = choiceValue;
+                      if (key) {
+                        const next = { ...choiceColors };
+                        delete next[key];
+                        setValue("choiceColors", next, { shouldDirty: true });
+                      }
+                      remove(index);
+                    }}
+                    aria-label="Poista vaihtoehto"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
+              );
+            })}
           </div>
           <Button
             type="button"

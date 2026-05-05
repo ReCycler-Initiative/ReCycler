@@ -72,6 +72,7 @@ export default function FieldsPage() {
       field_type: field.field_type,
       required: field.required ?? false,
       choices: (field.options?.choices ?? []).map((v) => ({ value: v })),
+      choiceColors: field.options?.choiceColors ?? {},
       placeholder: field.options?.placeholder ?? "",
       helpText: field.options?.helpText ?? "",
     });
