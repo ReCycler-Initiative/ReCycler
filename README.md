@@ -17,11 +17,12 @@ The current development demo (www.recyclerapp.fi) showcases recycling collection
 
 The development of these capabilities is ongoing during H1/2026. This includes the implementation of comprehensive user management and administrative tools that allow organizations to:
 
-- create and manage their own use cases,
-- define organization- and use case–specific configurations,
-- manage users, roles, and access rights securely, and
-- ensure clear separation and governance across organizations and domains.
-- [Auth0](https://auth0.com/) is utilized as the identity and access management (IAM) solution
+
+- Define organization- and use case–specific configurations
+- Add and maintain target objects (e.g, Collection spots) and their metadata (attributes)
+- Establish connections to new data sources using data connectors
+- Manage users, roles, and access rights securely
+- Auth0 is utilized as the identity and access management (IAM) solution.
 
 A demo of the multi-organization and multi–use case development version will be released once the required user interface components supporting these generic management capabilities have reached a sufficient level of maturity.
 
