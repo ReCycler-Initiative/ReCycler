@@ -7,8 +7,15 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Crosshair, MoreHorizontal, Trash2, X } from "lucide-react";
+import { Crosshair, Loader2, LocateFixed, MoreHorizontal, Trash2, X } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -66,6 +73,40 @@ export const LocationEditPanel = (props: LocationEditPanelProps) => {
     props.mode === "add" ? String(props.lngLat.latitude) : ""
   );
   const [fieldValues, setFieldValues] = useState<Record<string, string[]>>({});
+  const [isGeocodingAddress, setIsGeocodingAddress] = useState(false);
+  const [pendingGeocode, setPendingGeocode] = useState<{
+    fieldId: string;
+    values: [string, string, string];
+  } | null>(null);
+
+  const geocodeFromCoordinates = async (fieldId: string, lng: number, lat: number) => {
+    const token = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
+    if (!token) return;
+    setIsGeocodingAddress(true);
+    try {
+      const r = await fetch(
+        `https://api.mapbox.com/geocoding/v5/mapbox.places/${lng},${lat}.json?types=address&language=fi&access_token=${token}`
+      );
+      const json = await r.json();
+      const feature = json.features?.[0];
+      if (!feature) {
+        toast.error("Osoitetta ei löytynyt");
+        return;
+      }
+      const street = feature.address
+        ? `${feature.text} ${feature.address}`
+        : (feature.text ?? "");
+      const postalCode =
+        feature.context?.find((c: { id: string; text: string }) => c.id.startsWith("postcode"))?.text ?? "";
+      const city =
+        feature.context?.find((c: { id: string; text: string }) => c.id.startsWith("place"))?.text ?? "";
+      setPendingGeocode({ fieldId, values: [street, postalCode, city] });
+    } catch {
+      toast.error("Osoitteen haku epäonnistui");
+    } finally {
+      setIsGeocodingAddress(false);
+    }
+  };
 
   // Snapshot coords when relocate activates so cancel can restore them
   const savedLngLat = useRef<{ longitude: string; latitude: string } | null>(null);
@@ -162,6 +203,7 @@ export const LocationEditPanel = (props: LocationEditPanelProps) => {
       : (data?.properties.name ?? "Muokkaa kohdetta");
 
   return (
+    <>
     <div className="flex flex-col h-full bg-white border border-gray-200 rounded-xl overflow-hidden">
       {/* Header */}
       <div className="flex items-center justify-between gap-2 px-4 py-3 border-b border-gray-200 shrink-0">
@@ -312,16 +354,34 @@ export const LocationEditPanel = (props: LocationEditPanelProps) => {
 
                 {field.field_type === "address" && (
                   <div className="space-y-2">
-                    <Input
-                      value={(fieldValues[field.id] ?? [])[0] ?? ""}
-                      placeholder="Katuosoite"
-                      onChange={(e) =>
-                        setFieldValues((prev) => {
-                          const cur = prev[field.id] ?? ["", "", ""];
-                          return { ...prev, [field.id]: [e.target.value, cur[1] ?? "", cur[2] ?? ""] };
-                        })
-                      }
-                    />
+                    <div className="flex gap-2">
+                      <Input
+                        className="flex-1"
+                        value={(fieldValues[field.id] ?? [])[0] ?? ""}
+                        placeholder="Katuosoite"
+                        onChange={(e) =>
+                          setFieldValues((prev) => {
+                            const cur = prev[field.id] ?? ["", "", ""];
+                            return { ...prev, [field.id]: [e.target.value, cur[1] ?? "", cur[2] ?? ""] };
+                          })
+                        }
+                      />
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="icon"
+                        className="shrink-0"
+                        title="Hae osoite koordinaateista"
+                        disabled={isGeocodingAddress || isNaN(parseFloat(longitude)) || isNaN(parseFloat(latitude))}
+                        onClick={() => {
+                          geocodeFromCoordinates(field.id, parseFloat(longitude), parseFloat(latitude));
+                        }}
+                      >
+                        {isGeocodingAddress
+                          ? <Loader2 className="h-4 w-4 animate-spin" />
+                          : <LocateFixed className="h-4 w-4" />}
+                      </Button>
+                    </div>
                     <div className="grid grid-cols-2 gap-2">
                       <Input
                         value={(fieldValues[field.id] ?? [])[1] ?? ""}
@@ -429,5 +489,36 @@ export const LocationEditPanel = (props: LocationEditPanelProps) => {
         </div>
       )}
     </div>
+
+      {/* Geocode confirmation dialog */}
+      <Dialog open={!!pendingGeocode} onOpenChange={(open) => { if (!open) setPendingGeocode(null); }}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Päivitetäänkö osoite?</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3 text-sm">
+            <p className="text-muted-foreground">Koordinaateista löytyi seuraava osoite:</p>
+            <div className="rounded-md border border-gray-200 bg-gray-50 p-3 space-y-1">
+              <p className="font-medium">{pendingGeocode?.values[0]}</p>
+              <p className="text-muted-foreground">
+                {pendingGeocode?.values[1]}{pendingGeocode?.values[1] && pendingGeocode?.values[2] ? " " : ""}{pendingGeocode?.values[2]}
+              </p>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setPendingGeocode(null)}>Peruuta</Button>
+            <Button
+              onClick={() => {
+                if (!pendingGeocode) return;
+                setFieldValues((prev) => ({ ...prev, [pendingGeocode.fieldId]: pendingGeocode.values }));
+                setPendingGeocode(null);
+              }}
+            >
+              Päivitä osoite
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 };
