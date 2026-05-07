@@ -406,6 +406,78 @@ export const LocationEditPanel = (props: LocationEditPanelProps) => {
                     </div>
                   </div>
                 )}
+
+                {field.field_type === "opening_hours" && (() => {
+                  const DAYS = [
+                    { key: "ma", label: "Maanantai" },
+                    { key: "ti", label: "Tiistai" },
+                    { key: "ke", label: "Keskiviikko" },
+                    { key: "to", label: "Torstai" },
+                    { key: "pe", label: "Perjantai" },
+                    { key: "la", label: "Lauantai" },
+                    { key: "su", label: "Sunnuntai" },
+                  ];
+                  const entries: Record<string, { open: string; close: string } | null> = {};
+                  for (const raw of (fieldValues[field.id] ?? [])) {
+                    const parts = raw.split("|");
+                    if (parts.length === 2 && parts[1] === "closed") entries[parts[0]] = null;
+                    else if (parts.length === 3) entries[parts[0]] = { open: parts[1], close: parts[2] };
+                  }
+                  const setDay = (key: string, val: { open: string; close: string } | null) => {
+                    const next = { ...entries, [key]: val };
+                    setFieldValues((prev) => ({
+                      ...prev,
+                      [field.id]: Object.entries(next).map(([k, v]) =>
+                        v ? `${k}|${v.open}|${v.close}` : `${k}|closed`
+                      ),
+                    }));
+                  };
+                  return (
+                    <div className="space-y-2">
+                      {DAYS.map(({ key, label }) => {
+                        const val = entries[key];
+                        const isOpen = val !== null && val !== undefined;
+                        return (
+                          <div key={key} className="flex items-center gap-2">
+                            <Checkbox
+                              id={`${field.id}-${key}`}
+                              checked={isOpen}
+                              onCheckedChange={(v) =>
+                                setDay(key, v ? { open: "08:00", close: "20:00" } : null)
+                              }
+                            />
+                            <label
+                              htmlFor={`${field.id}-${key}`}
+                              className="text-sm w-24 shrink-0 cursor-pointer"
+                            >
+                              {label}
+                            </label>
+                            {isOpen && (
+                              <>
+                                <Input
+                                  type="time"
+                                  className="w-28 text-sm"
+                                  value={val!.open}
+                                  onChange={(e) => setDay(key, { open: e.target.value, close: val!.close })}
+                                />
+                                <span className="text-sm text-muted-foreground">–</span>
+                                <Input
+                                  type="time"
+                                  className="w-28 text-sm"
+                                  value={val!.close}
+                                  onChange={(e) => setDay(key, { open: val!.open, close: e.target.value })}
+                                />
+                              </>
+                            )}
+                            {!isOpen && (
+                              <span className="text-sm text-muted-foreground">Suljettu</span>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  );
+                })()}
               </div>
               );
             })}

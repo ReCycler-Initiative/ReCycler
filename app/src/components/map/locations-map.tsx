@@ -512,6 +512,27 @@ export default function LocationsMap({ geoJson }: LocationsMapProps) {
                               </p>
                             )}
                           </div>
+                        ) : field.field_type === "opening_hours" ? (
+                          <div className="text-sm space-y-0.5">
+                            {(() => {
+                              const DAY_LABELS: Record<string, string> = {
+                                ma: "Ma", ti: "Ti", ke: "Ke", to: "To", pe: "Pe", la: "La", su: "Su",
+                              };
+                              const DAY_ORDER = ["ma","ti","ke","to","pe","la","su"];
+                              const parsed = field.value.reduce<Record<string, string | null>>((acc, raw) => {
+                                const parts = raw.split("|");
+                                if (parts.length === 2 && parts[1] === "closed") acc[parts[0]] = null;
+                                else if (parts.length === 3) acc[parts[0]] = `${parts[1]}–${parts[2]}`;
+                                return acc;
+                              }, {});
+                              return DAY_ORDER.filter((k) => k in parsed).map((k) => (
+                                <div key={k} className="flex gap-2">
+                                  <span className="w-6 shrink-0 text-muted-foreground">{DAY_LABELS[k]}</span>
+                                  <span>{parsed[k] ?? "Suljettu"}</span>
+                                </div>
+                              ));
+                            })()}
+                          </div>
                         ) : (
                           <p className="text-sm">{field.value.join(", ")}</p>
                         )}
