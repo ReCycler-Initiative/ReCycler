@@ -27,6 +27,7 @@ export type ChatResponse = {
 export const FieldType = z.union([
   z.literal("multi_select"),
   z.literal("text_input"),
+  z.literal("address"),
 ]);
 
 export const FieldValue = z.array(z.string());

@@ -32,6 +32,7 @@ import { FieldRecord } from "@/types";
 const FIELD_TYPE_LABELS: Record<string, string> = {
   multi_select: "Monivalinta",
   text_input: "Tekstikenttä",
+  address: "Osoite",
 };
 
 type FieldItem = z.infer<typeof FieldRecord>;
@@ -59,6 +60,7 @@ export default function FieldsPage() {
       field_type: "text_input",
       required: false,
       choices: [],
+      choiceColors: {},
       placeholder: "",
       helpText: "",
     });
