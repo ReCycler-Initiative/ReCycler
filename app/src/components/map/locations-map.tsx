@@ -139,6 +139,21 @@ const clusterCount: SymbolLayer = {
   },
 };
 
+// Green dot (open) or gray dot (closed) above the icon — only for non-clusters with is_open set
+const openStatusLayer: CircleLayer = {
+  id: "open-status",
+  type: "circle",
+  source: "collection_spots",
+  filter: ["all", ["!", ["has", "point_count"]], ["!=", ["typeof", ["get", "is_open"]], "null"]],
+  paint: {
+    "circle-color": ["case", ["==", ["get", "is_open"], true], "#22c55e", "#9ca3af"],
+    "circle-radius": 5,
+    "circle-stroke-width": 1.5,
+    "circle-stroke-color": "#ffffff",
+    "circle-translate": [16, -16],
+  },
+};
+
 type PopupField = { id: string; name: string; field_type: string; order: number | null; value: string[] };
 
 const parseFeatureFields = (rawFields: unknown): PopupField[] => {
@@ -151,6 +166,22 @@ const parseFeatureFields = (rawFields: unknown): PopupField[] => {
   } catch {
     return [];
   }
+};
+
+// Returns true (open), false (closed), or null (no opening_hours data for today)
+const isOpenNow = (values: string[]): boolean | null => {
+  const DAY_KEYS = ["su", "ma", "ti", "ke", "to", "pe", "la"]; // JS getDay() order
+  const now = new Date();
+  const dayKey = DAY_KEYS[now.getDay()];
+  const currentMinutes = now.getHours() * 60 + now.getMinutes();
+  const entry = values.find((v) => v.startsWith(dayKey + "|"));
+  if (!entry) return null;
+  const parts = entry.split("|");
+  if (parts[1] === "closed") return false;
+  if (parts.length < 3) return null;
+  const [openH, openM] = parts[1].split(":").map(Number);
+  const [closeH, closeM] = parts[2].split(":").map(Number);
+  return currentMinutes >= openH * 60 + openM && currentMinutes < closeH * 60 + closeM;
 };
 
 // Helper to filter features based on selected materials
@@ -238,6 +269,7 @@ const filterFeaturesByFieldValues = (
 };
 
 // Apply both legacy material filter and field-based filter (AND between the two)
+// Also computes is_open property from opening_hours fields for map marker styling
 const applyAllFilters = (
   materials: number[],
   fieldFilters: Record<string, number[]>,
@@ -245,7 +277,23 @@ const applyAllFilters = (
   geoJson: GeoJSON.FeatureCollection<GeoJSON.Geometry>
 ): GeoJSON.FeatureCollection<GeoJSON.Geometry> => {
   const afterMaterials = filterFeaturesBySelectedMaterials(materials, geoJson);
-  return filterFeaturesByFieldValues(fieldFilters, fieldChoices, afterMaterials);
+  const afterFields = filterFeaturesByFieldValues(fieldFilters, fieldChoices, afterMaterials);
+
+  // Annotate each feature with is_open based on opening_hours field
+  const features = afterFields.features?.map((feature: any) => {
+    const fields = parseFeatureFields(feature.properties?.fields);
+    const ohField = fields.find((f) => f.field_type === "opening_hours");
+    const openStatus = ohField && ohField.value.length > 0 ? isOpenNow(ohField.value) : null;
+    return {
+      ...feature,
+      properties: {
+        ...feature.properties,
+        is_open: openStatus,
+      },
+    };
+  });
+
+  return { ...afterFields, features };
 };
 
 type LocationsMapProps = {
@@ -435,6 +483,7 @@ export default function LocationsMap({ geoJson }: LocationsMapProps) {
                 >
                   <Layer {...highlighLayer} />
                   <Layer {...layerStyle} />
+                  <Layer {...openStatusLayer} />
                   <Layer {...clusters} />
                   <Layer {...clusterCount} />
                 </Source>
@@ -489,6 +538,19 @@ export default function LocationsMap({ geoJson }: LocationsMapProps) {
                         ))}
                     </ul>
                   )}
+                  {(() => {
+                    const ohField = parseFeatureFields(details.properties?.fields)
+                      .find((f) => f.field_type === "opening_hours");
+                    if (!ohField || ohField.value.length === 0) return null;
+                    const open = isOpenNow(ohField.value);
+                    if (open === null) return null;
+                    return (
+                      <div className={`px-3 py-1.5 text-xs font-semibold flex items-center gap-1.5 border-b ${open ? "text-green-700 bg-green-50" : "text-gray-500 bg-gray-50"}`}>
+                        <span className={`w-2 h-2 rounded-full shrink-0 ${open ? "bg-green-500" : "bg-gray-400"}`} />
+                        {open ? "Auki nyt" : "Suljettu"}
+                      </div>
+                    );
+                  })()}
                   {parseFeatureFields(details.properties?.fields)
                     .sort((a, b) => (a.order ?? 999) - (b.order ?? 999))
                     .filter((field) => field.value.length > 0)
