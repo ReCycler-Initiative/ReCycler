@@ -139,14 +139,19 @@ const clusterCount: SymbolLayer = {
   },
 };
 
-// Green dot (open) or gray dot (closed) above the icon — only for non-clusters with is_open set
+// Colored dot in top-right of icon: green=open, orange=closing soon, gray=closed
 const openStatusLayer: CircleLayer = {
   id: "open-status",
   type: "circle",
   source: "collection_spots",
-  filter: ["all", ["!", ["has", "point_count"]], ["!=", ["typeof", ["get", "is_open"]], "null"]],
+  filter: ["all", ["!", ["has", "point_count"]], ["!=", ["get", "open_status"], null]],
   paint: {
-    "circle-color": ["case", ["==", ["get", "is_open"], true], "#22c55e", "#9ca3af"],
+    "circle-color": [
+      "case",
+      ["==", ["get", "open_status"], "open"], "#22c55e",
+      ["==", ["get", "open_status"], "closing_soon"], "#f97316",
+      "#9ca3af",
+    ],
     "circle-radius": 5,
     "circle-stroke-width": 1.5,
     "circle-stroke-color": "#ffffff",
@@ -168,8 +173,8 @@ const parseFeatureFields = (rawFields: unknown): PopupField[] => {
   }
 };
 
-// Returns true (open), false (closed), or null (no opening_hours data for today)
-const isOpenNow = (values: string[]): boolean | null => {
+// Returns "open", "closing_soon" (within 60 min), "closed", or null (no data for today)
+const getOpenStatus = (values: string[]): "open" | "closing_soon" | "closed" | null => {
   const DAY_KEYS = ["su", "ma", "ti", "ke", "to", "pe", "la"]; // JS getDay() order
   const now = new Date();
   const dayKey = DAY_KEYS[now.getDay()];
@@ -177,11 +182,15 @@ const isOpenNow = (values: string[]): boolean | null => {
   const entry = values.find((v) => v.startsWith(dayKey + "|"));
   if (!entry) return null;
   const parts = entry.split("|");
-  if (parts[1] === "closed") return false;
+  if (parts[1] === "closed") return "closed";
   if (parts.length < 3) return null;
   const [openH, openM] = parts[1].split(":").map(Number);
   const [closeH, closeM] = parts[2].split(":").map(Number);
-  return currentMinutes >= openH * 60 + openM && currentMinutes < closeH * 60 + closeM;
+  const openMinutes = openH * 60 + openM;
+  const closeMinutes = closeH * 60 + closeM;
+  if (currentMinutes < openMinutes || currentMinutes >= closeMinutes) return "closed";
+  if (currentMinutes >= closeMinutes - 60) return "closing_soon";
+  return "open";
 };
 
 // Helper to filter features based on selected materials
@@ -283,12 +292,12 @@ const applyAllFilters = (
   const features = afterFields.features?.map((feature: any) => {
     const fields = parseFeatureFields(feature.properties?.fields);
     const ohField = fields.find((f) => f.field_type === "opening_hours");
-    const openStatus = ohField && ohField.value.length > 0 ? isOpenNow(ohField.value) : null;
+    const openStatus = ohField && ohField.value.length > 0 ? getOpenStatus(ohField.value) : null;
     return {
       ...feature,
       properties: {
         ...feature.properties,
-        is_open: openStatus,
+        open_status: openStatus,
       },
     };
   });
@@ -542,12 +551,17 @@ export default function LocationsMap({ geoJson }: LocationsMapProps) {
                     const ohField = parseFeatureFields(details.properties?.fields)
                       .find((f) => f.field_type === "opening_hours");
                     if (!ohField || ohField.value.length === 0) return null;
-                    const open = isOpenNow(ohField.value);
-                    if (open === null) return null;
+                    const status = getOpenStatus(ohField.value);
+                    if (status === null) return null;
+                    const cfg = {
+                      open: { dot: "bg-green-500", text: "text-green-700", bg: "bg-green-50", label: "Auki nyt" },
+                      closing_soon: { dot: "bg-orange-400", text: "text-orange-700", bg: "bg-orange-50", label: "Sulkeutuu pian" },
+                      closed: { dot: "bg-gray-400", text: "text-gray-500", bg: "bg-gray-50", label: "Suljettu" },
+                    }[status];
                     return (
-                      <div className={`px-3 py-1.5 text-xs font-semibold flex items-center gap-1.5 border-b ${open ? "text-green-700 bg-green-50" : "text-gray-500 bg-gray-50"}`}>
-                        <span className={`w-2 h-2 rounded-full shrink-0 ${open ? "bg-green-500" : "bg-gray-400"}`} />
-                        {open ? "Auki nyt" : "Suljettu"}
+                      <div className={`px-3 py-1.5 text-xs font-semibold flex items-center gap-1.5 border-b ${cfg.text} ${cfg.bg}`}>
+                        <span className={`w-2 h-2 rounded-full shrink-0 ${cfg.dot}`} />
+                        {cfg.label}
                       </div>
                     );
                   })()}
