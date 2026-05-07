@@ -6,7 +6,7 @@ import { z } from "zod";
 
 const UpdateFieldBody = z.object({
   name: z.string().trim().min(1),
-  field_type: z.union([z.literal("multi_select"), z.literal("text_input")]),
+  field_type: z.union([z.literal("multi_select"), z.literal("text_input"), z.literal("address")]),
   required: z.boolean().default(false),
   options: z
     .object({

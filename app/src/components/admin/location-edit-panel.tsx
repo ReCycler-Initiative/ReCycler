@@ -309,6 +309,43 @@ export const LocationEditPanel = (props: LocationEditPanelProps) => {
                     }
                   />
                 )}
+
+                {field.field_type === "address" && (
+                  <div className="space-y-2">
+                    <Input
+                      value={(fieldValues[field.id] ?? [])[0] ?? ""}
+                      placeholder="Katuosoite"
+                      onChange={(e) =>
+                        setFieldValues((prev) => {
+                          const cur = prev[field.id] ?? ["", "", ""];
+                          return { ...prev, [field.id]: [e.target.value, cur[1] ?? "", cur[2] ?? ""] };
+                        })
+                      }
+                    />
+                    <div className="grid grid-cols-2 gap-2">
+                      <Input
+                        value={(fieldValues[field.id] ?? [])[1] ?? ""}
+                        placeholder="Postinumero"
+                        onChange={(e) =>
+                          setFieldValues((prev) => {
+                            const cur = prev[field.id] ?? ["", "", ""];
+                            return { ...prev, [field.id]: [cur[0] ?? "", e.target.value, cur[2] ?? ""] };
+                          })
+                        }
+                      />
+                      <Input
+                        value={(fieldValues[field.id] ?? [])[2] ?? ""}
+                        placeholder="Postitoimipaikka"
+                        onChange={(e) =>
+                          setFieldValues((prev) => {
+                            const cur = prev[field.id] ?? ["", "", ""];
+                            return { ...prev, [field.id]: [cur[0] ?? "", cur[1] ?? "", e.target.value] };
+                          })
+                        }
+                      />
+                    </div>
+                  </div>
+                )}
               </div>
               );
             })}
