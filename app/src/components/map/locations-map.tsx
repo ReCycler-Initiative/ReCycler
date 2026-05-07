@@ -503,6 +503,15 @@ export default function LocationsMap({ geoJson }: LocationsMapProps) {
                                 <li key={v} className="ml-4">{v}</li>
                               ))}
                           </ul>
+                        ) : field.field_type === "address" ? (
+                          <div className="text-sm leading-5">
+                            {field.value[0] && <p>{field.value[0]}</p>}
+                            {(field.value[1] || field.value[2]) && (
+                              <p>
+                                {[field.value[1], field.value[2]].filter(Boolean).join(", ")}
+                              </p>
+                            )}
+                          </div>
                         ) : (
                           <p className="text-sm">{field.value.join(", ")}</p>
                         )}
