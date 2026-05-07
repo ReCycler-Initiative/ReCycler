@@ -33,6 +33,7 @@ const FIELD_TYPE_LABELS: Record<string, string> = {
   multi_select: "Monivalinta",
   text_input: "Tekstikenttä",
   address: "Osoite",
+  opening_hours: "Aukioloajat",
 };
 
 type FieldItem = z.infer<typeof FieldRecord>;

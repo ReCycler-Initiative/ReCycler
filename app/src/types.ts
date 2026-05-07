@@ -28,6 +28,7 @@ export const FieldType = z.union([
   z.literal("multi_select"),
   z.literal("text_input"),
   z.literal("address"),
+  z.literal("opening_hours"),
 ]);
 
 export const FieldValue = z.array(z.string());

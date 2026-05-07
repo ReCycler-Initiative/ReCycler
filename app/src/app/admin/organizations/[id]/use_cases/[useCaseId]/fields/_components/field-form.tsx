@@ -26,7 +26,7 @@ import { z } from "zod";
 
 const FieldFormSchema = z.object({
   name: z.string().min(1, "Nimi on pakollinen"),
-  field_type: z.union([z.literal("multi_select"), z.literal("text_input"), z.literal("address")]),
+  field_type: z.union([z.literal("multi_select"), z.literal("text_input"), z.literal("address"), z.literal("opening_hours")]),
   required: z.boolean(),
   choices: z.array(z.object({ value: z.string() })),
   choiceColors: z.record(z.string()),
@@ -38,7 +38,7 @@ export type FieldFormValues = z.infer<typeof FieldFormSchema>;
 
 export type FieldFormDefaultValues = {
   name?: string;
-  field_type?: "multi_select" | "text_input" | "address";
+  field_type?: "multi_select" | "text_input" | "address" | "opening_hours";
   required?: boolean;
   choices?: string[];
   choiceColors?: Record<string, string>;
@@ -223,7 +223,7 @@ export const FieldFormContent = ({
         <Select
           value={fieldType}
           onValueChange={(v) =>
-            setValue("field_type", v as "multi_select" | "text_input" | "address")
+            setValue("field_type", v as "multi_select" | "text_input" | "address" | "opening_hours")
           }
         >
           <SelectTrigger>
@@ -233,6 +233,7 @@ export const FieldFormContent = ({
             <SelectItem value="text_input">Tekstikenttä</SelectItem>
             <SelectItem value="multi_select">Monivalinta</SelectItem>
             <SelectItem value="address">Osoite</SelectItem>
+            <SelectItem value="opening_hours">Aukioloajat</SelectItem>
           </SelectContent>
         </Select>
       </div>
