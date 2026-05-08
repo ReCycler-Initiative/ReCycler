@@ -3,6 +3,7 @@
 import { useUser } from "@auth0/nextjs-auth0";
 import { Button } from "./ui/button";
 import LoadingSpinner from "./loading-spinner";
+import Image from "next/image";
 import Link from "next/link";
 import {
   DropdownMenu,
@@ -16,6 +17,7 @@ import { getUserOrganizations } from "@/services/api";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { HomeIcon, LogInIcon, LogOutIcon, SettingsIcon } from "lucide-react";
 import { cn } from "@/utils/shadcn";
+import { useMessages } from "@/i18n/locale-provider";
 
 // Extracts initials: "Joe Doe" -> "JD", "joe@..." -> "J"
 function getInitials(name?: string | null, email?: string | null) {
@@ -28,6 +30,7 @@ function getInitials(name?: string | null, email?: string | null) {
 
 export default function Auth0Login() {
   const { user, isLoading } = useUser();
+  const messages = useMessages();
   const organizationsQuery = useQuery({
     queryKey: ["user_organizations"],
     queryFn: getUserOrganizations,
@@ -66,7 +69,7 @@ export default function Auth0Login() {
                   href={`/auth/login?returnTo=${encodeURIComponent(currentUrl)}`}
                 >
                   <LogInIcon size="20" />
-                  <span className="sr-only">Kirjaudu sisään</span>
+                  <span className="sr-only">{messages.auth.signIn}</span>
                 </a>
               </Button>
             ) : (
@@ -75,13 +78,16 @@ export default function Auth0Login() {
                   <DropdownMenuTrigger asChild>
                     <span
                       className="relative h-12 w-12 rounded-full overflow-hidden ring-1 ring-black/5 my-2 cursor-pointer group"
-                      aria-label={user.name ?? user.email ?? "Käyttäjä"}
-                      title={user.name ?? user.email ?? "Käyttäjä"}
+                      aria-label={user.name ?? user.email ?? messages.auth.user}
+                      title={user.name ?? user.email ?? messages.auth.user}
                     >
-                      <img
+                      <Image
                         src={user.picture ?? "/avatar-fallback.png"}
-                        alt={user.name ?? user.email ?? "Käyttäjä"}
-                        className="h-full w-full object-cover"
+                        alt={user.name ?? user.email ?? messages.auth.user}
+                        fill
+                        unoptimized
+                        sizes="48px"
+                        className="object-cover"
                         referrerPolicy="no-referrer"
                       />
                       <span className="h-full w-full absolute inset-0 group-hover:bg-black/50 transition" />
@@ -108,7 +114,7 @@ export default function Auth0Login() {
                     {organizationsQuery.isLoading && (
                       <div className="flex items-center gap-2 p-2 text-sm">
                         <LoadingSpinner />
-                        <span>Ladataan organisaatioita...</span>
+                        <span>{messages.auth.loadingOrganizations}</span>
                       </div>
                     )}
                     {((organizationsQuery.data &&
@@ -119,21 +125,21 @@ export default function Auth0Login() {
                     <DropdownMenuItem asChild>
                       <Link href="/user-settings" className="flex items-center gap-2">
                         <SettingsIcon size={14} />
-                        <span>Asetukset</span>
+                        <span>{messages.auth.settings}</span>
                       </Link>
                     </DropdownMenuItem>
                     {shouldShowMarketingHomeLink && (
                       <DropdownMenuItem asChild>
                         <Link href="/" className="flex items-center gap-2">
                           <HomeIcon size={14} />
-                          <span>Palaa etusivulle</span>
+                          <span>{messages.auth.backToHome}</span>
                         </Link>
                       </DropdownMenuItem>
                     )}
                     <DropdownMenuItem asChild>
                       <a href="/auth/logout" className="flex items-center gap-2">
                         <LogOutIcon size={14} />
-                        <span>Kirjaudu ulos</span>
+                        <span>{messages.auth.logout}</span>
                       </a>
                     </DropdownMenuItem>
                   </DropdownMenuContent>

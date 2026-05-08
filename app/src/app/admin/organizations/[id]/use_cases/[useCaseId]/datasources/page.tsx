@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { PageTemplate } from "@/components/admin/page-template";
 import { Button } from "@/components/ui/button";
+import { useMessages } from "@/i18n/locale-provider";
 
 /**
  * Temporary mock data.
@@ -37,12 +38,6 @@ const connections: DataConnection[] = [
   },
 ];
 
-const statusLabel: Record<ConnectionStatus, string> = {
-  active: "Aktiivinen",
-  error: "Virhe",
-  not_configured: "Ei määritetty",
-};
-
 const statusPillClass: Record<ConnectionStatus, string> = {
   active: "bg-green-100 text-green-800",
   error: "bg-red-100 text-red-800",
@@ -50,8 +45,15 @@ const statusPillClass: Record<ConnectionStatus, string> = {
 };
 
 const DatasourcesPage = () => {
+  const messages = useMessages();
+  const statusLabel: Record<ConnectionStatus, string> = {
+    active: messages.admin.statusActive,
+    error: messages.admin.statusError,
+    not_configured: messages.admin.statusNotConfigured,
+  };
+
   return (
-    <PageTemplate title="Datayhteydet">
+    <PageTemplate title={messages.admin.datasourcesPageTitle}>
       <div className="flex flex-col gap-6">
         {/* -------------------------------- */}
         {/* HEADER                           */}
@@ -60,13 +62,13 @@ const DatasourcesPage = () => {
           <div className="space-y-4">
             {/* PageTemplate is the only H1; keep intro minimal here */}
             <p className="text-sm text-gray-600">
-              Liitä ja hallitse käyttötapauksen datayhteyksiä.
+              {messages.admin.datasourcesIntro}
             </p>
 
             <div className="flex flex-wrap gap-2">
               <Button asChild size="sm">
                 <Link href="/admin/data-source/connect">
-                  + Liitä datayhteys
+                  {messages.admin.attachDatasource}
                 </Link>
               </Button>
             </div>
@@ -78,9 +80,9 @@ const DatasourcesPage = () => {
         {/* -------------------------------- */}
         <section className="rounded-xl border border-gray-200 bg-white shadow-sm">
           <div className="border-b border-gray-200 p-5">
-            <h2 className="text-lg font-medium text-gray-900">Datayhteydet</h2>
+            <h2 className="text-lg font-medium text-gray-900">{messages.admin.datasourcesListTitle}</h2>
             <p className="mt-1 text-sm text-gray-600">
-              Avaa datayhteys, selaa dataa tai tarkista lokit.
+              {messages.admin.datasourcesListDescription}
             </p>
           </div>
 
@@ -106,7 +108,7 @@ const DatasourcesPage = () => {
                   </div>
 
                   <div className="mt-1 text-sm text-gray-600">
-                    Viimeisin synkronointi:{" "}
+                    {messages.admin.lastSync}:{" "}
                     <span className="font-medium text-gray-900">
                       {c.lastSyncAt ?? "—"}
                     </span>
@@ -117,7 +119,7 @@ const DatasourcesPage = () => {
                 <div className="flex flex-wrap gap-2">
                   <Button asChild size="sm">
                     <Link href={`/admin/data-source?connection=${c.id}`}>
-                      Muokkaa
+                      {messages.admin.edit}
                     </Link>
                   </Button>
 

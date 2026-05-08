@@ -1,6 +1,7 @@
 import { checkOrganizationAuthorization } from "@/lib/authorization";
 import db from "@/services/db";
 import { UseCase } from "@/types";
+import { serializeLocalizedText } from "@/lib/use-case-content";
 import { NextRequest, NextResponse } from "next/server";
 import { z, ZodError } from "zod";
 import { mapDbRowToUseCase } from "@/lib/mappers/use-case-mapper";
@@ -83,15 +84,15 @@ export async function PUT(
       .update({
         name: body.name,
         description: body.description,
-        intro_title: body.content?.intro?.title,
-        intro_cta: body.content?.intro?.cta,
-        intro_skip: body.content?.intro?.skip,
-        intro_text: body.content?.intro?.text,
-        filters_title: body.content?.filters?.title,
-        filters_cta: body.content?.filters?.cta,
-        filters_text: body.content?.filters?.text,
-        filters_tab_ai: body.content?.filters?.tab_ai,
-        filters_tab_manual: body.content?.filters?.tab_manual,
+        intro_title: serializeLocalizedText(body.content?.intro?.title),
+        intro_cta: serializeLocalizedText(body.content?.intro?.cta),
+        intro_skip: serializeLocalizedText(body.content?.intro?.skip),
+        intro_text: serializeLocalizedText(body.content?.intro?.text),
+        filters_title: serializeLocalizedText(body.content?.filters?.title),
+        filters_cta: serializeLocalizedText(body.content?.filters?.cta),
+        filters_text: serializeLocalizedText(body.content?.filters?.text),
+        filters_tab_ai: serializeLocalizedText(body.content?.filters?.tab_ai),
+        filters_tab_manual: serializeLocalizedText(body.content?.filters?.tab_manual),
         updated_at: new Date(),
       })
       .returning("*")

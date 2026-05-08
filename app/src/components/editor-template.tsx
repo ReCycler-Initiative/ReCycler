@@ -2,6 +2,7 @@ import { PageTemplate } from "@/components/admin/page-template";
 import { LoadingState } from "@/components/loading-state";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
+import { useMessages } from "@/i18n/locale-provider";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ReactNode } from "react";
 import { DefaultValues, FieldValues, useForm } from "react-hook-form";
@@ -33,6 +34,7 @@ export const useEditor = <ApiData, FormData extends FieldValues>({
   onSuccess,
 }: UseEditorProps<ApiData, FormData>): UseEditorReturn<ApiData, FormData> => {
   const queryClient = useQueryClient();
+  const messages = useMessages();
 
   const query = useQuery({
     queryKey,
@@ -42,7 +44,7 @@ export const useEditor = <ApiData, FormData extends FieldValues>({
   const mutation = useMutation<ApiData, Error, FormData>({
     mutationFn: (data) => mutationFn(toApiData(data)),
     onSuccess: (data) => {
-      toast.success("Save successful");
+      toast.success(messages.editor.saveSuccessful);
       form.reset(toFormState(data));
       queryClient.setQueryData(queryKey, data);
 
@@ -51,7 +53,7 @@ export const useEditor = <ApiData, FormData extends FieldValues>({
       }
     },
     onError: () => {
-      toast.error("Save failed");
+      toast.error(messages.editor.saveFailed);
     },
   });
 
@@ -73,6 +75,8 @@ export const EditorTemplate = <ApiData, FormData extends FieldValues>({
   ApiData,
   FormData
 >) => {
+  const messages = useMessages();
+
   return (
     <Form {...form}>
       <form
@@ -89,7 +93,7 @@ export const EditorTemplate = <ApiData, FormData extends FieldValues>({
               isLoading={form.formState.isSubmitting}
               type="submit"
             >
-              Save
+              {messages.editor.save}
             </Button>
           </LoadingState>
         </PageTemplate>

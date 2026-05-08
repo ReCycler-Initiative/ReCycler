@@ -4,6 +4,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { checkOrganizationAuthorization } from "@/lib/authorization";
 import { z } from "zod";
 
+const OptionalLocationString = z.string().trim().max(255).optional().or(z.literal(""));
+
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ organizationId: string, useCaseId: string }> }
@@ -20,7 +22,25 @@ export async function GET(
   }
 
   const result = await db.raw(
-    `SELECT * FROM recycler.get_locations(?::uuid)`,
+    `
+      SELECT
+        f.id AS field_id,
+        f.name AS field_name,
+        f.order AS field_order,
+        f.field_type,
+        lf.value AS field_values,
+        ST_AsGeoJSON(l.geom)::jsonb AS location_geom,
+        l.id AS location_id,
+        l.name AS location_name,
+        l.address AS location_address,
+        l.postal_code AS location_postal_code,
+        l.post_office AS location_post_office
+      FROM recycler.locations l
+      LEFT JOIN recycler.location_fields lf ON lf.location_id = l.id
+      LEFT JOIN recycler.fields f ON f.id = lf.field_id
+      WHERE l.use_case_id = ?::uuid
+      ORDER BY l.name, f.order NULLS LAST;
+    `,
     [useCaseId]
   );
 
@@ -50,6 +70,7 @@ export async function GET(
     type: "Feature" as const,
     geometry: loc.geom,
     properties: {
+      address: loc.fields[0]?.location_address ?? undefined,
       id: loc.id,
       name: loc.name,
       fields: loc.fields.map((f) => ({
@@ -59,6 +80,8 @@ export async function GET(
         order: f.field_order,
         value: f.field_values ?? [],
       })),
+      post_office: loc.fields[0]?.location_post_office ?? undefined,
+      postal_code: loc.fields[0]?.location_postal_code ?? undefined,
     },
   }));
 
@@ -72,6 +95,17 @@ const CreateLocationBody = z.object({
   longitude: z.number().finite(),
   latitude: z.number().finite(),
   name: z.string().trim().min(1),
+  address: OptionalLocationString,
+  postal_code: OptionalLocationString,
+  post_office: OptionalLocationString,
+  fieldValues: z
+    .array(
+      z.object({
+        fieldId: z.string().uuid(),
+        values: z.array(z.string()),
+      })
+    )
+    .optional(),
 });
 
 export async function POST(
@@ -108,26 +142,52 @@ export async function POST(
     return NextResponse.json({ error: "Use case not found" }, { status: 404 });
   }
 
-  const { longitude, latitude, name } = parsed.data;
+  const {
+    longitude,
+    latitude,
+    name,
+    address,
+    postal_code,
+    post_office,
+    fieldValues,
+  } = parsed.data;
 
-  const insertResult = await db.raw(
-    `
-      INSERT INTO recycler.locations (name, use_case_id, geom)
-      VALUES (?, ?::uuid, ST_SetSRID(ST_Point(?, ?), 4326))
-      RETURNING id, name, ST_AsGeoJSON(geom)::jsonb as geom
-    `,
-    [name, useCaseId, longitude, latitude]
-  );
+  const row = await db.transaction(async (trx) => {
+    const insertResult = await trx.raw(
+      `
+        INSERT INTO recycler.locations (name, use_case_id, geom, address, postal_code, post_office)
+        VALUES (?, ?::uuid, ST_SetSRID(ST_Point(?, ?), 4326), ?, ?, ?)
+        RETURNING id, name, address, postal_code, post_office, ST_AsGeoJSON(geom)::jsonb as geom
+      `,
+      [name, useCaseId, longitude, latitude, address || null, postal_code || null, post_office || null]
+    );
 
-  const row = insertResult.rows[0];
+    const createdRow = insertResult.rows[0];
+
+    if (fieldValues && fieldValues.length > 0) {
+      await trx("recycler.location_fields").insert(
+        fieldValues.map(({ fieldId, values }) => ({
+          id: trx.raw("uuid_generate_v4()"),
+          location_id: createdRow.id,
+          field_id: fieldId,
+          value: JSON.stringify(values),
+        }))
+      );
+    }
+
+    return createdRow;
+  });
 
   return NextResponse.json({
     type: "Feature" as const,
     geometry: row.geom,
     properties: {
+      address: row.address ?? undefined,
       id: row.id,
       name: row.name,
       fields: [],
+      post_office: row.post_office ?? undefined,
+      postal_code: row.postal_code ?? undefined,
     },
   });
 }

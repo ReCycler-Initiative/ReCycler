@@ -21,12 +21,14 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Plus, X } from "lucide-react";
+import { useMessages } from "@/i18n/locale-provider";
 import { deleteLocation, getLocations } from "@/services/api";
 import { toast } from "sonner";
 
 const ITEMS_PER_PAGE = 15;
 
 const LocationsPage = () => {
+  const messages = useMessages();
   const params = useParams<{ id: string; useCaseId: string }>();
   const organizationId = params.id;
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -69,7 +71,7 @@ const LocationsPage = () => {
       setDeleteTarget(null);
       setEditId(null);
       if (deletedId && selectedId === deletedId) setSelectedId(null);
-      toast.success("Kohde poistettu");
+      toast.success(messages.adminLocationPanel.locationDeleted);
     },
   });
 
@@ -141,29 +143,42 @@ const LocationsPage = () => {
 
   // Ghost marker = original position of the location being relocated
   const ghostMarker = useMemo(() => {
-    if (!pickedLngLat || !editId) return undefined;
+    if (!relocateMode || !pickedLngLat || !editId) return undefined;
     const orig = locations.find((l) => l.id === editId);
     return orig ? { longitude: orig.longitude, latitude: orig.latitude } : undefined;
-  }, [pickedLngLat, editId, locations]);
+  }, [relocateMode, pickedLngLat, editId, locations]);
 
   return (
     <PageTemplate
-      title="Kohteet"
+      title={messages.adminLocations.title}
       actions={
         <Button
           type="button"
-          onClick={() => setAddMode((v) => !v)}
+          onClick={() => {
+            setAddMode((current) => {
+              const next = !current;
+              if (next) {
+                setEditId(null);
+                setSelectedId(null);
+                setRelocateMode(false);
+                setPickedLngLat(null);
+              } else {
+                setAddDraft(null);
+              }
+              return next;
+            });
+          }}
           variant={addMode ? "outline" : "default"}
         >
           {addMode ? (
             <>
               <X className="h-4 w-4" />
-              Peruuta lisääminen
+              {messages.adminLocations.cancelAdding}
             </>
           ) : (
             <>
               <Plus className="h-4 w-4" />
-              Lisää kohde
+              {messages.adminLocations.addLocation}
             </>
           )}
         </Button>
@@ -172,13 +187,13 @@ const LocationsPage = () => {
     >
       {isLoading && (
         <div className="flex items-center justify-center h-96">
-          <p className="text-muted-foreground">Ladataan kohteita...</p>
+          <p className="text-muted-foreground">{messages.adminLocations.loadingLocations}</p>
         </div>
       )}
 
       {isError && (
         <div className="flex items-center justify-center h-96">
-          <p className="text-destructive">Virhe kohteiden lataamisessa</p>
+          <p className="text-destructive">{messages.adminLocations.loadError}</p>
         </div>
       )}
 
@@ -204,12 +219,14 @@ const LocationsPage = () => {
             />
           }
           rightPanel={
-            addDraft ? (
+            addMode ? (
               <LocationEditPanel
+                key={`add:${addDraft ? `${addDraft.longitude}:${addDraft.latitude}` : "empty"}`}
                 mode="add"
-                lngLat={addDraft}
+                lngLat={addDraft ?? undefined}
                 organizationId={organizationId}
                 useCaseId={params.useCaseId}
+                onCoordinatesChange={setAddDraft}
                 onClose={() => { setAddDraft(null); setAddMode(false); }}
                 onSaved={(newId) => {
                   setAddDraft(null);
@@ -219,10 +236,12 @@ const LocationsPage = () => {
               />
             ) : editId ? (
               <LocationEditPanel
+                key={`edit:${editId}`}
                 mode="edit"
                 locationId={editId}
                 organizationId={organizationId}
                 useCaseId={params.useCaseId}
+                onCoordinatesChange={setPickedLngLat}
                 onClose={() => { setEditId(null); setRelocateMode(false); setPickedLngLat(null); }}
                 onSaved={() => { setRelocateMode(false); setPickedLngLat(null); }}
                 onDelete={() => {
@@ -244,16 +263,16 @@ const LocationsPage = () => {
               <Input
                 value={searchQuery}
                 onChange={(event) => setSearchQuery(event.target.value)}
-                placeholder="Hae kohdetta nimellä"
-                aria-label="Hae kohdetta nimellä"
+                placeholder={messages.adminLocations.searchPlaceholder}
+                aria-label={messages.adminLocations.searchAriaLabel}
               />
               <div className="flex items-center justify-between text-xs text-muted-foreground">
                 <span>
                   {filteredLocations.length === 0
-                    ? "Ei hakutuloksia"
-                    : `Näytetään ${Math.min((currentPage - 1) * ITEMS_PER_PAGE + 1, filteredLocations.length)}-${Math.min(currentPage * ITEMS_PER_PAGE, filteredLocations.length)} / ${filteredLocations.length}`}
+                    ? messages.adminLocations.noSearchResults
+                    : `${messages.adminLocations.showingResults} ${Math.min((currentPage - 1) * ITEMS_PER_PAGE + 1, filteredLocations.length)}-${Math.min(currentPage * ITEMS_PER_PAGE, filteredLocations.length)} / ${filteredLocations.length}`}
                 </span>
-                <span>Sivu {currentPage} / {totalPages}</span>
+                <span>{messages.adminLocations.page} {currentPage} / {totalPages}</span>
               </div>
             </div>
 
@@ -265,8 +284,8 @@ const LocationsPage = () => {
               }))}
               emptyMessage={
                 searchQuery.trim()
-                  ? "Hakuehdoilla ei löytynyt kohteita."
-                  : "Tällä organisaatiolla ei ole vielä kohteita."
+                  ? messages.adminLocations.noSearchResults
+                  : messages.adminLocations.noLocationsYet
               }
               selectedId={selectedId}
               onSelect={selectLocation}
@@ -281,10 +300,10 @@ const LocationsPage = () => {
                   disabled={currentPage === 1}
                   onClick={() => setCurrentPage((page) => Math.max(1, page - 1))}
                 >
-                  Edellinen
+                  {messages.adminLocations.previous}
                 </Button>
                 <div className="text-sm text-muted-foreground">
-                  Sivu {currentPage} / {totalPages}
+                  {messages.adminLocations.page} {currentPage} / {totalPages}
                 </div>
                 <Button
                   type="button"
@@ -295,7 +314,7 @@ const LocationsPage = () => {
                     setCurrentPage((page) => Math.min(totalPages, page + 1))
                   }
                 >
-                  Seuraava
+                  {messages.adminLocations.next}
                 </Button>
               </div>
             )}
@@ -312,13 +331,13 @@ const LocationsPage = () => {
       >
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Poistetaanko kohde?</DialogTitle>
+            <DialogTitle>{messages.adminLocations.deleteConfirmTitle}</DialogTitle>
           </DialogHeader>
 
           <div className="text-sm text-muted-foreground">
             {deleteTarget?.name
-              ? `Oletko varma, että haluat poistaa kohteen "${deleteTarget.name}"? Tätä ei voi perua.`
-              : "Oletko varma, että haluat poistaa tämän kohteen? Tätä ei voi perua."}
+              ? messages.adminLocations.deleteConfirmNamed.replace("{name}", deleteTarget.name)
+              : messages.adminLocations.deleteConfirmUnnamed}
           </div>
 
           <DialogFooter>
@@ -328,7 +347,7 @@ const LocationsPage = () => {
               onClick={() => setDeleteDialogOpen(false)}
               disabled={deleteMutation.isPending}
             >
-              Peruuta
+              {messages.adminLocationPanel.cancel}
             </Button>
             <Button
               type="button"
@@ -340,7 +359,7 @@ const LocationsPage = () => {
                 deleteMutation.mutate(deleteTarget.id);
               }}
             >
-              Poista
+              {messages.adminLocations.delete}
             </Button>
           </DialogFooter>
         </DialogContent>

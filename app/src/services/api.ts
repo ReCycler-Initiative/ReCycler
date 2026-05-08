@@ -9,6 +9,7 @@ import {
   Organization,
   UseCase,
 } from "@/types";
+import { Locale } from "@/i18n/messages";
 import axios from "axios";
 import { z } from "zod";
 
@@ -16,8 +17,12 @@ export const getCollectionSpots = async (): Promise<
   GeoJSON.FeatureCollection<GeoJSON.Geometry>
 > => axios.get("/api/collection_spots").then((response) => response.data);
 
-export const getMaterials = (): Promise<Array<Material>> =>
-  axios.get("/api/materials").then((response) => response.data);
+export const getMaterials = (locale?: Locale): Promise<Array<Material>> =>
+  axios
+    .get("/api/materials", {
+      params: locale ? { locale } : undefined,
+    })
+    .then((response) => response.data);
 
 export const chat = async ({
   message,
@@ -26,6 +31,9 @@ export const chat = async ({
   imageMimeType,
   organizationId,
   useCaseId,
+  locale,
+  currentSelectedCodes,
+  currentSelectedFieldValues,
 }: {
   message: string;
   history: { role: "user" | "assistant"; content: string }[];
@@ -33,9 +41,22 @@ export const chat = async ({
   imageMimeType?: string;
   organizationId?: string;
   useCaseId?: string;
+  locale?: Locale;
+  currentSelectedCodes?: number[];
+  currentSelectedFieldValues?: Record<string, number[]>;
 }): Promise<ChatResponse> =>
   axios
-    .post("/api/chat", { message, history, imageBase64, imageMimeType, organizationId, useCaseId })
+    .post("/api/chat", {
+      message,
+      history,
+      imageBase64,
+      imageMimeType,
+      organizationId,
+      useCaseId,
+      locale,
+      currentSelectedCodes,
+      currentSelectedFieldValues,
+    })
     .then((response) => response.data);
 
 export const getLocations = (
@@ -49,7 +70,15 @@ export const getLocations = (
 export const createLocation = (
   organizationId: string,
   useCaseId: string,
-  body: { name: string; longitude: number; latitude: number }
+  body: {
+    name: string;
+    longitude: number;
+    latitude: number;
+    address?: string;
+    postal_code?: string;
+    post_office?: string;
+    fieldValues?: { fieldId: string; values: string[] }[];
+  }
 ): Promise<any> =>
   axios
     .post(`/api/organizations/${organizationId}/use_cases/${useCaseId}/locations`, body)
@@ -74,6 +103,9 @@ export const updateLocation = (
     name: string;
     longitude: number;
     latitude: number;
+    address?: string;
+    postal_code?: string;
+    post_office?: string;
     fieldValues?: { fieldId: string; values: string[] }[];
   }
 ): Promise<void> =>

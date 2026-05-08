@@ -1,4 +1,5 @@
 import { getMaterials } from "@/services/api";
+import { normalizeMaterialText } from "@/lib/material-translations";
 import { useQuery } from "@tanstack/react-query";
 import { RecycleIcon } from "lucide-react";
 import { ReactNode } from "react";
@@ -22,6 +23,7 @@ import TextileReuse from "./icons/TextileReuse";
 import WasteBin from "./icons/WasteBin";
 import Wood from "./icons/Wood";
 import LoadingSpinner from "./loading-spinner";
+import { useLocale, useMessages } from "@/i18n/locale-provider";
 
 // HEX → rgba
 export const hexToRgba = (hex: string, alpha: number): string => {
@@ -62,30 +64,65 @@ export const iconMap: {
   { code: 108, baseHex: "#d9001e", icon: <Dangerous /> },
 ];
 
-// Name-based icon lookup (lowercase) for use with field string values
-export const nameIconMap: Record<string, { baseHex: string; icon: ReactNode }> = {
+// Name-based icon lookup for use with field string values.
+const rawNameIconMap: Record<string, { baseHex: string; icon: ReactNode }> = {
   "ajoneuvoakut": { baseHex: "#d9001e", icon: <CarBattery /> },
+  "ajoneuvoakut (lyijy)": { baseHex: "#d9001e", icon: <CarBattery /> },
+  "ajoneuvoakku (lyijy)": { baseHex: "#d9001e", icon: <CarBattery /> },
+  "vehicle batteries (lead-acid)": { baseHex: "#d9001e", icon: <CarBattery /> },
+  "vehicle battery (lead-acid)": { baseHex: "#d9001e", icon: <CarBattery /> },
   "energiajäte": { baseHex: "#000000", icon: <EnergyWaste /> },
+  "energy waste": { baseHex: "#000000", icon: <EnergyWaste /> },
   "kannettavat akut ja paristot": { baseHex: "#d9001e", icon: <SmallBattery /> },
+  "portable batteries": { baseHex: "#d9001e", icon: <SmallBattery /> },
   "kartonki": { baseHex: "#176eb1", icon: <Carton /> },
+  "carton": { baseHex: "#176eb1", icon: <Carton /> },
   "kyllästetty puu": { baseHex: "#d9001e", icon: <Wood /> },
+  "pressure-treated wood": { baseHex: "#d9001e", icon: <Wood /> },
   "lamput": { baseHex: "#d9001e", icon: <Lamp /> },
+  "lamps": { baseHex: "#d9001e", icon: <Lamp /> },
   "lasi": { baseHex: "#21a07b", icon: <Glass /> },
+  "glass": { baseHex: "#21a07b", icon: <Glass /> },
   "metalli": { baseHex: "#485b66", icon: <Metal /> },
+  "metal": { baseHex: "#485b66", icon: <Metal /> },
   "muovi": { baseHex: "#820f71", icon: <Plastic /> },
+  "plastic": { baseHex: "#820f71", icon: <Plastic /> },
   "sähkölaitteet (ser)": { baseHex: "#d9001e", icon: <ElectricWaste /> },
+  "electronics (weee)": { baseHex: "#d9001e", icon: <ElectricWaste /> },
   "sekajäte": { baseHex: "#000000", icon: <WasteBin /> },
+  "mixed waste": { baseHex: "#000000", icon: <WasteBin /> },
   "biojäte": { baseHex: "#139339", icon: <BioWaste /> },
+  "biowaste": { baseHex: "#139339", icon: <BioWaste /> },
   "muu jäte": { baseHex: "#000000", icon: <WasteBin /> },
+  "other waste": { baseHex: "#000000", icon: <WasteBin /> },
   "pahvi": { baseHex: "#176eb1", icon: <CardBoard /> },
+  "cardboard": { baseHex: "#176eb1", icon: <CardBoard /> },
   "paperi": { baseHex: "#176eb1", icon: <Paper /> },
+  "paper": { baseHex: "#176eb1", icon: <Paper /> },
   "tekstiili": { baseHex: "#6b9030", icon: <Textile /> },
+  "textile": { baseHex: "#6b9030", icon: <Textile /> },
   "puu": { baseHex: "#d9001e", icon: <Wood /> },
+  "wood": { baseHex: "#d9001e", icon: <Wood /> },
   "puutarhajäte": { baseHex: "#139339", icon: <Garden /> },
+  "garden waste": { baseHex: "#139339", icon: <Garden /> },
   "rakennus- ja purkujäte": { baseHex: "#0c3a6f", icon: <Construction /> },
+  "construction waste": { baseHex: "#0c3a6f", icon: <Construction /> },
   "poistotekstiili": { baseHex: "#6b9030", icon: <TextileReuse /> },
+  "discarded textile": { baseHex: "#6b9030", icon: <TextileReuse /> },
   "vaarallinen jäte": { baseHex: "#d9001e", icon: <Dangerous /> },
+  "hazardous waste": { baseHex: "#d9001e", icon: <Dangerous /> },
 };
+
+export const nameIconMap: Record<string, { baseHex: string; icon: ReactNode }> =
+  Object.fromEntries(
+    Object.entries(rawNameIconMap).map(([name, entry]) => [
+      normalizeMaterialText(name),
+      entry,
+    ])
+  );
+
+export const getNameIconEntry = (name: string) =>
+  nameIconMap[normalizeMaterialText(name)];
 
 export const CustomCheckbox = ({
   baseHex,
@@ -135,9 +172,11 @@ export const Materials = ({
   selectedCodes: number[];
   onSelectionChange: (codes: number[]) => void;
 }) => {
+  const { locale } = useLocale();
+  const messages = useMessages();
   const { data: materials, isFetching } = useQuery({
-    queryKey: ["materials"],
-    queryFn: getMaterials,
+    queryKey: ["materials", locale],
+    queryFn: () => getMaterials(locale),
     staleTime: Infinity,
   });
 
@@ -145,7 +184,7 @@ export const Materials = ({
     return (
       <div className="flex items-center flex-col gap-4 py-6">
         <LoadingSpinner />
-        <p>Haetaan materiaaleja...</p>
+        <p>{messages.materials.loadingMaterials}</p>
       </div>
     );
   }

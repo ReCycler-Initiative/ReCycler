@@ -3,6 +3,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { checkOrganizationAuthorization } from "@/lib/authorization";
 import { z } from "zod";
 
+const OptionalLocationString = z.string().trim().max(255).optional().or(z.literal(""));
+
 export async function GET(
   request: NextRequest,
   {
@@ -32,6 +34,9 @@ export async function GET(
         SELECT
           l.id,
           l.name,
+          l.address,
+          l.postal_code,
+          l.post_office,
           ST_AsGeoJSON(l.geom)::jsonb as geom,
           f.id         AS field_id,
           f.name       AS field_name,
@@ -75,9 +80,12 @@ export async function GET(
     type: "Feature" as const,
     geometry: first.geom,
     properties: {
+      address: first.address ?? undefined,
       id: first.id,
       name: first.name,
       fields,
+      post_office: first.post_office ?? undefined,
+      postal_code: first.postal_code ?? undefined,
     },
   });
 }
@@ -86,6 +94,9 @@ const UpdateLocationBody = z.object({
   name: z.string().trim().min(1),
   longitude: z.number().finite(),
   latitude: z.number().finite(),
+  address: OptionalLocationString,
+  postal_code: OptionalLocationString,
+  post_office: OptionalLocationString,
   fieldValues: z
     .array(
       z.object({
@@ -128,12 +139,17 @@ export async function PUT(
     );
   }
 
-  const { name, longitude, latitude, fieldValues } = parsed.data;
+  const { name, longitude, latitude, address, postal_code, post_office, fieldValues } = parsed.data;
 
   const updated = await db.raw(
     `
       UPDATE recycler.locations l
-      SET name = ?, geom = ST_SetSRID(ST_Point(?, ?), 4326)
+      SET
+        name = ?,
+        geom = ST_SetSRID(ST_Point(?, ?), 4326),
+        address = ?,
+        postal_code = ?,
+        post_office = ?
       FROM recycler.use_cases uc
       WHERE l.use_case_id = uc.id
         AND uc.organization_id = ?::uuid
@@ -141,7 +157,17 @@ export async function PUT(
         AND l.id = ?::uuid
       RETURNING l.id;
     `,
-    [name, longitude, latitude, organizationId, useCaseId, locationId]
+    [
+      name,
+      longitude,
+      latitude,
+      address || null,
+      postal_code || null,
+      post_office || null,
+      organizationId,
+      useCaseId,
+      locationId,
+    ]
   );
 
   if (!updated.rows?.[0]) {

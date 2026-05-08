@@ -1,0 +1,15 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "dev-server-clean",
+			"type": "shell",
+			"command": "sh",
+			"args": [
+				"-lc",
+				"rm -rf .next && npm run dev"
+			],
+			"isBackground": true
+		}
+	]
+}

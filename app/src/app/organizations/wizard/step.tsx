@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
+import { useMessages } from "@/i18n/locale-provider";
 import { createContext, useContext, useState } from "react";
 import { FieldValues, useFormContext, UseFormReturn } from "react-hook-form";
 
@@ -31,14 +32,17 @@ type StepNextProps = {
 };
 
 function StepNext({ children, isLoading }: StepNextProps) {
+  const messages = useMessages();
+
   return (
     <Button className="w-full max-w-40" type="submit" size="lg" isLoading={isLoading}>
-      {children ?? "Jatka"}
+      {children ?? messages.wizard.continue}
     </Button>
   );
 }
 
 function StepPrevious() {
+  const messages = useMessages();
   const { onPrevious, onStepChange } = useContext(StepActionsContext);
   const form = useFormContext();
 
@@ -52,7 +56,7 @@ function StepPrevious() {
       variant="outline"
       size="lg"
     >
-      Takaisin
+      {messages.wizard.back}
     </Button>
   );
 }

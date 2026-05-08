@@ -4,6 +4,7 @@ import FormInput from "@/components/form/form-input";
 import FormSelect from "@/components/form/form-select";
 import { FormTextArea } from "@/components/form/form-textarea";
 import { Button } from "@/components/ui/button";
+import { useMessages } from "@/i18n/locale-provider";
 import { createOrganization } from "@/services/api";
 import {
   CreateOrganizationRequest,
@@ -26,21 +27,18 @@ const WelcomeStep = ({
   onNext: () => void;
   onStepChange: () => void;
 }) => {
+  const messages = useMessages();
   const form = useForm();
 
   return (
     <Step
       form={form}
-      nextText="Aloita"
+      nextText={messages.wizard.start}
       onNext={onNext}
       onStepChange={onStepChange}
-      title="Tervetuloa"
+      title={messages.wizard.welcomeTitle}
     >
-      <p>
-        Tämän vaiheittaisen opastuksen avulla voit luoda oman tilin ja
-        määritellä, millaisia tietoja haluat tallentaa eri kohteista. Aloitetaan
-        ensimmäisestä vaiheesta klikkaamalla {'"Aloita"'}.
-      </p>
+      <p>{messages.wizard.welcomeBody}</p>
     </Step>
   );
 };
@@ -56,6 +54,7 @@ const OrganizationStep = ({
   onStepChange: (values: TCreateOrganizationRequest["organization"]) => void;
   values: TCreateOrganizationRequest["organization"];
 }) => {
+  const messages = useMessages();
   const form = useForm<TCreateOrganizationRequest["organization"]>({
     defaultValues: values,
   });
@@ -66,12 +65,12 @@ const OrganizationStep = ({
       onNext={onNext}
       onPrevious={onPrevious}
       onStepChange={onStepChange}
-      title="Organisaatio"
+      title={messages.wizard.organizationTitle}
     >
       <FormInput
-        label="Nimi"
+        label={messages.wizard.nameLabel}
         name="name"
-        rules={{ required: "Nimi on pakollinen" }}
+        rules={{ required: messages.wizard.nameRequired }}
       />
     </Step>
   );
@@ -90,6 +89,7 @@ const UseCase = ({
   onPrevious: () => void;
   values: UseCaseFormState;
 }) => {
+  const messages = useMessages();
   const form = useForm<UseCaseFormState>({
     defaultValues: values,
   });
@@ -100,21 +100,21 @@ const UseCase = ({
       onNext={onNext}
       onPrevious={onPrevious}
       onStepChange={onStepChange}
-      title="Käyttötapaus"
+      title={messages.wizard.useCaseTitle}
     >
       <div className="flex flex-col gap-6">
         <FormInput
-          label="Nimi"
+          label={messages.wizard.nameLabel}
           name="name"
           rules={{
-            required: "Nimi on pakollinen",
+            required: messages.wizard.nameRequired,
           }}
         />
         <FormTextArea
-          label="Kuvaus"
+          label={messages.wizard.descriptionLabel}
           name="description"
           rules={{
-            required: "Kuvaus on pakollinen",
+            required: messages.wizard.descriptionRequired,
           }}
         />
       </div>
@@ -133,6 +133,7 @@ const SummaryStep = ({
   onPrevious: () => void;
   values: TCreateOrganizationRequest;
 }) => {
+  const messages = useMessages();
   const form = useForm<TCreateOrganizationRequest>({
     defaultValues: values,
   });
@@ -146,21 +147,21 @@ const SummaryStep = ({
       }}
       onPrevious={onPrevious}
       onStepChange={() => undefined}
-      nextText="Lähetä"
-      title="Yhteenveto"
+      nextText={messages.wizard.submit}
+      title={messages.wizard.summaryTitle}
     >
       <div className="flex flex-col gap-y-6">
         <div>
-          <h2 className="text-xl mb-4">Organisaatio</h2>
+          <h2 className="text-xl mb-4">{messages.wizard.organizationSectionTitle}</h2>
           <dl>
-            <dt className="font-bold">Nimi</dt>
+            <dt className="font-bold">{messages.wizard.nameLabel}</dt>
             <dd className="mb-4">{values.organization.name}</dd>
           </dl>
         </div>
         <div>
-          <h2 className="text-xl mb-4">Käyttötapaus</h2>
+          <h2 className="text-xl mb-4">{messages.wizard.useCaseSectionTitle}</h2>
           <dl>
-            <dt className="font-bold">Kuvaus</dt>
+            <dt className="font-bold">{messages.wizard.descriptionLabel}</dt>
             <dd className="mb-4">{values.useCase.description}</dd>
           </dl>
         </div>

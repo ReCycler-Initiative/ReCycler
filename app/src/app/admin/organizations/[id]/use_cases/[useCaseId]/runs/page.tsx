@@ -2,6 +2,7 @@
 
 import { PageTemplate } from "@/components/admin/page-template";
 import { Button } from "@/components/ui/button";
+import { useMessages } from "@/i18n/locale-provider";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 
@@ -56,32 +57,37 @@ const statusPillClass: Record<RunStatus, string> = {
 };
 
 export default function RunsPage() {
+  const messages = useMessages();
   const searchParams = useSearchParams();
   const connection = searchParams.get("connection");
 
+  const statusLabel: Record<RunStatus, string> = {
+    success: messages.admin.statusSuccess,
+    error: messages.admin.statusError,
+    running: messages.admin.statusRunning,
+  };
+
   return (
-    <PageTemplate title="Lokit">
+    <PageTemplate title={messages.admin.runsPageTitle}>
       <div className="flex flex-col gap-6">
         <section className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
           <div className="space-y-3">
             <p className="text-sm text-gray-600">
-                Tässä näkymässä seurataan synkronointien tilaa ja mahdollisia
-                virheitä. Tämä on toistaiseksi sivupohja/mockup – tänne voidaan
-                myöhemmin kytkeä oikea synkronointihistoria ja lokit.
+              {messages.admin.runsIntro}
             </p>
 
             {connection && (
               <div className="rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-xs text-gray-700">
-                Suodatin: datayhteys <span className="font-semibold">{connection}</span>
+                {messages.admin.filterLabel} <span className="font-semibold">{connection}</span>
               </div>
             )}
 
             <div className="flex flex-wrap gap-2">
               <Button asChild size="sm" variant="outline">
-                <Link href="?">Tyhjennä suodatus</Link>
+                <Link href="?">{messages.admin.clearFilter}</Link>
               </Button>
               <Button asChild size="sm">
-                <Link href="#">Käynnistä ajo</Link>
+                <Link href="#">{messages.admin.startRun}</Link>
               </Button>
             </div>
           </div>
@@ -89,9 +95,9 @@ export default function RunsPage() {
 
         <section className="rounded-xl border border-gray-200 bg-white shadow-sm">
           <div className="border-b border-gray-200 p-5">
-            <h2 className="text-lg font-medium text-gray-900">Ajohistoria</h2>
+            <h2 className="text-lg font-medium text-gray-900">{messages.admin.runHistoryTitle}</h2>
             <p className="mt-1 text-sm text-gray-600">
-                Viimeisimmät synkronoinnit ja niiden lopputulos.
+              {messages.admin.runHistoryDescription}
             </p>
           </div>
 
@@ -104,7 +110,7 @@ export default function RunsPage() {
                 <div className="min-w-0">
                   <div className="flex flex-wrap items-center gap-2">
                     <div className="text-base font-semibold text-gray-900">
-                      {run.source ?? "Ajo"}
+                      {run.source ?? messages.admin.runSourceFallback}
                     </div>
                     <span
                       className={[
@@ -118,11 +124,11 @@ export default function RunsPage() {
                   </div>
 
                   <div className="mt-1 text-sm text-gray-600">
-                    Aloitettu: <span className="font-medium text-gray-900">{run.startedAt}</span>
+                    {messages.admin.startedAt}: <span className="font-medium text-gray-900">{run.startedAt}</span>
                     {run.finishedAt && (
                       <>
                         {" "}
-                        · Valmis: <span className="font-medium text-gray-900">{run.finishedAt}</span>
+                        · {messages.admin.completedAt}: <span className="font-medium text-gray-900">{run.finishedAt}</span>
                       </>
                     )}
                   </div>
@@ -132,10 +138,10 @@ export default function RunsPage() {
 
                 <div className="flex flex-wrap gap-2">
                   <Button asChild size="sm" variant="outline">
-                    <Link href="#">Avaa loki</Link>
+                    <Link href="#">{messages.admin.openLog}</Link>
                   </Button>
                   <Button asChild size="sm" variant="outline">
-                    <Link href="#">Näytä virheet</Link>
+                    <Link href="#">{messages.admin.showErrors}</Link>
                   </Button>
                 </div>
               </div>
@@ -144,11 +150,9 @@ export default function RunsPage() {
         </section>
 
         <section className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
-          <h2 className="text-lg font-medium text-gray-900">Mitä seuraavaksi?</h2>
+          <h2 className="text-lg font-medium text-gray-900">{messages.admin.nextStepsTitle}</h2>
           <p className="mt-2 text-sm text-gray-600">
-            Kun oikea ajodataa/API on valmis, tämä sivu voidaan kytkeä siihen ja
-            korvata mockup-lista oikeilla suodatuksilla, lokisisällöllä sekä
-            ajokohtaisilla yksityiskohdilla.
+            {messages.admin.nextStepsDescription}
           </p>
         </section>
       </div>

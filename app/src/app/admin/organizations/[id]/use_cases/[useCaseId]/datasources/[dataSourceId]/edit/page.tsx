@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { PageTemplate } from "@/components/admin/page-template";
 import { Button } from "@/components/ui/button";
+import { useMessages } from "@/i18n/locale-provider";
 
 type ConnectorStatus = "draft" | "active" | "disabled";
 
@@ -63,6 +64,7 @@ const statusBadgeClass: Record<ConnectorStatus, string> = {
 };
 
 const EditDataSourcePage = () => {
+  const messages = useMessages();
   // Oletus: use case käyttää aluksi vain yhtä yhdistintä
   const [attachedConnectors, setAttachedConnectors] = useState<Connector[]>([
     allConnectors[0],
@@ -73,6 +75,21 @@ const EditDataSourcePage = () => {
   );
 
   const [selectedConnectorId, setSelectedConnectorId] = useState<string>("");
+
+  const statusLabel: Record<ConnectorStatus, string> = {
+    draft: messages.datasourceEditor.draft,
+    active: messages.datasourceEditor.active,
+    disabled: messages.datasourceEditor.disabled,
+  };
+
+  const connectorDescriptions: Record<string, string> = {
+    "Pääasiallinen kierrätyspisteiden datalähde.":
+      messages.adminDatasourcePage.connectorPrimaryDescription,
+    "Kaupunki A:n avoin keräyspiste-rajapinta.":
+      messages.adminDatasourcePage.connectorCityDescription,
+    "Sisäinen CSV-tuonti taustajärjestelmästä.":
+      messages.adminDatasourcePage.connectorCsvDescription,
+  };
 
   const handleAttachConnector = () => {
     if (!selectedConnectorId) return;
@@ -99,7 +116,7 @@ const EditDataSourcePage = () => {
   };
 
   return (
-    <PageTemplate title={`Datalähde`}>
+    <PageTemplate title={messages.adminDatasourcePage.pageTitle}>
       <div className="flex flex-col gap-y-8 pb-24 lg:pb-0">
         {/* ----------------------------- */}
         {/* HEADER & SUMMARY               */}
@@ -108,26 +125,27 @@ const EditDataSourcePage = () => {
           <div className="flex flex-col justify-between gap-4 md:flex-row md:items-start">
             <div className="space-y-2">
               <h1 className="text-xl font-semibold text-gray-900">
-                Use casen datalähteet
+                {messages.adminDatasourcePage.headerTitle}
               </h1>
               <p className="text-sm text-gray-600">
-                Tältä sivulta näet, mitä yhdistimiä tämä use case käyttää, ja
-                voit lisätä tai poistaa datalähteitä.
+                {messages.adminDatasourcePage.headerDescription}
               </p>
 
               {mockUseCase.description && (
                 <p className="text-xs text-gray-500">
-                  <span className="font-medium">Kuvaus:</span>{" "}
-                  {mockUseCase.description}
+                  <span className="font-medium">
+                    {messages.adminDatasourcePage.descriptionLabel}:
+                  </span>{" "}
+                  {messages.adminDatasourcePage.useCaseDescription}
                 </p>
               )}
 
               <div className="mt-2 flex flex-wrap gap-3 text-xs text-gray-600">
                 <span className="rounded-full bg-gray-50 px-3 py-1">
-                  {attachedConnectors.length} yhdistintä liitetty
+                  {attachedConnectors.length} {messages.adminDatasourcePage.attachedCountSuffix}
                 </span>
                 <span className="rounded-full bg-gray-50 px-3 py-1">
-                  {availableConnectors.length} muuta yhdistintä saatavilla
+                  {availableConnectors.length} {messages.adminDatasourcePage.availableCountSuffix}
                 </span>
               </div>
             </div>
@@ -141,11 +159,10 @@ const EditDataSourcePage = () => {
           <div className="flex items-center justify-between gap-4">
             <div>
               <h2 className="text-lg font-medium text-gray-900">
-                Liitetyt yhdistimet
+                {messages.adminDatasourcePage.attachedTitle}
               </h2>
               <p className="mt-1 text-sm text-gray-500">
-                Nämä yhdistimet toimittavat dataa tälle use caselle. Voit
-                avata yhdistimen muokkausnäkymän tai poistaa sen use casesta.
+                {messages.adminDatasourcePage.attachedDescription}
               </p>
             </div>
           </div>
@@ -173,13 +190,13 @@ const EditDataSourcePage = () => {
 
                   {connector.description && (
                     <p className="text-xs text-gray-600">
-                      {connector.description}
+                      {connectorDescriptions[connector.description] ?? connector.description}
                     </p>
                   )}
 
                   {connector.lastSyncAt && (
                     <p className="text-xs text-gray-500">
-                      Viimeisin ajo / synkronointi:{" "}
+                      {messages.adminDatasourcePage.lastSync}:{" "}
                       {new Date(connector.lastSyncAt).toLocaleString("fi-FI")}
                     </p>
                   )}
@@ -189,7 +206,7 @@ const EditDataSourcePage = () => {
                   {/* Linkitä tänne teidän uusi connector-konffisivu */}
                   <Button asChild variant="outline" size="sm">
                     <Link href={`/admin/connectors/${connector.id}`}>
-                      Avaa yhdistimen asetukset
+                      {messages.adminDatasourcePage.openConnectorSettings}
                     </Link>
                   </Button>
 
@@ -200,7 +217,7 @@ const EditDataSourcePage = () => {
                     className="text-red-600 hover:text-red-700"
                     onClick={() => handleDetachConnector(connector.id)}
                   >
-                    Poista use casesta
+                    {messages.adminDatasourcePage.removeFromUseCase}
                   </Button>
                 </div>
               </div>
@@ -215,11 +232,10 @@ const EditDataSourcePage = () => {
           <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
             <div>
               <h2 className="text-lg font-medium text-gray-900">
-                Lisää olemassa oleva yhdistin
+                {messages.adminDatasourcePage.addExistingTitle}
               </h2>
               <p className="mt-1 text-sm text-gray-500">
-                Liitä olemassa olevia yhdistimiä tähän use caseen. Yhdistimen
-                tekniset asetukset muokataan omalla yhdistinsivullaan.
+                {messages.adminDatasourcePage.addExistingDescription}
               </p>
             </div>
 
@@ -232,8 +248,8 @@ const EditDataSourcePage = () => {
               >
                 <option value="">
                   {availableConnectors.length === 0
-                    ? "Ei muita yhdistimiä saatavilla"
-                    : "Valitse lisättävä yhdistin"}
+                    ? messages.adminDatasourcePage.noConnectorsAvailable
+                    : messages.adminDatasourcePage.selectConnector}
                 </option>
                 {availableConnectors.map((connector) => (
                   <option key={connector.id} value={connector.id}>
@@ -252,10 +268,9 @@ const EditDataSourcePage = () => {
                 onClick={handleAttachConnector}
                 disabled={!selectedConnectorId}
               >
-                + Liitä use caseen
+                {messages.adminDatasourcePage.attachToUseCase}
               </Button>
 
-              {/* >>> UUSI: Luo uusi yhdistin -nappi <<< */}
               <Button
                 asChild
                 type="button"
@@ -263,9 +278,8 @@ const EditDataSourcePage = () => {
                 size="sm"
                 className="md:ml-2 w-full md:w-auto"
               >
-                {/* Vaihda href siihen reittiin, missä teidän "uusi connectori" -sivu on */}
                 <Link href="datasources/new">
-                  + Luo uusi datalähde
+                  {messages.adminDatasourcePage.createNew}
                 </Link>
               </Button>
             </div>

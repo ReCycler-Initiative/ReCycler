@@ -1,10 +1,13 @@
+"use client";
+
 import Link from "next/link";
-import { PageTemplate } from "@/components/admin/page-template";
-import { PricingAiChat } from "@/components/pricing-ai-chat";
-import { pricingPlans } from "@/content/pricing";
-import TitleBarService from "@/components/title-bar-service";
 import { ExternalLink } from "lucide-react";
 import { ReactNode } from "react";
+import { PageTemplate } from "@/components/admin/page-template";
+import { PricingAiChat } from "@/components/pricing-ai-chat";
+import TitleBarService from "@/components/title-bar-service";
+import { getPricingPlans } from "@/content/pricing";
+import { useLocale, useMessages } from "@/i18n/locale-provider";
 
 type PricingCardProps = {
   name: string;
@@ -16,6 +19,7 @@ type PricingCardProps = {
   ctaHref?: string;
   ctaNode?: ReactNode;
   featured?: boolean;
+  featuredLabel: string;
 };
 
 const PricingCard = ({
@@ -28,6 +32,7 @@ const PricingCard = ({
   ctaHref,
   ctaNode,
   featured = false,
+  featuredLabel,
 }: PricingCardProps) => {
   return (
     <section
@@ -47,7 +52,7 @@ const PricingCard = ({
         </div>
         {featured && (
           <span className="rounded-full bg-gray-900 px-3 py-1 text-xs font-medium text-white">
-            Suositeltu
+            {featuredLabel}
           </span>
         )}
       </div>
@@ -84,6 +89,10 @@ const PricingCard = ({
 };
 
 const HomePage = () => {
+  const { locale } = useLocale();
+  const messages = useMessages();
+  const pricingPlans = getPricingPlans(locale);
+
   return (
     <>
       <TitleBarService />
@@ -94,54 +103,33 @@ const HomePage = () => {
             <div className="p-6 md:p-10">
               <div className="mx-auto max-w-3xl">
                 <h1 className="mt-4 text-3xl font-semibold tracking-tight text-gray-900 md:text-5xl">
-                  Sijaintipohjaisten palveluiden alusta
+                  {messages.marketing.heroTitle}
                 </h1>
 
                 <p className="mt-4 text-sm leading-6 text-gray-600 md:text-base">
-                  ReCycler auttaa rakentamaan palveluita, joissa ihmiset löytävät
-                  oikeat paikat, palvelupisteet tai keräyskohteet helposti.
-                  Samalla sama järjestelmä auttaa ylläpitämään kohteita,
-                  tuomaan tietoa muista järjestelmistä ja julkaisemaan palvelun
-                  verkkoon ilman raskasta omaa kehitysprojektia.
+                  {messages.marketing.heroDescription}
                 </p>
 
                 <div className="mt-6 grid gap-3 text-sm text-gray-700 sm:grid-cols-2">
-                  <div className="rounded-xl border border-gray-200 bg-gray-50 p-4">
-                    Asiakaslähtöinen palvelu tekee asioinnista nopeampaa,
-                    selkeämpää ja helpompaa.
-                  </div>
-                  <div className="rounded-xl border border-gray-200 bg-gray-50 p-4">
-                    Käyttäjä löytää oikean palvelun helpommin ja saa heti
-                    vastauksia selkokieliseltä AI-avustajalta.
-                  </div>
-                  <div className="rounded-xl border border-gray-200 bg-gray-50 p-4">
-                    Tietoa voidaan tuoda muista järjestelmistä automaattisesti.
-                  </div>
-                  <div className="rounded-xl border border-gray-200 bg-gray-50 p-4">
-                    Käyttäjät voidaan tunnistaa organisaation nykyisillä
-                    tunnuksilla, kuten Microsoft- tai Google-kirjautumisella.
-                  </div>
+                  {messages.marketing.highlights.map((highlight: string) => (
+                    <div
+                      key={highlight}
+                      className="rounded-xl border border-gray-200 bg-gray-50 p-4"
+                    >
+                      {highlight}
+                    </div>
+                  ))}
                 </div>
 
                 <div className="mt-6 rounded-xl border border-gray-200 bg-gray-50 p-4">
                   <h2 className="text-xl font-semibold text-gray-900">
-                    Esimerkkejä käytöstä
+                    {messages.marketing.examplesTitle}
                   </h2>
                   <p className="mt-2 text-sm leading-6 text-gray-600">
-                    Esimerkiksi kunta voi toteuttaa palvelun, jossa asukas
-                    löytää helposti alueen päiväkodit kartalta, vertailee
-                    vaihtoehtoja ja saa AI-avustajalta nopeasti vastauksia
-                    käytännön kysymyksiin. Käyttäjä näkee myös helposti, mistä
-                    palvelu löytyy, ja voi tarkistaa nopeasti esimerkiksi,
-                    löytyykö alueelta englanninkielinen päiväkoti tai
-                    ympärivuorokautinen päiväkoti.
+                    {messages.marketing.exampleMunicipal}
                   </p>
                   <p className="mt-4 border-t border-gray-200 pt-4 text-sm leading-6 text-gray-600">
-                    Yritys voi vastaavasti toteuttaa palvelun, jossa asiakas
-                    löytää helposti oikean myymälän tai palvelupisteen,
-                    vertailee vaihtoehtoja kartalla ja saa nopeasti vastauksen
-                    esimerkiksi siihen, missä on esteetön toimipiste tai
-                    viikonloppuna avoinna oleva palvelupiste.
+                    {messages.marketing.exampleBusiness}
                   </p>
                 </div>
 
@@ -150,7 +138,7 @@ const HomePage = () => {
                     href="/recycler"
                     className="inline-flex items-center justify-center rounded-full bg-gray-900 px-6 py-3 text-sm font-medium text-white transition hover:bg-gray-800 sm:w-auto"
                   >
-                    Avaa ReCycler-demo
+                    {messages.marketing.openDemo}
                     <ExternalLink className="ml-2 inline" size={18} />
                   </Link>
                 </div>
@@ -162,18 +150,22 @@ const HomePage = () => {
           <div className="mt-10">
             <div className="max-w-3xl">
               <h2 className="text-base font-semibold text-gray-900">
-                Hinnoittelu ja käyttöönotto
+                {messages.marketing.pricingTitle}
               </h2>
               <p className="mt-1 text-sm leading-6 text-gray-600">
-                ReCycler voidaan ottaa käyttöön kevyenä pilotointina tai laajempana
-                jatkuvana palveluna. Hinnoittelu rakentuu tyypillisesti
-                käyttötapausten, datalähteiden, integraatioiden ja ylläpidon
-                tarpeen mukaan.
+                {messages.marketing.pricingDescription}
               </p>
             </div>
 
             <div className="mt-4 grid gap-4 xl:grid-cols-3">
-              {pricingPlans.map((plan) => (
+              {pricingPlans.map((plan: {
+                name: string;
+                audience: string;
+                price: string;
+                description: string;
+                highlights: string[];
+                featured?: boolean;
+              }) => (
                 <PricingCard
                   key={plan.name}
                   name={plan.name}
@@ -182,6 +174,7 @@ const HomePage = () => {
                   description={plan.description}
                   highlights={plan.highlights}
                   featured={plan.featured}
+                  featuredLabel={messages.common.recommended}
                   ctaNode={<PricingAiChat />}
                 />
               ))}
@@ -193,35 +186,29 @@ const HomePage = () => {
           <div className="mt-8 grid gap-4 lg:grid-cols-2">
             <section className="rounded-2xl border border-gray-200 bg-white p-6">
               <h3 className="text-sm font-semibold text-gray-900">
-                Teknologia ja arkkitehtuuri
+                {messages.marketing.technologyTitle}
               </h3>
               <p className="mt-2 text-sm text-gray-600">
-                Alusta on rakennettu modernilla teknologiapinolla: Next.js,
-                TypeScript, PostgreSQL + PostGIS, Tailwind CSS. Docker-pohjainen
-                kehitysympäristö ja Knex.js-migraatiot varmistavat helpon
-                käyttöönoton.
+                {messages.marketing.technologyDescription}
               </p>
               <div className="mt-3 text-xs text-gray-500">
-                Full-stack TypeScript • PostGIS • ETL-pipelinet • REST API
+                {messages.marketing.technologyStack}
               </div>
             </section>
 
             <section className="rounded-2xl border border-gray-200 bg-white p-6">
               <h3 className="text-sm font-semibold text-gray-900">
-                Avoin lähdekoodi ja kehitys
+                {messages.marketing.openSourceTitle}
               </h3>
               <p className="mt-2 text-sm text-gray-600">
-                ReCycler-palvelu perustuu avoimen lähdekoodin
-                ReCycler-projektiin. Lähdekoodi on saatavilla GitHubissa,
-                kehitys on läpinäkyvää, ja projektiin voi osallistua kuka
-                tahansa. Projekti on lisensoitu Apache 2.0 -lisenssillä.
+                {messages.marketing.openSourceDescription}
               </p>
               <div className="mt-3">
                 <a
                   href="https://github.com/ReCycler-Initiative/ReCycler"
                   className="text-sm font-medium text-gray-900 underline underline-offset-4 hover:text-gray-700"
                 >
-                  Tutustu projektiin GitHubissa{" "}
+                  {messages.common.openProjectGithub}{" "}
                   <ExternalLink className="ml-1 inline" size={16} />
                 </a>
               </div>
@@ -232,39 +219,39 @@ const HomePage = () => {
             <div className="grid gap-8 md:grid-cols-3">
               <div>
                 <h3 className="text-sm font-semibold uppercase tracking-[0.18em] text-gray-300">
-                  Yhteystiedot
+                  {messages.marketing.footerContactTitle}
                 </h3>
                 <p className="mt-3 text-lg font-semibold text-white">
-                  Yritys Oy
+                  {messages.marketing.footerCompanyName}
                 </p>
                 <p className="mt-2 text-sm leading-6 text-gray-300">
-                  ReCycler-palvelun käyttöönotto, pilotointi ja jatkuva kehitys
-                  organisaatioille.
+                  {messages.marketing.footerCompanyDescription}
                 </p>
               </div>
 
               <div>
-                <h4 className="text-sm font-semibold text-white">Osoite</h4>
+                <h4 className="text-sm font-semibold text-white">{messages.marketing.footerAddressTitle}</h4>
                 <p className="mt-3 text-sm leading-6 text-gray-300">
-                  Kuvitteellinenkatu 12 A
-                  <br />
-                  00100 Helsinki
-                  <br />
-                  Suomi
+                  {messages.marketing.footerAddressLines.map((line: string) => (
+                    <span key={line}>
+                      {line}
+                      <br />
+                    </span>
+                  ))}
                 </p>
               </div>
 
               <div>
-                <h4 className="text-sm font-semibold text-white">Ota yhteyttä</h4>
+                <h4 className="text-sm font-semibold text-white">{messages.marketing.footerContactSubtitle}</h4>
                 <div className="mt-3 space-y-2 text-sm text-gray-300">
                   <p>
-                    Sähköposti: info@yritys.fi
+                    {messages.marketing.footerEmailLabel}: info@yritys.fi
                   </p>
                   <p>
-                    Puhelin: 010 123 4567
+                    {messages.marketing.footerPhoneLabel}: 010 123 4567
                   </p>
                   <p>
-                    Y-tunnus: 1234567-8
+                    {messages.marketing.footerBusinessIdLabel}: 1234567-8
                   </p>
                 </div>
               </div>

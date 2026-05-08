@@ -4,6 +4,10 @@ export type CollectionSpot = {
   id: number;
   name: string;
   address: string;
+  additional_details?: string;
+  description_en?: string;
+  description_fi?: string;
+  opening_hours_en?: string;
   opening_hours_fi: string;
   postal_code: string;
   post_office: string;
@@ -14,6 +18,11 @@ export type Material = {
   code: number;
   name: string;
 };
+
+export const LocalizedText = z.object({
+  fi: z.string(),
+  en: z.string(),
+});
 
 export type Modify<T, R> = Omit<T, keyof R> & R;
 
@@ -64,12 +73,16 @@ export const DbLocation = z.object({
   field_order: z.number().nullable(),
   field_type: FieldType.nullable(),
   field_values: FieldValue.nullable(),
+  location_address: z.string().nullable().optional(),
   location_geom: Point,
   location_id: z.string().uuid(),
   location_name: z.string(),
+  location_post_office: z.string().nullable().optional(),
+  location_postal_code: z.string().nullable().optional(),
 });
 
 export const LocationProperties = z.object({
+  address: z.string().optional(),
   id: z.string().uuid(),
   name: z.string(),
   fields: z.array(
@@ -78,6 +91,8 @@ export const LocationProperties = z.object({
       value: FieldValue,
     })
   ),
+  post_office: z.string().optional(),
+  postal_code: z.string().optional(),
 });
 
 export const LocationGeoJson = z.object({
@@ -105,9 +120,12 @@ export const LocationDetail = z.object({
   type: z.literal("Feature"),
   geometry: Point,
   properties: z.object({
+    address: z.string().optional(),
     id: z.string().uuid(),
     name: z.string(),
     fields: z.array(LocationDetailField),
+    post_office: z.string().optional(),
+    postal_code: z.string().optional(),
   }),
 });
 
@@ -126,17 +144,17 @@ export const UseCase = NewUseCase.merge(
     created_at: z.coerce.date().optional(),
     content: z.object({
       intro: z.object({
-        title: z.string(),
-        cta: z.string(),
-        skip: z.string(),
-        text: z.string(),
+        title: LocalizedText,
+        cta: LocalizedText,
+        skip: LocalizedText,
+        text: LocalizedText,
       }),
       filters: z.object({
-        title: z.string(),
-        cta: z.string(),
-        text: z.string(),
-        tab_ai: z.string(),
-        tab_manual: z.string(),
+        title: LocalizedText,
+        cta: LocalizedText,
+        text: LocalizedText,
+        tab_ai: LocalizedText,
+        tab_manual: LocalizedText,
       }),
     }),
     updated_at: z.coerce.date().optional(),

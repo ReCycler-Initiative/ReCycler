@@ -3,6 +3,13 @@
 import { useEffect, useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createLocation, getFields, getLocation, updateLocation } from "@/services/api";
+import { useLocale, useMessages } from "@/i18n/locale-provider";
+import {
+  MapboxAddressResult,
+  reverseGeocodeMapbox,
+  searchMapboxAddresses,
+} from "@/lib/mapbox-geocoding";
+import { localizeMaterialNameCandidate } from "@/lib/material-translations";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -25,7 +32,7 @@ import {
 
 type AddProps = {
   mode: "add";
-  lngLat: { longitude: number; latitude: number };
+  lngLat?: { longitude: number; latitude: number };
   onSaved: (newId: string) => void;
 };
 
@@ -40,6 +47,7 @@ export type LocationEditPanelProps = {
   organizationId: string;
   useCaseId: string;
   onClose: () => void;
+  onCoordinatesChange?: (lngLat: { longitude: number; latitude: number } | null) => void;
   relocateMode?: boolean;
   onToggleRelocate?: () => void;
   onConfirmRelocate?: () => void;
@@ -48,7 +56,19 @@ export type LocationEditPanelProps = {
 } & (AddProps | EditProps);
 
 export const LocationEditPanel = (props: LocationEditPanelProps) => {
-  const { organizationId, useCaseId, onClose, relocateMode, onToggleRelocate, onConfirmRelocate, onCancelRelocate, pickedLngLat } = props;
+  const { locale } = useLocale();
+  const messages = useMessages();
+  const {
+    organizationId,
+    useCaseId,
+    onClose,
+    onCoordinatesChange,
+    relocateMode,
+    onToggleRelocate,
+    onConfirmRelocate,
+    onCancelRelocate,
+    pickedLngLat,
+  } = props;
   const queryClient = useQueryClient();
 
   const locationId = props.mode === "edit" ? props.locationId : undefined;
@@ -67,11 +87,19 @@ export const LocationEditPanel = (props: LocationEditPanelProps) => {
 
   const [name, setName] = useState("");
   const [longitude, setLongitude] = useState(
-    props.mode === "add" ? String(props.lngLat.longitude) : ""
+    props.mode === "add" ? String(props.lngLat?.longitude ?? "") : ""
   );
   const [latitude, setLatitude] = useState(
-    props.mode === "add" ? String(props.lngLat.latitude) : ""
+    props.mode === "add" ? String(props.lngLat?.latitude ?? "") : ""
   );
+  const [addressQuery, setAddressQuery] = useState("");
+  const [address, setAddress] = useState("");
+  const [postalCode, setPostalCode] = useState("");
+  const [postOffice, setPostOffice] = useState("");
+  const [addressResults, setAddressResults] = useState<MapboxAddressResult[]>([]);
+  const [addressLookupMessage, setAddressLookupMessage] = useState<string | null>(null);
+  const [isSearchingAddress, setIsSearchingAddress] = useState(false);
+  const [isResolvingAddress, setIsResolvingAddress] = useState(false);
   const [fieldValues, setFieldValues] = useState<Record<string, string[]>>({});
   const [isGeocodingAddress, setIsGeocodingAddress] = useState(false);
   const [pendingGeocode, setPendingGeocode] = useState<{
@@ -108,6 +136,83 @@ export const LocationEditPanel = (props: LocationEditPanelProps) => {
     }
   };
 
+  const applyAddressResult = (
+    result: MapboxAddressResult,
+    updateCoordinates = true
+  ) => {
+    setAddress(result.address);
+    setPostalCode(result.postalCode);
+    setPostOffice(result.postOffice);
+    setAddressQuery(result.label || result.address);
+    setAddressResults([]);
+    setAddressLookupMessage(null);
+
+    if (updateCoordinates) {
+      setLongitude(String(result.longitude));
+      setLatitude(String(result.latitude));
+      onCoordinatesChange?.({
+        longitude: result.longitude,
+        latitude: result.latitude,
+      });
+    }
+  };
+
+  const selectAddressResult = (result: MapboxAddressResult) => {
+    applyAddressResult(result, true);
+  };
+
+  const resolveAddressFromCoordinates = async () => {
+    const lng = Number.parseFloat(longitude);
+    const lat = Number.parseFloat(latitude);
+
+    if (Number.isNaN(lng) || Number.isNaN(lat)) {
+      setAddressLookupMessage(messages.adminLocationPanel.addressLookupFailed);
+      return;
+    }
+
+    setIsResolvingAddress(true);
+    setAddressLookupMessage(null);
+    setAddressResults([]);
+
+    try {
+      const result = await reverseGeocodeMapbox(lng, lat, locale);
+      if (!result) {
+        setAddressLookupMessage(messages.adminLocationPanel.noAddressFound);
+        return;
+      }
+
+      applyAddressResult(result, false);
+    } catch {
+      setAddressLookupMessage(messages.adminLocationPanel.addressLookupFailed);
+    } finally {
+      setIsResolvingAddress(false);
+    }
+  };
+
+  const handleAddressSearch = async () => {
+    if (!addressQuery.trim()) {
+      setAddressResults([]);
+      setAddressLookupMessage(null);
+      return;
+    }
+
+    setIsSearchingAddress(true);
+    setAddressLookupMessage(null);
+
+    try {
+      const results = await searchMapboxAddresses(addressQuery, locale);
+      setAddressResults(results);
+      if (results.length === 0) {
+        setAddressLookupMessage(messages.adminLocationPanel.noAddressFound);
+      }
+    } catch {
+      setAddressResults([]);
+      setAddressLookupMessage(messages.adminLocationPanel.addressLookupFailed);
+    } finally {
+      setIsSearchingAddress(false);
+    }
+  };
+
   // Snapshot coords when relocate activates so cancel can restore them
   const savedLngLat = useRef<{ longitude: string; latitude: string } | null>(null);
   const prevRelocateMode = useRef(false);
@@ -122,13 +227,18 @@ export const LocationEditPanel = (props: LocationEditPanelProps) => {
     if (!pickedLngLat) return;
     setLongitude(String(pickedLngLat.longitude));
     setLatitude(String(pickedLngLat.latitude));
-  }, [pickedLngLat]);
+    onCoordinatesChange?.(pickedLngLat);
+  }, [onCoordinatesChange, pickedLngLat]);
 
   useEffect(() => {
     if (props.mode !== "edit" || !data) return;
     setName(data.properties.name);
     setLongitude(String(data.geometry.coordinates[0]));
     setLatitude(String(data.geometry.coordinates[1]));
+    setAddress(data.properties.address ?? "");
+    setPostalCode(data.properties.postal_code ?? "");
+    setPostOffice(data.properties.post_office ?? "");
+    setAddressQuery(data.properties.address ?? "");
     const initial: Record<string, string[]> = {};
     for (const f of data.properties.fields) {
       initial[f.id] = f.value;
@@ -140,29 +250,26 @@ export const LocationEditPanel = (props: LocationEditPanelProps) => {
     mutationFn: async () => {
       if (props.mode === "add") {
         const created = await createLocation(organizationId, useCaseId, {
+          address: address.trim() || undefined,
+          fieldValues: Object.entries(fieldValues).map(([fieldId, values]) => ({
+            fieldId,
+            values,
+          })),
           name: name.trim(),
-          longitude: parseFloat(longitude),
           latitude: parseFloat(latitude),
+          longitude: parseFloat(longitude),
+          post_office: postOffice.trim() || undefined,
+          postal_code: postalCode.trim() || undefined,
         });
-        const newId = created?.properties?.id;
-        const hasFieldValues = Object.values(fieldValues).some((v) => v.length > 0);
-        if (newId && hasFieldValues) {
-          await updateLocation(organizationId, useCaseId, newId, {
-            name: name.trim(),
-            longitude: parseFloat(longitude),
-            latitude: parseFloat(latitude),
-            fieldValues: Object.entries(fieldValues).map(([fieldId, values]) => ({
-              fieldId,
-              values,
-            })),
-          });
-        }
         return created;
       }
       return updateLocation(organizationId, useCaseId, locationId!, {
+        address: address.trim() || undefined,
         name: name.trim(),
-        longitude: parseFloat(longitude),
         latitude: parseFloat(latitude),
+        longitude: parseFloat(longitude),
+        post_office: postOffice.trim() || undefined,
+        postal_code: postalCode.trim() || undefined,
         fieldValues: Object.entries(fieldValues).map(([fieldId, values]) => ({
           fieldId,
           values,
@@ -174,13 +281,13 @@ export const LocationEditPanel = (props: LocationEditPanelProps) => {
         queryKey: ["locations", organizationId, useCaseId],
       });
       if (props.mode === "add") {
-        toast.success("Kohde lisätty");
+        toast.success(messages.adminLocationPanel.locationAdded);
         props.onSaved(result?.properties?.id ?? "");
       } else {
         await queryClient.invalidateQueries({
           queryKey: ["location", organizationId, useCaseId, locationId],
         });
-        toast.success("Kohde tallennettu");
+        toast.success(messages.adminLocationPanel.locationSaved);
         props.onSaved();
       }
     },
@@ -197,10 +304,10 @@ export const LocationEditPanel = (props: LocationEditPanelProps) => {
 
   const title =
     props.mode === "add"
-      ? "Lisää kohde"
+      ? messages.adminLocationPanel.addLocation
       : isLoading_
-      ? "Ladataan..."
-      : (data?.properties.name ?? "Muokkaa kohdetta");
+      ? messages.adminLocationPanel.loading
+      : (data?.properties.name ?? messages.adminLocationPanel.editLocation);
 
   return (
     <>
@@ -214,7 +321,7 @@ export const LocationEditPanel = (props: LocationEditPanelProps) => {
               <button
                 type="button"
                 className="text-muted-foreground hover:text-foreground transition-colors"
-                aria-label="Lisää toimintoja"
+                aria-label={messages.adminLocationPanel.moreActions}
               >
                 <MoreHorizontal className="h-4 w-4" />
               </button>
@@ -225,7 +332,7 @@ export const LocationEditPanel = (props: LocationEditPanelProps) => {
                 onClick={props.onDelete}
               >
                 <Trash2 className="h-4 w-4 mr-2 text-destructive" />
-                Poista kohde
+                {messages.adminLocationPanel.deleteLocation}
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -234,7 +341,7 @@ export const LocationEditPanel = (props: LocationEditPanelProps) => {
           type="button"
           onClick={onClose}
           className="text-muted-foreground hover:text-foreground transition-colors"
-          aria-label="Sulje"
+          aria-label={messages.adminLocationPanel.close}
         >
           <X className="h-4 w-4" />
         </button>
@@ -244,28 +351,28 @@ export const LocationEditPanel = (props: LocationEditPanelProps) => {
       <div className="flex-1 overflow-y-auto">
         {isLoading_ && (
           <div className="flex items-center justify-center h-32">
-            <p className="text-sm text-muted-foreground">Ladataan...</p>
+            <p className="text-sm text-muted-foreground">{messages.adminLocationPanel.loading}</p>
           </div>
         )}
         {isError_ && (
           <div className="flex items-center justify-center h-32">
-            <p className="text-sm text-destructive">Virhe kohteen lataamisessa</p>
+            <p className="text-sm text-destructive">{messages.adminLocationPanel.loadError}</p>
           </div>
         )}
         {isReady && (
           <div className="p-4 space-y-5">
             <div className="space-y-1.5">
-              <Label htmlFor="panel-location-name">Nimi</Label>
+              <Label htmlFor="panel-location-name">{messages.adminLocationPanel.name}</Label>
               <Input
                 id="panel-location-name"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                placeholder="Kohteen nimi"
+                placeholder={messages.adminLocationPanel.namePlaceholder}
                 autoFocus={props.mode === "add"}
               />
             </div>
             <div className="space-y-1.5">
-              <Label>Koordinaatit</Label>
+              <Label>{messages.adminLocationPanel.coordinates}</Label>
               <div className="grid grid-cols-2 gap-2">
                 <div className="space-y-1">
                   <Label htmlFor="panel-longitude" className="text-xs text-muted-foreground">
@@ -276,7 +383,15 @@ export const LocationEditPanel = (props: LocationEditPanelProps) => {
                     type="number"
                     step="any"
                     value={longitude}
-                    onChange={(e) => setLongitude(e.target.value)}
+                    onChange={(e) => {
+                      const nextLongitude = e.target.value;
+                      setLongitude(nextLongitude);
+                      const lng = Number.parseFloat(nextLongitude);
+                      const lat = Number.parseFloat(latitude);
+                      if (!Number.isNaN(lng) && !Number.isNaN(lat)) {
+                        onCoordinatesChange?.({ longitude: lng, latitude: lat });
+                      }
+                    }}
                   />
                 </div>
                 <div className="space-y-1">
@@ -288,9 +403,122 @@ export const LocationEditPanel = (props: LocationEditPanelProps) => {
                     type="number"
                     step="any"
                     value={latitude}
-                    onChange={(e) => setLatitude(e.target.value)}
+                    onChange={(e) => {
+                      const nextLatitude = e.target.value;
+                      setLatitude(nextLatitude);
+                      const lng = Number.parseFloat(longitude);
+                      const lat = Number.parseFloat(nextLatitude);
+                      if (!Number.isNaN(lng) && !Number.isNaN(lat)) {
+                        onCoordinatesChange?.({ longitude: lng, latitude: lat });
+                      }
+                    }}
                   />
                 </div>
+              </div>
+              {!longitude.trim() || !latitude.trim() ? (
+                <p className="text-xs text-muted-foreground">
+                  {messages.adminLocationPanel.chooseLocationOnMap}
+                </p>
+              ) : null}
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="panel-address-search">{messages.adminLocationPanel.addressSearch}</Label>
+              <div className="flex gap-2">
+                <Input
+                  id="panel-address-search"
+                  value={addressQuery}
+                  onChange={(e) => setAddressQuery(e.target.value)}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter") {
+                      event.preventDefault();
+                      void handleAddressSearch();
+                    }
+                  }}
+                  placeholder={messages.adminLocationPanel.addressSearchPlaceholder}
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  disabled={isSearchingAddress || !addressQuery.trim()}
+                  onClick={() => void handleAddressSearch()}
+                >
+                  {isSearchingAddress ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    messages.adminLocationPanel.addressSearch
+                  )}
+                </Button>
+              </div>
+
+              <Button
+                type="button"
+                variant="outline"
+                className="w-full"
+                disabled={isResolvingAddress}
+                onClick={() => void resolveAddressFromCoordinates()}
+              >
+                {isResolvingAddress ? (
+                  <span className="flex items-center gap-2">
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    {messages.adminLocationPanel.resolvingAddress}
+                  </span>
+                ) : (
+                  messages.adminLocationPanel.suggestAddressFromCoordinates
+                )}
+              </Button>
+
+              {isSearchingAddress && (
+                <p className="text-xs text-muted-foreground">
+                  {messages.adminLocationPanel.searchingAddress}
+                </p>
+              )}
+
+              {addressLookupMessage && (
+                <p className="text-xs text-muted-foreground">{addressLookupMessage}</p>
+              )}
+
+              {addressResults.length > 0 && (
+                <div className="rounded-md border border-gray-200 bg-white">
+                  {addressResults.map((result) => (
+                    <button
+                      key={`${result.longitude}:${result.latitude}:${result.label}`}
+                      type="button"
+                      onClick={() => selectAddressResult(result)}
+                      className="block w-full border-b border-gray-100 px-3 py-2 text-left text-sm last:border-b-0 hover:bg-gray-50"
+                    >
+                      {result.label || result.address}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <div className="space-y-1.5">
+              <Label htmlFor="panel-address">{messages.adminLocationPanel.address}</Label>
+              <Input
+                id="panel-address"
+                value={address}
+                onChange={(e) => setAddress(e.target.value)}
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-2">
+              <div className="space-y-1.5">
+                <Label htmlFor="panel-postal-code">{messages.adminLocationPanel.postalCode}</Label>
+                <Input
+                  id="panel-postal-code"
+                  value={postalCode}
+                  onChange={(e) => setPostalCode(e.target.value)}
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="panel-post-office">{messages.adminLocationPanel.postOffice}</Label>
+                <Input
+                  id="panel-post-office"
+                  value={postOffice}
+                  onChange={(e) => setPostOffice(e.target.value)}
+                />
               </div>
             </div>
 
@@ -377,7 +605,7 @@ export const LocationEditPanel = (props: LocationEditPanelProps) => {
                             htmlFor={`${field.id}-${choice}`}
                             className="text-sm cursor-pointer"
                           >
-                            {choice}
+                            {localizeMaterialNameCandidate(choice, locale)}
                           </label>
                         </div>
                       );
@@ -528,6 +756,56 @@ export const LocationEditPanel = (props: LocationEditPanelProps) => {
               );
             })}
 
+            {onToggleRelocate && (
+              <div className="space-y-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (!relocateMode) onToggleRelocate();
+                  }}
+                  className={`flex items-center gap-2 text-sm px-3 py-2 rounded-md border transition-colors w-full ${
+                    relocateMode
+                      ? "border-primary bg-primary text-primary-foreground"
+                      : "border-gray-200 bg-white text-muted-foreground hover:text-foreground hover:border-gray-400"
+                  }`}
+                >
+                  <Crosshair className="h-4 w-4 shrink-0" />
+                  {relocateMode
+                    ? messages.adminLocationPanel.chooseLocationOnMap
+                    : messages.adminLocationPanel.updateLocationOnMap}
+                </button>
+
+                {relocateMode && (
+                  <div className="flex gap-2">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (savedLngLat.current) {
+                          setLongitude(savedLngLat.current.longitude);
+                          setLatitude(savedLngLat.current.latitude);
+                          const lng = Number.parseFloat(savedLngLat.current.longitude);
+                          const lat = Number.parseFloat(savedLngLat.current.latitude);
+                          if (!Number.isNaN(lng) && !Number.isNaN(lat)) {
+                            onCoordinatesChange?.({ longitude: lng, latitude: lat });
+                          }
+                        }
+                        onCancelRelocate?.();
+                      }}
+                      className="flex-1 text-sm px-3 py-1.5 rounded-md border border-gray-200 bg-white hover:bg-gray-50 transition-colors"
+                    >
+                      {messages.adminLocationPanel.restoreOriginal}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={onConfirmRelocate}
+                      className="flex-1 text-sm px-3 py-1.5 rounded-md border border-gray-200 bg-white hover:bg-gray-50 transition-colors"
+                    >
+                      {messages.adminLocationPanel.finishUpdate}
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         )}
       </div>
@@ -537,7 +815,7 @@ export const LocationEditPanel = (props: LocationEditPanelProps) => {
         <div className="shrink-0 border-t border-gray-200 p-4">
           {mutation.isError && (
             <p className="text-xs text-destructive mb-2">
-              Tallennus epäonnistui. Yritä uudelleen.
+              {messages.adminLocationPanel.saveFailed}
             </p>
           )}
           <div className="flex gap-2">
@@ -548,7 +826,7 @@ export const LocationEditPanel = (props: LocationEditPanelProps) => {
               disabled={mutation.isPending}
               onClick={onClose}
             >
-              Peruuta
+              {messages.adminLocationPanel.cancel}
             </Button>
             <Button
               type="button"
@@ -556,7 +834,7 @@ export const LocationEditPanel = (props: LocationEditPanelProps) => {
               disabled={!isValid || mutation.isPending}
               onClick={() => mutation.mutate()}
             >
-              {mutation.isPending ? "Tallennetaan..." : "Tallenna"}
+              {mutation.isPending ? messages.adminLocationPanel.saving : messages.adminLocationPanel.save}
             </Button>
           </div>
         </div>
