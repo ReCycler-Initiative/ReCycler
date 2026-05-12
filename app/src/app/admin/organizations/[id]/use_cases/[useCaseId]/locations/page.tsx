@@ -151,7 +151,7 @@ const LocationsPage = () => {
   return (
     <PageTemplate
       title={messages.adminLocations.title}
-      actions={
+      actions={!addMode ? (
         <Button
           type="button"
           onClick={() => {
@@ -168,21 +168,11 @@ const LocationsPage = () => {
               return next;
             });
           }}
-          variant={addMode ? "outline" : "default"}
         >
-          {addMode ? (
-            <>
-              <X className="h-4 w-4" />
-              {messages.adminLocations.cancelAdding}
-            </>
-          ) : (
-            <>
-              <Plus className="h-4 w-4" />
-              {messages.adminLocations.addLocation}
-            </>
-          )}
+          <Plus className="h-4 w-4" />
+          {messages.adminLocations.addLocation}
         </Button>
-      }
+      ) : undefined}
       mode="fullScreen"
     >
       {isLoading && (

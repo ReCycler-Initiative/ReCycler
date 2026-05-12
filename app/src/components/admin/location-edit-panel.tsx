@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createLocation, getFields, getLocation, updateLocation } from "@/services/api";
 import { useLocale, useMessages } from "@/i18n/locale-provider";
@@ -298,6 +298,53 @@ export const LocationEditPanel = (props: LocationEditPanelProps) => {
     !isNaN(parseFloat(longitude)) &&
     !isNaN(parseFloat(latitude));
 
+  const normalizeFieldValues = (values: Record<string, string[]>) =>
+    Object.fromEntries(
+      Object.entries(values).sort(([left], [right]) => left.localeCompare(right))
+    );
+
+  const initialFormState = useMemo(() => {
+    if (props.mode === "add") {
+      return null;
+    }
+
+    if (!data) {
+      return null;
+    }
+
+    return JSON.stringify({
+      name: data.properties.name ?? "",
+      longitude: String(data.geometry.coordinates[0]),
+      latitude: String(data.geometry.coordinates[1]),
+      address: data.properties.address ?? "",
+      postalCode: data.properties.postal_code ?? "",
+      postOffice: data.properties.post_office ?? "",
+      fieldValues: normalizeFieldValues(
+        Object.fromEntries(data.properties.fields.map((field) => [field.id, field.value]))
+      ),
+    });
+  }, [data, props.mode]);
+
+  const currentFormState = useMemo(() => {
+    if (props.mode === "add") {
+      return null;
+    }
+
+    return JSON.stringify({
+      name,
+      longitude,
+      latitude,
+      address,
+      postalCode,
+      postOffice,
+      fieldValues: normalizeFieldValues(fieldValues),
+    });
+  }, [address, fieldValues, latitude, longitude, name, postalCode, postOffice, props.mode]);
+
+  const isDirty = props.mode === "add" || (
+    initialFormState !== null && currentFormState !== null && initialFormState !== currentFormState
+  );
+
   const isLoading_ = props.mode === "edit" && isLoading;
   const isError_ = props.mode === "edit" && isError;
   const isReady = props.mode === "add" || (!isLoading_ && !isError_ && !!data);
@@ -522,52 +569,6 @@ export const LocationEditPanel = (props: LocationEditPanelProps) => {
               </div>
             </div>
 
-            {onToggleRelocate && (
-              <div className="space-y-2">
-                <button
-                  type="button"
-                  onClick={() => {
-                    if (!relocateMode) onToggleRelocate();
-                  }}
-                  className={`flex items-center gap-2 text-sm px-3 py-2 rounded-md border transition-colors w-full ${
-                    relocateMode
-                      ? "border-primary bg-primary text-primary-foreground"
-                      : "border-gray-200 bg-white text-muted-foreground hover:text-foreground hover:border-gray-400"
-                  }`}
-                >
-                  <Crosshair className="h-4 w-4 shrink-0" />
-                  {relocateMode
-                    ? "Klikkaa karttaa valitaksesi sijainti"
-                    : "Päivitä sijainti valitsemalla kartalta uusi"}
-                </button>
-
-                {relocateMode && (
-                  <div className="flex gap-2">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        if (savedLngLat.current) {
-                          setLongitude(savedLngLat.current.longitude);
-                          setLatitude(savedLngLat.current.latitude);
-                        }
-                        onCancelRelocate?.();
-                      }}
-                      className="flex-1 text-sm px-3 py-1.5 rounded-md border border-gray-200 bg-white hover:bg-gray-50 transition-colors"
-                    >
-                      Palauta alkuperäinen
-                    </button>
-                    <button
-                      type="button"
-                      onClick={onConfirmRelocate}
-                      className="flex-1 text-sm px-3 py-1.5 rounded-md border border-gray-200 bg-white hover:bg-gray-50 transition-colors"
-                    >
-                      Lopeta päivitys
-                    </button>
-                  </div>
-                )}
-              </div>
-            )}
-
             {(fieldsDefinitions ?? []).map((field) => {
               const existingField = data?.properties.fields.find((f) => f.id === field.id);
               const choices = existingField?.options?.choices ?? field.options?.choices ?? [];
@@ -758,27 +759,26 @@ export const LocationEditPanel = (props: LocationEditPanelProps) => {
 
             {onToggleRelocate && (
               <div className="space-y-2">
-                <button
+                <Button
                   type="button"
                   onClick={() => {
                     if (!relocateMode) onToggleRelocate();
                   }}
-                  className={`flex items-center gap-2 text-sm px-3 py-2 rounded-md border transition-colors w-full ${
-                    relocateMode
-                      ? "border-primary bg-primary text-primary-foreground"
-                      : "border-gray-200 bg-white text-muted-foreground hover:text-foreground hover:border-gray-400"
-                  }`}
+                  variant={relocateMode ? "default" : "outline"}
+                  className="w-full justify-start gap-2 px-3"
                 >
                   <Crosshair className="h-4 w-4 shrink-0" />
                   {relocateMode
                     ? messages.adminLocationPanel.chooseLocationOnMap
                     : messages.adminLocationPanel.updateLocationOnMap}
-                </button>
+                </Button>
 
                 {relocateMode && (
                   <div className="flex gap-2">
-                    <button
+                    <Button
                       type="button"
+                      variant="outline"
+                      className="flex-1"
                       onClick={() => {
                         if (savedLngLat.current) {
                           setLongitude(savedLngLat.current.longitude);
@@ -791,17 +791,17 @@ export const LocationEditPanel = (props: LocationEditPanelProps) => {
                         }
                         onCancelRelocate?.();
                       }}
-                      className="flex-1 text-sm px-3 py-1.5 rounded-md border border-gray-200 bg-white hover:bg-gray-50 transition-colors"
                     >
                       {messages.adminLocationPanel.restoreOriginal}
-                    </button>
-                    <button
+                    </Button>
+                    <Button
                       type="button"
+                      variant="outline"
+                      className="flex-1"
                       onClick={onConfirmRelocate}
-                      className="flex-1 text-sm px-3 py-1.5 rounded-md border border-gray-200 bg-white hover:bg-gray-50 transition-colors"
                     >
                       {messages.adminLocationPanel.finishUpdate}
-                    </button>
+                    </Button>
                   </div>
                 )}
               </div>
@@ -831,7 +831,7 @@ export const LocationEditPanel = (props: LocationEditPanelProps) => {
             <Button
               type="button"
               className="flex-1"
-              disabled={!isValid || mutation.isPending}
+              disabled={!isValid || mutation.isPending || !isDirty}
               onClick={() => mutation.mutate()}
             >
               {mutation.isPending ? messages.adminLocationPanel.saving : messages.adminLocationPanel.save}
