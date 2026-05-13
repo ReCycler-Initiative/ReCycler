@@ -322,7 +322,7 @@ type DatasourceBody = {
   name: string;
   url: string;
   status: "draft" | "active" | "disabled";
-  source_format: "json" | "geojson";
+  source_format: "json" | "geojson" | "wfs";
   auth_type: "none" | "api_key" | "basic" | "query_param";
   auth_header?: string | null;
   auth_credential?: string | null;
@@ -330,6 +330,7 @@ type DatasourceBody = {
   name_source_field?: string | null;
   external_id_source_field?: string | null;
   coordinate_type: "latlon" | "geojson";
+  source_crs?: string | null;
   lat_source_field?: string | null;
   lon_source_field?: string | null;
   geometry_source_field?: string | null;
@@ -384,8 +385,8 @@ export const testDatasource = (
   datasourceId: string,
   config: {
     url: string;
-    source_format: "json" | "geojson";
-    auth_type: "none" | "api_key" | "basic";
+    source_format: "json" | "geojson" | "wfs";
+    auth_type: "none" | "api_key" | "basic" | "query_param";
     auth_header?: string | null;
     auth_credential?: string | null;
     data_path?: string | null;

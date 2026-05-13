@@ -1,11 +1,16 @@
 import { checkOrganizationAuthorization } from "@/lib/authorization";
+import {
+  getWfsConfigurationHint,
+  isGeoJsonLikeSourceFormat,
+  isWfsCapabilitiesRequest,
+} from "@/lib/datasource";
 import { DatasourceTestResult } from "@/types";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 
 const TestBody = z.object({
   url: z.string().url(),
-  source_format: z.enum(["json", "geojson"]).default("json"),
+  source_format: z.enum(["json", "geojson", "wfs"]).default("json"),
   auth_type: z.enum(["none", "api_key", "basic", "query_param"]).default("none"),
   auth_header: z.string().nullable().optional(),
   /** Plain-text credential for the test (never persisted from this endpoint) */
@@ -92,6 +97,10 @@ export async function POST(request: NextRequest, { params }: Params) {
   const { url, source_format, auth_type, auth_header, auth_credential, data_path } =
     parsed.data;
 
+  if (source_format === "wfs" && isWfsCapabilitiesRequest(url)) {
+    return NextResponse.json({ error: getWfsConfigurationHint(url) }, { status: 422 });
+  }
+
   const headers = buildHeaders(auth_type, auth_header, auth_credential);
   const fetchUrl = appendQueryParam(url, auth_type, auth_header, auth_credential);
 
@@ -100,20 +109,31 @@ export async function POST(request: NextRequest, { params }: Params) {
     const res = await fetch(fetchUrl, { headers, signal: AbortSignal.timeout(15_000) });
 
     if (!res.ok) {
+      const detail = source_format === "wfs" ? ` ${getWfsConfigurationHint(url)}` : "";
       return NextResponse.json(
-        { error: `Source API responded with ${res.status} ${res.statusText}` },
+        { error: `Source API responded with ${res.status} ${res.statusText}.${detail}`.trim() },
         { status: 422 }
       );
     }
+
+    const contentType = res.headers.get("content-type") ?? "";
+    if (source_format === "wfs" && !contentType.toLowerCase().includes("json")) {
+      return NextResponse.json({ error: getWfsConfigurationHint(url) }, { status: 422 });
+    }
+
     responseData = await res.json();
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : String(err);
-    return NextResponse.json({ error: `Failed to reach URL: ${message}` }, { status: 422 });
+    const detail = source_format === "wfs" ? ` ${getWfsConfigurationHint(url)}` : "";
+    return NextResponse.json(
+      { error: `Failed to reach URL: ${message}.${detail}`.trim() },
+      { status: 422 }
+    );
   }
 
   let sampleItem: unknown;
 
-  if (source_format === "geojson") {
+  if (isGeoJsonLikeSourceFormat(source_format)) {
     const fc = responseData as { features?: unknown[] };
     const first = fc?.features?.[0] as Record<string, unknown> | undefined;
     if (!first) {

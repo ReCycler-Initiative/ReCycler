@@ -1,6 +1,7 @@
 import db from "@/services/db";
 import { checkOrganizationAuthorization } from "@/lib/authorization";
 import { encryptSecret } from "@/lib/crypto";
+import { isSupportedSourceCrsValue, normalizeSourceCrsValue } from "@/lib/datasource";
 import { Datasource } from "@/types";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
@@ -9,7 +10,7 @@ const UpdateDatasourceBody = z.object({
   name: z.string().trim().min(1),
   url: z.string().url(),
   status: z.enum(["draft", "active", "disabled"]),
-  source_format: z.enum(["json", "geojson"]),
+  source_format: z.enum(["json", "geojson", "wfs"]),
   auth_type: z.enum(["none", "api_key", "basic", "query_param"]),
   auth_header: z.string().nullable().optional(),
   /** Supply to update credentials; omit to keep existing */
@@ -18,7 +19,15 @@ const UpdateDatasourceBody = z.object({
   name_source_field: z.string().nullable().optional(),
   external_id_source_field: z.string().nullable().optional(),
   coordinate_type: z.enum(["latlon", "geojson"]),
-  source_crs: z.enum(["wgs84", "etrs_tm35fin"]).optional(),
+  source_crs: z
+    .string()
+    .trim()
+    .refine(
+      (value) => isSupportedSourceCrsValue(value),
+      "Invalid source CRS. Use an EPSG code such as 4326 or EPSG:3067."
+    )
+    .transform((value) => normalizeSourceCrsValue(value))
+    .optional(),
   lat_source_field: z.string().nullable().optional(),
   lon_source_field: z.string().nullable().optional(),
   geometry_source_field: z.string().nullable().optional(),

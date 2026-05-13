@@ -1,6 +1,12 @@
 import db from "@/services/db";
 import { checkOrganizationAuthorization } from "@/lib/authorization";
 import { decryptSecret } from "@/lib/crypto";
+import {
+  getWfsConfigurationHint,
+  isGeoJsonLikeSourceFormat,
+  isWfsCapabilitiesRequest,
+  parseSourceSrid,
+} from "@/lib/datasource";
 import { DatasourceRun } from "@/types";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -104,13 +110,34 @@ export async function POST(request: NextRequest, { params }: Params) {
       datasource.auth_credentials_ciphertext
     );
 
+    if (
+      datasource.source_format === "wfs" &&
+      isWfsCapabilitiesRequest(fetchUrl)
+    ) {
+      throw new Error(getWfsConfigurationHint(fetchUrl));
+    }
+
     const res = await fetch(fetchUrl, {
       headers,
       signal: AbortSignal.timeout(30_000),
     });
 
     if (!res.ok) {
-      throw new Error(`Source API responded with ${res.status} ${res.statusText}`);
+      const detail =
+        datasource.source_format === "wfs"
+          ? ` ${getWfsConfigurationHint(fetchUrl)}`
+          : "";
+      throw new Error(
+        `Source API responded with ${res.status} ${res.statusText}.${detail}`.trim()
+      );
+    }
+
+    const contentType = res.headers.get("content-type") ?? "";
+    if (
+      datasource.source_format === "wfs" &&
+      !contentType.toLowerCase().includes("json")
+    ) {
+      throw new Error(getWfsConfigurationHint(fetchUrl));
     }
 
     const responseData: unknown = await res.json();
@@ -137,8 +164,9 @@ export async function POST(request: NextRequest, { params }: Params) {
           continue;
         }
 
-        const sourceSrid =
-          datasource.source_crs === "etrs_tm35fin" ? 3067 : 4326;
+        const sourceSrid = parseSourceSrid(
+          datasource.source_crs as string | null | undefined
+        );
 
         // Upsert location — relies on UNIQUE INDEX (datasource_id, external_id)
         const upsertResult = await db.raw(
@@ -208,7 +236,7 @@ export async function POST(request: NextRequest, { params }: Params) {
 }
 
 function extractItems(datasource: Record<string, unknown>, data: unknown): unknown[] {
-  if (datasource.source_format === "geojson") {
+  if (isGeoJsonLikeSourceFormat(datasource.source_format as string | undefined)) {
     const fc = data as { features?: unknown[] };
     return fc?.features ?? [];
   }

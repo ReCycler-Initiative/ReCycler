@@ -3,6 +3,7 @@
 import { FormFooter } from "@/components/editor-template";
 import FormInput from "@/components/form/form-input";
 import FormSelect from "@/components/form/form-select";
+import { normalizeSourceCrsValue } from "@/lib/datasource";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -35,6 +36,7 @@ import {
   DatasourceTestResult,
   FieldRecord,
 } from "@/types";
+import axios from "axios";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -48,7 +50,7 @@ const DatasourceFormSchema = z.object({
   name: z.string().trim().min(1, "Nimi vaaditaan"),
   url: z.string().url("Anna kelvollinen URL"),
   status: z.enum(["draft", "active", "disabled"]),
-  source_format: z.enum(["json", "geojson"]),
+  source_format: z.enum(["json", "geojson", "wfs"]),
   auth_type: z.enum(["none", "api_key", "basic", "query_param"]),
   auth_header: z.string().nullable().optional(),
   auth_credential: z.string().nullable().optional(),
@@ -56,7 +58,10 @@ const DatasourceFormSchema = z.object({
   name_source_field: z.string().nullable().optional(),
   external_id_source_field: z.string().nullable().optional(),
   coordinate_type: z.enum(["latlon", "geojson"]),
-  source_crs: z.enum(["wgs84", "etrs_tm35fin"]),
+  source_crs: z
+    .string()
+    .trim()
+    .regex(/^(?:epsg:)?\d+$/i, "Anna EPSG-koodi, esim. 4326 tai EPSG:3067"),
   lat_source_field: z.string().nullable().optional(),
   lon_source_field: z.string().nullable().optional(),
   geometry_source_field: z.string().nullable().optional(),
@@ -121,7 +126,7 @@ export const DataSourceEditor = ({
       name_source_field: null,
       external_id_source_field: null,
       coordinate_type: "latlon",
-      source_crs: "wgs84",
+      source_crs: "4326",
       lat_source_field: null,
       lon_source_field: null,
       geometry_source_field: null,
@@ -170,7 +175,7 @@ export const DataSourceEditor = ({
           name_source_field: ds.name_source_field ?? null,
           external_id_source_field: ds.external_id_source_field ?? null,
           coordinate_type: ds.coordinate_type,
-          source_crs: ds.source_crs ?? "wgs84",
+          source_crs: normalizeSourceCrsValue(ds.source_crs ?? "4326"),
           lat_source_field: ds.lat_source_field ?? null,
           lon_source_field: ds.lon_source_field ?? null,
           geometry_source_field: ds.geometry_source_field ?? null,
@@ -185,9 +190,26 @@ export const DataSourceEditor = ({
   }, [isEdit, datasourceId, organizationId, useCaseId, reset]);
 
   const handleTestConnection = async () => {
-    const values = getValues();
     setConnectionError(null);
     setConnectionStatus("testing");
+
+    const isValid = await form.trigger([
+      "name",
+      "url",
+      "status",
+      "source_format",
+      "auth_type",
+      "coordinate_type",
+      "source_crs",
+    ]);
+
+    if (!isValid) {
+      setConnectionStatus("error");
+      setConnectionError("Täytä pakolliset kentät ennen yhteyden testausta.");
+      return;
+    }
+
+    const values = getValues();
 
     try {
       // Need a datasourceId for the test endpoint — create a draft first if in create mode
@@ -195,6 +217,7 @@ export const DataSourceEditor = ({
       if (!dsId) {
         const created = await createDatasource(organizationId, useCaseId, {
           ...values,
+          source_crs: normalizeSourceCrsValue(values.source_crs),
           status: "draft",
         });
         dsId = created.id;
@@ -214,8 +237,11 @@ export const DataSourceEditor = ({
       setConnectionStatus("success");
     } catch (err: unknown) {
       setConnectionStatus("error");
-      const msg =
-        err instanceof Error ? err.message : "Yhteyden testaus epäonnistui";
+      const msg = axios.isAxiosError(err)
+        ? ((err.response?.data as { error?: string } | undefined)?.error ?? err.message)
+        : err instanceof Error
+          ? err.message
+          : "Yhteyden testaus epäonnistui";
       setConnectionError(msg);
     }
   };
@@ -230,10 +256,16 @@ export const DataSourceEditor = ({
           organizationId,
           useCaseId,
           createdDatasourceId,
-          values
+          {
+            ...values,
+            source_crs: normalizeSourceCrsValue(values.source_crs),
+          }
         );
       } else {
-        saved = await createDatasource(organizationId, useCaseId, values);
+        saved = await createDatasource(organizationId, useCaseId, {
+          ...values,
+          source_crs: normalizeSourceCrsValue(values.source_crs),
+        });
         setCreatedDatasourceId(saved.id);
       }
 
@@ -314,6 +346,7 @@ export const DataSourceEditor = ({
           items={[
             { value: "json", label: "JSON" },
             { value: "geojson", label: "GeoJSON" },
+            { value: "wfs", label: "WFS (GeoJSON-vastaus)" },
           ]}
         />
 
@@ -410,16 +443,25 @@ export const DataSourceEditor = ({
             ]}
           />
 
-          <FormSelect
+          <FormField
+            control={control}
             name="source_crs"
-            label="Koordinaatisto"
-            items={[
-              { value: "wgs84", label: "WGS84 (desimaaliasteet, yleinen)" },
-              {
-                value: "etrs_tm35fin",
-                label: "ETRS-TM35FIN / EPSG:3067 (suomalainen)",
-              },
-            ]}
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Koordinaatisto (EPSG)</FormLabel>
+                <FormControl>
+                  <Input
+                    {...field}
+                    value={field.value ?? "4326"}
+                    placeholder="4326"
+                  />
+                </FormControl>
+                <p className="text-xs text-muted-foreground">
+                  Anna lähdedatan EPSG-koodi, esim. 4326 tai 3067. Kohteet muunnetaan
+                  automaattisesti WGS84 / Mapbox-muotoon tuonnin aikana.
+                </p>
+              </FormItem>
+            )}
           />
 
           {coordinateType === "latlon" && (

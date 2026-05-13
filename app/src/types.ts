@@ -1,3 +1,4 @@
+import { isSupportedSourceCrsValue, normalizeSourceCrsValue } from "@/lib/datasource";
 import { z } from "zod";
 
 export type CollectionSpot = {
@@ -179,10 +180,17 @@ export const CreateOrganizationResponse = z.object({
 });
 
 export const DatasourceStatus = z.enum(["draft", "active", "disabled"]);
-export const DatasourceSourceFormat = z.enum(["json", "geojson"]);
+export const DatasourceSourceFormat = z.enum(["json", "geojson", "wfs"]);
 export const DatasourceAuthType = z.enum(["none", "api_key", "basic", "query_param"]);
 export const DatasourceCoordinateType = z.enum(["latlon", "geojson"]);
-export const DatasourceSourceCrs = z.enum(["wgs84", "etrs_tm35fin"]);
+export const DatasourceSourceCrs = z
+  .string()
+  .trim()
+  .refine(
+    (value) => isSupportedSourceCrsValue(value),
+    "Invalid source CRS. Use an EPSG code such as 4326 or EPSG:3067."
+  )
+  .transform((value) => normalizeSourceCrsValue(value));
 
 export const Datasource = z.object({
   id: z.string().uuid(),
@@ -200,7 +208,7 @@ export const Datasource = z.object({
   name_source_field: z.string().nullable().optional(),
   external_id_source_field: z.string().nullable().optional(),
   coordinate_type: DatasourceCoordinateType.default("latlon"),
-  source_crs: DatasourceSourceCrs.default("wgs84"),
+  source_crs: DatasourceSourceCrs.default("4326"),
   lat_source_field: z.string().nullable().optional(),
   lon_source_field: z.string().nullable().optional(),
   geometry_source_field: z.string().nullable().optional(),
