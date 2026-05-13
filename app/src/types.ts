@@ -178,18 +178,74 @@ export const CreateOrganizationResponse = z.object({
   useCase: UseCase,
 });
 
+export const DatasourceStatus = z.enum(["draft", "active", "disabled"]);
+export const DatasourceSourceFormat = z.enum(["json", "geojson"]);
+export const DatasourceAuthType = z.enum(["none", "api_key", "basic", "query_param"]);
+export const DatasourceCoordinateType = z.enum(["latlon", "geojson"]);
+export const DatasourceSourceCrs = z.enum(["wgs84", "etrs_tm35fin"]);
+
 export const Datasource = z.object({
   id: z.string().uuid(),
   name: z.string(),
   url: z.string(),
   use_case_id: z.string().uuid(),
+  status: DatasourceStatus.default("draft"),
+  source_format: DatasourceSourceFormat.default("json"),
+  auth_type: DatasourceAuthType.default("none"),
+  auth_header: z.string().nullable().optional(),
+  /** Never returned from the API — only auth_credentials_configured + auth_credentials_last4 */
+  auth_credentials_configured: z.boolean().optional(),
+  auth_credentials_last4: z.string().nullable().optional(),
+  data_path: z.string().nullable().optional(),
+  name_source_field: z.string().nullable().optional(),
+  external_id_source_field: z.string().nullable().optional(),
+  coordinate_type: DatasourceCoordinateType.default("latlon"),
+  source_crs: DatasourceSourceCrs.default("wgs84"),
+  lat_source_field: z.string().nullable().optional(),
+  lon_source_field: z.string().nullable().optional(),
+  geometry_source_field: z.string().nullable().optional(),
+  schedule: z.string().nullable().optional(),
   created_at: z.coerce.date().optional(),
   updated_at: z.coerce.date().optional(),
 });
 
 export type Datasource = z.infer<typeof Datasource>;
 
-export const DatasourcePingStatus = z.object({
-  status: z.number(),
-  statusText: z.string(),
+export const DatasourceFieldMapping = z.object({
+  id: z.string().uuid(),
+  datasource_id: z.string().uuid(),
+  source_field: z.string(),
+  field_id: z.string().uuid(),
+  created_at: z.coerce.date().optional(),
 });
+
+export type DatasourceFieldMapping = z.infer<typeof DatasourceFieldMapping>;
+
+export const DatasourceRunStatus = z.enum(["running", "completed", "failed"]);
+
+export const DatasourceRun = z.object({
+  id: z.string().uuid(),
+  datasource_id: z.string().uuid(),
+  status: DatasourceRunStatus,
+  started_at: z.coerce.date(),
+  finished_at: z.coerce.date().nullable().optional(),
+  rows_synced: z.number().nullable().optional(),
+  rows_failed: z.number().nullable().optional(),
+  error_message: z.string().nullable().optional(),
+  created_at: z.coerce.date().optional(),
+  /** Joined from datasources table */
+  datasource_name: z.string().optional(),
+});
+
+export type DatasourceRun = z.infer<typeof DatasourceRun>;
+
+export const SampleField = z.object({
+  path: z.string(),
+  sampleValue: z.string(),
+});
+
+export const DatasourceTestResult = z.object({
+  sample_fields: z.array(SampleField),
+});
+
+export type DatasourceTestResult = z.infer<typeof DatasourceTestResult>;

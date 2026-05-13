@@ -2,6 +2,10 @@ import {
   ChatResponse,
   CreateOrganizationRequest,
   CreateOrganizationResponse,
+  Datasource,
+  DatasourceFieldMapping,
+  DatasourceRun,
+  DatasourceTestResult,
   FieldRecord,
   LocationDetail,
   LocationGeoJsonCollection,
@@ -311,4 +315,120 @@ export const reorderFields = (
       order
     )
     .then(() => undefined);
+
+// ---------- Datasources ----------
+
+type DatasourceBody = {
+  name: string;
+  url: string;
+  status: "draft" | "active" | "disabled";
+  source_format: "json" | "geojson";
+  auth_type: "none" | "api_key" | "basic" | "query_param";
+  auth_header?: string | null;
+  auth_credential?: string | null;
+  data_path?: string | null;
+  name_source_field?: string | null;
+  external_id_source_field?: string | null;
+  coordinate_type: "latlon" | "geojson";
+  lat_source_field?: string | null;
+  lon_source_field?: string | null;
+  geometry_source_field?: string | null;
+  schedule?: string | null;
+};
+
+const base = (orgId: string, ucId: string) =>
+  `/api/organizations/${orgId}/use_cases/${ucId}/datasources`;
+
+export const getDatasources = (
+  organizationId: string,
+  useCaseId: string
+): Promise<Datasource[]> =>
+  axios.get(base(organizationId, useCaseId)).then((r) => z.array(Datasource).parse(r.data));
+
+export const getDatasource = (
+  organizationId: string,
+  useCaseId: string,
+  datasourceId: string
+): Promise<Datasource> =>
+  axios
+    .get(`${base(organizationId, useCaseId)}/${datasourceId}`)
+    .then((r) => Datasource.parse(r.data));
+
+export const createDatasource = (
+  organizationId: string,
+  useCaseId: string,
+  data: DatasourceBody
+): Promise<Datasource> =>
+  axios.post(base(organizationId, useCaseId), data).then((r) => Datasource.parse(r.data));
+
+export const updateDatasource = (
+  organizationId: string,
+  useCaseId: string,
+  datasourceId: string,
+  data: DatasourceBody
+): Promise<Datasource> =>
+  axios
+    .put(`${base(organizationId, useCaseId)}/${datasourceId}`, data)
+    .then((r) => Datasource.parse(r.data));
+
+export const deleteDatasource = (
+  organizationId: string,
+  useCaseId: string,
+  datasourceId: string
+): Promise<void> =>
+  axios.delete(`${base(organizationId, useCaseId)}/${datasourceId}`).then(() => undefined);
+
+export const testDatasource = (
+  organizationId: string,
+  useCaseId: string,
+  datasourceId: string,
+  config: {
+    url: string;
+    source_format: "json" | "geojson";
+    auth_type: "none" | "api_key" | "basic";
+    auth_header?: string | null;
+    auth_credential?: string | null;
+    data_path?: string | null;
+  }
+): Promise<DatasourceTestResult> =>
+  axios
+    .post(`${base(organizationId, useCaseId)}/${datasourceId}/test`, config)
+    .then((r) => DatasourceTestResult.parse(r.data));
+
+export const getDatasourceMappings = (
+  organizationId: string,
+  useCaseId: string,
+  datasourceId: string
+): Promise<DatasourceFieldMapping[]> =>
+  axios
+    .get(`${base(organizationId, useCaseId)}/${datasourceId}/mappings`)
+    .then((r) => z.array(DatasourceFieldMapping).parse(r.data));
+
+export const saveDatasourceMappings = (
+  organizationId: string,
+  useCaseId: string,
+  datasourceId: string,
+  mappings: { source_field: string; field_id: string }[]
+): Promise<DatasourceFieldMapping[]> =>
+  axios
+    .post(`${base(organizationId, useCaseId)}/${datasourceId}/mappings`, { mappings })
+    .then((r) => z.array(DatasourceFieldMapping).parse(r.data));
+
+export const runDatasource = (
+  organizationId: string,
+  useCaseId: string,
+  datasourceId: string
+): Promise<DatasourceRun> =>
+  axios
+    .post(`${base(organizationId, useCaseId)}/${datasourceId}/run`)
+    .then((r) => DatasourceRun.parse(r.data));
+
+export const getDatasourceRuns = (
+  organizationId: string,
+  useCaseId: string,
+  datasourceId: string
+): Promise<DatasourceRun[]> =>
+  axios
+    .get(`${base(organizationId, useCaseId)}/${datasourceId}/runs`)
+    .then((r) => z.array(DatasourceRun).parse(r.data));
 

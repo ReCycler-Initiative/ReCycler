@@ -1,6 +1,7 @@
 "use client";
 
 import { useMessages } from "@/i18n/locale-provider";
+import { FormFooter, FormShell } from "@/components/editor-template";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
@@ -19,7 +20,6 @@ import {
 } from "@/components/ui/select";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Plus, Trash2 } from "lucide-react";
-import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { HexColorPicker } from "react-colorful";
 import { useFieldArray, useForm, useWatch } from "react-hook-form";
@@ -27,7 +27,12 @@ import { z } from "zod";
 
 const FieldFormSchema = z.object({
   name: z.string().min(1, "Nimi on pakollinen"),
-  field_type: z.union([z.literal("multi_select"), z.literal("text_input"), z.literal("address"), z.literal("opening_hours")]),
+  field_type: z.union([
+    z.literal("multi_select"),
+    z.literal("text_input"),
+    z.literal("address"),
+    z.literal("opening_hours"),
+  ]),
   required: z.boolean(),
   choices: z.array(z.object({ value: z.string() })),
   choiceColors: z.record(z.string()),
@@ -66,6 +71,16 @@ export const toApiData = (values: FieldFormValues) => ({
           ...(values.helpText ? { helpText: values.helpText } : {}),
         },
 });
+
+export const fieldFormDefaultValues: FieldFormValues = {
+  name: "",
+  field_type: "text_input",
+  required: false,
+  choices: [],
+  choiceColors: {},
+  placeholder: "",
+  helpText: "",
+};
 
 export const useFieldForm = (defaults?: FieldFormDefaultValues) =>
   useForm<FieldFormValues>({
@@ -162,28 +177,13 @@ const ColorPickerPopover = ({
   );
 };
 
-export const FieldFormContent = ({
+export const FieldFormFields = ({
   form,
-  backHref,
-  onCancel,
-  isPending,
-  onSubmit,
 }: {
   form: ReturnType<typeof useFieldForm>;
-  backHref?: string;
-  onCancel?: () => void;
-  isPending: boolean;
-  onSubmit: (values: FieldFormValues) => void;
 }) => {
   const messages = useMessages();
-  const {
-    register,
-    setValue,
-    getValues,
-    control,
-    handleSubmit,
-    formState,
-  } = form;
+  const { register, setValue, getValues, control, formState } = form;
 
   const fieldType = useWatch({ control, name: "field_type" });
   const required = useWatch({ control, name: "required" });
@@ -201,7 +201,7 @@ export const FieldFormContent = ({
   });
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 max-w-xl">
+    <>
       <div ref={popoverContainerRef} />
       {/* Name */}
       <div className="space-y-1.5">
@@ -279,13 +279,9 @@ export const FieldFormContent = ({
                     onColorChange={(color) => {
                       if (!choiceValue) return;
                       const current = getValues("choiceColors") ?? {};
-                      
                       setValue(
                         "choiceColors",
-                        {
-                          ...current,
-                          [choiceValue]: color,
-                        },
+                        { ...current, [choiceValue]: color },
                         { shouldDirty: true }
                       );
                     }}
@@ -303,7 +299,6 @@ export const FieldFormContent = ({
                         : undefined
                     }
                   />
-
                   <Button
                     type="button"
                     variant="ghost"
@@ -357,21 +352,31 @@ export const FieldFormContent = ({
           placeholder="esim. Näkyy käyttäjälle kenttää täyttäessä"
         />
       </div>
-
-      <div className="flex gap-3 pt-2">
-        {onCancel ? (
-          <Button variant="outline" type="button" onClick={onCancel}>
-            {messages.adminLocationPanel.cancel}
-          </Button>
-        ) : (
-          <Button variant="outline" asChild>
-            <Link href={backHref!}>{messages.adminLocationPanel.cancel}</Link>
-          </Button>
-        )}
-        <Button type="submit" disabled={isPending || !formState.isDirty}>
-          {isPending ? messages.adminLocationPanel.saving : messages.editor.save}
-        </Button>
-      </div>
-    </form>
+    </>
   );
 };
+
+// Convenience wrapper for use inside dialogs (provides its own Form context + footer).
+export const FieldFormContent = ({
+  form,
+  backHref,
+  onCancel,
+  isPending,
+  onSubmit,
+}: {
+  form: ReturnType<typeof useFieldForm>;
+  backHref?: string;
+  onCancel?: () => void;
+  isPending: boolean;
+  onSubmit: (values: FieldFormValues) => void;
+}) => (
+  <FormShell form={form} onSubmit={onSubmit}>
+    <FieldFormFields form={form} />
+    <FormFooter
+      isSubmitting={isPending}
+      isDirty={form.formState.isDirty}
+      onCancel={onCancel}
+      cancelHref={backHref}
+    />
+  </FormShell>
+);

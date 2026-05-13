@@ -81,7 +81,7 @@ const FormItem = ({
 
   return (
     <FormItemContext.Provider value={{ id }}>
-      <div ref={ref} className={cn("gap-y-2", className)} {...props} />
+      <div ref={ref} className={cn("flex flex-col gap-2", className)} {...props} />
     </FormItemContext.Provider>
   );
 };
@@ -99,7 +99,7 @@ const FormLabel = ({
   return (
     <Label
       ref={ref}
-      className={cn(error && "text-destructive", className)}
+      className={cn("block", error && "text-destructive", className)}
       htmlFor={formItemId}
       {...props}
     />

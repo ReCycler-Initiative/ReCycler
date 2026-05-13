@@ -1,534 +1,596 @@
+"use client";
+
+import { FormFooter } from "@/components/editor-template";
+import FormInput from "@/components/form/form-input";
+import FormSelect from "@/components/form/form-select";
 import { Button } from "@/components/ui/button";
-import { Form } from "@/components/ui/form";
-import { useMessages } from "@/i18n/locale-provider";
-import { useState } from "react";
-import { useForm } from "react-hook-form";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  createDatasource,
+  getDatasource,
+  getDatasourceMappings,
+  getFields,
+  saveDatasourceMappings,
+  testDatasource,
+  updateDatasource,
+} from "@/services/api";
+import {
+  Datasource,
+  DatasourceFieldMapping,
+  DatasourceTestResult,
+  FieldRecord,
+} from "@/types";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Trash2 } from "lucide-react";
+import { useEffect, useState } from "react";
+import { useFieldArray, useForm, useWatch } from "react-hook-form";
+import { toast } from "sonner";
+import { z } from "zod";
 
-type FilterRow = {
-  id: number;
-  label: string;
-  attribute: string;
-  icon: string;
-};
+// ---------- Schema ----------
 
-type ConnectorFormValues = {
-  name?: string;
+const DatasourceFormSchema = z.object({
+  name: z.string().trim().min(1, "Nimi vaaditaan"),
+  url: z.string().url("Anna kelvollinen URL"),
+  status: z.enum(["draft", "active", "disabled"]),
+  source_format: z.enum(["json", "geojson"]),
+  auth_type: z.enum(["none", "api_key", "basic", "query_param"]),
+  auth_header: z.string().nullable().optional(),
+  auth_credential: z.string().nullable().optional(),
+  data_path: z.string().nullable().optional(),
+  name_source_field: z.string().nullable().optional(),
+  external_id_source_field: z.string().nullable().optional(),
+  coordinate_type: z.enum(["latlon", "geojson"]),
+  source_crs: z.enum(["wgs84", "etrs_tm35fin"]),
+  lat_source_field: z.string().nullable().optional(),
+  lon_source_field: z.string().nullable().optional(),
+  geometry_source_field: z.string().nullable().optional(),
+  schedule: z.string().nullable().optional(),
+  mappings: z.array(
+    z.object({
+      source_field: z.string().min(1),
+      field_id: z.string().uuid(),
+    })
+  ),
+});
+
+type DatasourceFormValues = z.infer<typeof DatasourceFormSchema>;
+
+// ---------- Props ----------
+
+export type DataSourceEditorProps = {
+  organizationId: string;
+  useCaseId: string;
+  /** Omit for create mode */
+  datasourceId?: string;
+  onSaved?: (datasource: Datasource) => void;
 };
 
 type ConnectionStatus = "idle" | "testing" | "success" | "error";
 
-export const DataSourceEditor = () => {
-  const messages = useMessages();
-  const form = useForm<ConnectorFormValues>();
-  const [hasChanges, setHasChanges] = useState(false);
+// ---------- Component ----------
 
-  const [filters, setFilters] = useState<FilterRow[]>([
-    { id: 1, label: "Materiaali", attribute: "material", icon: "tag" },
-  ]);
+export const DataSourceEditor = ({
+  organizationId,
+  useCaseId,
+  datasourceId,
+  onSaved,
+}: DataSourceEditorProps) => {
+  const isEdit = !!datasourceId;
 
   const [connectionStatus, setConnectionStatus] =
     useState<ConnectionStatus>("idle");
   const [connectionError, setConnectionError] = useState<string | null>(null);
+  const [sampleFields, setSampleFields] = useState<
+    DatasourceTestResult["sample_fields"]
+  >([]);
+  const [useCaseFields, setUseCaseFields] = useState<
+    z.infer<typeof FieldRecord>[]
+  >([]);
+  const [isSaving, setIsSaving] = useState(false);
+  const [createdDatasourceId, setCreatedDatasourceId] = useState<
+    string | undefined
+  >(datasourceId);
 
-  // Lisää uusi suodatinkenttä
-  const addFilter = () => {
-    setHasChanges(true);
-    setFilters((prev) => [
-      ...prev,
-      { id: Date.now(), label: "", attribute: "", icon: "tag" },
-    ]);
-  };
+  const form = useForm<DatasourceFormValues>({
+    resolver: zodResolver(DatasourceFormSchema),
+    defaultValues: {
+      name: "",
+      url: "",
+      status: "draft",
+      source_format: "json",
+      auth_type: "none",
+      auth_header: null,
+      auth_credential: null,
+      data_path: null,
+      name_source_field: null,
+      external_id_source_field: null,
+      coordinate_type: "latlon",
+      source_crs: "wgs84",
+      lat_source_field: null,
+      lon_source_field: null,
+      geometry_source_field: null,
+      schedule: null,
+      mappings: [],
+    },
+  });
 
-  // Poista suodatinkenttä
-  const removeFilter = (id: number) => {
-    setHasChanges(true);
-    setFilters((prev) => prev.filter((f) => f.id !== id));
-  };
+  const { register, control, handleSubmit, getValues, formState, reset } = form;
 
-  // Päivitä yksittäinen suodatinkentän arvo
-  const updateFilter = (
-    id: number,
-    field: keyof Omit<FilterRow, "id">,
-    value: string
-  ) => {
-    setHasChanges(true);
-    setFilters((prev) =>
-      prev.map((f) => (f.id === id ? { ...f, [field]: value } : f))
-    );
-  };
+  const {
+    fields: mappingRows,
+    append: appendMapping,
+    remove: removeMapping,
+  } = useFieldArray({ control, name: "mappings" });
 
-  // Testaa yhteys datalähteeseen
+  const authType = useWatch({ control, name: "auth_type" });
+  const sourceFormat = useWatch({ control, name: "source_format" });
+  const coordinateType = useWatch({ control, name: "coordinate_type" });
+  const mappingDisabled = !isEdit && connectionStatus !== "success";
+
+  // Load use case fields
+  useEffect(() => {
+    getFields(organizationId, useCaseId)
+      .then(setUseCaseFields)
+      .catch(() => {});
+  }, [organizationId, useCaseId]);
+
+  // Load existing datasource in edit mode
+  useEffect(() => {
+    if (!isEdit || !datasourceId) return;
+    Promise.all([
+      getDatasource(organizationId, useCaseId, datasourceId),
+      getDatasourceMappings(organizationId, useCaseId, datasourceId),
+    ])
+      .then(([ds, mappings]: [Datasource, DatasourceFieldMapping[]]) => {
+        reset({
+          name: ds.name,
+          url: ds.url,
+          status: ds.status,
+          source_format: ds.source_format,
+          auth_type: ds.auth_type,
+          auth_header: ds.auth_header ?? null,
+          auth_credential: null, // never pre-filled
+          data_path: ds.data_path ?? null,
+          name_source_field: ds.name_source_field ?? null,
+          external_id_source_field: ds.external_id_source_field ?? null,
+          coordinate_type: ds.coordinate_type,
+          source_crs: ds.source_crs ?? "wgs84",
+          lat_source_field: ds.lat_source_field ?? null,
+          lon_source_field: ds.lon_source_field ?? null,
+          geometry_source_field: ds.geometry_source_field ?? null,
+          schedule: ds.schedule ?? null,
+          mappings: mappings.map((m) => ({
+            source_field: m.source_field,
+            field_id: m.field_id,
+          })),
+        });
+      })
+      .catch(() => toast.error("Datalähteen lataus epäonnistui"));
+  }, [isEdit, datasourceId, organizationId, useCaseId, reset]);
+
   const handleTestConnection = async () => {
+    const values = getValues();
     setConnectionError(null);
     setConnectionStatus("testing");
 
     try {
-      // TODO: korvaa oikealla API-kutsulla
-      // Esim:
-      // const res = await fetch("/api/connectors/test", { method: "POST", body: JSON.stringify({...}) });
-      // if (!res.ok) throw new Error("Yhteys epäonnistui");
+      // Need a datasourceId for the test endpoint — create a draft first if in create mode
+      let dsId = createdDatasourceId;
+      if (!dsId) {
+        const created = await createDatasource(organizationId, useCaseId, {
+          ...values,
+          status: "draft",
+        });
+        dsId = created.id;
+        setCreatedDatasourceId(dsId);
+      }
 
-      // Mock: onnistunut testi
+      const result = await testDatasource(organizationId, useCaseId, dsId, {
+        url: values.url,
+        source_format: values.source_format,
+        auth_type: values.auth_type,
+        auth_header: values.auth_header,
+        auth_credential: values.auth_credential,
+        data_path: values.data_path,
+      });
+
+      setSampleFields(result.sample_fields);
       setConnectionStatus("success");
-    } catch (err) {
+    } catch (err: unknown) {
       setConnectionStatus("error");
-      setConnectionError(
-        messages.datasourceEditor.connectionError
+      const msg =
+        err instanceof Error ? err.message : "Yhteyden testaus epäonnistui";
+      setConnectionError(msg);
+    }
+  };
+
+  const onSubmit = async (values: DatasourceFormValues) => {
+    setIsSaving(true);
+    try {
+      let saved: Datasource;
+
+      if (createdDatasourceId) {
+        saved = await updateDatasource(
+          organizationId,
+          useCaseId,
+          createdDatasourceId,
+          values
+        );
+      } else {
+        saved = await createDatasource(organizationId, useCaseId, values);
+        setCreatedDatasourceId(saved.id);
+      }
+
+      await saveDatasourceMappings(
+        organizationId,
+        useCaseId,
+        saved.id,
+        values.mappings
       );
+
+      toast.success("Datalähde tallennettu");
+      onSaved?.(saved);
+    } catch {
+      toast.error("Tallentaminen epäonnistui");
+    } finally {
+      setIsSaving(false);
     }
   };
 
-  // Submit – sallitaan vain jos yhteystesti on onnistunut
-  const onSubmit = (values: ConnectorFormValues) => {
-    if (connectionStatus !== "success") {
-      // Voit korvata tämän toastilla tms.
-      alert(messages.datasourceEditor.testBeforeStart);
-      return;
-    }
-
-    console.log("Käynnistetään yhdistin arvoilla:", values, filters);
-    // TODO: kutsu backend /activate tms.
-  };
-
-  const mappingDisabled = connectionStatus !== "success";
+  const fieldPathOptions = sampleFields.map((f) => f.path);
 
   return (
     <Form {...form}>
-      <form
-        onSubmit={form.handleSubmit(onSubmit)}
-        className="flex flex-col gap-y-8 pb-24 lg:pb-0"
-        onChangeCapture={() => setHasChanges(true)}
-      >
-        {/* ----------------------------- */}
-        {/* YHDISTIMEN ASETUKSET          */}
-        {/* ----------------------------- */}
-        <section className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
-          <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
-            <div className="space-y-1">
-              <h2 className="text-lg font-medium text-gray-900">
-                {messages.datasourceEditor.connectionSettingsTitle}
-              </h2>
-              <p className="text-sm text-gray-500">
-                {messages.datasourceEditor.connectionSettingsDescription}
-              </p>
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 max-w-xl">
+        {/* ─── Perustiedot ─── */}
+        <h2 className="text-base font-semibold">Yhdistimen asetukset</h2>
 
-              <div className="text-xs">
-                {connectionStatus === "idle" && (
-                  <span className="text-gray-500">
-                    {messages.datasourceEditor.notTested}
-                  </span>
-                )}
-                {connectionStatus === "testing" && (
-                  <span className="text-blue-700">
-                    {messages.datasourceEditor.testingConnection}
-                  </span>
-                )}
-                {connectionStatus === "success" && (
-                  <span className="rounded-full bg-green-50 px-2 py-1 text-[11px] font-medium text-green-700">
-                    {messages.datasourceEditor.connectionOk}
-                  </span>
-                )}
-                {connectionStatus === "error" && (
-                  <span className="rounded-full bg-red-50 px-2 py-1 text-[11px] font-medium text-red-700">
-                    {messages.datasourceEditor.connectionFailed}
-                  </span>
-                )}
-              </div>
+        <FormInput name="name" label="Nimi" />
 
-              {connectionError && (
-                <p className="mt-1 text-xs text-red-600">{connectionError}</p>
-              )}
-            </div>
+        <FormSelect
+          name="status"
+          label="Tila"
+          items={[
+            { value: "draft", label: "Luonnos" },
+            { value: "active", label: "Aktiivinen" },
+            { value: "disabled", label: "Poissa käytöstä" },
+          ]}
+        />
 
-            {/* Desktop-painikkeet */}
-            <div className="flex gap-2 self-end md:self-auto">
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                className="min-w-[120px]"
-                onClick={handleTestConnection}
-                disabled={connectionStatus === "testing"}
-              >
-                {connectionStatus === "testing"
-                  ? messages.datasourceEditor.testing
-                  : messages.datasourceEditor.testConnection}
-              </Button>
-              <Button type="submit" size="sm" className="min-w-[160px]" disabled={!hasChanges}>
-                {messages.datasourceEditor.startAndValidate}
-              </Button>
-            </div>
-          </div>
-
-          {/* Yhdistimen kentät */}
-          <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-2">
-            <div>
-              <label className="text-sm font-medium text-gray-700">
-                {messages.datasourceEditor.connectorName}
-              </label>
-              <input
-                type="text"
-                placeholder="Recycler 4.0 API"
-                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm 
-                             focus:border-black focus:outline-none focus:ring-1 focus:ring-black"
-              />
-            </div>
-
-            <div>
-              <label className="text-sm font-medium text-gray-700">{messages.datasourceEditor.status}</label>
-              <select
-                className="mt-1 block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm shadow-sm 
-                             focus:border-black focus:outline-none focus:ring-1 focus:ring-black"
-                defaultValue="Luonnos"
-              >
-                <option>{messages.datasourceEditor.draft}</option>
-                <option>{messages.datasourceEditor.active}</option>
-                <option>{messages.datasourceEditor.disabled}</option>
-              </select>
-            </div>
-
-            <div>
-              <label className="text-sm font-medium text-gray-700">
-                {messages.datasourceEditor.url}
-              </label>
-              <input
-                type="text"
-                placeholder="https://api.example.com/collection-points"
-                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm 
-                             focus:border-black focus:outline-none focus:ring-1 focus:ring-black"
-              />
-            </div>
-
-            <div>
-              <label className="text-sm font-medium text-gray-700">
-                {messages.datasourceEditor.authentication}
-              </label>
-              <select
-                className="mt-1 block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm shadow-sm 
-                             focus:border-black focus:outline-none focus:ring-1 focus:ring-black"
-              >
-                <option>{messages.datasourceEditor.apiKeyOption}</option>
-                <option>{messages.datasourceEditor.bearerOption}</option>
-                <option>{messages.datasourceEditor.basicAuthOption}</option>
-                <option>{messages.datasourceEditor.noAuthOption}</option>
-              </select>
-            </div>
-
-            <div>
-              <label className="text-sm font-medium text-gray-700">
-                {messages.datasourceEditor.apiKey}
-              </label>
-              <input
-                type="password"
-                placeholder="•••••••••••••"
-                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm 
-                             focus:border-black focus:outline-none focus:ring-1 focus:ring-black"
-              />
-            </div>
-          </div>
-        </section>
-
-        {/* ----------------------------- */}
-        {/* KENTTÄVASTINNAT                */}
-        {/* ----------------------------- */}
-        <section className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
-          <div className="flex items-center justify-between gap-4">
-            <div>
-              <h2 className="text-lg font-medium text-gray-900">
-                {messages.datasourceEditor.fieldMappingsTitle}
-              </h2>
-              <p className="mt-1 text-sm text-gray-500">
-                {messages.datasourceEditor.fieldMappingsDescription}
-              </p>
-            </div>
-
-            {mappingDisabled && (
-              <span className="rounded-full bg-gray-100 px-2 py-1 text-[11px] font-medium text-gray-600">
-                {messages.datasourceEditor.testBeforeMappings}
-              </span>
-            )}
-          </div>
-
-          <fieldset
-            disabled={mappingDisabled}
-            className={mappingDisabled ? "mt-6 opacity-60" : "mt-6"}
-          >
-            <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
-              {/* Koordinaattijärjestelmä ja koordinaatit */}
-              <div className="space-y-4">
-                <h3 className="text-sm font-semibold text-gray-900">
-                  {messages.datasourceEditor.coordinatesSection}
-                </h3>
-
-                <div>
-                  <label className="text-sm font-medium text-gray-700">
-                    {messages.datasourceEditor.coordinateSystem}
-                  </label>
-                  <select
-                    className="mt-1 block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm shadow-sm 
-                               focus:border-black focus:outline-none focus:ring-1 focus:ring-black"
-                    defaultValue="EPSG:4326"
-                  >
-                    <option value="EPSG:4326">WGS84 (EPSG:4326)</option>
-                    <option value="EPSG:3067">
-                      ETRS89 / TM35FIN (EPSG:3067)
-                    </option>
-                  </select>
-                  <p className="mt-1 text-xs text-gray-500">
-                    {messages.datasourceEditor.coordinateSystemHelp}
-                  </p>
-                </div>
-
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                  <div>
-                    <label className="text-sm font-medium text-gray-700">
-                      {messages.datasourceEditor.xField}
-                    </label>
-                    <input
-                      type="text"
-                      placeholder="location.x"
-                      className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm 
-                                 focus:border-black focus:outline-none focus:ring-1 focus:ring-black"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="text-sm font-medium text-gray-700">
-                      {messages.datasourceEditor.yField}
-                    </label>
-                    <input
-                      type="text"
-                      placeholder="location.y"
-                      className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm 
-                                 focus:border-black focus:outline-none focus:ring-1 focus:ring-black"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="text-sm font-medium text-gray-700">
-                    {messages.datasourceEditor.geometryType}
-                  </label>
-                  <select
-                    className="mt-1 block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm shadow-sm 
-                               focus:border-black focus:outline-none focus:ring-1 focus:ring-black"
-                    defaultValue="point"
-                  >
-                    <option value="point">{messages.datasourceEditor.pointOption}</option>
-                    {/* myöhemmin: LineString, Polygon jne. */}
-                  </select>
-                  <p className="mt-1 text-xs text-gray-500">
-                    {messages.datasourceEditor.geometryHelp}
-                  </p>
-                </div>
-              </div>
-
-              {/* Kohdetyyppi */}
-              <div className="space-y-4">
-                <h3 className="text-sm font-semibold text-gray-900">
-                  {messages.datasourceEditor.locationTypeSection}
-                </h3>
-                <label className="text-sm font-medium text-gray-700">
-                  {messages.datasourceEditor.typeField}
-                </label>
-                <input
-                  type="text"
-                  placeholder="type (oletus: collectionspot)"
-                  className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm 
-                             focus:border-black focus:outline-none focus:ring-1 focus:ring-black"
-                />
-                <div>
-                  <label className="text-sm font-medium text-gray-700">
-                    {messages.datasourceEditor.typeAttributes}
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="material, fraction, containerType..."
-                    className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm 
-                               focus:border-black focus:outline-none focus:ring-1 focus:ring-black"
-                  />
-                  <p className="mt-1 text-xs text-gray-500">
-                    {messages.datasourceEditor.typeAttributesHelp}
-                  </p>
-                </div>
-              </div>
-
-              {/* Perustiedot */}
-              <div className="space-y-4">
-                <h3 className="text-sm font-semibold text-gray-900">
-                  {messages.datasourceEditor.basicInfoSection}
-                </h3>
-
-                <div>
-                  <label className="text-sm font-medium text-gray-700">
-                    {messages.datasourceEditor.nameField}
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="name"
-                    className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm 
-                               focus:border-black focus:outline-none focus:ring-1 focus:ring-black"
-                  />
-                  <p className="mt-1 text-xs text-gray-500">
-                    {messages.datasourceEditor.nameFieldHelp}
-                  </p>
-                </div>
-
-                <div>
-                  <label className="text-sm font-medium text-gray-700">
-                    {messages.datasourceEditor.addressField}
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="address.full"
-                    className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm 
-                               focus:border-black focus:outline-none focus:ring-1 focus:ring-black"
-                  />
-                  <p className="mt-1 text-xs text-gray-500">
-                    {messages.datasourceEditor.addressFieldHelp}
-                  </p>
-                </div>
-              </div>
-            </div>
-          </fieldset>
-        </section>
-
-        {/* ----------------------------- */}
-        {/* SUODATTIMET                   */}
-        {/* ----------------------------- */}
-        <section className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
-          <div className="flex items-start justify-between gap-4">
-            <div>
-              <h2 className="text-lg font-medium text-gray-900">
-                {messages.datasourceEditor.filtersTitle}
-              </h2>
-              <p className="mt-1 text-sm text-gray-500">
-                {messages.datasourceEditor.filtersDescription}
-              </p>
-            </div>
-
+        <div className="space-y-1.5">
+          <Label htmlFor="ds-url">HTTP-osoite (URL)</Label>
+          <div className="flex gap-2">
+            <Input
+              id="ds-url"
+              className="flex-1"
+              {...register("url")}
+              placeholder="https://api.example.com/collection-points"
+            />
             <Button
               type="button"
               variant="outline"
-              size="sm"
-              onClick={addFilter}
-              disabled={mappingDisabled}
+              onClick={handleTestConnection}
+              disabled={connectionStatus === "testing"}
             >
-              {messages.datasourceEditor.addFilter}
+              {connectionStatus === "testing"
+                ? "Testataan..."
+                : "Testaa yhteys"}
             </Button>
           </div>
+          {connectionStatus === "success" && (
+            <p className="text-xs text-green-600">
+              Yhteys OK – kenttävastinnat vapautettu.
+            </p>
+          )}
+          {connectionError && (
+            <p className="text-xs text-destructive">{connectionError}</p>
+          )}
+          {formState.errors.url && (
+            <p className="text-xs text-destructive">
+              {formState.errors.url.message}
+            </p>
+          )}
+        </div>
 
-          <fieldset
-            disabled={mappingDisabled}
-            className={mappingDisabled ? "mt-6 opacity-60" : "mt-6"}
-          >
-            {/* Suodatinlista */}
-            <div className="space-y-3">
-              {filters.map((filter) => (
-                <div
-                  key={filter.id}
-                  className="grid grid-cols-1 gap-3 rounded-lg border border-gray-200 bg-gray-50 p-3 text-sm 
-                               md:grid-cols-[minmax(0,2fr),minmax(0,2fr),minmax(0,1.5fr),auto]"
-                >
-                  <div>
-                    <label className="text-xs font-medium text-gray-600">
-                      {messages.datasourceEditor.filterName}
-                    </label>
-                    <input
-                      type="text"
-                      value={filter.label}
-                      onChange={(e) =>
-                        updateFilter(filter.id, "label", e.target.value)
-                      }
-                      className="mt-1 block w-full rounded-md border border-gray-300 px-2 py-1.5 text-sm shadow-sm 
-                                   focus:border-black focus:outline-none focus:ring-1 focus:ring-black"
-                    />
-                  </div>
+        <FormSelect
+          name="source_format"
+          label="Datalähteen formaatti"
+          items={[
+            { value: "json", label: "JSON" },
+            { value: "geojson", label: "GeoJSON" },
+          ]}
+        />
 
-                  <div>
-                    <label className="text-xs font-medium text-gray-600">
-                      {messages.datasourceEditor.sourceField}
-                    </label>
-                    <input
-                      type="text"
-                      value={filter.attribute}
-                      onChange={(e) =>
-                        updateFilter(filter.id, "attribute", e.target.value)
-                      }
-                      className="mt-1 block w-full rounded-md border border-gray-300 px-2 py-1.5 text-sm shadow-sm 
-                                   focus:border-black focus:outline-none focus:ring-1 focus:ring-black"
-                    />
-                  </div>
+        {sourceFormat === "json" && (
+          <FormInput name="data_path" label="Taulukon polku (data path)" />
+        )}
 
-                  <div>
-                    <label className="text-xs font-medium text-gray-600">
-                      {messages.datasourceEditor.icon}
-                    </label>
-                    <input
-                      type="text"
-                      value={filter.icon}
-                      onChange={(e) =>
-                        updateFilter(filter.id, "icon", e.target.value)
-                      }
-                      className="mt-1 block w-full rounded-md border border-gray-300 px-2 py-1.5 text-sm shadow-sm 
-                                   focus:border-black focus:outline-none focus:ring-1 focus:ring-black"
-                    />
-                  </div>
+        <FormSelect
+          name="auth_type"
+          label="Tunnistautuminen"
+          items={[
+            { value: "none", label: "Ei tunnistautumista" },
+            { value: "api_key", label: "API-avain (header)" },
+            { value: "basic", label: "Basic auth" },
+            { value: "query_param", label: "Query-parametri" },
+          ]}
+        />
 
-                  {/* Poista-painike */}
-                  <div className="flex items-end justify-end">
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="icon"
-                      className="h-8 w-8 text-red-600 hover:text-red-700"
-                      onClick={() => removeFilter(filter.id)}
-                    >
-                      ✕
-                    </Button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </fieldset>
-        </section>
+        {authType === "api_key" && (
+          <>
+            <FormInput name="auth_header" label="Header-nimi" />
+            <FormInput name="auth_credential" label="API-avain" />
+          </>
+        )}
 
-        {/* ----------------------------- */}
-        {/* ALAPALKIN TOIMINNOT (MOBIILI) */}
-        {/* ----------------------------- */}
-        <div
-          className="fixed bottom-0 left-0 right-0 border-t border-gray-300 bg-white p-4 
-                          lg:static lg:border-none lg:bg-transparent lg:p-0"
+        {authType === "basic" && (
+          <FormInput name="auth_credential" label="Tunnus:Salasana" />
+        )}
+
+        {authType === "query_param" && (
+          <>
+            <FormInput name="auth_header" label="Parametrin nimi" />
+            <FormInput name="auth_credential" label="Arvo" />
+          </>
+        )}
+
+        <FormInput name="schedule" label="Aikataulu (cron)" />
+
+        {/* ─── Koordinaatit ja nimikenttä ─── */}
+        <h2 className="text-base font-semibold pt-2">
+          Koordinaatit ja nimikenttä
+        </h2>
+
+        <fieldset
+          disabled={mappingDisabled}
+          className={
+            mappingDisabled
+              ? "space-y-6 opacity-50 pointer-events-none"
+              : "space-y-6"
+          }
         >
-          <div
-            className="mx-auto flex max-w-4xl flex-col gap-y-3 
-                            lg:flex-row lg:items-center lg:justify-between"
-          >
-            <div className="text-sm text-gray-600">
-              {filters.length} {messages.datasourceEditor.filtersDefined}
-            </div>
+          <FormField
+            control={control}
+            name="name_source_field"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Sijaintinimen kenttä</FormLabel>
+                <FormControl>
+                  <FieldPathSelect
+                    options={fieldPathOptions}
+                    value={field.value ?? ""}
+                    onChange={field.onChange}
+                    placeholder="Valitse lähdekenttä…"
+                  />
+                </FormControl>
+              </FormItem>
+            )}
+          />
 
-            <div className="flex w-full flex-col gap-2 lg:w-auto lg:flex-row">
+          <FormField
+            control={control}
+            name="external_id_source_field"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Ulkoinen ID-kenttä (upsertia varten)</FormLabel>
+                <FormControl>
+                  <FieldPathSelect
+                    options={fieldPathOptions}
+                    value={field.value ?? ""}
+                    onChange={field.onChange}
+                    placeholder="Valitse lähdekenttä…"
+                  />
+                </FormControl>
+              </FormItem>
+            )}
+          />
+
+          <FormSelect
+            name="coordinate_type"
+            label="Koordinaattimuoto"
+            items={[
+              { value: "latlon", label: "Lat/Lon -kentät" },
+              { value: "geojson", label: "GeoJSON geometry" },
+            ]}
+          />
+
+          <FormSelect
+            name="source_crs"
+            label="Koordinaatisto"
+            items={[
+              { value: "wgs84", label: "WGS84 (desimaaliasteet, yleinen)" },
+              {
+                value: "etrs_tm35fin",
+                label: "ETRS-TM35FIN / EPSG:3067 (suomalainen)",
+              },
+            ]}
+          />
+
+          {coordinateType === "latlon" && (
+            <>
+              <FormField
+                control={control}
+                name="lat_source_field"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Leveysasteen kenttä (lat / N)</FormLabel>
+                    <FormControl>
+                      <FieldPathSelect
+                        options={fieldPathOptions}
+                        value={field.value ?? ""}
+                        onChange={field.onChange}
+                        placeholder="Valitse lähdekenttä…"
+                      />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={control}
+                name="lon_source_field"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Pituusasteen kenttä (lon / E)</FormLabel>
+                    <FormControl>
+                      <FieldPathSelect
+                        options={fieldPathOptions}
+                        value={field.value ?? ""}
+                        onChange={field.onChange}
+                        placeholder="Valitse lähdekenttä…"
+                      />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+            </>
+          )}
+
+          {coordinateType === "geojson" && (
+            <FormField
+              control={control}
+              name="geometry_source_field"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Geometria-kenttä</FormLabel>
+                  <FormControl>
+                    <FieldPathSelect
+                      options={fieldPathOptions}
+                      value={field.value ?? ""}
+                      onChange={field.onChange}
+                      placeholder="Valitse lähdekenttä…"
+                    />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+          )}
+        </fieldset>
+
+        {/* ─── Kenttämäppäykset ─── */}
+        <div className="flex items-center justify-between pt-2">
+          <h2 className="text-base font-semibold">Kenttämäppäykset</h2>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            disabled={mappingDisabled}
+            onClick={() => appendMapping({ source_field: "", field_id: "" })}
+          >
+            + Lisää mäppäys
+          </Button>
+        </div>
+
+        <fieldset
+          disabled={mappingDisabled}
+          className={
+            mappingDisabled
+              ? "space-y-3 opacity-50 pointer-events-none"
+              : "space-y-3"
+          }
+        >
+          {mappingRows.length === 0 && (
+            <p className="text-sm text-muted-foreground">
+              Ei mäppäyksiä. Testaa yhteys ensin ja lisää sitten mäppäyksiä.
+            </p>
+          )}
+          {mappingRows.map((row, index) => (
+            <div key={row.id} className="flex gap-2 items-end">
+              <FormField
+                control={control}
+                name={`mappings.${index}.source_field`}
+                render={({ field }) => (
+                  <FormItem className="flex-1">
+                    <FormLabel className="text-xs">Lähdekenttä</FormLabel>
+                    <FormControl>
+                      <FieldPathSelect
+                        options={fieldPathOptions}
+                        value={field.value ?? ""}
+                        onChange={field.onChange}
+                        placeholder="Valitse lähdekenttä…"
+                      />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+              <FormSelect
+                name={`mappings.${index}.field_id`}
+                label="Kohdekenttä"
+                className="flex-1"
+                items={useCaseFields.map((f) => ({
+                  value: f.id,
+                  label: f.name,
+                }))}
+              />
               <Button
                 type="button"
-                variant="outline"
-                size="lg"
-                className="w-full lg:w-auto"
-                onClick={handleTestConnection}
-                disabled={connectionStatus === "testing"}
+                variant="ghost"
+                size="icon"
+                className="text-muted-foreground hover:text-destructive mb-0.5"
+                onClick={() => removeMapping(index)}
               >
-                {connectionStatus === "testing"
-                  ? messages.datasourceEditor.testing
-                  : messages.datasourceEditor.testConnection}
-              </Button>
-
-              <Button type="submit" size="lg" className="w-full lg:w-auto" disabled={!hasChanges}>
-                {messages.datasourceEditor.startAndValidate}
+                <Trash2 className="h-4 w-4" />
               </Button>
             </div>
-          </div>
-        </div>
+          ))}
+        </fieldset>
+
+        {/* ─── Footer ─── */}
+        <FormFooter isSubmitting={isSaving} isDirty={formState.isDirty} />
       </form>
     </Form>
   );
 };
+
+// ---------- Helper: path selector ----------
+
+function FieldPathSelect({
+  options,
+  value,
+  onChange,
+  placeholder,
+}: {
+  options: string[];
+  value: string;
+  onChange: (v: string) => void;
+  placeholder?: string;
+}) {
+  if (options.length === 0) {
+    return (
+      <Input
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder={placeholder}
+      />
+    );
+  }
+  return (
+    <Select value={value} onValueChange={onChange}>
+      <SelectTrigger>
+        <SelectValue placeholder={placeholder} />
+      </SelectTrigger>
+      <SelectContent>
+        {options.map((opt) => (
+          <SelectItem key={opt} value={opt}>
+            {opt}
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
+  );
+}

@@ -2,160 +2,162 @@
 
 import { PageTemplate } from "@/components/admin/page-template";
 import { Button } from "@/components/ui/button";
-import { useMessages } from "@/i18n/locale-provider";
-import Link from "next/link";
-import { useSearchParams } from "next/navigation";
+import {
+  getDatasourceRuns,
+  getDatasources,
+  runDatasource,
+} from "@/services/api";
+import { Datasource, DatasourceRun } from "@/types";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useParams } from "next/navigation";
+import { toast } from "sonner";
 
-type RunStatus = "success" | "error" | "running";
-
-type RunItem = {
-  id: string;
-  startedAt: string;
-  finishedAt?: string;
-  status: RunStatus;
-  source?: string;
-  summary: string;
-};
-
-const runs: RunItem[] = [
-  {
-    id: "run_001",
-    startedAt: "09.12.2025 22:14",
-    finishedAt: "09.12.2025 22:15",
-    status: "error",
-    source: "Ominaisuudet",
-    summary: "1 virhe – tarkista loki",
-  },
-  {
-    id: "run_002",
-    startedAt: "09.12.2025 04:10",
-    finishedAt: "09.12.2025 04:11",
-    status: "success",
-    source: "Sijainnit",
-    summary: "OK",
-  },
-  {
-    id: "run_003",
-    startedAt: "08.12.2025 22:14",
-    finishedAt: "08.12.2025 22:14",
-    status: "success",
-    source: "Viitetiedot",
-    summary: "OK",
-  },
-];
-
-const statusLabel: Record<RunStatus, string> = {
-  success: "Onnistui",
-  error: "Virhe",
+const statusLabel: Record<string, string> = {
   running: "Käynnissä",
+  completed: "Valmis",
+  failed: "Epäonnistui",
 };
 
-const statusPillClass: Record<RunStatus, string> = {
-  success: "bg-green-100 text-green-800",
-  error: "bg-red-100 text-red-800",
+const statusPillClass: Record<string, string> = {
   running: "bg-blue-100 text-blue-800",
+  completed: "bg-green-100 text-green-800",
+  failed: "bg-red-100 text-red-800",
 };
+
+function formatDate(date: Date | undefined | null) {
+  if (!date) return "—";
+  return new Date(date).toLocaleString("fi-FI");
+}
 
 export default function RunsPage() {
-  const messages = useMessages();
-  const searchParams = useSearchParams();
-  const connection = searchParams.get("connection");
+  const params = useParams<{ id: string; useCaseId: string }>();
+  const organizationId = params.id;
+  const { useCaseId } = params;
+  const queryClient = useQueryClient();
 
-  const statusLabel: Record<RunStatus, string> = {
-    success: messages.admin.statusSuccess,
-    error: messages.admin.statusError,
-    running: messages.admin.statusRunning,
-  };
+  const { data: datasources = [] } = useQuery({
+    queryKey: ["datasources", organizationId, useCaseId],
+    queryFn: () => getDatasources(organizationId, useCaseId),
+  });
+
+  const runMutation = useMutation({
+    mutationFn: (datasourceId: string) =>
+      runDatasource(organizationId, useCaseId, datasourceId),
+    onSuccess: (run, datasourceId) => {
+      toast.success(`Synkronointi valmis — ${run.rows_synced ?? 0} sijaintia`);
+      queryClient.invalidateQueries({
+        queryKey: ["datasource-runs", organizationId, useCaseId, datasourceId],
+      });
+    },
+    onError: () => toast.error("Synkronointi epäonnistui"),
+  });
 
   return (
-    <PageTemplate title={messages.admin.runsPageTitle}>
+    <PageTemplate title="Synkronointiajot">
       <div className="flex flex-col gap-6">
-        <section className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
-          <div className="space-y-3">
-            <p className="text-sm text-gray-600">
-              {messages.admin.runsIntro}
-            </p>
-
-            {connection && (
-              <div className="rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-xs text-gray-700">
-                {messages.admin.filterLabel} <span className="font-semibold">{connection}</span>
-              </div>
-            )}
-
-            <div className="flex flex-wrap gap-2">
-              <Button asChild size="sm" variant="outline">
-                <Link href="?">{messages.admin.clearFilter}</Link>
-              </Button>
-              <Button asChild size="sm">
-                <Link href="#">{messages.admin.startRun}</Link>
-              </Button>
-            </div>
-          </div>
-        </section>
-
-        <section className="rounded-xl border border-gray-200 bg-white shadow-sm">
-          <div className="border-b border-gray-200 p-5">
-            <h2 className="text-lg font-medium text-gray-900">{messages.admin.runHistoryTitle}</h2>
-            <p className="mt-1 text-sm text-gray-600">
-              {messages.admin.runHistoryDescription}
-            </p>
-          </div>
-
-          <div className="divide-y divide-gray-200">
-            {runs.map((run) => (
-              <div
-                key={run.id}
-                className="flex flex-col gap-3 p-5 md:flex-row md:items-center md:justify-between"
-              >
-                <div className="min-w-0">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <div className="text-base font-semibold text-gray-900">
-                      {run.source ?? messages.admin.runSourceFallback}
-                    </div>
-                    <span
-                      className={[
-                        "inline-flex rounded-full px-2.5 py-1 text-xs font-medium",
-                        statusPillClass[run.status],
-                      ].join(" ")}
-                    >
-                      {statusLabel[run.status]}
-                    </span>
-                    <span className="text-xs text-gray-500">{run.id}</span>
-                  </div>
-
-                  <div className="mt-1 text-sm text-gray-600">
-                    {messages.admin.startedAt}: <span className="font-medium text-gray-900">{run.startedAt}</span>
-                    {run.finishedAt && (
-                      <>
-                        {" "}
-                        · {messages.admin.completedAt}: <span className="font-medium text-gray-900">{run.finishedAt}</span>
-                      </>
-                    )}
-                  </div>
-
-                  <div className="mt-1 text-sm text-gray-600">{run.summary}</div>
-                </div>
-
-                <div className="flex flex-wrap gap-2">
-                  <Button asChild size="sm" variant="outline">
-                    <Link href="#">{messages.admin.openLog}</Link>
-                  </Button>
-                  <Button asChild size="sm" variant="outline">
-                    <Link href="#">{messages.admin.showErrors}</Link>
-                  </Button>
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        <section className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
-          <h2 className="text-lg font-medium text-gray-900">{messages.admin.nextStepsTitle}</h2>
-          <p className="mt-2 text-sm text-gray-600">
-            {messages.admin.nextStepsDescription}
+        {datasources.length === 0 && (
+          <p className="text-sm text-gray-500">
+            Ei datalähteitä. Luo ensin datalähde Datayhteydet-välilehdellä.
           </p>
-        </section>
+        )}
+        {datasources.map((ds: Datasource) => (
+          <DatasourceRunsSection
+            key={ds.id}
+            datasource={ds}
+            organizationId={organizationId}
+            useCaseId={useCaseId}
+            onRun={() => runMutation.mutate(ds.id)}
+            isRunning={runMutation.isPending && runMutation.variables === ds.id}
+          />
+        ))}
       </div>
     </PageTemplate>
+  );
+}
+
+function DatasourceRunsSection({
+  datasource,
+  organizationId,
+  useCaseId,
+  onRun,
+  isRunning,
+}: {
+  datasource: Datasource;
+  organizationId: string;
+  useCaseId: string;
+  onRun: () => void;
+  isRunning: boolean;
+}) {
+  const { data: runs = [], isLoading } = useQuery({
+    queryKey: ["datasource-runs", organizationId, useCaseId, datasource.id],
+    queryFn: () => getDatasourceRuns(organizationId, useCaseId, datasource.id),
+  });
+
+  return (
+    <section className="rounded-xl border border-gray-200 bg-white shadow-sm">
+      <div className="flex items-center justify-between border-b border-gray-200 p-5">
+        <div>
+          <h2 className="text-base font-semibold text-gray-900">
+            {datasource.name}
+          </h2>
+          <p className="mt-0.5 truncate text-sm text-gray-500">
+            {datasource.url}
+          </p>
+        </div>
+        <Button size="sm" onClick={onRun} disabled={isRunning}>
+          {isRunning ? "Ajetaan..." : "Käynnistä ajo"}
+        </Button>
+      </div>
+
+      {isLoading && <p className="p-4 text-sm text-gray-500">Ladataan...</p>}
+      {!isLoading && runs.length === 0 && (
+        <p className="p-4 text-sm text-gray-500">Ei ajoja.</p>
+      )}
+      <div className="divide-y divide-gray-100">
+        {runs.map((run: DatasourceRun) => (
+          <div
+            key={run.id}
+            className="flex flex-col gap-1 px-5 py-3 text-sm md:flex-row md:items-center md:justify-between"
+          >
+            <div className="flex flex-wrap items-center gap-2">
+              <span
+                className={[
+                  "inline-flex rounded-full px-2 py-0.5 text-xs font-medium",
+                  statusPillClass[run.status] ?? "bg-gray-100 text-gray-700",
+                ].join(" ")}
+              >
+                {statusLabel[run.status] ?? run.status}
+              </span>
+              <span className="text-gray-700">
+                {formatDate(run.started_at)}
+              </span>
+              {run.finished_at && (
+                <span className="text-gray-400 text-xs">
+                  → {formatDate(run.finished_at)}
+                </span>
+              )}
+            </div>
+            <div className="flex gap-4 text-xs text-gray-500">
+              {run.rows_synced != null && (
+                <span>{run.rows_synced} päivitetty</span>
+              )}
+              {run.rows_failed != null && run.rows_failed > 0 && (
+                <span className="text-red-600">
+                  {run.rows_failed} virheellistä
+                </span>
+              )}
+              {run.error_message && (
+                <span
+                  className="text-red-600 max-w-xs truncate"
+                  title={run.error_message}
+                >
+                  {run.error_message}
+                </span>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
   );
 }

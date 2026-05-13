@@ -4,16 +4,83 @@ import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 import { useMessages } from "@/i18n/locale-provider";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import Link from "next/link";
 import { ReactNode } from "react";
 import { DefaultValues, FieldValues, useForm } from "react-hook-form";
 import { toast } from "sonner";
 
+// ---------- FormFooter ----------
+
+export const FormFooter = ({
+  isSubmitting,
+  isDirty,
+  onCancel,
+  cancelHref,
+}: {
+  isSubmitting: boolean;
+  isDirty: boolean;
+  onCancel?: () => void;
+  cancelHref?: string;
+}) => (
+  <>
+    <hr />
+    <div className="flex justify-between items-center">
+      {onCancel ? (
+        <Button variant="outline" type="button" onClick={onCancel}>
+          Peruuta
+        </Button>
+      ) : cancelHref ? (
+        <Button variant="outline" asChild>
+          <Link href={cancelHref}>Peruuta</Link>
+        </Button>
+      ) : (
+        <span />
+      )}
+      <Button
+        type="submit"
+        className="sm:w-fit ml-auto"
+        disabled={!isDirty}
+        isLoading={isSubmitting}
+      >
+        Tallenna
+      </Button>
+    </div>
+  </>
+);
+
+// ---------- FormShell ----------
+// Wraps children in <Form> context + <form> tag without any page layout.
+// Use inside dialogs or anywhere PageTemplate would be redundant.
+
+export const FormShell = <FormData extends FieldValues>({
+  form,
+  onSubmit,
+  children,
+  className,
+}: {
+  form: ReturnType<typeof useForm<FormData>>;
+  onSubmit: (values: FormData) => void;
+  children: ReactNode;
+  className?: string;
+}) => (
+  <Form {...form}>
+    <form
+      onSubmit={form.handleSubmit(onSubmit)}
+      className={className ?? "space-y-6 max-w-xl"}
+    >
+      {children}
+    </form>
+  </Form>
+);
+
+// ---------- useEditor ----------
+
 type UseEditorProps<ApiData, FormData> = {
   defaultValues: DefaultValues<FormData>;
-  queryFn: () => Promise<ApiData>;
+  queryFn?: () => Promise<ApiData>;
   queryKey: unknown[];
   mutationFn: (data: ApiData) => Promise<ApiData>;
-  toFormState: (data: ApiData) => FormData;
+  toFormState?: (data: ApiData) => FormData;
   toApiData: (data: FormData) => ApiData;
   onSuccess?: () => void;
 };
@@ -38,19 +105,19 @@ export const useEditor = <ApiData, FormData extends FieldValues>({
 
   const query = useQuery({
     queryKey,
-    queryFn,
+    queryFn: queryFn ?? (() => Promise.resolve(undefined as ApiData)),
+    enabled: !!queryFn,
   });
 
   const mutation = useMutation<ApiData, Error, FormData>({
     mutationFn: (data) => mutationFn(toApiData(data)),
     onSuccess: (data) => {
       toast.success(messages.editor.saveSuccessful);
-      form.reset(toFormState(data));
-      queryClient.setQueryData(queryKey, data);
-
-      if (onSuccess) {
-        onSuccess();
+      if (toFormState) {
+        form.reset(toFormState(data));
+        queryClient.setQueryData(queryKey, data);
       }
+      onSuccess?.();
     },
     onError: () => {
       toast.error(messages.editor.saveFailed);
@@ -59,7 +126,7 @@ export const useEditor = <ApiData, FormData extends FieldValues>({
 
   const form = useForm<FormData>({
     defaultValues,
-    values: query.data ? toFormState(query.data) : undefined,
+    values: query.data && toFormState ? toFormState(query.data) : undefined,
   });
 
   return { form, query, mutation };
@@ -86,15 +153,10 @@ export const EditorTemplate = <ApiData, FormData extends FieldValues>({
         <PageTemplate title={title}>
           <LoadingState isLoading={query.isLoading} error={!!query.error}>
             {children}
-            <hr />
-            <Button
-              className="sm:w-fit ml-auto"
-              disabled={!form.formState.isDirty}
-              isLoading={form.formState.isSubmitting}
-              type="submit"
-            >
-              {messages.editor.save}
-            </Button>
+            <FormFooter
+              isSubmitting={form.formState.isSubmitting}
+              isDirty={form.formState.isDirty}
+            />
           </LoadingState>
         </PageTemplate>
       </form>
