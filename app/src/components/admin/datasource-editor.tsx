@@ -3,6 +3,7 @@
 import { FormFooter } from "@/components/editor-template";
 import FormInput from "@/components/form/form-input";
 import FormSelect from "@/components/form/form-select";
+import { useMessages } from "@/i18n/locale-provider";
 import { normalizeSourceCrsValue } from "@/lib/datasource";
 import { Button } from "@/components/ui/button";
 import {
@@ -46,33 +47,34 @@ import { z } from "zod";
 
 // ---------- Schema ----------
 
-const DatasourceFormSchema = z.object({
-  name: z.string().trim().min(1, "Nimi vaaditaan"),
-  url: z.string().url("Anna kelvollinen URL"),
-  status: z.enum(["draft", "active", "disabled"]),
-  source_format: z.enum(["json", "geojson", "wfs"]),
-  auth_type: z.enum(["none", "api_key", "basic", "query_param"]),
-  auth_header: z.string().nullable().optional(),
-  auth_credential: z.string().nullable().optional(),
-  data_path: z.string().nullable().optional(),
-  name_source_field: z.string().nullable().optional(),
-  external_id_source_field: z.string().nullable().optional(),
-  coordinate_type: z.enum(["latlon", "geojson"]),
-  source_crs: z
-    .string()
-    .trim()
-    .regex(/^(?:epsg:)?\d+$/i, "Anna EPSG-koodi, esim. 4326 tai EPSG:3067"),
-  lat_source_field: z.string().nullable().optional(),
-  lon_source_field: z.string().nullable().optional(),
-  geometry_source_field: z.string().nullable().optional(),
-  schedule: z.string().nullable().optional(),
-  mappings: z.array(
-    z.object({
-      source_field: z.string().min(1),
-      field_id: z.string().uuid(),
-    })
-  ),
-});
+const createDatasourceFormSchema = (messages: any) =>
+  z.object({
+    name: z.string().trim().min(1, messages.datasourceEditor.nameRequired),
+    url: z.string().url(messages.datasourceEditor.validUrlRequired),
+    status: z.enum(["draft", "active", "disabled"]),
+    source_format: z.enum(["json", "geojson", "wfs"]),
+    auth_type: z.enum(["none", "api_key", "basic", "query_param"]),
+    auth_header: z.string().nullable().optional(),
+    auth_credential: z.string().nullable().optional(),
+    data_path: z.string().nullable().optional(),
+    name_source_field: z.string().nullable().optional(),
+    external_id_source_field: z.string().nullable().optional(),
+    coordinate_type: z.enum(["latlon", "geojson"]),
+    source_crs: z
+      .string()
+      .trim()
+      .regex(/^(?:epsg:)?\d+$/i, messages.datasourceEditor.validEpsgRequired),
+    lat_source_field: z.string().nullable().optional(),
+    lon_source_field: z.string().nullable().optional(),
+    geometry_source_field: z.string().nullable().optional(),
+    schedule: z.string().nullable().optional(),
+    mappings: z.array(
+      z.object({
+        source_field: z.string().min(1),
+        field_id: z.string().uuid(),
+      })
+    ),
+  });
 
 type DatasourceFormValues = z.infer<typeof DatasourceFormSchema>;
 
@@ -96,7 +98,9 @@ export const DataSourceEditor = ({
   datasourceId,
   onSaved,
 }: DataSourceEditorProps) => {
+  const messages = useMessages();
   const isEdit = !!datasourceId;
+  const DatasourceFormSchema = createDatasourceFormSchema(messages);
 
   const [connectionStatus, setConnectionStatus] =
     useState<ConnectionStatus>("idle");
@@ -186,7 +190,7 @@ export const DataSourceEditor = ({
           })),
         });
       })
-      .catch(() => toast.error("Datalähteen lataus epäonnistui"));
+        .catch(() => toast.error(messages.datasourceEditor.datasourceLoadFailed));
   }, [isEdit, datasourceId, organizationId, useCaseId, reset]);
 
   const handleTestConnection = async () => {
@@ -205,7 +209,7 @@ export const DataSourceEditor = ({
 
     if (!isValid) {
       setConnectionStatus("error");
-      setConnectionError("Täytä pakolliset kentät ennen yhteyden testausta.");
+      setConnectionError(messages.datasourceEditor.fillRequiredBeforeTest);
       return;
     }
 
@@ -253,7 +257,7 @@ export const DataSourceEditor = ({
         ? ((err.response?.data as { error?: string } | undefined)?.error ?? err.message)
         : err instanceof Error
           ? err.message
-          : "Yhteyden testaus epäonnistui";
+          : messages.datasourceEditor.connectionError;
       setConnectionError(msg);
     }
   };
@@ -288,10 +292,10 @@ export const DataSourceEditor = ({
         values.mappings
       );
 
-      toast.success("Datalähde tallennettu");
+      toast.success(messages.datasourceEditor.datasourceSaved);
       onSaved?.(saved);
     } catch {
-      toast.error("Tallentaminen epäonnistui");
+      toast.error(messages.datasourceEditor.datasourceSaveFailed);
     } finally {
       setIsSaving(false);
     }
@@ -303,22 +307,24 @@ export const DataSourceEditor = ({
     <Form {...form}>
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 max-w-xl">
         {/* ─── Perustiedot ─── */}
-        <h2 className="text-base font-semibold">Yhdistimen asetukset</h2>
+        <h2 className="text-base font-semibold">
+          {messages.datasourceEditor.connectionSettingsTitle}
+        </h2>
 
-        <FormInput name="name" label="Nimi" />
+        <FormInput name="name" label={messages.datasourceEditor.connectorName} />
 
         <FormSelect
           name="status"
-          label="Tila"
+          label={messages.datasourceEditor.status}
           items={[
-            { value: "draft", label: "Luonnos" },
-            { value: "active", label: "Aktiivinen" },
-            { value: "disabled", label: "Poissa käytöstä" },
+            { value: "draft", label: messages.datasourceEditor.draft },
+            { value: "active", label: messages.datasourceEditor.active },
+            { value: "disabled", label: messages.datasourceEditor.disabled },
           ]}
         />
 
         <div className="space-y-1.5">
-          <Label htmlFor="ds-url">HTTP-osoite (URL)</Label>
+          <Label htmlFor="ds-url">{messages.datasourceEditor.url}</Label>
           <div className="flex gap-2">
             <Input
               id="ds-url"
@@ -333,13 +339,13 @@ export const DataSourceEditor = ({
               disabled={connectionStatus === "testing"}
             >
               {connectionStatus === "testing"
-                ? "Testataan..."
-                : "Testaa yhteys"}
+                ? messages.datasourceEditor.testing
+                : messages.datasourceEditor.testConnection}
             </Button>
           </div>
           {connectionStatus === "success" && (
             <p className="text-xs text-green-600">
-              Yhteys OK – kenttävastinnat vapautettu.
+              {messages.datasourceEditor.connectionOk}
             </p>
           )}
           {connectionError && (
@@ -354,52 +360,52 @@ export const DataSourceEditor = ({
 
         <FormSelect
           name="source_format"
-          label="Datalähteen formaatti"
+          label={messages.datasourceEditor.sourceFormat}
           items={[
             { value: "json", label: "JSON" },
             { value: "geojson", label: "GeoJSON" },
-            { value: "wfs", label: "WFS (GeoJSON-vastaus)" },
+            { value: "wfs", label: messages.datasourceEditor.wfsOption },
           ]}
         />
 
         {sourceFormat === "json" && (
-          <FormInput name="data_path" label="Taulukon polku (data path)" />
+          <FormInput name="data_path" label={messages.datasourceEditor.dataPath} />
         )}
 
         <FormSelect
           name="auth_type"
-          label="Tunnistautuminen"
+          label={messages.datasourceEditor.authentication}
           items={[
-            { value: "none", label: "Ei tunnistautumista" },
-            { value: "api_key", label: "API-avain (header)" },
-            { value: "basic", label: "Basic auth" },
-            { value: "query_param", label: "Query-parametri" },
+            { value: "none", label: messages.datasourceEditor.noAuth },
+            { value: "api_key", label: messages.datasourceEditor.apiKeyHeader },
+            { value: "basic", label: messages.datasourceEditor.basicAuth },
+            { value: "query_param", label: messages.datasourceEditor.queryParam },
           ]}
         />
 
         {authType === "api_key" && (
           <>
-            <FormInput name="auth_header" label="Header-nimi" />
-            <FormInput name="auth_credential" label="API-avain" />
+            <FormInput name="auth_header" label={messages.datasourceEditor.headerName} />
+            <FormInput name="auth_credential" label={messages.datasourceEditor.apiKey} />
           </>
         )}
 
         {authType === "basic" && (
-          <FormInput name="auth_credential" label="Tunnus:Salasana" />
+          <FormInput name="auth_credential" label={messages.datasourceEditor.usernamePassword} />
         )}
 
         {authType === "query_param" && (
           <>
-            <FormInput name="auth_header" label="Parametrin nimi" />
-            <FormInput name="auth_credential" label="Arvo" />
+            <FormInput name="auth_header" label={messages.datasourceEditor.parameterName} />
+            <FormInput name="auth_credential" label={messages.datasourceEditor.value} />
           </>
         )}
 
-        <FormInput name="schedule" label="Aikataulu (cron)" />
+        <FormInput name="schedule" label={messages.datasourceEditor.schedule} />
 
         {/* ─── Koordinaatit ja nimikenttä ─── */}
         <h2 className="text-base font-semibold pt-2">
-          Koordinaatit ja nimikenttä
+          {messages.datasourceEditor.coordinatesAndNameField}
         </h2>
 
         <fieldset
@@ -415,13 +421,13 @@ export const DataSourceEditor = ({
             name="name_source_field"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Sijaintinimen kenttä</FormLabel>
+                <FormLabel>{messages.datasourceEditor.locationNameField}</FormLabel>
                 <FormControl>
                   <FieldPathSelect
                     options={fieldPathOptions}
                     value={field.value ?? ""}
                     onChange={field.onChange}
-                    placeholder="Valitse lähdekenttä…"
+                    placeholder={messages.datasourceEditor.selectSourceField}
                   />
                 </FormControl>
               </FormItem>
@@ -433,13 +439,13 @@ export const DataSourceEditor = ({
             name="external_id_source_field"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Ulkoinen ID-kenttä (upsertia varten)</FormLabel>
+                <FormLabel>{messages.datasourceEditor.externalIdField}</FormLabel>
                 <FormControl>
                   <FieldPathSelect
                     options={fieldPathOptions}
                     value={field.value ?? ""}
                     onChange={field.onChange}
-                    placeholder="Valitse lähdekenttä…"
+                    placeholder={messages.datasourceEditor.selectSourceField}
                   />
                 </FormControl>
               </FormItem>
@@ -448,10 +454,10 @@ export const DataSourceEditor = ({
 
           <FormSelect
             name="coordinate_type"
-            label="Koordinaattimuoto"
+            label={messages.datasourceEditor.coordinateType}
             items={[
-              { value: "latlon", label: "Lat/Lon -kentät" },
-              { value: "geojson", label: "GeoJSON geometry" },
+              { value: "latlon", label: messages.datasourceEditor.latLonFields },
+              { value: "geojson", label: messages.datasourceEditor.geojsonGeometry },
             ]}
           />
 
@@ -460,7 +466,7 @@ export const DataSourceEditor = ({
             name="source_crs"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Koordinaatisto (EPSG)</FormLabel>
+                <FormLabel>{messages.datasourceEditor.coordinateSystem}</FormLabel>
                 <FormControl>
                   <Input
                     {...field}
@@ -469,12 +475,11 @@ export const DataSourceEditor = ({
                   />
                 </FormControl>
                 <p className="text-xs text-muted-foreground">
-                  Anna lähdedatan EPSG-koodi, esim. 4326 tai 3067. Kohteet muunnetaan
-                  automaattisesti WGS84 / Mapbox-muotoon tuonnin aikana.
+                  {messages.datasourceEditor.coordinateSystemLongHelp}
                 </p>
                 {sourceFormat === "wfs" && (
                   <p className="text-xs text-muted-foreground">
-                    Testaa yhteys yrittää lukea koordinaatiston automaattisesti WFS-vastauksesta.
+                    {messages.datasourceEditor.wfsCoordinateSystemHelp}
                   </p>
                 )}
               </FormItem>
@@ -488,13 +493,13 @@ export const DataSourceEditor = ({
                 name="lat_source_field"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Leveysasteen kenttä (lat / N)</FormLabel>
+                    <FormLabel>{messages.datasourceEditor.latitudeField}</FormLabel>
                     <FormControl>
                       <FieldPathSelect
                         options={fieldPathOptions}
                         value={field.value ?? ""}
                         onChange={field.onChange}
-                        placeholder="Valitse lähdekenttä…"
+                        placeholder={messages.datasourceEditor.selectSourceField}
                       />
                     </FormControl>
                   </FormItem>
@@ -505,13 +510,13 @@ export const DataSourceEditor = ({
                 name="lon_source_field"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Pituusasteen kenttä (lon / E)</FormLabel>
+                    <FormLabel>{messages.datasourceEditor.longitudeField}</FormLabel>
                     <FormControl>
                       <FieldPathSelect
                         options={fieldPathOptions}
                         value={field.value ?? ""}
                         onChange={field.onChange}
-                        placeholder="Valitse lähdekenttä…"
+                        placeholder={messages.datasourceEditor.selectSourceField}
                       />
                     </FormControl>
                   </FormItem>
@@ -526,13 +531,13 @@ export const DataSourceEditor = ({
               name="geometry_source_field"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Geometria-kenttä</FormLabel>
+                    <FormLabel>{messages.datasourceEditor.geometryField}</FormLabel>
                   <FormControl>
                     <FieldPathSelect
                       options={fieldPathOptions}
                       value={field.value ?? ""}
                       onChange={field.onChange}
-                      placeholder="Valitse lähdekenttä…"
+                        placeholder={messages.datasourceEditor.selectSourceField}
                     />
                   </FormControl>
                 </FormItem>
@@ -543,7 +548,7 @@ export const DataSourceEditor = ({
 
         {/* ─── Kenttämäppäykset ─── */}
         <div className="flex items-center justify-between pt-2">
-          <h2 className="text-base font-semibold">Kenttämäppäykset</h2>
+          <h2 className="text-base font-semibold">{messages.datasourceEditor.fieldMappingsTitle}</h2>
           <Button
             type="button"
             variant="outline"
@@ -551,7 +556,7 @@ export const DataSourceEditor = ({
             disabled={mappingDisabled}
             onClick={() => appendMapping({ source_field: "", field_id: "" })}
           >
-            + Lisää mäppäys
+            {messages.datasourceEditor.addMapping}
           </Button>
         </div>
 
@@ -565,7 +570,7 @@ export const DataSourceEditor = ({
         >
           {mappingRows.length === 0 && (
             <p className="text-sm text-muted-foreground">
-              Ei mäppäyksiä. Testaa yhteys ensin ja lisää sitten mäppäyksiä.
+              {messages.datasourceEditor.noMappings}
             </p>
           )}
           {mappingRows.map((row, index) => (
@@ -575,13 +580,13 @@ export const DataSourceEditor = ({
                 name={`mappings.${index}.source_field`}
                 render={({ field }) => (
                   <FormItem className="flex-1">
-                    <FormLabel className="text-xs">Lähdekenttä</FormLabel>
+                    <FormLabel className="text-xs">{messages.datasourceEditor.sourceField}</FormLabel>
                     <FormControl>
                       <FieldPathSelect
                         options={fieldPathOptions}
                         value={field.value ?? ""}
                         onChange={field.onChange}
-                        placeholder="Valitse lähdekenttä…"
+                        placeholder={messages.datasourceEditor.selectSourceField}
                       />
                     </FormControl>
                   </FormItem>
@@ -589,7 +594,7 @@ export const DataSourceEditor = ({
               />
               <FormSelect
                 name={`mappings.${index}.field_id`}
-                label="Kohdekenttä"
+                label={messages.datasourceEditor.targetField}
                 className="flex-1"
                 items={useCaseFields.map((f) => ({
                   value: f.id,
