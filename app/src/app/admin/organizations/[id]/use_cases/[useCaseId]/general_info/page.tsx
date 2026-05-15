@@ -27,7 +27,11 @@ const GeneralInfoPage = () => {
   });
 
   return (
-    <EditorTemplate {...editor} title={messages.adminGeneralInfo.title}>
+    <EditorTemplate
+      {...editor}
+      title={messages.adminGeneralInfo.title}
+      introDescription={messages.adminGeneralInfo.description}
+    >
       <div className="my-2 max-w-xl">
         <FormInput label={messages.adminGeneralInfo.nameLabel} name="name" />
       </div>

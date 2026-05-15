@@ -1,6 +1,7 @@
 "use client";
 
 import { PageTemplate } from "@/components/admin/page-template";
+import { UseCasePageIntro } from "@/components/admin/use-case-page-intro";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -20,6 +21,7 @@ import { ArrowDown, ArrowUp, Pencil, Plus, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { useParams } from "next/navigation";
 import { toast } from "sonner";
+import { useMessages } from "@/i18n/locale-provider";
 import {
   FieldFormContent,
   FieldFormValues,
@@ -40,6 +42,7 @@ const FIELD_TYPE_LABELS: Record<string, string> = {
 type FieldItem = z.infer<typeof FieldRecord>;
 
 export default function FieldsPage() {
+  const messages = useMessages();
   const { id: organizationId, useCaseId } = useParams<{
     id: string;
     useCaseId: string;
@@ -144,15 +147,17 @@ export default function FieldsPage() {
 
   return (
     <>
-      <PageTemplate
-        title="Sisältömalli"
-        actions={
-          <Button onClick={openNew}>
-            <Plus className="h-4 w-4 mr-2" />
-            Lisää kenttä
-          </Button>
-        }
-      >
+      <PageTemplate>
+        <UseCasePageIntro
+          title={messages.admin.fields}
+          description={messages.admin.useCaseHomeHighlights[2]}
+          actions={
+            <Button onClick={openNew}>
+              <Plus className="h-4 w-4 mr-2" />
+              Lisää kenttä
+            </Button>
+          }
+        />
         {isLoading ? (
           <p className="text-sm text-muted-foreground">Ladataan...</p>
         ) : fields.length === 0 ? (

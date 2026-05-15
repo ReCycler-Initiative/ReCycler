@@ -22,16 +22,29 @@ import {
 } from "@/services/api";
 import { useQuery } from "@tanstack/react-query";
 import { cn } from "@/lib/utils";
-import { ExternalLink, SettingsIcon } from "lucide-react";
+import {
+  AppWindow,
+  BriefcaseBusiness,
+  ChartColumn,
+  Blocks,
+  Bot,
+  Database,
+  ExternalLink,
+  MapPin,
+  ScrollText,
+  SettingsIcon,
+} from "lucide-react";
 import Link from "next/link";
 import { useParams, usePathname, useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { PageLoadingSpinner } from "@/components/page-loading-spinner";
 import { useMessages } from "@/i18n/locale-provider";
+import { LucideIcon } from "lucide-react";
 
 type NavLink = {
   exact?: boolean;
   href: string;
+  icon?: LucideIcon;
   label: string;
 };
 
@@ -67,19 +80,41 @@ const Content = ({
   // Same visual style as "Avaa ReCycler-demo"
   const navButtonClass = (isActive: boolean) =>
     cn(
-      "inline-flex items-center rounded-full px-5 py-2 text-sm font-medium transition",
+      "inline-flex items-center rounded-full px-5 py-2 text-sm font-normal transition",
       isActive
         ? "bg-gradient-to-b from-slate-900 to-slate-800 text-white shadow-sm"
         : "text-gray-700 hover:bg-gray-100"
     );
 
   const navLinks: NavLink[] = [
-    { exact: true, href: `${orgRootPath}`, label: organization.name },
-    { href: `${orgRootPath}/datasources`, label: messages.admin.datasources },
-    { href: `${orgRootPath}/fields`, label: "Sisältömalli" },
-    { href: `${orgRootPath}/locations`, label: messages.admin.locations },
-    { href: `${orgRootPath}/ai`, label: messages.admin.ai },
-    { href: `${orgRootPath}/runs`, label: messages.admin.logs },
+    {
+      exact: true,
+      href: `${orgRootPath}`,
+      label: organization.name,
+      icon: AppWindow,
+    },
+    {
+      href: `${orgRootPath}/datasources`,
+      label: messages.admin.datasources,
+      icon: Database,
+    },
+    {
+      href: `${orgRootPath}/fields`,
+      label: messages.admin.fields,
+      icon: Blocks,
+    },
+    {
+      href: `${orgRootPath}/locations`,
+      label: messages.admin.locations,
+      icon: MapPin,
+    },
+    { href: `${orgRootPath}/ai`, label: messages.admin.ai, icon: Bot },
+    { href: `${orgRootPath}/runs`, label: messages.admin.logs, icon: ScrollText },
+    {
+      href: `${orgRootPath}/usage`,
+      label: messages.admin.usageStats,
+      icon: ChartColumn,
+    },
   ];
 
   return (
@@ -95,12 +130,16 @@ const Content = ({
                   isActiveSection(link.href, link.exact)
                 )}
               >
+                {link.icon && <link.icon className="mr-2 h-4 w-4" aria-hidden="true" />}
                 {link.label}
               </Link>
             ))}
           </nav>
           <div className="flex items-center ml-auto mr-2">
-            <Label className="mr-4">{messages.admin.useCaseLabel}</Label>
+            <Label className="mr-4 inline-flex items-center gap-2 font-normal text-gray-700">
+              <BriefcaseBusiness className="h-4 w-4" aria-hidden="true" />
+              {messages.admin.useCaseLabel}
+            </Label>
             <Select
               defaultValue={useCasesQuery.data?.[0]?.id}
               value={selectedUseCaseId}
@@ -143,6 +182,7 @@ const Content = ({
             <DropdownMenuContent>
               <DropdownMenuItem asChild>
                 <Link href={`${orgRootPath}/general_info`}>
+                  <AppWindow className="mr-2 h-4 w-4 text-slate-500" />
                   {messages.admin.organizationDetails}
                 </Link>
               </DropdownMenuItem>
@@ -150,14 +190,11 @@ const Content = ({
               {selectedUseCaseId && (
                 <DropdownMenuItem asChild>
                   <Link href={`${orgRootPath}/edit`}>
+                    <BriefcaseBusiness className="mr-2 h-4 w-4 text-slate-500" />
                     {messages.admin.useCaseDetails}
                   </Link>
                 </DropdownMenuItem>
               )}
-
-              <DropdownMenuItem asChild>
-                <Link href={`${orgRootPath}/runs`}>{messages.admin.logs}</Link>
-              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
