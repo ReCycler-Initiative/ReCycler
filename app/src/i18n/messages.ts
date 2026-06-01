@@ -860,6 +860,11 @@ const baseEn = {
 		footerLicense:
 			"The project is licensed under Apache 2.0. The data used in the project comes from the Kierratys.info API.",
 	},
+	editor: {
+		save: "Save",
+		saveSuccessful: "Saved successfully",
+		saveFailed: "Saving failed",
+	},
 	pricingChat: {
 		...baseFi.pricingChat,
 		initialAssistantMessage:
@@ -911,7 +916,7 @@ const baseEn = {
 		{
 			name: "Launch",
 			audience: "Fast launch",
-			price: "690 €/month",
+			price: "xxx €/month",
 			description:
 				"Fits a first published service when you want to quickly launch one service with real data.",
 			highlights: [
@@ -923,7 +928,7 @@ const baseEn = {
 		{
 			name: "Growth",
 			audience: "Organization-wide use",
-			price: "1,290-1,990 €/month",
+			price: "xxxx €/month",
 			description:
 				"Designed for organizations that want multiple services on the same platform.",
 			highlights: [

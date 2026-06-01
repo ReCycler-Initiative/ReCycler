@@ -1,5 +1,6 @@
 "use client";
 
+import { useMessages } from "@/i18n/locale-provider";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
@@ -174,6 +175,7 @@ export const FieldFormContent = ({
   isPending: boolean;
   onSubmit: (values: FieldFormValues) => void;
 }) => {
+  const messages = useMessages();
   const {
     register,
     setValue,
@@ -223,7 +225,11 @@ export const FieldFormContent = ({
         <Select
           value={fieldType}
           onValueChange={(v) =>
-            setValue("field_type", v as "multi_select" | "text_input" | "address" | "opening_hours")
+            setValue(
+              "field_type",
+              v as "multi_select" | "text_input" | "address" | "opening_hours",
+              { shouldDirty: true }
+            )
           }
         >
           <SelectTrigger>
@@ -243,7 +249,9 @@ export const FieldFormContent = ({
         <Checkbox
           id="field-required"
           checked={required}
-          onCheckedChange={(v) => setValue("required", !!v)}
+          onCheckedChange={(v) =>
+            setValue("required", !!v, { shouldDirty: true })
+          }
         />
         <Label htmlFor="field-required" className="cursor-pointer">
           Pakollinen kenttä
@@ -353,15 +361,15 @@ export const FieldFormContent = ({
       <div className="flex gap-3 pt-2">
         {onCancel ? (
           <Button variant="outline" type="button" onClick={onCancel}>
-            Peruuta
+            {messages.adminLocationPanel.cancel}
           </Button>
         ) : (
           <Button variant="outline" asChild>
-            <Link href={backHref!}>Peruuta</Link>
+            <Link href={backHref!}>{messages.adminLocationPanel.cancel}</Link>
           </Button>
         )}
-        <Button type="submit" disabled={isPending}>
-          {isPending ? "Tallennetaan..." : "Tallenna"}
+        <Button type="submit" disabled={isPending || !formState.isDirty}>
+          {isPending ? messages.adminLocationPanel.saving : messages.editor.save}
         </Button>
       </div>
     </form>

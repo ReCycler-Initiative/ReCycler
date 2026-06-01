@@ -20,6 +20,7 @@ type ConnectionStatus = "idle" | "testing" | "success" | "error";
 export const DataSourceEditor = () => {
   const messages = useMessages();
   const form = useForm<ConnectorFormValues>();
+  const [hasChanges, setHasChanges] = useState(false);
 
   const [filters, setFilters] = useState<FilterRow[]>([
     { id: 1, label: "Materiaali", attribute: "material", icon: "tag" },
@@ -31,6 +32,7 @@ export const DataSourceEditor = () => {
 
   // Lisää uusi suodatinkenttä
   const addFilter = () => {
+    setHasChanges(true);
     setFilters((prev) => [
       ...prev,
       { id: Date.now(), label: "", attribute: "", icon: "tag" },
@@ -39,6 +41,7 @@ export const DataSourceEditor = () => {
 
   // Poista suodatinkenttä
   const removeFilter = (id: number) => {
+    setHasChanges(true);
     setFilters((prev) => prev.filter((f) => f.id !== id));
   };
 
@@ -48,6 +51,7 @@ export const DataSourceEditor = () => {
     field: keyof Omit<FilterRow, "id">,
     value: string
   ) => {
+    setHasChanges(true);
     setFilters((prev) =>
       prev.map((f) => (f.id === id ? { ...f, [field]: value } : f))
     );
@@ -93,6 +97,7 @@ export const DataSourceEditor = () => {
       <form
         onSubmit={form.handleSubmit(onSubmit)}
         className="flex flex-col gap-y-8 pb-24 lg:pb-0"
+        onChangeCapture={() => setHasChanges(true)}
       >
         {/* ----------------------------- */}
         {/* YHDISTIMEN ASETUKSET          */}
@@ -149,7 +154,7 @@ export const DataSourceEditor = () => {
                   ? messages.datasourceEditor.testing
                   : messages.datasourceEditor.testConnection}
               </Button>
-              <Button type="submit" size="sm" className="min-w-[160px]">
+              <Button type="submit" size="sm" className="min-w-[160px]" disabled={!hasChanges}>
                 {messages.datasourceEditor.startAndValidate}
               </Button>
             </div>
@@ -517,7 +522,7 @@ export const DataSourceEditor = () => {
                   : messages.datasourceEditor.testConnection}
               </Button>
 
-              <Button type="submit" size="lg" className="w-full lg:w-auto">
+              <Button type="submit" size="lg" className="w-full lg:w-auto" disabled={!hasChanges}>
                 {messages.datasourceEditor.startAndValidate}
               </Button>
             </div>
