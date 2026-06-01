@@ -76,6 +76,7 @@ const Content = ({
   const navLinks: NavLink[] = [
     { exact: true, href: `${orgRootPath}`, label: organization.name },
     { href: `${orgRootPath}/datasources`, label: messages.admin.datasources },
+    { href: `${orgRootPath}/fields`, label: "Sisältömalli" },
     { href: `${orgRootPath}/locations`, label: messages.admin.locations },
     { href: `${orgRootPath}/ai`, label: messages.admin.ai },
     { href: `${orgRootPath}/runs`, label: messages.admin.logs },

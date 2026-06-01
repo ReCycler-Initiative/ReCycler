@@ -1,15 +1,14 @@
 "use client";
 
-import { PageTemplate } from "@/components/admin/page-template";
+import { EditorTemplate, useEditor } from "@/components/editor-template";
 import { createField } from "@/services/api";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import { useParams, useRouter } from "next/navigation";
-import { toast } from "sonner";
 import {
-  FieldFormContent,
+  FieldFormFields,
   FieldFormValues,
+  fieldFormDefaultValues,
   toApiData,
-  useFieldForm,
 } from "../_components/field-form";
 
 export default function NewFieldPage() {
@@ -19,31 +18,28 @@ export default function NewFieldPage() {
   }>();
   const router = useRouter();
   const queryClient = useQueryClient();
-  const backHref = `/admin/organizations/${organizationId}/use_cases/${useCaseId}/fields`;
 
-  const form = useFieldForm();
-
-  const mutation = useMutation({
-    mutationFn: (values: FieldFormValues) =>
-      createField(organizationId, useCaseId, toApiData(values)),
+  const editor = useEditor<FieldFormValues, FieldFormValues>({
+    defaultValues: fieldFormDefaultValues,
+    queryKey: [],
+    mutationFn: async (formValues) => {
+      await createField(organizationId, useCaseId, toApiData(formValues));
+      return formValues;
+    },
+    toApiData: (v) => v,
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: ["fields", organizationId, useCaseId],
       });
-      toast.success("Kenttä luotu");
-      router.push(backHref);
+      router.push(
+        `/admin/organizations/${organizationId}/use_cases/${useCaseId}/fields`
+      );
     },
-    onError: () => toast.error("Tallennus epäonnistui"),
   });
 
   return (
-    <PageTemplate title="Uusi kenttä">
-      <FieldFormContent
-        form={form}
-        backHref={backHref}
-        isPending={mutation.isPending}
-        onSubmit={(values) => mutation.mutate(values)}
-      />
-    </PageTemplate>
+    <EditorTemplate {...editor} title="Uusi kenttä">
+      <FieldFormFields form={editor.form} />
+    </EditorTemplate>
   );
 }

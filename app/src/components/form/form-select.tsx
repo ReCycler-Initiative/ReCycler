@@ -31,7 +31,7 @@ const FormSelect = ({
           <FormLabel className={cn("mb-2", { "sr-only": !showLabel })}>
             {label}
           </FormLabel>
-          <Select onValueChange={field.onChange} defaultValue={field.value}>
+          <Select value={field.value} onValueChange={field.onChange}>
             <FormControl>
               <SelectTrigger>
                 <SelectValue />

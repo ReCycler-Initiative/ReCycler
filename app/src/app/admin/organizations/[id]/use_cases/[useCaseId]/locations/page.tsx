@@ -78,13 +78,23 @@ const LocationsPage = () => {
   // Transform GeoJSON data to LocationMarker format
   const locations: (LocationMarker & { title: string })[] = useMemo(
     () =>
-      data?.features.map((feature) => ({
-        id: feature.properties.id,
-        name: feature.properties.name,
-        title: feature.properties.name,
-        longitude: feature.geometry.coordinates[0],
-        latitude: feature.geometry.coordinates[1],
-      })) ?? [],
+      data?.features
+        .map((feature) => ({
+          id: feature.properties.id,
+          name: feature.properties.name,
+          title: feature.properties.name,
+          longitude: feature.geometry.coordinates[0],
+          latitude: feature.geometry.coordinates[1],
+        }))
+        .filter(
+          (loc) =>
+            isFinite(loc.latitude) &&
+            isFinite(loc.longitude) &&
+            loc.latitude >= -90 &&
+            loc.latitude <= 90 &&
+            loc.longitude >= -180 &&
+            loc.longitude <= 180
+        ) ?? [],
     [data]
   );
 
