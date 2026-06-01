@@ -1,11 +1,14 @@
 "use client";
 
 import { MaterialsPageContent } from "@/components/materials-page";
+import { useLocale } from "@/i18n/locale-provider";
+import { resolveLocalizedText } from "@/lib/use-case-content";
 import { getUseCaseById } from "@/services/api";
 import { useQuery } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
 
 const MaterialsPage = () => {
+  const { locale } = useLocale();
   const { organizationId, useCaseId } = useParams<{
     organizationId: string;
     useCaseId: string;
@@ -20,11 +23,11 @@ const MaterialsPage = () => {
     <MaterialsPageContent
       organizationId={organizationId}
       useCaseId={useCaseId}
-      title={useCase?.content.filters.title || undefined}
-      description={useCase?.content.filters.text || undefined}
-      ctaText={useCase?.content.filters.cta || undefined}
-      tabAiText={useCase?.content.filters.tab_ai || undefined}
-      tabManualText={useCase?.content.filters.tab_manual || undefined}
+      title={useCase ? resolveLocalizedText(useCase.content.filters.title, locale) : undefined}
+      description={useCase ? resolveLocalizedText(useCase.content.filters.text, locale) : undefined}
+      ctaText={useCase ? resolveLocalizedText(useCase.content.filters.cta, locale) : undefined}
+      tabAiText={useCase ? resolveLocalizedText(useCase.content.filters.tab_ai, locale) : undefined}
+      tabManualText={useCase ? resolveLocalizedText(useCase.content.filters.tab_manual, locale) : undefined}
     />
   );
 };

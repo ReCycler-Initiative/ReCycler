@@ -1,15 +1,26 @@
 "use client";
 
 import { Toaster } from "@/components/ui/sonner";
+import { LocaleProvider } from "@/i18n/locale-provider";
+import { Locale } from "@/i18n/messages";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { useState } from "react";
 
-const Providers = ({ children }: { children: React.ReactNode }) => {
-  const queryClient = new QueryClient();
+const Providers = ({
+  children,
+  initialLocale,
+}: {
+  children: React.ReactNode;
+  initialLocale: Locale;
+}) => {
+  const [queryClient] = useState(() => new QueryClient());
 
   return (
     <>
       <Toaster />
-      <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+      <QueryClientProvider client={queryClient}>
+        <LocaleProvider initialLocale={initialLocale}>{children}</LocaleProvider>
+      </QueryClientProvider>
     </>
   );
 };

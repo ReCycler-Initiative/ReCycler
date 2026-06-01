@@ -2,8 +2,10 @@
 
 import { getFields } from "@/services/api";
 import { useQuery } from "@tanstack/react-query";
-import { CustomCheckbox, nameIconMap } from "@/components/materials";
+import { CustomCheckbox, getNameIconEntry } from "@/components/materials";
 import LoadingSpinner from "@/components/loading-spinner";
+import { useLocale, useMessages } from "@/i18n/locale-provider";
+import { localizeMaterialNameCandidate } from "@/lib/material-translations";
 
 export type FieldSelections = Record<string, number[]>;
 
@@ -18,6 +20,8 @@ export const FieldMaterials = ({
   selectedValues: FieldSelections;
   onSelectionChange: (values: FieldSelections) => void;
 }) => {
+  const { locale } = useLocale();
+  const messages = useMessages();
   const { data: fields, isFetching } = useQuery({
     queryKey: ["fields", organizationId, useCaseId],
     queryFn: () => getFields(organizationId, useCaseId),
@@ -30,7 +34,7 @@ export const FieldMaterials = ({
     return (
       <div className="flex items-center flex-col gap-4 py-6">
         <LoadingSpinner />
-        <p>Haetaan vaihtoehtoja...</p>
+        <p>{messages.materials.loadingMaterials}</p>
       </div>
     );
   }
@@ -50,15 +54,15 @@ export const FieldMaterials = ({
             )}
             <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
               {choices.map((choice, choiceIndex) => {
-                const color = field.options?.choiceColors?.[choice] ?? nameIconMap[choice.toLowerCase()]?.baseHex;
-                const iconEntry = nameIconMap[choice.toLowerCase()];
+                const iconEntry = getNameIconEntry(choice);
+                const color = field.options?.choiceColors?.[choice] ?? iconEntry?.baseHex;
                 const checked = fieldSelected.includes(choiceIndex);
                 return (
                   <CustomCheckbox
                     key={choice}
                     baseHex={color}
                     checked={checked}
-                    label={choice}
+                    label={localizeMaterialNameCandidate(choice, locale)}
                     icon={iconEntry?.icon}
                     onToggle={() => {
                       const next = checked

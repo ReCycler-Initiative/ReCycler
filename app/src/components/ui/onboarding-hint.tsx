@@ -1,6 +1,8 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { useMessages } from "@/i18n/locale-provider";
+import Image from "next/image";
 import React, { useEffect, useMemo, useState } from "react";
 import {
   Dialog,
@@ -15,10 +17,13 @@ type Step = {
   body: React.ReactNode;
   imageSrc?: string | null;
   imageAlt?: string | null;
+  imageWidth?: number;
+  imageHeight?: number;
   ctaLabel?: string; // käytetään viimeisessä stepissä
 };
 
 export default function OnboardingHint() {
+  const messages = useMessages();
   const [visible, setVisible] = useState(false);
   const [index, setIndex] = useState(0);
 
@@ -26,111 +31,94 @@ export default function OnboardingHint() {
   const steps: Step[] = useMemo(
     () => [
       {
-        title: "Hae osoitteella tai paikalla",
+        title: messages.onboarding.searchTitle,
         body: (
           <>
-            Kirjoita osoite, paikka tai alue hakukenttään.
-            <br />
-            Saat ehdotuksia kirjoittaessasi; klikkaa ehdotusta tai paina Enter,
-            niin karttaikkuna keskittyy valittuun sijaintiin.
+            {messages.onboarding.searchHint}
             <br />
             <br />
-            Esimerkkejä:&nbsp;
+            {messages.onboarding.examplesLabel}:&nbsp;
             <small>
               <span className="inline-flex gap-2 flex-wrap">
-                <span className="px-2 py-1 rounded-full bg-gray-100">
-                  Mannerheimintie 10
-                </span>
-                <span className="px-2 py-1 rounded-full bg-gray-100">
-                  Kauppatori
-                </span>
-                <span className="px-2 py-1 rounded-full bg-gray-100">
-                  Hervanta
-                </span>
+                {messages.onboarding.searchExamples.map((example: string) => (
+                  <span key={example} className="px-2 py-1 rounded-full bg-gray-100">
+                    {example}
+                  </span>
+                ))}
               </span>
             </small>
             <br />
             <br />
-            <small>Vinkki: ↑/↓ selaa ehdotuksia, ↩︎ Enter hakee</small>
+            <small>{messages.onboarding.searchTip}</small>
             <br />
             <br />
           </>
         ),
         imageSrc: "/images/searchBoxOnBoarding.png",
-        imageAlt: "Hakukenttä",
+        imageAlt: messages.onboarding.searchImageAlt,
+        imageWidth: 530,
+        imageHeight: 114,
       },
       {
-        title: "Ota paikannus käyttöön",
+        title: messages.onboarding.locationTitle,
         body: (
           <>
-            Napsauta sijaintipainiketta. Ensimmäisellä kerralla sovellusta käytettäessä verkkoselain kysyy luvan sijainnin käyttöön – hyväksy,
-            niin karttaikkuna keskittyy nykyiseen sijaintiisi.
-            <br />
-            <br />
-            Paina painiketta uudelleen, niin <b>Seuraa sijaintiani</b> -tila
-            kytkeytyy päälle/pois (esimerkkikuvassa toiminto on päällä).
-            Seurantatilassa näkymä seuraa sijaintiasi liikkuessasi.
+            {messages.onboarding.locationBody}
             <br />
             <br />
             <small>
-              Vinkki: Jos et anna lupaa tai paikannus ei toimi, voit hakea
-              kohteen osoitteella tai paikannimellä.
+              {messages.onboarding.locationTip}
             </small>
           </>
         ),
         imageSrc: "/images/geolocationOnBoarding.png",
-        imageAlt: "Sijaintipainike",
+        imageAlt: messages.onboarding.locationImageAlt,
+        imageWidth: 98,
+        imageHeight: 84,
       },
       {
-        title: "Vaihda taustanäkymä",
+        title: messages.onboarding.mapStyleTitle,
         body: (
           <>
-            Klikkaa taustakarttapainiketta (maapallo-kuvake).
-            <br />
-            Voit vaihtaa kartan taustanäkymän: <b>normaali kartta</b> (selkeä
-            kadut ja alueet) tai <b>satelliittikuva</b> (realistinen
-            ilmakuvanäkymä).
+            {messages.onboarding.mapStyleBody}
             <br />
             <br />
             <small>
-              Vinkki: käytä karttanäkymää reittien ja osoitteiden hakuun,
-              satelliittia kun haluat nähdä rakennukset ja maaston tarkemmin.
-              3D-näkymässä voit puolestaan tarkastella rakennuksia ja maastoa
-              kolmiulotteisesti eri kulmista.
+              {messages.onboarding.mapStyleTip}
             </small>
           </>
         ),
         imageSrc: "/images/backgroundMapOnBoarding.png",
-        imageAlt: "Taustakartan vaihtopainike",
+        imageAlt: messages.onboarding.mapStyleImageAlt,
+        imageWidth: 92,
+        imageHeight: 82,
       },
       {
-        title: "Valitse hakuehdot",
+        title: messages.onboarding.filterTitle,
         body: (
           <>
-            Valitse haluamasi hakuehdot painikkeesta.
-            <br />
-            Numerokuvake <b>(0 → 1, 2…)</b> kertoo, montako hakuehtoa on
-            valittuna.
+            {messages.onboarding.filterBody}
             <br />
             <br />
             <small>
-              Vinkki: Kartalla korostetaan ne keltaisella reunuksella kohteet,
-              jotka täyttävät kaikki valitsemasi hakuehdot.
+              {messages.onboarding.filterTip}
             </small>
           </>
         ),
         imageSrc: "/images/materialSelectorOnBoarding.png",
-        imageAlt: "Hakuehtojen valintapainike",
+        imageAlt: messages.onboarding.filterImageAlt,
+        imageWidth: 90,
+        imageHeight: 94,
       },
       {
-        title: "Kaikki valmista!",
+        title: messages.onboarding.completeTitle,
         body: <></>,
         imageSrc: null,
         imageAlt: null,
-        ctaLabel: "Aloita",
+        ctaLabel: messages.onboarding.completeCta,
       },
     ],
-    []
+    [messages]
   );
 
   // Allow manual reopening via custom event
@@ -155,7 +143,9 @@ export default function OnboardingHint() {
   const step = steps[index];
   const pct = ((index + 1) / steps.length) * 100;
   const nextLabel =
-    index === steps.length - 1 ? (step.ctaLabel ?? "Valmis") : "Seuraava";
+    index === steps.length - 1
+      ? (step.ctaLabel ?? messages.onboarding.done)
+      : messages.onboarding.next;
 
   return (
     <Dialog open={visible} onOpenChange={setVisible}>
@@ -179,10 +169,12 @@ export default function OnboardingHint() {
 
         {step.imageSrc && (
           <div className="mb-3 flex items-center justify-start">
-            <img
+            <Image
               src={step.imageSrc}
               alt={step.imageAlt ?? ""}
-              className="rounded-lg border border-gray-200 shadow-sm max-h-14"
+              width={step.imageWidth ?? 240}
+              height={step.imageHeight ?? 56}
+              className="h-auto w-auto max-h-20 max-w-full rounded-lg border border-gray-200 object-contain shadow-sm"
             />
           </div>
         )}
@@ -194,7 +186,7 @@ export default function OnboardingHint() {
             className="max-sm:w-full"
             onClick={markDone}
           >
-            Ohita
+            {messages.onboarding.skip}
           </Button>
           <div className="ml-auto flex gap-2 max-sm:w-full">
             <Button
@@ -203,7 +195,7 @@ export default function OnboardingHint() {
               onClick={prev}
               disabled={index === 0}
             >
-              Takaisin
+              {messages.onboarding.back}
             </Button>
             <Button className="max-sm:w-full" onClick={next}>
               {nextLabel}

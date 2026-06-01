@@ -3,6 +3,7 @@
 import { PageTemplate } from "@/components/admin/page-template";
 import { Button } from "@/components/ui/button";
 import { FileText, Files, HardDrive, Trash2, Upload } from "lucide-react";
+import { useMessages } from "@/i18n/locale-provider";
 import {
   deleteUseCaseTrainingMaterial,
   listUseCaseTrainingMaterials,
@@ -14,6 +15,7 @@ import { useParams } from "next/navigation";
 import { useMemo, useRef, useState } from "react";
 
 export default function AiPage() {
+  const messages = useMessages();
   const { id, useCaseId } = useParams<{ id: string; useCaseId: string }>();
   const queryClient = useQueryClient();
 
@@ -51,19 +53,19 @@ export default function AiPage() {
   });
 
   return (
-    <PageTemplate title="Tekoäly">
+    <PageTemplate title={messages.adminAiPage.title}>
       <div className="flex flex-col gap-6">
         <section className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
-          <h2 className="text-lg font-medium text-gray-900">Opetusmateriaalit</h2>
+          <h2 className="text-lg font-medium text-gray-900">{messages.adminAiPage.trainingMaterials}</h2>
           <p className="mt-2 text-sm text-gray-600">
-            Lataa käyttötapaukseen omia tekstitiedostoja (.txt / .md).
+            {messages.adminAiPage.description}
           </p>
 
           <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-3">
             <div className="rounded-lg border border-gray-200 bg-white p-4">
               <div className="flex items-center gap-2 text-sm font-medium text-gray-900">
                 <Files className="h-4 w-4 text-gray-600" />
-                Opetusmateriaalit
+                {messages.adminAiPage.trainingMaterials}
               </div>
               <div className="mt-1 text-2xl font-semibold text-gray-900">
                 {trainingMaterialsQuery.isLoading
@@ -75,7 +77,7 @@ export default function AiPage() {
             <div className="rounded-lg border border-gray-200 bg-white p-4">
               <div className="flex items-center gap-2 text-sm font-medium text-gray-900">
                 <FileText className="h-4 w-4 text-gray-600" />
-                Sallitut muodot
+                {messages.adminAiPage.allowedFormats}
               </div>
               <div className="mt-1 text-sm text-gray-700">.txt, .md</div>
             </div>
@@ -83,7 +85,7 @@ export default function AiPage() {
             <div className="rounded-lg border border-gray-200 bg-white p-4">
               <div className="flex items-center gap-2 text-sm font-medium text-gray-900">
                 <HardDrive className="h-4 w-4 text-gray-600" />
-                Max koko
+                {messages.adminAiPage.maxSize}
               </div>
               <div className="mt-1 text-sm text-gray-700">512 KB / tiedosto</div>
             </div>
@@ -109,14 +111,14 @@ export default function AiPage() {
               disabled={uploadMutation.isPending}
             >
               <Upload className="mr-2 h-4 w-4" />
-              Valitse tiedosto
+              {messages.adminAiPage.chooseFile}
             </Button>
 
             <div className="min-w-0 text-sm text-gray-700">
               {selectedFile ? (
                 <span className="truncate">{selectedFile.name}</span>
               ) : (
-                <span className="text-gray-500">Ei tiedostoa valittuna</span>
+                <span className="text-gray-500">{messages.adminAiPage.noFileSelected}</span>
               )}
             </div>
 
@@ -130,31 +132,31 @@ export default function AiPage() {
               disabled={uploadMutation.isPending || !selectedFile}
             >
               <Upload className="mr-2 h-4 w-4" />
-              Lataa
+              {messages.adminAiPage.upload}
             </Button>
           </div>
 
           {uploadMutation.isError && (
             <div className="mt-3 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800">
-              Lataus epäonnistui.
+              {messages.adminAiPage.uploadFailed}
             </div>
           )}
 
           <div className="mt-5 rounded-lg border border-gray-200">
             <div className="border-b border-gray-200 px-4 py-3">
               <div className="text-sm font-medium text-gray-900">
-                Ladatut opetusmateriaalit
+                {messages.adminAiPage.uploadedMaterials}
               </div>
             </div>
 
             <div className="divide-y divide-gray-200">
               {trainingMaterialsQuery.isLoading && (
-                <div className="px-4 py-3 text-sm text-gray-600">Ladataan…</div>
+                <div className="px-4 py-3 text-sm text-gray-600">{messages.adminAiPage.loading}</div>
               )}
 
               {trainingMaterialsQuery.isError && (
                 <div className="px-4 py-3 text-sm text-red-700">
-                  Materiaalien haku epäonnistui.
+                  {messages.adminAiPage.fetchFailed}
                 </div>
               )}
 
@@ -182,26 +184,26 @@ export default function AiPage() {
                         isLoading={deleteMutation.isPending}
                         onClick={() => {
                           const ok = window.confirm(
-                            `Poistetaanko opetusmateriaali "${m.filename}"?`
+                            messages.adminAiPage.confirmDelete.replace("{name}", m.filename)
                           );
                           if (!ok) return;
                           deleteMutation.mutate(m.id);
                         }}
                       >
                         <Trash2 className="mr-2 h-4 w-4" />
-                        Poista
+                        {messages.adminAiPage.delete}
                       </Button>
                     </div>
                   ))
                 ) : (
-                  <div className="px-4 py-3 text-sm text-gray-600">Ei ladattuja materiaaleja.</div>
+                  <div className="px-4 py-3 text-sm text-gray-600">{messages.adminAiPage.noUploadedMaterials}</div>
                 ))}
             </div>
           </div>
 
           {deleteMutation.isError && (
             <div className="mt-3 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800">
-              Poisto epäonnistui.
+              {messages.adminAiPage.deleteFailed}
             </div>
           )}
         </section>

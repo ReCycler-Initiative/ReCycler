@@ -2,6 +2,7 @@
 
 import Container from "@/components/container";
 import { AiMaterialPrompt } from "@/components/ai-material-prompt";
+import { useMessages } from "@/i18n/locale-provider";
 import { Materials } from "@/components/materials";
 import { FieldMaterials, FieldSelections } from "@/components/field-materials";
 import { Button } from "@/components/ui/button";
@@ -16,11 +17,13 @@ export const MaterialsPageContent = ({
   useCaseId,
   resultsBasePath,
   embedded = false,
-  title = "Mitäs tänään kierrätetään?",
+  title,
   description,
-  ctaText = "Näytä kierrätyspisteet",
-  tabAiText = "Chat",
-  tabManualText = "Valitse itse",
+  ctaText,
+  tabAiText,
+  tabManualText,
+  onResultsNavigate,
+  onResultsHrefChange,
 }: {
   initialSelectedCodes?: number[];
   initialSelectedFieldValues?: FieldSelections;
@@ -33,15 +36,25 @@ export const MaterialsPageContent = ({
   ctaText?: string;
   tabAiText?: string;
   tabManualText?: string;
+  onResultsNavigate?: () => void;
+  onResultsHrefChange?: (href: string) => void;
 }) => {
-  const [selectedCodes, setSelectedCodes] = useState<number[]>(initialSelectedCodes);
-  const [selectedFieldValues, setSelectedFieldValues] = useState<FieldSelections>(initialSelectedFieldValues);
-
+  const messages = useMessages();
+  const [selectedCodes, setSelectedCodes] = useState<number[]>(
+    initialSelectedCodes
+  );
+  const [selectedFieldValues, setSelectedFieldValues] = useState<FieldSelections>(
+    initialSelectedFieldValues
+  );
   const resolvedResultsBasePath =
     resultsBasePath ??
     (organizationId && useCaseId
       ? `/organizations/${organizationId}/use_cases/${useCaseId}/results`
       : "/recycler/results");
+  const resolvedTitle = title || messages.materials.pageTitle;
+  const resolvedCtaText = ctaText || messages.materials.ctaShowResults;
+  const resolvedTabAiText = tabAiText || messages.materials.tabChat;
+  const resolvedTabManualText = tabManualText || messages.materials.tabManual;
 
   useEffect(() => {
     setSelectedCodes(initialSelectedCodes);
@@ -67,6 +80,10 @@ export const MaterialsPageContent = ({
 
   const resultsHref = buildResultsHref();
 
+  useEffect(() => {
+    onResultsHrefChange?.(resultsHref);
+  }, [onResultsHrefChange, resultsHref]);
+
   const totalSelected =
     selectedCodes.length +
     Object.values(selectedFieldValues).reduce((sum, vals) => sum + vals.length, 0);
@@ -76,7 +93,7 @@ export const MaterialsPageContent = ({
   return (
     <Container className={`max-w-2xl ${embedded ? "pt-4" : "pt-7 lg:pt-14"}`}>
       <h1 className="text-xl font-medium mb-4 font-sans">
-        {title}
+        {resolvedTitle}
       </h1>
       {description && (
         <p className="mb-4 font-sans">{description}</p>
@@ -84,10 +101,10 @@ export const MaterialsPageContent = ({
       <Tabs defaultValue="ai">
         <TabsList className="w-full mb-6">
           <TabsTrigger value="ai" className="flex-1">
-            {tabAiText}
+            {resolvedTabAiText}
           </TabsTrigger>
           <TabsTrigger value="manual" className="flex-1">
-            {tabManualText}
+            {resolvedTabManualText}
           </TabsTrigger>
         </TabsList>
 
@@ -99,8 +116,10 @@ export const MaterialsPageContent = ({
             onSelectedFieldValuesChange={setSelectedFieldValues}
             organizationId={organizationId}
             useCaseId={useCaseId}
-            ctaText={ctaText}
+            ctaText={resolvedCtaText}
             resultsBasePath={resolvedResultsBasePath}
+            onResultsNavigate={onResultsNavigate}
+            showPreparationTips={!embedded}
           />
         </TabsContent>
 
@@ -127,10 +146,10 @@ export const MaterialsPageContent = ({
                 : "fixed lg:static bottom-0 bg-white lg:bg-transparent border lg:border-none p-4 lg:p-0 left-0 right-0 border-gray-400 flex flex-col items-center gap-y-4"
             }
           >
-            Valitut ({totalSelected})
+            {messages.materials.selected} ({totalSelected})
             <Button asChild className="w-full max-w-96 lg:mb-6" size="lg">
-              <Link href={resultsHref}>
-                {ctaText}
+              <Link href={resultsHref} onClick={onResultsNavigate}>
+                {resolvedCtaText}
               </Link>
             </Button>
           </div>

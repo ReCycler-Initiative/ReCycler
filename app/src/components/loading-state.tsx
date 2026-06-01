@@ -1,3 +1,5 @@
+import { useMessages } from "@/i18n/locale-provider";
+
 import LoadingSpinner from "./loading-spinner";
 
 export const LoadingState = ({
@@ -9,11 +11,13 @@ export const LoadingState = ({
   isLoading: boolean;
   error: boolean;
 }) => {
+  const messages = useMessages();
+
   if (isLoading)
     return (
       <div className="flex flex-col items-center justify-center gap-4 py-4">
         <LoadingSpinner />
-        Loading...
+        {messages.pageLoading.loading}
       </div>
     );
   if (error)

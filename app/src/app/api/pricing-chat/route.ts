@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getMessages } from "@/i18n/messages";
+import { resolveLocale } from "@/i18n/locale-config";
 import OpenAI from "openai";
 
 class MissingApiKeyError extends Error {}
@@ -11,57 +13,94 @@ async function getOpenAiClient(): Promise<OpenAI> {
   throw new MissingApiKeyError("No OpenAI API key available");
 }
 
-const PRICING_CONTEXT = `ReCycler Platformin etusivulla esitellään kolme palvelutasoa:
-
-1. Pilotti
-- 690 €/kk
-- sopii ensimmäiseen tuotantokelpoiseen kokeiluun
-- 1 käyttötapaus ja yksi julkaistava palvelunäkymä
-- 1-2 datalähdettä tai kevyt ETL-tuonti
-- perusbrändäys ja valmiit kartta- sekä hakunäkymät
-- kevyt käyttöönotto ja sparraus aloitukseen
-
-2. Kasvu
-- tyypillisesti 1 290-1 990 €/kk
-- useampi käyttötapaus samalla alustalla
-- useita tietolähteitä ja automatisoituja ETL-ajastuksia
-- laajempi ylläpito, kehitysjono ja käyttöoikeushallinta
-- tuki sisällön, kohteiden ja datamallin jatkokehitykseen
-
-3. Räätälöity
-- tarjouskohtainen
-- oma ympäristö tai asiakkaan hallinnoima hosting
-- räätälöidyt integraatiot, tunnistautuminen ja datamallit
-- projektikohtainen käyttöönotto, koulutus ja palvelunhallinta
-- SLA, tuki- ja ylläpitomallit sekä jatkokehitys
-
-Tärkeä linjaus:
-- ReCycler on avoimen lähdekoodin alusta
-- hinnoittelu liittyy käyttöönottoprojektiin, hostaukseen, integraatioihin, ylläpitoon, tukeen ja palvelun soveltamiseen eri käyttötapauksiin`;
-
 export async function POST(req: NextRequest) {
   try {
-    const { message, history = [] } = await req.json();
+    const { message, history = [], locale: rawLocale } = await req.json();
+    const locale = resolveLocale(rawLocale);
+    const dictionary = getMessages(locale);
+    const pricingContext = dictionary.pricingPlans
+      .map(
+        (
+          plan: {
+            name: string;
+            price: string;
+            description: string;
+            highlights: string[];
+          },
+          index: number
+        ) =>
+          `${index + 1}. ${plan.name}\n- ${plan.price}\n- ${plan.description}\n${plan.highlights
+            .map((highlight: string) => `- ${highlight}`)
+            .join("\n")}`
+      )
+      .join("\n\n");
 
-    const systemPrompt = `${PRICING_CONTEXT}
+    const systemPrompt = `${
+      locale === "en"
+        ? "The ReCycler platform front page presents three service levels:"
+        : "ReCycler Platformin etusivulla esitellään kolme palvelutasoa:"
+    }
 
-Olet ReCycler Platformin hinnoittelua ja käyttöönottoa selittävä avustaja.
+${pricingContext}
 
-Tehtäväsi:
-- vastaa käyttäjän kysymyksiin näiden palvelutasojen eroista, käyttötapauksista ja käyttöönotosta
-- auta käyttäjää hahmottamaan mikä taso sopii hänelle parhaiten
-- pidä sävy keskustelevana, selkeänä ja käytännöllisenä
-- jos käyttäjä kysyy jotain mitä et tiedä varmasti, sano se suoraan ja ohjaa tarjouskeskusteluun
-
-Vastaa AINA JSON-muodossa:
-{
-  "reply": "Lyhyt mutta hyödyllinen vastaus suomeksi"
+${locale === "en" ? "Important policy:" : "Tärkeä linjaus:"}
+- ${locale === "en" ? "ReCycler is an open-source platform" : "ReCycler on avoimen lähdekoodin alusta"}
+- ${
+  locale === "en"
+    ? "Pricing is tied to onboarding, hosting, integrations, maintenance, support, and adapting the service to different use cases"
+    : "hinnoittelu liittyy käyttöönottoprojektiin, hostaukseen, integraatioihin, ylläpitoon, tukeen ja palvelun soveltamiseen eri käyttötapauksiin"
 }
 
-Lisäohjeet:
-- jos keskustelu alkaa ilman viestiä, tervehdi ja kysy esimerkiksi organisaation koosta, käyttötapauksesta tai datalähteistä
-- pidä vastaukset lyhyinä, yleensä 2-5 lausetta
-- älä keksi uusia hintatasoja tai lupaa ominaisuuksia joita yllä ei ole kuvattu`;
+${
+  locale === "en"
+    ? "You are an assistant that explains ReCycler platform pricing and onboarding."
+    : "Olet ReCycler Platformin hinnoittelua ja käyttöönottoa selittävä avustaja."
+}
+
+${locale === "en" ? "Your task:" : "Tehtäväsi:"}
+- ${
+  locale === "en"
+    ? "Answer the user's questions about service level differences, use cases, and onboarding"
+    : "vastaa käyttäjän kysymyksiin näiden palvelutasojen eroista, käyttötapauksista ja käyttöönotosta"
+}
+- ${
+  locale === "en"
+    ? "Help the user understand which level fits them best"
+    : "auta käyttäjää hahmottamaan mikä taso sopii hänelle parhaiten"
+}
+- ${
+  locale === "en"
+    ? "Keep the tone conversational, clear, and practical"
+    : "pidä sävy keskustelevana, selkeänä ja käytännöllisenä"
+}
+- ${
+  locale === "en"
+    ? "If the user asks something you do not know for sure, say so clearly and steer toward a quote discussion"
+    : "jos käyttäjä kysyy jotain mitä et tiedä varmasti, sano se suoraan ja ohjaa tarjouskeskusteluun"
+}
+
+${locale === "en" ? "Always reply in JSON format:" : "Vastaa AINA JSON-muodossa:"}
+{
+  "reply": "${locale === "en" ? "A short but useful answer in English" : "Lyhyt mutta hyödyllinen vastaus suomeksi"}"
+}
+
+${locale === "en" ? "Additional instructions:" : "Lisäohjeet:"}
+- ${
+  locale === "en"
+    ? "If the conversation starts without a message, greet the user and ask about organization size, use case, or data sources"
+    : "jos keskustelu alkaa ilman viestiä, tervehdi ja kysy esimerkiksi organisaation koosta, käyttötapauksesta tai datalähteistä"
+}
+- ${
+  locale === "en"
+    ? "Keep replies short, usually 2-5 sentences"
+    : "pidä vastaukset lyhyinä, yleensä 2-5 lausetta"
+}
+- ${
+  locale === "en"
+    ? "Do not invent new price levels or promise features not described above"
+    : "älä keksi uusia hintatasoja tai lupaa ominaisuuksia joita yllä ei ole kuvattu"
+}
+- ${locale === "en" ? "Always answer in English." : "Vastaa aina suomeksi"}`;
 
     const openai = await getOpenAiClient();
 
@@ -71,7 +110,7 @@ Lisäohjeet:
         { role: "system", content: systemPrompt },
         ...(history as { role: string; content: string }[])
           .slice(-10)
-          .map((item) => ({
+          .map((item: { role: string; content: string }) => ({
             role: item.role as "user" | "assistant",
             content: item.content,
           })),
@@ -85,18 +124,19 @@ Lisäohjeet:
     const raw = completion.choices[0].message.content ?? "{}";
     const parsed = JSON.parse(raw) as { reply?: string };
 
-    return NextResponse.json({ reply: parsed.reply ?? "" });
+    return NextResponse.json({ reply: parsed.reply ?? dictionary.api.pricingGreeting });
   } catch (err) {
+    const dictionary = getMessages(resolveLocale(null));
     if (err instanceof MissingApiKeyError) {
       return NextResponse.json(
-        { error: "Palvelu ei ole tällä hetkellä käytettävissä" },
+        { error: dictionary.api.chatUnavailable },
         { status: 503 }
       );
     }
 
     console.error("Pricing chat API error:", err);
     return NextResponse.json(
-      { error: "Virhe chat-palvelussa" },
+      { error: dictionary.api.chatError },
       { status: 500 }
     );
   }

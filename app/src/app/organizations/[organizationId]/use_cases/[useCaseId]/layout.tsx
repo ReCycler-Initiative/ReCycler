@@ -3,12 +3,14 @@
 import { PageLoadingSpinner } from "@/components/page-loading-spinner";
 import TitleBar from "@/components/title-bar";
 import { Button } from "@/components/ui/button";
+import { useMessages } from "@/i18n/locale-provider";
 import { getUseCaseById } from "@/services/api";
 import { useQuery } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
 const OrganizationLayout = ({ children }: { children: React.ReactNode }) => {
+  const messages = useMessages();
   const params = useParams<{ organizationId: string; useCaseId: string }>();
   const useCaseQuery = useQuery({
     queryKey: ["use_case", params.organizationId, params.useCaseId],
@@ -54,9 +56,9 @@ const OrganizationLayout = ({ children }: { children: React.ReactNode }) => {
               variant="outline"
               onClick={openOnboarding}
               className="h-10 px-4 mr-3"
-              aria-label="Open onboarding"
+              aria-label={messages.layout.openOnboarding}
             >
-              Ohjeet
+              {messages.layout.instructions}
             </Button>
           )}
         </div>

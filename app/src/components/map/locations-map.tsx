@@ -8,18 +8,28 @@ import { Button } from "@/components/ui/button";
 import {
   Drawer,
   DrawerContent,
+  DrawerHeader,
+  DrawerTitle,
 } from "@/components/ui/drawer";
 import OnboardingHint from "@/components/ui/onboarding-hint";
+import { useLocale, useMessages } from "@/i18n/locale-provider";
 import { Material } from "@/types";
+import { useUser } from "@auth0/nextjs-auth0";
 import { Loader2Icon, MapPinned } from "lucide-react";
 import { GeolocateControl as TGeolocateControl } from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import {
+  getLocalizedMaterialName,
+  localizeMaterialNameCandidate,
+  localizeMaterials,
+} from "@/lib/material-translations";
+import {
   usePathname,
   useParams,
+  useRouter,
   useSearchParams
 } from "next/navigation";
-import { Suspense, useCallback, useEffect, useRef, useState } from "react";
+import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { getFields } from "@/services/api";
 import Map, {
@@ -66,6 +76,38 @@ const CollectionPointIcon = () => {
   }, [map]);
 
   return null;
+};
+
+const getLocalizedOpeningHours = (
+  properties: Record<string, unknown> | undefined,
+  locale: string
+) => {
+  if (!properties) return undefined;
+
+  if (locale === "en") {
+    return (properties.opening_hours_en as string | undefined) ??
+      (properties.opening_hours_fi as string | undefined);
+  }
+
+  return (properties.opening_hours_fi as string | undefined) ??
+    (properties.opening_hours_en as string | undefined);
+};
+
+const getLocalizedDescription = (
+  properties: Record<string, unknown> | undefined,
+  locale: string
+) => {
+  if (!properties) return undefined;
+
+  if (locale === "en") {
+    return (properties.description_en as string | undefined) ??
+      (properties.additional_details as string | undefined) ??
+      (properties.description_fi as string | undefined);
+  }
+
+  return (properties.description_fi as string | undefined) ??
+    (properties.additional_details as string | undefined) ??
+    (properties.description_en as string | undefined);
 };
 
 // Bounding box to restrict map movement to Finland
@@ -310,26 +352,37 @@ type LocationsMapProps = {
 };
 
 export default function LocationsMap({ geoJson }: LocationsMapProps) {
+  const { locale } = useLocale();
+  const messages = useMessages();
+  const { user } = useUser();
   const [mapLoaded, setMapLoaded] = useState(false);
   const [styleLoaded, setStyleLoaded] = useState(true);
   const [details, setDetails] = useState<MapboxGeoJSONFeature | null>(null);
   const [mapStyle, setStyle] = useState<"detail" | "satellite">("detail");
   const mapRef = useRef<MapRef>(null);
+  const router = useRouter();
   const pathname = usePathname();
   const params = useParams<{ organizationId?: string; useCaseId?: string }>();
   const searchParams = useSearchParams();
+  const searchParamsKey = searchParams.toString();
+  const currentResultsHref = searchParamsKey ? `${pathname}?${searchParamsKey}` : pathname;
   const materialsParam = searchParams.get("materials") ?? "";
-  const selectedMaterials =
-    materialsParam.split(",").filter(Boolean).map((code) => +code) || [];
+  const selectedMaterials = useMemo(
+    () => materialsParam.split(",").filter(Boolean).map((code) => +code),
+    [materialsParam]
+  );
 
   // Parse field_<fieldId> URL params into a Record (values are indices)
-  const selectedFieldFilters: Record<string, number[]> = {};
-  searchParams.forEach((value, key) => {
-    if (key.startsWith("field_")) {
-      const fieldId = key.slice("field_".length);
-      selectedFieldFilters[fieldId] = value.split(",").filter(Boolean).map(Number);
-    }
-  });
+  const selectedFieldFilters = useMemo<Record<string, number[]>>(() => {
+    const filters: Record<string, number[]> = {};
+    searchParams.forEach((value, key) => {
+      if (key.startsWith("field_")) {
+        const fieldId = key.slice("field_".length);
+        filters[fieldId] = value.split(",").filter(Boolean).map(Number);
+      }
+    });
+    return filters;
+  }, [searchParams]);
 
   const { data: fieldsData } = useQuery({
     queryKey: ["fields", params.organizationId, params.useCaseId],
@@ -346,11 +399,19 @@ export default function LocationsMap({ geoJson }: LocationsMapProps) {
   }
 
   const [showMaterials, setShowMaterials] = useState(false);
+  const [pendingResultsHref, setPendingResultsHref] = useState(currentResultsHref);
+  const previousSearchParamsKey = useRef(searchParamsKey);
 
   useEffect(() => {
-    if (showMaterials) setShowMaterials(false);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [materialsParam]);
+    setPendingResultsHref(currentResultsHref);
+  }, [currentResultsHref]);
+
+  useEffect(() => {
+    if (previousSearchParamsKey.current !== searchParamsKey) {
+      setShowMaterials(false);
+      previousSearchParamsKey.current = searchParamsKey;
+    }
+  }, [searchParamsKey]);
 
   const geolocateControlRef = useRef<TGeolocateControl>(null);
 
@@ -470,7 +531,7 @@ export default function LocationsMap({ geoJson }: LocationsMapProps) {
           <GeocoderControl
             mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_TOKEN!}
             position="top-left"
-            placeholder="Etsi"
+            placeholder={messages.map.searchPlaceholder}
             bbox={[19.0, 59.0, 32.0, 71.0]}
           />
 
@@ -508,6 +569,18 @@ export default function LocationsMap({ geoJson }: LocationsMapProps) {
                   maxWidth="360px"
                   className="[&_.mapboxgl-popup-content]:min-w-52 [&_.mapboxgl-popup-content]:p-0! [&_.mapboxgl-popup-close-button]:hidden"
                 >
+                  {(() => {
+                    const openingHours = getLocalizedOpeningHours(
+                      details.properties as Record<string, unknown> | undefined,
+                      locale
+                    );
+                    const description = getLocalizedDescription(
+                      details.properties as Record<string, unknown> | undefined,
+                      locale
+                    );
+
+                    return (
+                      <>
                   <div className="p-3 border-b">
                     <h2 className="text-base font-semibold mb-1">
                       {details.properties?.name}
@@ -524,28 +597,43 @@ export default function LocationsMap({ geoJson }: LocationsMapProps) {
                       </div>
                     )}
                   </div>
-                  {details.properties?.opening_hours_fi && (
+                  {openingHours && (
                     <div className="p-3 border-b">
-                      <h3 className="sr-only">Opening hours</h3>
+                      <h3 className="text-xs font-medium text-muted-foreground mb-1">
+                        {messages.mapPopup.openingHours}
+                      </h3>
                       <div
                         dangerouslySetInnerHTML={{
-                          __html: details.properties?.opening_hours_fi,
+                          __html: openingHours,
                         }}
                       />
                     </div>
                   )}
                   {parseFeatureMaterials(details.properties?.materials).length > 0 && (
-                    <ul className="text-sm p-3 leading-6 list-disc columns-2">
-                      {parseFeatureMaterials(details.properties?.materials)
-                        .sort((a: Material, b: Material) =>
-                          a.name.localeCompare(b.name)
-                        )
-                        .map((material: Material) => (
-                          <li key={material.code} className="ml-4">
-                            {material.name}
-                          </li>
-                        ))}
-                    </ul>
+                    <div className="p-3 border-b">
+                      <h3 className="text-xs font-medium text-muted-foreground mb-1">
+                        {messages.mapPopup.materials}
+                      </h3>
+                      <ul className="text-sm leading-6 list-disc columns-2">
+                        {localizeMaterials(parseFeatureMaterials(details.properties?.materials), locale)
+                          .sort((a: Material, b: Material) =>
+                            a.name.localeCompare(b.name)
+                          )
+                          .map((material: Material) => (
+                            <li key={material.code} className="ml-4">
+                              {material.name}
+                            </li>
+                          ))}
+                      </ul>
+                    </div>
+                  )}
+                  {description && (
+                    <div className="p-3 border-b">
+                      <h3 className="text-xs font-medium text-muted-foreground mb-1">
+                        {messages.mapPopup.additionalDetails}
+                      </h3>
+                      <p className="text-sm whitespace-pre-line">{description}</p>
+                    </div>
                   )}
                   {(() => {
                     const ohField = parseFeatureFields(details.properties?.fields)
@@ -576,7 +664,7 @@ export default function LocationsMap({ geoJson }: LocationsMapProps) {
                             {[...field.value]
                               .sort((a, b) => a.localeCompare(b, "fi"))
                               .map((v) => (
-                                <li key={v} className="ml-4">{v}</li>
+                                <li key={v} className="ml-4">{localizeMaterialNameCandidate(v, locale)}</li>
                               ))}
                           </ul>
                         ) : field.field_type === "address" ? (
@@ -610,7 +698,7 @@ export default function LocationsMap({ geoJson }: LocationsMapProps) {
                             })()}
                           </div>
                         ) : (
-                          <p className="text-sm">{field.value.join(", ")}</p>
+                          <p className="text-sm">{field.value.map((value) => localizeMaterialNameCandidate(value, locale)).join(", ")}</p>
                         )}
                       </div>
                     ))}
@@ -624,11 +712,14 @@ export default function LocationsMap({ geoJson }: LocationsMapProps) {
                         href={`https://www.google.com/maps/search/?api=1&query=${(details.geometry as GeoJSON.Point).coordinates[1]},${(details.geometry as GeoJSON.Point).coordinates[0]}`}
                         target="_blank"
                       >
-                        <span>Open in Google Maps</span>
+                        <span>{messages.mapPopup.openInGoogleMaps}</span>
                         <MapPinned className="ml-2" size={18} />
                       </a>
                     </Button>
                   </div>
+                      </>
+                    );
+                  })()}
                 </Popup>
               )}
             </>
@@ -638,17 +729,31 @@ export default function LocationsMap({ geoJson }: LocationsMapProps) {
         {!mapLoaded && (
           <div className="fixed flex inset-0 items-center justify-center flex-col gap-6 text-black">
             <Loader2Icon className="animate-spin" />
-            Ladataan kierrätyspisteet kartalle
+            {messages.pageLoading.loadingMapLocations}
           </div>
         )}
 
         {/* Drawer for selecting materials */}
         <Drawer
           open={showMaterials}
-          onOpenChange={setShowMaterials}
+          onOpenChange={(open) => {
+            if (open) {
+              setPendingResultsHref(currentResultsHref);
+              setShowMaterials(true);
+              return;
+            }
+
+            setShowMaterials(false);
+            if (pendingResultsHref !== currentResultsHref) {
+              router.push(pendingResultsHref);
+            }
+          }}
         >
           <DrawerContent>
-            <div className="max-h-[500px] overflow-y-auto">
+            <DrawerHeader className="sr-only">
+              <DrawerTitle>{messages.materials.pageTitle}</DrawerTitle>
+            </DrawerHeader>
+            <div className="max-h-[calc(80vh-2rem)] overflow-y-auto pb-4">
               <MaterialsPageContent
                 initialSelectedCodes={selectedMaterials}
                 initialSelectedFieldValues={selectedFieldFilters}
@@ -656,6 +761,8 @@ export default function LocationsMap({ geoJson }: LocationsMapProps) {
                 useCaseId={params.useCaseId}
                 resultsBasePath={pathname}
                 embedded
+                onResultsNavigate={() => setShowMaterials(false)}
+                onResultsHrefChange={setPendingResultsHref}
               />
             </div>
           </DrawerContent>

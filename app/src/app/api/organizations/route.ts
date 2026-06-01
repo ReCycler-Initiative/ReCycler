@@ -1,6 +1,7 @@
 import { auth0, managementClient } from "@/lib/auth0";
 import knex from "@/services/db";
 import { CreateOrganizationRequest, CreateOrganizationResponse } from "@/types";
+import { emptyLocalizedText } from "@/lib/use-case-content";
 import { withZodPost } from "@/utils/routes";
 import { NextResponse } from "next/server";
 import { z } from "zod";
@@ -64,8 +65,19 @@ export const POST = withZodPost(
             ...useCase,
             id: useCaseRow.id,
             content: {
-              intro: { title: "", cta: "", skip: "", text: "" },
-              filters: { title: "", cta: "", text: "", tab_ai: "", tab_manual: "" },
+              intro: {
+                title: emptyLocalizedText(),
+                cta: emptyLocalizedText(),
+                skip: emptyLocalizedText(),
+                text: emptyLocalizedText(),
+              },
+              filters: {
+                title: emptyLocalizedText(),
+                cta: emptyLocalizedText(),
+                text: emptyLocalizedText(),
+                tab_ai: emptyLocalizedText(),
+                tab_manual: emptyLocalizedText(),
+              },
             },
           },
         };

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import db from "@/services/db";
+import { useMessages } from "@/i18n/locale-provider";
 
 export type Material = {
   id?: number;
@@ -11,46 +11,21 @@ export type Material = {
 };
 
 interface Props {
+  initialMaterials: Material[];
   page?: number;
   title?: string;
-}
-
-export default async function MaterialsList({ page = 1, title }: Props) {
-  // Fetch materials from DB (server-side)
-  const materials: Material[] = await db("recycler.materials").orderBy("name");
-
-  if (!materials || materials.length === 0) {
-    return <div className="text-sm text-gray-500">Ei materiaaleja.</div>;
-  }
-
-  let pages: Material[][] = [materials];
-  let pageCount = 1;
-
-  if (materials.length > 30) {
-    pageCount = 2;
-    const half = Math.ceil(materials.length / 2);
-    pages = [materials.slice(0, half), materials.slice(half)];
-  }
-
-  const current = pages[Math.max(0, Math.min(pageCount - 1, page - 1))] || pages[0];
-
-  // 👇 Tästä alkaa mockup-editoinnin logiikka
-  return <EditableMaterialsList initialMaterials={current} title={title} page={page} total={materials.length} pageCount={pageCount} />;
-}
-
-function EditableMaterialsList({
-  initialMaterials,
-  title,
-  page,
-  total,
-  pageCount,
-}: {
-  initialMaterials: Material[];
-  title?: string;
-  page: number;
   total: number;
   pageCount: number;
-}) {
+}
+
+export default function MaterialsList({
+  initialMaterials,
+  title,
+  page = 1,
+  total,
+  pageCount,
+}: Props) {
+  const messages = useMessages();
   const [materials, setMaterials] = useState(initialMaterials);
   const [editing, setEditing] = useState(false);
 
@@ -69,9 +44,9 @@ function EditableMaterialsList({
           onClick={() => setEditing(!editing)}
           className="text-sm px-3 py-1 border rounded hover:bg-gray-50"
         >
-          {editing ? "Lopeta muokkaus" : "Muokkaa listaa"}
+          {editing ? messages.materialsList.stopEditing : messages.materialsList.editList}
         </button>
-        {editing && <span className="text-xs text-gray-500">Mockup-editointi – ei tallenna tietokantaan</span>}
+        {editing && <span className="text-xs text-gray-500">{messages.materialsList.mockupEditing}</span>}
       </div>
 
       <ul className="list-disc ml-5 columns-1 md:columns-2 text-sm">
@@ -106,7 +81,7 @@ function EditableMaterialsList({
             2
           </a>
           <div className="text-xs text-gray-500 ml-2">
-            Näytetään {materials.length} / {total}
+            {messages.materialsList.showing} {materials.length} / {total}
           </div>
         </div>
       )}

@@ -2,11 +2,13 @@
 
 import TitleBar from "@/components/title-bar";
 import { Button } from "@/components/ui/button";
+import { useMessages } from "@/i18n/locale-provider";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import logo from "../../recycler-logo.png";
 
 const OrganizationLayout = ({ children }: { children: React.ReactNode }) => {
+  const messages = useMessages();
   const [mapReady, setMapReady] = useState(false);
 
   useEffect(() => {
@@ -39,9 +41,9 @@ const OrganizationLayout = ({ children }: { children: React.ReactNode }) => {
               variant="outline"
               onClick={openOnboarding}
               className="h-10 px-4 mr-3"
-              aria-label="Open onboarding"
+              aria-label={messages.layout.openOnboarding}
             >
-              Ohjeet
+              {messages.layout.instructions}
             </Button>
           )}
         </div>

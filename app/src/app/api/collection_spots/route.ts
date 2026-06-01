@@ -18,7 +18,10 @@ export async function GET() {
                     'postal_code', postal_code,
                     'post_office', post_office,
                     'materials', materials,
+                    'additional_details', additional_details,
+                    'description_en', description_en,
                     'opening_hours_fi', opening_hours_fi,
+                    'opening_hours_en', opening_hours_en,
                     'description_fi', description_fi
                 )
             ) AS feature

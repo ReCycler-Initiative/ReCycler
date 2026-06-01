@@ -4,6 +4,7 @@
 import Link from "next/link";
 import { ReactNode, Suspense } from "react";
 import Auth0Login from "./auth0-login"; // <-- tuotu tänne
+import LanguageSwitcher from "./language-switcher";
 
 const TitleBar = ({
   children,
@@ -23,6 +24,7 @@ const TitleBar = ({
       </div>
       {children}
       <div className="flex items-center ml-auto">
+        <LanguageSwitcher />
         <Suspense fallback={null}>
           <Auth0Login />
         </Suspense>

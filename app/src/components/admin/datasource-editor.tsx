@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
+import { useMessages } from "@/i18n/locale-provider";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 
@@ -17,6 +18,7 @@ type ConnectorFormValues = {
 type ConnectionStatus = "idle" | "testing" | "success" | "error";
 
 export const DataSourceEditor = () => {
+  const messages = useMessages();
   const form = useForm<ConnectorFormValues>();
 
   const [filters, setFilters] = useState<FilterRow[]>([
@@ -67,7 +69,7 @@ export const DataSourceEditor = () => {
     } catch (err) {
       setConnectionStatus("error");
       setConnectionError(
-        "Yhteyden testaus epäonnistui. Tarkista URL, tunnistautuminen ja mahdolliset rajapintarajoitteet."
+        messages.datasourceEditor.connectionError
       );
     }
   };
@@ -76,7 +78,7 @@ export const DataSourceEditor = () => {
   const onSubmit = (values: ConnectorFormValues) => {
     if (connectionStatus !== "success") {
       // Voit korvata tämän toastilla tms.
-      alert("Testaa yhteys onnistuneesti ennen yhdistimen käynnistämistä.");
+      alert(messages.datasourceEditor.testBeforeStart);
       return;
     }
 
@@ -99,32 +101,31 @@ export const DataSourceEditor = () => {
           <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
             <div className="space-y-1">
               <h2 className="text-lg font-medium text-gray-900">
-                Yhdistimen asetukset
+                {messages.datasourceEditor.connectionSettingsTitle}
               </h2>
               <p className="text-sm text-gray-500">
-                Määritä API-yhteys, tunnistautuminen ja yhdistimen perustiedot.
+                {messages.datasourceEditor.connectionSettingsDescription}
               </p>
 
               <div className="text-xs">
                 {connectionStatus === "idle" && (
                   <span className="text-gray-500">
-                    Yhteyttä ei ole vielä testattu.
+                    {messages.datasourceEditor.notTested}
                   </span>
                 )}
                 {connectionStatus === "testing" && (
                   <span className="text-blue-700">
-                    Testataan yhteyttä datalähteeseen...
+                    {messages.datasourceEditor.testingConnection}
                   </span>
                 )}
                 {connectionStatus === "success" && (
                   <span className="rounded-full bg-green-50 px-2 py-1 text-[11px] font-medium text-green-700">
-                    Yhteys OK – voit nyt määrittää kenttävastinnat ja
-                    suodattimet.
+                    {messages.datasourceEditor.connectionOk}
                   </span>
                 )}
                 {connectionStatus === "error" && (
                   <span className="rounded-full bg-red-50 px-2 py-1 text-[11px] font-medium text-red-700">
-                    Yhteystesti epäonnistui – tarkista asetukset.
+                    {messages.datasourceEditor.connectionFailed}
                   </span>
                 )}
               </div>
@@ -145,11 +146,11 @@ export const DataSourceEditor = () => {
                 disabled={connectionStatus === "testing"}
               >
                 {connectionStatus === "testing"
-                  ? "Testataan..."
-                  : "Testaa yhteys"}
+                  ? messages.datasourceEditor.testing
+                  : messages.datasourceEditor.testConnection}
               </Button>
               <Button type="submit" size="sm" className="min-w-[160px]">
-                Käynnistä ja validoi yhdistin
+                {messages.datasourceEditor.startAndValidate}
               </Button>
             </div>
           </div>
@@ -158,7 +159,7 @@ export const DataSourceEditor = () => {
           <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-2">
             <div>
               <label className="text-sm font-medium text-gray-700">
-                Yhdistimen nimi
+                {messages.datasourceEditor.connectorName}
               </label>
               <input
                 type="text"
@@ -169,21 +170,21 @@ export const DataSourceEditor = () => {
             </div>
 
             <div>
-              <label className="text-sm font-medium text-gray-700">Tila</label>
+              <label className="text-sm font-medium text-gray-700">{messages.datasourceEditor.status}</label>
               <select
                 className="mt-1 block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm shadow-sm 
                              focus:border-black focus:outline-none focus:ring-1 focus:ring-black"
                 defaultValue="Luonnos"
               >
-                <option>Luonnos</option>
-                <option>Aktiivinen</option>
-                <option>Poissa käytöstä</option>
+                <option>{messages.datasourceEditor.draft}</option>
+                <option>{messages.datasourceEditor.active}</option>
+                <option>{messages.datasourceEditor.disabled}</option>
               </select>
             </div>
 
             <div>
               <label className="text-sm font-medium text-gray-700">
-                HTTP-osoite (URL)
+                {messages.datasourceEditor.url}
               </label>
               <input
                 type="text"
@@ -195,22 +196,22 @@ export const DataSourceEditor = () => {
 
             <div>
               <label className="text-sm font-medium text-gray-700">
-                Tunnistautuminen
+                {messages.datasourceEditor.authentication}
               </label>
               <select
                 className="mt-1 block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm shadow-sm 
                              focus:border-black focus:outline-none focus:ring-1 focus:ring-black"
               >
-                <option>API-avain</option>
-                <option>Bearer-token</option>
-                <option>Perusautentikointi (Basic auth)</option>
-                <option>Ei mitään</option>
+                <option>{messages.datasourceEditor.apiKeyOption}</option>
+                <option>{messages.datasourceEditor.bearerOption}</option>
+                <option>{messages.datasourceEditor.basicAuthOption}</option>
+                <option>{messages.datasourceEditor.noAuthOption}</option>
               </select>
             </div>
 
             <div>
               <label className="text-sm font-medium text-gray-700">
-                API-avain / token
+                {messages.datasourceEditor.apiKey}
               </label>
               <input
                 type="password"
@@ -229,17 +230,16 @@ export const DataSourceEditor = () => {
           <div className="flex items-center justify-between gap-4">
             <div>
               <h2 className="text-lg font-medium text-gray-900">
-                Kenttävastinnat
+                {messages.datasourceEditor.fieldMappingsTitle}
               </h2>
               <p className="mt-1 text-sm text-gray-500">
-                Määritä paikkatiedon koordinaatit, kohteen tyyppi ja
-                perustiedot.
+                {messages.datasourceEditor.fieldMappingsDescription}
               </p>
             </div>
 
             {mappingDisabled && (
               <span className="rounded-full bg-gray-100 px-2 py-1 text-[11px] font-medium text-gray-600">
-                Testaa yhteys ennen kenttävastintojen määrittämistä
+                {messages.datasourceEditor.testBeforeMappings}
               </span>
             )}
           </div>
@@ -252,12 +252,12 @@ export const DataSourceEditor = () => {
               {/* Koordinaattijärjestelmä ja koordinaatit */}
               <div className="space-y-4">
                 <h3 className="text-sm font-semibold text-gray-900">
-                  Määritä koordinaattijärjestelmä ja koordinaatit
+                  {messages.datasourceEditor.coordinatesSection}
                 </h3>
 
                 <div>
                   <label className="text-sm font-medium text-gray-700">
-                    Koordinaattijärjestelmä (EPSG)
+                    {messages.datasourceEditor.coordinateSystem}
                   </label>
                   <select
                     className="mt-1 block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm shadow-sm 
@@ -270,15 +270,14 @@ export const DataSourceEditor = () => {
                     </option>
                   </select>
                   <p className="mt-1 text-xs text-gray-500">
-                    Valitse koordinaattijärjestelmä, jonka mukaisia alla olevat
-                    koordinaattikentät ovat.
+                    {messages.datasourceEditor.coordinateSystemHelp}
                   </p>
                 </div>
 
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                   <div>
                     <label className="text-sm font-medium text-gray-700">
-                      X-koordinaatin kenttä
+                      {messages.datasourceEditor.xField}
                     </label>
                     <input
                       type="text"
@@ -290,7 +289,7 @@ export const DataSourceEditor = () => {
 
                   <div>
                     <label className="text-sm font-medium text-gray-700">
-                      Y-koordinaatin kenttä
+                      {messages.datasourceEditor.yField}
                     </label>
                     <input
                       type="text"
@@ -303,19 +302,18 @@ export const DataSourceEditor = () => {
 
                 <div>
                   <label className="text-sm font-medium text-gray-700">
-                    Geometriatyyppi
+                    {messages.datasourceEditor.geometryType}
                   </label>
                   <select
                     className="mt-1 block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm shadow-sm 
                                focus:border-black focus:outline-none focus:ring-1 focus:ring-black"
                     defaultValue="point"
                   >
-                    <option value="point">Piste (point)</option>
+                    <option value="point">{messages.datasourceEditor.pointOption}</option>
                     {/* myöhemmin: LineString, Polygon jne. */}
                   </select>
                   <p className="mt-1 text-xs text-gray-500">
-                    Aluksi tuetaan vain pistekohteita. Muita geometriatyyppejä
-                    voidaan lisätä myöhemmin.
+                    {messages.datasourceEditor.geometryHelp}
                   </p>
                 </div>
               </div>
@@ -323,10 +321,10 @@ export const DataSourceEditor = () => {
               {/* Kohdetyyppi */}
               <div className="space-y-4">
                 <h3 className="text-sm font-semibold text-gray-900">
-                  Kohdetyyppi
+                  {messages.datasourceEditor.locationTypeSection}
                 </h3>
                 <label className="text-sm font-medium text-gray-700">
-                  Tyyppikenttä
+                  {messages.datasourceEditor.typeField}
                 </label>
                 <input
                   type="text"
@@ -336,7 +334,7 @@ export const DataSourceEditor = () => {
                 />
                 <div>
                   <label className="text-sm font-medium text-gray-700">
-                    Tyyppikohtaiset attribuutit
+                    {messages.datasourceEditor.typeAttributes}
                   </label>
                   <input
                     type="text"
@@ -345,7 +343,7 @@ export const DataSourceEditor = () => {
                                focus:border-black focus:outline-none focus:ring-1 focus:ring-black"
                   />
                   <p className="mt-1 text-xs text-gray-500">
-                    Esimerkiksi materiaalit, fraktiot tai astiatyyppi.
+                    {messages.datasourceEditor.typeAttributesHelp}
                   </p>
                 </div>
               </div>
@@ -353,12 +351,12 @@ export const DataSourceEditor = () => {
               {/* Perustiedot */}
               <div className="space-y-4">
                 <h3 className="text-sm font-semibold text-gray-900">
-                  Perustiedot
+                  {messages.datasourceEditor.basicInfoSection}
                 </h3>
 
                 <div>
                   <label className="text-sm font-medium text-gray-700">
-                    Nimikenttä
+                    {messages.datasourceEditor.nameField}
                   </label>
                   <input
                     type="text"
@@ -367,13 +365,13 @@ export const DataSourceEditor = () => {
                                focus:border-black focus:outline-none focus:ring-1 focus:ring-black"
                   />
                   <p className="mt-1 text-xs text-gray-500">
-                    Kenttä, josta luetaan kohteen nimi.
+                    {messages.datasourceEditor.nameFieldHelp}
                   </p>
                 </div>
 
                 <div>
                   <label className="text-sm font-medium text-gray-700">
-                    Osoitekenttä
+                    {messages.datasourceEditor.addressField}
                   </label>
                   <input
                     type="text"
@@ -382,7 +380,7 @@ export const DataSourceEditor = () => {
                                focus:border-black focus:outline-none focus:ring-1 focus:ring-black"
                   />
                   <p className="mt-1 text-xs text-gray-500">
-                    Esimerkiksi yhdistetty osoite tai osoiteobjektin polku.
+                    {messages.datasourceEditor.addressFieldHelp}
                   </p>
                 </div>
               </div>
@@ -397,10 +395,10 @@ export const DataSourceEditor = () => {
           <div className="flex items-start justify-between gap-4">
             <div>
               <h2 className="text-lg font-medium text-gray-900">
-                Suodattimet ja suodatettavat ominaisuudet
+                {messages.datasourceEditor.filtersTitle}
               </h2>
               <p className="mt-1 text-sm text-gray-500">
-                Määritä, mitä arvoja käyttöliittymä voi käyttää suodattimina.
+                {messages.datasourceEditor.filtersDescription}
               </p>
             </div>
 
@@ -411,7 +409,7 @@ export const DataSourceEditor = () => {
               onClick={addFilter}
               disabled={mappingDisabled}
             >
-              + Lisää suodatin
+              {messages.datasourceEditor.addFilter}
             </Button>
           </div>
 
@@ -429,7 +427,7 @@ export const DataSourceEditor = () => {
                 >
                   <div>
                     <label className="text-xs font-medium text-gray-600">
-                      Suodattimen nimi
+                      {messages.datasourceEditor.filterName}
                     </label>
                     <input
                       type="text"
@@ -444,7 +442,7 @@ export const DataSourceEditor = () => {
 
                   <div>
                     <label className="text-xs font-medium text-gray-600">
-                      Lähdekenttä
+                      {messages.datasourceEditor.sourceField}
                     </label>
                     <input
                       type="text"
@@ -459,7 +457,7 @@ export const DataSourceEditor = () => {
 
                   <div>
                     <label className="text-xs font-medium text-gray-600">
-                      Ikoni
+                      {messages.datasourceEditor.icon}
                     </label>
                     <input
                       type="text"
@@ -502,7 +500,7 @@ export const DataSourceEditor = () => {
                             lg:flex-row lg:items-center lg:justify-between"
           >
             <div className="text-sm text-gray-600">
-              {filters.length} suodatinta määritetty
+              {filters.length} {messages.datasourceEditor.filtersDefined}
             </div>
 
             <div className="flex w-full flex-col gap-2 lg:w-auto lg:flex-row">
@@ -515,12 +513,12 @@ export const DataSourceEditor = () => {
                 disabled={connectionStatus === "testing"}
               >
                 {connectionStatus === "testing"
-                  ? "Testataan..."
-                  : "Testaa yhteys"}
+                  ? messages.datasourceEditor.testing
+                  : messages.datasourceEditor.testConnection}
               </Button>
 
               <Button type="submit" size="lg" className="w-full lg:w-auto">
-                Käynnistä ja validoi yhdistin
+                {messages.datasourceEditor.startAndValidate}
               </Button>
             </div>
           </div>

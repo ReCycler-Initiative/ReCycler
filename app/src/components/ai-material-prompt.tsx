@@ -1,6 +1,7 @@
 "use client";
 
-import { chat, getMaterials } from "@/services/api";
+import { chat, getFields, getMaterials } from "@/services/api";
+import { localizeMaterialNameCandidate } from "@/lib/material-translations";
 import { Material } from "@/types";
 import { useQuery } from "@tanstack/react-query";
 import {
@@ -12,9 +13,11 @@ import {
   SendHorizonal,
   X,
 } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import { FormEvent, useEffect, useRef, useState } from "react";
-import { hexToRgba, iconMap } from "./materials";
+import { useLocale, useMessages } from "@/i18n/locale-provider";
+import { getNameIconEntry, hexToRgba, iconMap } from "./materials";
 import { Button } from "./ui/button";
 import { Textarea } from "./ui/textarea";
 
@@ -31,6 +34,8 @@ export const AiMaterialPrompt = ({
   useCaseId,
   ctaText = "Näytä kohteet",
   resultsBasePath,
+  onResultsNavigate,
+  showPreparationTips = true,
 }: {
   selectedCodes: number[];
   onSelectedCodesChange: (codes: number[]) => void;
@@ -40,7 +45,11 @@ export const AiMaterialPrompt = ({
   useCaseId?: string;
   ctaText?: string;
   resultsBasePath?: string;
+  onResultsNavigate?: () => void;
+  showPreparationTips?: boolean;
 }) => {
+  const { locale } = useLocale();
+  const dictionary = useMessages();
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
@@ -57,10 +66,18 @@ export const AiMaterialPrompt = ({
   const recognitionRef = useRef<any>(null);
   const initialized = useRef(false);
   const selectedCodesRef = useRef(selectedCodes);
+  const selectedFieldValuesRef = useRef(selectedFieldValues);
 
   const { data: materials } = useQuery({
-    queryKey: ["materials"],
-    queryFn: getMaterials,
+    queryKey: ["materials", locale],
+    queryFn: () => getMaterials(locale),
+    staleTime: Infinity,
+  });
+
+  const { data: fieldsData } = useQuery({
+    queryKey: ["fields", organizationId, useCaseId],
+    queryFn: () => getFields(organizationId!, useCaseId!),
+    enabled: !!(organizationId && useCaseId),
     staleTime: Infinity,
   });
 
@@ -68,12 +85,44 @@ export const AiMaterialPrompt = ({
     selectedCodesRef.current = selectedCodes;
   }, [selectedCodes]);
 
+  useEffect(() => {
+    selectedFieldValuesRef.current = selectedFieldValues;
+  }, [selectedFieldValues]);
+
   const cartMaterials: CartMaterial[] = (materials ?? [])
     .filter((m) => selectedCodes.includes(m.code))
     .map((m) => {
       const match = iconMap.find((i) => i.code === m.code);
       return { ...m, baseHex: match?.baseHex, icon: match?.icon };
     });
+
+  const selectedFieldEntries = (fieldsData ?? [])
+    .filter((field) => field.field_type === "multi_select")
+    .map((field) => {
+      const selectedIndices = selectedFieldValues[field.id] ?? [];
+      const choices = field.options?.choices ?? [];
+      const selectedChoices = selectedIndices.flatMap((index) => {
+          const rawValue = choices[index];
+          if (!rawValue) return [];
+
+          const visual = getNameIconEntry(rawValue);
+
+          return [{
+            index,
+            rawValue,
+            label: localizeMaterialNameCandidate(rawValue, locale),
+            baseHex: visual?.baseHex,
+            icon: visual?.icon,
+          }];
+        });
+
+      return {
+        fieldId: field.id,
+        fieldName: field.name,
+        values: selectedChoices,
+      };
+    })
+    .filter((field) => field.values.length > 0);
 
   const resultsBaseHref = resultsBasePath ?? "/recycler/results";
 
@@ -101,6 +150,19 @@ export const AiMaterialPrompt = ({
     );
   };
 
+  const removeFieldSelection = (fieldId: string, indexToRemove: number) => {
+    if (!onSelectedFieldValuesChange) return;
+
+    const nextValues = selectedFieldValues[fieldId]?.filter(
+      (index) => index !== indexToRemove
+    ) ?? [];
+
+    onSelectedFieldValuesChange({
+      ...selectedFieldValues,
+      [fieldId]: nextValues,
+    });
+  };
+
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
@@ -115,7 +177,15 @@ export const AiMaterialPrompt = ({
     initialized.current = true;
 
     setLoading(true);
-    chat({ message: "", history: [], organizationId, useCaseId })
+    chat({
+      message: "",
+      history: [],
+      organizationId,
+      useCaseId,
+      locale,
+      currentSelectedCodes: selectedCodesRef.current,
+      currentSelectedFieldValues: selectedFieldValuesRef.current,
+    })
       .then((res) => {
         setMessages([{ role: "assistant", content: res.reply }]);
         if (selectedCodesRef.current.length === 0) {
@@ -130,12 +200,19 @@ export const AiMaterialPrompt = ({
         setMessages([
           {
             role: "assistant",
-            content: "Hei! Kerro mitä sinulla on kierrätettävänä.",
+            content: dictionary.materials.greetingFallback,
           },
         ]);
       })
       .finally(() => setLoading(false));
-  }, []);
+  }, [
+    dictionary.materials.greetingFallback,
+    locale,
+    onSelectedCodesChange,
+    onSelectedFieldValuesChange,
+    organizationId,
+    useCaseId,
+  ]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -216,7 +293,7 @@ export const AiMaterialPrompt = ({
     }
 
     const recognition = new SR();
-    recognition.lang = "fi-FI";
+  recognition.lang = locale === "en" ? "en-US" : "fi-FI";
     recognition.continuous = false;
     recognition.interimResults = true;
     recognitionRef.current = recognition;
@@ -280,6 +357,9 @@ export const AiMaterialPrompt = ({
         imageMimeType: imageToSend?.mimeType,
         organizationId,
         useCaseId,
+        locale,
+        currentSelectedCodes: selectedCodesRef.current,
+        currentSelectedFieldValues: selectedFieldValuesRef.current,
       });
       setMessages([...newMessages, { role: "assistant", content: res.reply }]);
       onSelectedCodesChange(res.suggestedCodes);
@@ -292,7 +372,7 @@ export const AiMaterialPrompt = ({
         ...newMessages,
         {
           role: "assistant",
-          content: "Jokin meni pieleen. Kokeile hetken kuluttua uudelleen.",
+          content: dictionary.materials.errorFallback,
         },
       ]);
     } finally {
@@ -321,10 +401,10 @@ export const AiMaterialPrompt = ({
           />
           <div className="flex gap-3">
             <Button size="lg" onClick={capturePhoto}>
-              Ota kuva
+              {dictionary.materials.takePhoto}
             </Button>
             <Button size="lg" variant="outline" onClick={stopCamera} className="bg-white text-black">
-              Peruuta
+              {dictionary.materials.cancel}
             </Button>
           </div>
         </div>
@@ -345,10 +425,13 @@ export const AiMaterialPrompt = ({
               }`}
             >
               {msg.imagePreview && (
-                <img
+                <Image
                   src={msg.imagePreview}
-                  alt="Lähetetty kuva"
-                  className="rounded-lg max-h-48 object-contain"
+                  alt={dictionary.materials.imageAltSent}
+                  width={192}
+                  height={192}
+                  unoptimized
+                  className="rounded-lg max-h-48 w-auto object-contain"
                 />
               )}
               {msg.content !== "📷 Kuva" && <span>{msg.content}</span>}
@@ -375,9 +458,12 @@ export const AiMaterialPrompt = ({
       >
         {pendingImage && (
           <div className="relative self-start">
-            <img
+            <Image
               src={pendingImage.previewUrl}
-              alt="Valittu kuva"
+              alt={dictionary.materials.imageAltSelected}
+              width={96}
+              height={96}
+              unoptimized
               className="h-24 w-24 object-cover rounded-lg border border-gray-200"
             />
             <button
@@ -397,7 +483,7 @@ export const AiMaterialPrompt = ({
           onChange={handleFileChange}
         />
         <Textarea
-          placeholder="Kirjoita viesti tai ota kuva… (Enter lähettää)"
+          placeholder={dictionary.materials.placeholder}
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={handleKeyDown}
@@ -414,7 +500,7 @@ export const AiMaterialPrompt = ({
               className="h-8 w-8 text-gray-500 hover:text-black"
               onClick={() => startCamera()}
               disabled={loading}
-              title="Ota kuva"
+              title={dictionary.materials.takePhoto}
             >
               <Camera className="h-4 w-4" />
             </Button>
@@ -429,7 +515,11 @@ export const AiMaterialPrompt = ({
               }`}
               onClick={toggleListening}
               disabled={loading || typeof window === "undefined" || !("SpeechRecognition" in window || "webkitSpeechRecognition" in window)}
-              title={isListening ? "Lopeta kuuntelu" : "Puhu viesti"}
+              title={
+                isListening
+                  ? dictionary.materials.stopListening
+                  : dictionary.materials.speakMessage
+              }
             >
               {isListening ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
             </Button>
@@ -448,44 +538,74 @@ export const AiMaterialPrompt = ({
       {/* Valitut materiaalit */}
       <div className="rounded-lg border border-gray-200 bg-gray-50 p-4 flex flex-col gap-3">
         <p className="text-sm font-medium text-gray-700">
-          Valitut ({cartMaterials.length})
+          {dictionary.materials.selected} ({cartMaterials.length + selectedFieldEntries.reduce((sum, field) => sum + field.values.length, 0)})
         </p>
 
-        {cartMaterials.length === 0 ? (
+        {cartMaterials.length === 0 && selectedFieldEntries.length === 0 ? (
           <p className="text-xs text-gray-400 italic">
-            Kerro chatissa mitä kierrätät — valinnat ilmestyvät tähän.
+            {dictionary.materials.selectedEmpty}
           </p>
         ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
-            {cartMaterials.map((m) => (
-              <div
-                key={m.code}
-                className="relative flex aspect-square flex-col items-center justify-center rounded-sm px-2 py-2 text-center text-white ring-4 ring-yellow-400"
-                style={{
-                  backgroundColor: m.baseHex
-                    ? hexToRgba(m.baseHex, 1)
-                    : "#4b5563",
-                }}
-              >
-                <button
-                  type="button"
-                  onClick={() => removeCartMaterial(m.code)}
-                  className="absolute right-1 top-1 rounded-full bg-black/45 p-1 text-white transition hover:bg-black/70"
-                  aria-label={`Poista materiaali ${m.name}`}
-                  title={`Poista ${m.name}`}
+          <>
+            <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
+              {cartMaterials.map((m) => (
+                <div
+                  key={m.code}
+                  className="relative flex aspect-square flex-col items-center justify-center rounded-sm px-2 py-2 text-center text-white ring-4 ring-yellow-400"
+                  style={{
+                    backgroundColor: m.baseHex
+                      ? hexToRgba(m.baseHex, 1)
+                      : "#4b5563",
+                  }}
                 >
-                  <X className="h-3 w-3" />
-                </button>
-                <div className="mb-2 transform scale-125">
-                  {m.icon ?? <RecycleIcon />}
+                  <button
+                    type="button"
+                    onClick={() => removeCartMaterial(m.code)}
+                    className="absolute right-1 top-1 rounded-full bg-black/45 p-1 text-white transition hover:bg-black/70"
+                    aria-label={`${dictionary.materials.removeMaterialAria} ${m.name}`}
+                    title={`${dictionary.materials.removeMaterialTitle} ${m.name}`}
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                  <div className="mb-2 transform scale-125">
+                    {m.icon ?? <RecycleIcon />}
+                  </div>
+                  <span className="text-sm">{m.name}</span>
                 </div>
-                <span className="text-sm">{m.name}</span>
-              </div>
-            ))}
-          </div>
+              ))}
+
+              {selectedFieldEntries.flatMap((field) =>
+                field.values.map((value) => (
+                  <div
+                    key={`${field.fieldId}-${value.index}`}
+                    className="relative flex aspect-square flex-col items-center justify-center rounded-sm px-2 py-2 text-center text-white ring-4 ring-yellow-400"
+                    style={{
+                      backgroundColor: value.baseHex
+                        ? hexToRgba(value.baseHex, 1)
+                        : "#4b5563",
+                    }}
+                  >
+                    <button
+                      type="button"
+                      onClick={() => removeFieldSelection(field.fieldId, value.index)}
+                      className="absolute right-1 top-1 rounded-full bg-black/45 p-1 text-white transition hover:bg-black/70"
+                      aria-label={`${dictionary.materials.removeMaterialAria} ${value.label}`}
+                      title={`${dictionary.materials.removeMaterialTitle} ${value.label}`}
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
+                    <div className="mb-2 transform scale-125">
+                      {value.icon ?? <RecycleIcon />}
+                    </div>
+                    <span className="text-sm">{value.label}</span>
+                  </div>
+                ))
+              )}
+            </div>
+          </>
         )}
 
-        {preparationTips.length > 0 && (
+        {showPreparationTips && preparationTips.length > 0 && (
           <ul className="flex flex-col gap-1.5 border-t border-gray-200 pt-3">
             {preparationTips.map((t) => (
               <li
@@ -500,7 +620,7 @@ export const AiMaterialPrompt = ({
         )}
 
         <Button asChild size="lg" className="w-full mt-1">
-          <Link href={resultsHref}>
+          <Link href={resultsHref} onClick={onResultsNavigate}>
             {ctaText}
             <ArrowRight className="ml-2 h-4 w-4" />
           </Link>

@@ -27,6 +27,7 @@ import Link from "next/link";
 import { useParams, usePathname, useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { PageLoadingSpinner } from "@/components/page-loading-spinner";
+import { useMessages } from "@/i18n/locale-provider";
 
 type NavLink = {
   exact?: boolean;
@@ -43,6 +44,7 @@ const Content = ({
   organization: any;
   selectedUseCaseId: string;
 }) => {
+  const messages = useMessages();
   const { id } = useParams<{ id: string }>();
   const pathname = usePathname();
   const router = useRouter();
@@ -73,11 +75,10 @@ const Content = ({
 
   const navLinks: NavLink[] = [
     { exact: true, href: `${orgRootPath}`, label: organization.name },
-    { href: `${orgRootPath}/datasources`, label: "Datayhteydet" },
-    { href: `${orgRootPath}/fields`, label: "Sisältömalli" },
-    { href: `${orgRootPath}/locations`, label: "Kohteet" },
-    { href: `${orgRootPath}/ai`, label: "Tekoäly" },
-    { href: `${orgRootPath}/runs`, label: "Lokit" },
+    { href: `${orgRootPath}/datasources`, label: messages.admin.datasources },
+    { href: `${orgRootPath}/locations`, label: messages.admin.locations },
+    { href: `${orgRootPath}/ai`, label: messages.admin.ai },
+    { href: `${orgRootPath}/runs`, label: messages.admin.logs },
   ];
 
   return (
@@ -98,7 +99,7 @@ const Content = ({
             ))}
           </nav>
           <div className="flex items-center ml-auto mr-2">
-            <Label className="mr-4">Käyttötapaus</Label>
+            <Label className="mr-4">{messages.admin.useCaseLabel}</Label>
             <Select
               defaultValue={useCasesQuery.data?.[0]?.id}
               value={selectedUseCaseId}
@@ -125,11 +126,11 @@ const Content = ({
             <Link
               href={`/organizations/${id}/use_cases/${selectedUseCaseId}`}
               className={navButtonClass(true)}
-              aria-label="Avaa valittu käyttötapaus"
+              aria-label={messages.admin.openSelectedUseCase}
               target="_blank"
-              title="Avaa valittu käyttötapaus"
+              title={messages.admin.openSelectedUseCase}
             >
-              Avaa
+              {messages.admin.open}
               <ExternalLink className="ml-2" size={16} />
             </Link>
           )}
@@ -141,20 +142,20 @@ const Content = ({
             <DropdownMenuContent>
               <DropdownMenuItem asChild>
                 <Link href={`${orgRootPath}/general_info`}>
-                  Organisaation tiedot
+                  {messages.admin.organizationDetails}
                 </Link>
               </DropdownMenuItem>
 
               {selectedUseCaseId && (
                 <DropdownMenuItem asChild>
                   <Link href={`${orgRootPath}/edit`}>
-                    Käyttötapauksen tiedot
+                    {messages.admin.useCaseDetails}
                   </Link>
                 </DropdownMenuItem>
               )}
 
               <DropdownMenuItem asChild>
-                <Link href={`${orgRootPath}/runs`}>Lokit</Link>
+                <Link href={`${orgRootPath}/runs`}>{messages.admin.logs}</Link>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -167,6 +168,7 @@ const Content = ({
 };
 
 const AdminLayout = ({ children }: { children: React.ReactNode }) => {
+  const messages = useMessages();
   const { id, useCaseId } = useParams<{ id: string; useCaseId: string }>();
   const router = useRouter();
 
@@ -202,7 +204,7 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
   if (accessQuery.error || !accessQuery.data?.hasAccess) {
     return (
       <div className="flex items-center justify-center h-screen">
-        <div className="text-lg">Verifying access...</div>
+        <div className="text-lg">{messages.pageLoading.verifyingAccess}</div>
       </div>
     );
   }

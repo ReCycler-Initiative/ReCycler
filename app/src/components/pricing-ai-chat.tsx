@@ -15,6 +15,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
+import { useLocale, useMessages } from "@/i18n/locale-provider";
 import { toast } from "sonner";
 
 type Message = {
@@ -22,15 +23,16 @@ type Message = {
   content: string;
 };
 
-const initialAssistantMessage: Message = {
-  role: "assistant",
-  content:
-    "Hei! Voin auttaa ReCyclerin hinnoittelussa ja käyttöönotossa. Kerro vaikka organisaatiosi koko, käyttötapaus tai montako datalähdettä tarvitsette.",
-};
-
 export const PricingAiChat = () => {
+  const { locale } = useLocale();
+  const dictionary = useMessages();
   const [open, setOpen] = useState(false);
-  const [messages, setMessages] = useState<Message[]>([initialAssistantMessage]);
+  const [messages, setMessages] = useState<Message[]>([
+    {
+      role: "assistant",
+      content: dictionary.pricingChat.initialAssistantMessage,
+    },
+  ]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [leadLoading, setLeadLoading] = useState(false);
@@ -43,6 +45,15 @@ export const PricingAiChat = () => {
     message: "",
   });
   const listEndRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    setMessages([
+      {
+        role: "assistant",
+        content: dictionary.pricingChat.initialAssistantMessage,
+      },
+    ]);
+  }, [dictionary.pricingChat.initialAssistantMessage]);
 
   useEffect(() => {
     if (!open) return;
@@ -62,19 +73,22 @@ export const PricingAiChat = () => {
       const response = await axios.post("/api/pricing-chat", {
         message: trimmed,
         history: messages,
+        locale,
       });
 
       setMessages([
         ...nextHistory,
-        { role: "assistant", content: response.data.reply || "Voin auttaa tarkentamaan pakettia tarkemmin, jos kerrot vähän tarpeestasi." },
+        {
+          role: "assistant",
+          content: response.data.reply || dictionary.pricingChat.assistantFallback,
+        },
       ]);
     } catch {
       setMessages([
         ...nextHistory,
         {
           role: "assistant",
-          content:
-            "Tekoälychat ei ole juuri nyt käytettävissä. Voit silti jättää tarjouspyynnön tai kokeilla hetken päästä uudelleen.",
+          content: dictionary.pricingChat.unavailableFallback,
         },
       ]);
     } finally {
@@ -84,7 +98,7 @@ export const PricingAiChat = () => {
 
   const submitLead = async () => {
     if (!leadForm.name.trim() || !leadForm.email.trim()) {
-      toast.error("Lisää vähintään nimi ja sähköposti.");
+      toast.error(dictionary.pricingChat.missingLeadFields);
       return;
     }
 
@@ -96,9 +110,9 @@ export const PricingAiChat = () => {
         chatHistory: messages,
       });
       setLeadSubmitted(true);
-      toast.success("Yhteydenottopyyntö lähetetty.");
+      toast.success(dictionary.pricingChat.leadSuccess);
     } catch {
-      toast.error("Yhteydenoton lähetys epäonnistui.");
+      toast.error(dictionary.pricingChat.leadError);
     } finally {
       setLeadLoading(false);
     }
@@ -108,16 +122,14 @@ export const PricingAiChat = () => {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <button className="mt-6 inline-flex w-full items-center justify-center rounded-full border border-gray-200 bg-white px-5 py-3 text-sm font-medium text-gray-900 transition hover:bg-gray-50">
-          Kysy chatissa ja jätä yhteydenotto
+          {dictionary.pricingChat.dialogTrigger}
         </button>
       </DialogTrigger>
       <DialogContent className="max-w-2xl">
         <DialogHeader>
-          <DialogTitle>Kysy hinnoittelusta</DialogTitle>
+          <DialogTitle>{dictionary.pricingChat.dialogTitle}</DialogTitle>
           <DialogDescription>
-            Voit kysyä esimerkiksi pilotista, käyttöönoton laajuudesta tai siitä,
-            mikä palvelutaso sopisi teille. Jätä lopuksi yhteystietosi, niin
-            myyntitiimi on yhteydessä.
+            {dictionary.pricingChat.dialogDescription}
           </DialogDescription>
         </DialogHeader>
 
@@ -143,7 +155,7 @@ export const PricingAiChat = () => {
             {loading && (
               <div className="pr-10">
                 <div className="rounded-2xl rounded-tl-md bg-white px-4 py-3 text-sm text-gray-500">
-                  Kirjoitetaan vastausta...
+                  {dictionary.pricingChat.loadingReply}
                 </div>
               </div>
             )}
@@ -155,7 +167,7 @@ export const PricingAiChat = () => {
               <Textarea
                 value={input}
                 onChange={(event) => setInput(event.target.value)}
-                placeholder="Esim. Meillä on yksi palvelu ja kaksi datalähdettä. Riittäisikö pilotti?"
+                placeholder={dictionary.pricingChat.placeholder}
                 className="min-h-24 resize-none bg-white"
                 onKeyDown={(event) => {
                   if (event.key === "Enter" && !event.shiftKey) {
@@ -166,10 +178,10 @@ export const PricingAiChat = () => {
               />
               <div className="flex items-center justify-between gap-3">
                 <div className="text-xs text-gray-500">
-                  Enter lähettää, Shift+Enter lisää rivinvaihdon.
+                  {dictionary.pricingChat.enterHint}
                 </div>
                 <Button type="button" onClick={() => void sendMessage()} disabled={loading || !input.trim()}>
-                  Lähetä
+                  {dictionary.pricingChat.send}
                   <SendHorizonal className="ml-2 h-4 w-4" />
                 </Button>
               </div>
@@ -179,32 +191,31 @@ export const PricingAiChat = () => {
 
           <div className="rounded-xl border border-gray-200 bg-white p-4">
             <div className="mb-3">
-              <h3 className="text-sm font-semibold text-gray-900">Ota yhteyttä</h3>
+              <h3 className="text-sm font-semibold text-gray-900">{dictionary.pricingChat.contactTitle}</h3>
               <p className="mt-1 text-sm text-gray-600">
-                Kun jätät yhteystietosi, myyntitiimi voi palata keskusteluunne ja
-                olla sinuun yhteydessä.
+                {dictionary.pricingChat.contactDescription}
               </p>
             </div>
 
             {leadSubmitted ? (
               <div className="rounded-lg border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-900">
-                Kiitos. Yhteydenottopyyntösi on vastaanotettu ja palaamme asiaan.
+                {dictionary.pricingChat.contactSubmitted}
               </div>
             ) : (
               <div className="grid gap-3 sm:grid-cols-2">
                 <div className="space-y-2">
-                  <Label htmlFor="pricing-lead-name">Nimi</Label>
+                  <Label htmlFor="pricing-lead-name">{dictionary.pricingChat.nameLabel}</Label>
                   <Input
                     id="pricing-lead-name"
                     value={leadForm.name}
                     onChange={(event) =>
                       setLeadForm((current) => ({ ...current, name: event.target.value }))
                     }
-                    placeholder="Etunimi Sukunimi"
+                    placeholder={dictionary.pricingChat.namePlaceholder}
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="pricing-lead-email">Sähköposti</Label>
+                  <Label htmlFor="pricing-lead-email">{dictionary.pricingChat.emailLabel}</Label>
                   <Input
                     id="pricing-lead-email"
                     type="email"
@@ -212,11 +223,11 @@ export const PricingAiChat = () => {
                     onChange={(event) =>
                       setLeadForm((current) => ({ ...current, email: event.target.value }))
                     }
-                    placeholder="nimi@organisaatio.fi"
+                    placeholder={dictionary.pricingChat.emailPlaceholder}
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="pricing-lead-organization">Organisaatio</Label>
+                  <Label htmlFor="pricing-lead-organization">{dictionary.pricingChat.organizationLabel}</Label>
                   <Input
                     id="pricing-lead-organization"
                     value={leadForm.organizationName}
@@ -226,38 +237,40 @@ export const PricingAiChat = () => {
                         organizationName: event.target.value,
                       }))
                     }
-                    placeholder="Esim. Yritys Oy"
+                    placeholder={dictionary.pricingChat.organizationPlaceholder}
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="pricing-lead-phone">Puhelin</Label>
+                  <Label htmlFor="pricing-lead-phone">{dictionary.pricingChat.phoneLabel}</Label>
                   <Input
                     id="pricing-lead-phone"
                     value={leadForm.phone}
                     onChange={(event) =>
                       setLeadForm((current) => ({ ...current, phone: event.target.value }))
                     }
-                    placeholder="040 123 4567"
+                    placeholder={dictionary.pricingChat.phonePlaceholder}
                   />
                 </div>
                 <div className="space-y-2 sm:col-span-2">
-                  <Label htmlFor="pricing-lead-message">Lisätiedot</Label>
+                  <Label htmlFor="pricing-lead-message">{dictionary.pricingChat.detailsLabel}</Label>
                   <Textarea
                     id="pricing-lead-message"
                     value={leadForm.message}
                     onChange={(event) =>
                       setLeadForm((current) => ({ ...current, message: event.target.value }))
                     }
-                    placeholder="Kerro lyhyesti tarpeestanne tai toivotusta aikataulusta."
+                    placeholder={dictionary.pricingChat.detailsPlaceholder}
                     className="min-h-24 resize-none"
                   />
                 </div>
                 <div className="sm:col-span-2 flex items-center justify-between gap-3">
                   <div className="text-xs text-gray-500">
-                    Keskusteluhistoria tallennetaan yhteydenoton tueksi.
+                    {dictionary.pricingChat.historySavedHint}
                   </div>
                   <Button type="button" onClick={() => void submitLead()} disabled={leadLoading}>
-                    {leadLoading ? "Lähetetään..." : "Lähetä yhteydenottopyyntö"}
+                    {leadLoading
+                      ? dictionary.pricingChat.sendingContactRequest
+                      : dictionary.pricingChat.sendContactRequest}
                   </Button>
                 </div>
               </div>
