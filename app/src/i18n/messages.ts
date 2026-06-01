@@ -460,7 +460,7 @@ const baseFi = {
 		{
 			name: "Käynnistys",
 			audience: "Nopea käynnistys",
-			price: "690 €/kk",
+			price: "xxx €/kk",
 			description:
 				"Sopii ensimmäiseen julkaistavaan palveluun, kun halutaan nopeasti käyttöön yksi palvelu oikealla datalla.",
 			highlights: [
@@ -472,7 +472,7 @@ const baseFi = {
 		{
 			name: "Kasvu",
 			audience: "Organisaatiokäyttö",
-			price: "1 290-1 990 €/kk",
+			price: "xxxx €/kk",
 			description:
 				"Tarkoitettu organisaatioille, jotka haluavat useampia palveluita saman alustan päälle.",
 			highlights: [
