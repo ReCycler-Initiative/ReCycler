@@ -23,32 +23,36 @@ export const FormFooter = ({
   isDirty: boolean;
   onCancel?: () => void;
   cancelHref?: string;
-}) => (
-  <>
-    <hr />
-    <div className="flex justify-between items-center">
-      {onCancel ? (
-        <Button variant="outline" type="button" onClick={onCancel}>
-          Peruuta
+}) => {
+  const messages = useMessages();
+
+  return (
+    <>
+      <hr />
+      <div className="flex justify-between items-center">
+        {onCancel ? (
+          <Button variant="outline" type="button" onClick={onCancel}>
+            {messages.editor.cancel}
+          </Button>
+        ) : cancelHref ? (
+          <Button variant="outline" asChild>
+            <Link href={cancelHref}>{messages.editor.cancel}</Link>
+          </Button>
+        ) : (
+          <span />
+        )}
+        <Button
+          type="submit"
+          className="sm:w-fit ml-auto"
+          disabled={!isDirty}
+          isLoading={isSubmitting}
+        >
+          {messages.editor.save}
         </Button>
-      ) : cancelHref ? (
-        <Button variant="outline" asChild>
-          <Link href={cancelHref}>Peruuta</Link>
-        </Button>
-      ) : (
-        <span />
-      )}
-      <Button
-        type="submit"
-        className="sm:w-fit ml-auto"
-        disabled={!isDirty}
-        isLoading={isSubmitting}
-      >
-        Tallenna
-      </Button>
-    </div>
-  </>
-);
+      </div>
+    </>
+  );
+};
 
 // ---------- FormShell ----------
 // Wraps children in <Form> context + <form> tag without any page layout.

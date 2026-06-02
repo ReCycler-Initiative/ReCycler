@@ -14,7 +14,16 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Crosshair, Loader2, LocateFixed, MoreHorizontal, Trash2, X } from "lucide-react";
+import {
+  ChevronDown,
+  ChevronRight,
+  Crosshair,
+  Loader2,
+  LocateFixed,
+  MoreHorizontal,
+  Trash2,
+  X,
+} from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
   Dialog,
@@ -106,6 +115,15 @@ export const LocationEditPanel = (props: LocationEditPanelProps) => {
     fieldId: string;
     values: [string, string, string];
   } | null>(null);
+  const [addressDetailsOpen, setAddressDetailsOpen] = useState(true);
+  const [expandedFieldIds, setExpandedFieldIds] = useState<Record<string, boolean>>({});
+
+  const toggleFieldSection = (fieldId: string) => {
+    setExpandedFieldIds((prev) => ({
+      ...prev,
+      [fieldId]: !prev[fieldId],
+    }));
+  };
 
   const geocodeFromCoordinates = async (fieldId: string, lng: number, lat: number) => {
     const token = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
@@ -229,6 +247,17 @@ export const LocationEditPanel = (props: LocationEditPanelProps) => {
     setLatitude(String(pickedLngLat.latitude));
     onCoordinatesChange?.(pickedLngLat);
   }, [onCoordinatesChange, pickedLngLat]);
+
+  useEffect(() => {
+    if (
+      isResolvingAddress ||
+      isSearchingAddress ||
+      addressResults.length > 0 ||
+      addressLookupMessage
+    ) {
+      setAddressDetailsOpen(true);
+    }
+  }, [addressLookupMessage, addressResults.length, isResolvingAddress, isSearchingAddress]);
 
   useEffect(() => {
     if (props.mode !== "edit" || !data) return;
@@ -469,104 +498,131 @@ export const LocationEditPanel = (props: LocationEditPanelProps) => {
               ) : null}
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="panel-address-search">{messages.adminLocationPanel.addressSearch}</Label>
-              <div className="flex gap-2">
-                <Input
-                  id="panel-address-search"
-                  value={addressQuery}
-                  onChange={(e) => setAddressQuery(e.target.value)}
-                  onKeyDown={(event) => {
-                    if (event.key === "Enter") {
-                      event.preventDefault();
-                      void handleAddressSearch();
-                    }
-                  }}
-                  placeholder={messages.adminLocationPanel.addressSearchPlaceholder}
-                />
-                <Button
-                  type="button"
-                  variant="outline"
-                  disabled={isSearchingAddress || !addressQuery.trim()}
-                  onClick={() => void handleAddressSearch()}
-                >
-                  {isSearchingAddress ? (
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                  ) : (
-                    messages.adminLocationPanel.addressSearch
-                  )}
-                </Button>
-              </div>
-
-              <Button
+            <div className="rounded-lg border border-gray-200 bg-gray-50/60">
+              <button
                 type="button"
-                variant="outline"
-                className="w-full"
-                disabled={isResolvingAddress}
-                onClick={() => void resolveAddressFromCoordinates()}
+                onClick={() => setAddressDetailsOpen((prev) => !prev)}
+                className="flex w-full items-center justify-between gap-3 px-3 py-2 text-left"
+                aria-expanded={addressDetailsOpen}
               >
-                {isResolvingAddress ? (
-                  <span className="flex items-center gap-2">
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                    {messages.adminLocationPanel.resolvingAddress}
-                  </span>
+                <div>
+                  <p className="text-sm font-medium">{messages.adminLocationPanel.addressDetails}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {address || postalCode || postOffice
+                      ? [address, postalCode, postOffice].filter(Boolean).join(", ")
+                      : messages.adminLocationPanel.addressDetailsEmpty}
+                  </p>
+                </div>
+                {addressDetailsOpen ? (
+                  <ChevronDown className="h-4 w-4 shrink-0 text-muted-foreground" />
                 ) : (
-                  messages.adminLocationPanel.suggestAddressFromCoordinates
+                  <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground" />
                 )}
-              </Button>
+              </button>
 
-              {isSearchingAddress && (
-                <p className="text-xs text-muted-foreground">
-                  {messages.adminLocationPanel.searchingAddress}
-                </p>
-              )}
+              {addressDetailsOpen && (
+                <div className="space-y-4 border-t border-gray-200 bg-white px-3 py-3">
+                  <div className="space-y-2">
+                    <Label htmlFor="panel-address-search">{messages.adminLocationPanel.addressSearch}</Label>
+                    <div className="flex gap-2">
+                      <Input
+                        id="panel-address-search"
+                        value={addressQuery}
+                        onChange={(e) => setAddressQuery(e.target.value)}
+                        onKeyDown={(event) => {
+                          if (event.key === "Enter") {
+                            event.preventDefault();
+                            void handleAddressSearch();
+                          }
+                        }}
+                        placeholder={messages.adminLocationPanel.addressSearchPlaceholder}
+                      />
+                      <Button
+                        type="button"
+                        variant="outline"
+                        disabled={isSearchingAddress || !addressQuery.trim()}
+                        onClick={() => void handleAddressSearch()}
+                      >
+                        {isSearchingAddress ? (
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                        ) : (
+                          messages.adminLocationPanel.addressSearch
+                        )}
+                      </Button>
+                    </div>
 
-              {addressLookupMessage && (
-                <p className="text-xs text-muted-foreground">{addressLookupMessage}</p>
-              )}
-
-              {addressResults.length > 0 && (
-                <div className="rounded-md border border-gray-200 bg-white">
-                  {addressResults.map((result) => (
-                    <button
-                      key={`${result.longitude}:${result.latitude}:${result.label}`}
+                    <Button
                       type="button"
-                      onClick={() => selectAddressResult(result)}
-                      className="block w-full border-b border-gray-100 px-3 py-2 text-left text-sm last:border-b-0 hover:bg-gray-50"
+                      variant="outline"
+                      className="w-full"
+                      disabled={isResolvingAddress}
+                      onClick={() => void resolveAddressFromCoordinates()}
                     >
-                      {result.label || result.address}
-                    </button>
-                  ))}
+                      {isResolvingAddress ? (
+                        <span className="flex items-center gap-2">
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                          {messages.adminLocationPanel.resolvingAddress}
+                        </span>
+                      ) : (
+                        messages.adminLocationPanel.suggestAddressFromCoordinates
+                      )}
+                    </Button>
+
+                    {isSearchingAddress && (
+                      <p className="text-xs text-muted-foreground">
+                        {messages.adminLocationPanel.searchingAddress}
+                      </p>
+                    )}
+
+                    {addressLookupMessage && (
+                      <p className="text-xs text-muted-foreground">{addressLookupMessage}</p>
+                    )}
+
+                    {addressResults.length > 0 && (
+                      <div className="rounded-md border border-gray-200 bg-white">
+                        {addressResults.map((result) => (
+                          <button
+                            key={`${result.longitude}:${result.latitude}:${result.label}`}
+                            type="button"
+                            onClick={() => selectAddressResult(result)}
+                            className="block w-full border-b border-gray-100 px-3 py-2 text-left text-sm last:border-b-0 hover:bg-gray-50"
+                          >
+                            {result.label || result.address}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <Label htmlFor="panel-address">{messages.adminLocationPanel.address}</Label>
+                    <Input
+                      id="panel-address"
+                      value={address}
+                      onChange={(e) => setAddress(e.target.value)}
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-2">
+                    <div className="space-y-1.5">
+                      <Label htmlFor="panel-postal-code">{messages.adminLocationPanel.postalCode}</Label>
+                      <Input
+                        id="panel-postal-code"
+                        value={postalCode}
+                        onChange={(e) => setPostalCode(e.target.value)}
+                      />
+                    </div>
+                    <div className="space-y-1.5">
+                      <Label htmlFor="panel-post-office">{messages.adminLocationPanel.postOffice}</Label>
+                      <Input
+                        id="panel-post-office"
+                        value={postOffice}
+                        onChange={(e) => setPostOffice(e.target.value)}
+                      />
+                    </div>
+                  </div>
                 </div>
               )}
-            </div>
-
-            <div className="space-y-1.5">
-              <Label htmlFor="panel-address">{messages.adminLocationPanel.address}</Label>
-              <Input
-                id="panel-address"
-                value={address}
-                onChange={(e) => setAddress(e.target.value)}
-              />
-            </div>
-
-            <div className="grid grid-cols-2 gap-2">
-              <div className="space-y-1.5">
-                <Label htmlFor="panel-postal-code">{messages.adminLocationPanel.postalCode}</Label>
-                <Input
-                  id="panel-postal-code"
-                  value={postalCode}
-                  onChange={(e) => setPostalCode(e.target.value)}
-                />
-              </div>
-              <div className="space-y-1.5">
-                <Label htmlFor="panel-post-office">{messages.adminLocationPanel.postOffice}</Label>
-                <Input
-                  id="panel-post-office"
-                  value={postOffice}
-                  onChange={(e) => setPostOffice(e.target.value)}
-                />
-              </div>
             </div>
 
             {(fieldsDefinitions ?? []).map((field) => {
@@ -574,185 +630,225 @@ export const LocationEditPanel = (props: LocationEditPanelProps) => {
               const choices = existingField?.options?.choices ?? field.options?.choices ?? [];
               const placeholder = existingField?.options?.placeholder ?? field.options?.placeholder ?? "";
               const required = existingField?.required ?? field.required;
+              const selectedCount = (fieldValues[field.id] ?? []).filter(Boolean).length;
+              const isCollapsible =
+                field.field_type === "multi_select" ||
+                field.field_type === "address" ||
+                field.field_type === "opening_hours";
+              const isExpanded = expandedFieldIds[field.id] ?? false;
               return (
               <div key={field.id} className="space-y-2">
-                <Label>
-                  {field.name}
-                  {required && <span className="text-destructive ml-1">*</span>}
-                </Label>
+                {isCollapsible ? (
+                  <div className="rounded-lg border border-gray-200 bg-gray-50/60">
+                    <button
+                      type="button"
+                      onClick={() => toggleFieldSection(field.id)}
+                      className="flex w-full items-center justify-between gap-3 px-3 py-2 text-left"
+                      aria-expanded={isExpanded}
+                    >
+                      <div>
+                        <p className="text-sm font-medium">
+                          {field.name}
+                          {required && <span className="text-destructive ml-1">*</span>}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          {selectedCount > 0
+                            ? messages.adminLocationPanel.selectedCount.replace("{count}", String(selectedCount))
+                            : messages.adminLocationPanel.noSelections}
+                        </p>
+                      </div>
+                      {isExpanded ? (
+                        <ChevronDown className="h-4 w-4 shrink-0 text-muted-foreground" />
+                      ) : (
+                        <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground" />
+                      )}
+                    </button>
 
-                {field.field_type === "multi_select" && (
-                  <div className="space-y-1.5">
-                    {choices.map((choice) => {
-                      const checked = (fieldValues[field.id] ?? []).includes(choice);
-                      return (
-                        <div key={choice} className="flex items-center gap-2">
-                          <Checkbox
-                            id={`${field.id}-${choice}`}
-                            checked={checked}
-                            onCheckedChange={(v) =>
-                              setFieldValues((prev) => {
-                                const current = prev[field.id] ?? [];
-                                return {
-                                  ...prev,
-                                  [field.id]: v
-                                    ? [...current, choice]
-                                    : current.filter((c) => c !== choice),
-                                };
-                              })
-                            }
-                          />
-                          <label
-                            htmlFor={`${field.id}-${choice}`}
-                            className="text-sm cursor-pointer"
-                          >
-                            {localizeMaterialNameCandidate(choice, locale)}
-                          </label>
-                        </div>
-                      );
-                    })}
-                  </div>
-                )}
-
-                {field.field_type === "text_input" && (
-                  <Input
-                    value={(fieldValues[field.id] ?? [])[0] ?? ""}
-                    placeholder={placeholder}
-                    onChange={(e) =>
-                      setFieldValues((prev) => ({
-                        ...prev,
-                        [field.id]: e.target.value ? [e.target.value] : [],
-                      }))
-                    }
-                  />
-                )}
-
-                {field.field_type === "address" && (
-                  <div className="space-y-2">
-                    <div className="flex gap-2">
-                      <Input
-                        className="flex-1"
-                        value={(fieldValues[field.id] ?? [])[0] ?? ""}
-                        placeholder="Katuosoite"
-                        onChange={(e) =>
-                          setFieldValues((prev) => {
-                            const cur = prev[field.id] ?? ["", "", ""];
-                            return { ...prev, [field.id]: [e.target.value, cur[1] ?? "", cur[2] ?? ""] };
-                          })
-                        }
-                      />
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="icon"
-                        className="shrink-0"
-                        title="Hae osoite koordinaateista"
-                        disabled={isGeocodingAddress || isNaN(parseFloat(longitude)) || isNaN(parseFloat(latitude))}
-                        onClick={() => {
-                          geocodeFromCoordinates(field.id, parseFloat(longitude), parseFloat(latitude));
-                        }}
-                      >
-                        {isGeocodingAddress
-                          ? <Loader2 className="h-4 w-4 animate-spin" />
-                          : <LocateFixed className="h-4 w-4" />}
-                      </Button>
-                    </div>
-                    <div className="grid grid-cols-2 gap-2">
-                      <Input
-                        value={(fieldValues[field.id] ?? [])[1] ?? ""}
-                        placeholder="Postinumero"
-                        onChange={(e) =>
-                          setFieldValues((prev) => {
-                            const cur = prev[field.id] ?? ["", "", ""];
-                            return { ...prev, [field.id]: [cur[0] ?? "", e.target.value, cur[2] ?? ""] };
-                          })
-                        }
-                      />
-                      <Input
-                        value={(fieldValues[field.id] ?? [])[2] ?? ""}
-                        placeholder="Postitoimipaikka"
-                        onChange={(e) =>
-                          setFieldValues((prev) => {
-                            const cur = prev[field.id] ?? ["", "", ""];
-                            return { ...prev, [field.id]: [cur[0] ?? "", cur[1] ?? "", e.target.value] };
-                          })
-                        }
-                      />
-                    </div>
-                  </div>
-                )}
-
-                {field.field_type === "opening_hours" && (() => {
-                  const DAYS = [
-                    { key: "ma", label: "Maanantai" },
-                    { key: "ti", label: "Tiistai" },
-                    { key: "ke", label: "Keskiviikko" },
-                    { key: "to", label: "Torstai" },
-                    { key: "pe", label: "Perjantai" },
-                    { key: "la", label: "Lauantai" },
-                    { key: "su", label: "Sunnuntai" },
-                  ];
-                  const entries: Record<string, { open: string; close: string } | null> = {};
-                  for (const raw of (fieldValues[field.id] ?? [])) {
-                    const parts = raw.split("|");
-                    if (parts.length === 2 && parts[1] === "closed") entries[parts[0]] = null;
-                    else if (parts.length === 3) entries[parts[0]] = { open: parts[1], close: parts[2] };
-                  }
-                  const setDay = (key: string, val: { open: string; close: string } | null) => {
-                    const next = { ...entries, [key]: val };
-                    setFieldValues((prev) => ({
-                      ...prev,
-                      [field.id]: Object.entries(next).map(([k, v]) =>
-                        v ? `${k}|${v.open}|${v.close}` : `${k}|closed`
-                      ),
-                    }));
-                  };
-                  return (
-                    <div className="space-y-2">
-                      {DAYS.map(({ key, label }) => {
-                        const val = entries[key];
-                        const isOpen = val !== null && val !== undefined;
-                        return (
-                          <div key={key} className="flex items-center gap-2">
-                            <Checkbox
-                              id={`${field.id}-${key}`}
-                              checked={isOpen}
-                              onCheckedChange={(v) =>
-                                setDay(key, v ? { open: "08:00", close: "20:00" } : null)
-                              }
-                            />
-                            <label
-                              htmlFor={`${field.id}-${key}`}
-                              className="text-sm w-24 shrink-0 cursor-pointer"
-                            >
-                              {label}
-                            </label>
-                            {isOpen && (
-                              <>
-                                <Input
-                                  type="time"
-                                  className="w-28 text-sm"
-                                  value={val!.open}
-                                  onChange={(e) => setDay(key, { open: e.target.value, close: val!.close })}
-                                />
-                                <span className="text-sm text-muted-foreground">–</span>
-                                <Input
-                                  type="time"
-                                  className="w-28 text-sm"
-                                  value={val!.close}
-                                  onChange={(e) => setDay(key, { open: val!.open, close: e.target.value })}
-                                />
-                              </>
-                            )}
-                            {!isOpen && (
-                              <span className="text-sm text-muted-foreground">Suljettu</span>
-                            )}
+                    {isExpanded && (
+                      <div className="space-y-2 border-t border-gray-200 bg-white px-3 py-3">
+                        {field.field_type === "multi_select" && (
+                          <div className="space-y-1.5">
+                            {choices.map((choice) => {
+                              const checked = (fieldValues[field.id] ?? []).includes(choice);
+                              return (
+                                <div key={choice} className="flex items-center gap-2">
+                                  <Checkbox
+                                    id={`${field.id}-${choice}`}
+                                    checked={checked}
+                                    onCheckedChange={(v) =>
+                                      setFieldValues((prev) => {
+                                        const current = prev[field.id] ?? [];
+                                        return {
+                                          ...prev,
+                                          [field.id]: v
+                                            ? [...current, choice]
+                                            : current.filter((c) => c !== choice),
+                                        };
+                                      })
+                                    }
+                                  />
+                                  <label
+                                    htmlFor={`${field.id}-${choice}`}
+                                    className="text-sm cursor-pointer"
+                                  >
+                                    {localizeMaterialNameCandidate(choice, locale)}
+                                  </label>
+                                </div>
+                              );
+                            })}
                           </div>
-                        );
-                      })}
-                    </div>
-                  );
-                })()}
+                        )}
+
+                        {field.field_type === "address" && (
+                          <div className="space-y-2">
+                            <div className="flex gap-2">
+                              <Input
+                                className="flex-1"
+                                value={(fieldValues[field.id] ?? [])[0] ?? ""}
+                                placeholder="Katuosoite"
+                                onChange={(e) =>
+                                  setFieldValues((prev) => {
+                                    const cur = prev[field.id] ?? ["", "", ""];
+                                    return { ...prev, [field.id]: [e.target.value, cur[1] ?? "", cur[2] ?? ""] };
+                                  })
+                                }
+                              />
+                              <Button
+                                type="button"
+                                variant="outline"
+                                size="icon"
+                                className="shrink-0"
+                                title="Hae osoite koordinaateista"
+                                disabled={isGeocodingAddress || isNaN(parseFloat(longitude)) || isNaN(parseFloat(latitude))}
+                                onClick={() => {
+                                  geocodeFromCoordinates(field.id, parseFloat(longitude), parseFloat(latitude));
+                                }}
+                              >
+                                {isGeocodingAddress
+                                  ? <Loader2 className="h-4 w-4 animate-spin" />
+                                  : <LocateFixed className="h-4 w-4" />}
+                              </Button>
+                            </div>
+                            <div className="grid grid-cols-2 gap-2">
+                              <Input
+                                value={(fieldValues[field.id] ?? [])[1] ?? ""}
+                                placeholder="Postinumero"
+                                onChange={(e) =>
+                                  setFieldValues((prev) => {
+                                    const cur = prev[field.id] ?? ["", "", ""];
+                                    return { ...prev, [field.id]: [cur[0] ?? "", e.target.value, cur[2] ?? ""] };
+                                  })
+                                }
+                              />
+                              <Input
+                                value={(fieldValues[field.id] ?? [])[2] ?? ""}
+                                placeholder="Postitoimipaikka"
+                                onChange={(e) =>
+                                  setFieldValues((prev) => {
+                                    const cur = prev[field.id] ?? ["", "", ""];
+                                    return { ...prev, [field.id]: [cur[0] ?? "", cur[1] ?? "", e.target.value] };
+                                  })
+                                }
+                              />
+                            </div>
+                          </div>
+                        )}
+
+                        {field.field_type === "opening_hours" && (() => {
+                          const DAYS = [
+                            { key: "ma", label: "Maanantai" },
+                            { key: "ti", label: "Tiistai" },
+                            { key: "ke", label: "Keskiviikko" },
+                            { key: "to", label: "Torstai" },
+                            { key: "pe", label: "Perjantai" },
+                            { key: "la", label: "Lauantai" },
+                            { key: "su", label: "Sunnuntai" },
+                          ];
+                          const entries: Record<string, { open: string; close: string } | null> = {};
+                          for (const raw of (fieldValues[field.id] ?? [])) {
+                            const parts = raw.split("|");
+                            if (parts.length === 2 && parts[1] === "closed") entries[parts[0]] = null;
+                            else if (parts.length === 3) entries[parts[0]] = { open: parts[1], close: parts[2] };
+                          }
+                          const setDay = (key: string, val: { open: string; close: string } | null) => {
+                            const next = { ...entries, [key]: val };
+                            setFieldValues((prev) => ({
+                              ...prev,
+                              [field.id]: Object.entries(next).map(([k, v]) =>
+                                v ? `${k}|${v.open}|${v.close}` : `${k}|closed`
+                              ),
+                            }));
+                          };
+                          return (
+                            <div className="space-y-2">
+                              {DAYS.map(({ key, label }) => {
+                                const val = entries[key];
+                                const isOpen = val !== null && val !== undefined;
+                                return (
+                                  <div key={key} className="flex items-center gap-2">
+                                    <Checkbox
+                                      id={`${field.id}-${key}`}
+                                      checked={isOpen}
+                                      onCheckedChange={(v) =>
+                                        setDay(key, v ? { open: "08:00", close: "20:00" } : null)
+                                      }
+                                    />
+                                    <label
+                                      htmlFor={`${field.id}-${key}`}
+                                      className="text-sm w-24 shrink-0 cursor-pointer"
+                                    >
+                                      {label}
+                                    </label>
+                                    {isOpen && (
+                                      <>
+                                        <Input
+                                          type="time"
+                                          className="w-28 text-sm"
+                                          value={val!.open}
+                                          onChange={(e) => setDay(key, { open: e.target.value, close: val!.close })}
+                                        />
+                                        <span className="text-sm text-muted-foreground">–</span>
+                                        <Input
+                                          type="time"
+                                          className="w-28 text-sm"
+                                          value={val!.close}
+                                          onChange={(e) => setDay(key, { open: val!.open, close: e.target.value })}
+                                        />
+                                      </>
+                                    )}
+                                    {!isOpen && (
+                                      <span className="text-sm text-muted-foreground">Suljettu</span>
+                                    )}
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          );
+                        })()}
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <>
+                    <Label>
+                      {field.name}
+                      {required && <span className="text-destructive ml-1">*</span>}
+                    </Label>
+
+                    {field.field_type === "text_input" && (
+                      <Input
+                        value={(fieldValues[field.id] ?? [])[0] ?? ""}
+                        placeholder={placeholder}
+                        onChange={(e) =>
+                          setFieldValues((prev) => ({
+                            ...prev,
+                            [field.id]: e.target.value ? [e.target.value] : [],
+                          }))
+                        }
+                      />
+                    )}
+                  </>
+                )}
               </div>
               );
             })}
@@ -765,12 +861,14 @@ export const LocationEditPanel = (props: LocationEditPanelProps) => {
                     if (!relocateMode) onToggleRelocate();
                   }}
                   variant={relocateMode ? "default" : "outline"}
-                  className="w-full justify-start gap-2 px-3"
+                  className="h-auto w-full justify-start gap-2 px-3 py-2 text-left whitespace-normal"
                 >
                   <Crosshair className="h-4 w-4 shrink-0" />
-                  {relocateMode
-                    ? messages.adminLocationPanel.chooseLocationOnMap
-                    : messages.adminLocationPanel.updateLocationOnMap}
+                  <span className="min-w-0 leading-snug">
+                    {relocateMode
+                      ? messages.adminLocationPanel.chooseLocationOnMap
+                      : messages.adminLocationPanel.updateLocationOnMap}
+                  </span>
                 </Button>
 
                 {relocateMode && (
@@ -845,10 +943,12 @@ export const LocationEditPanel = (props: LocationEditPanelProps) => {
       <Dialog open={!!pendingGeocode} onOpenChange={(open) => { if (!open) setPendingGeocode(null); }}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Päivitetäänkö osoite?</DialogTitle>
+            <DialogTitle>{messages.adminLocationPanel.updateAddressConfirmTitle}</DialogTitle>
           </DialogHeader>
           <div className="space-y-3 text-sm">
-            <p className="text-muted-foreground">Koordinaateista löytyi seuraava osoite:</p>
+            <p className="text-muted-foreground">
+              {messages.adminLocationPanel.updateAddressConfirmDescription}
+            </p>
             <div className="rounded-md border border-gray-200 bg-gray-50 p-3 space-y-1">
               <p className="font-medium">{pendingGeocode?.values[0]}</p>
               <p className="text-muted-foreground">
@@ -857,7 +957,9 @@ export const LocationEditPanel = (props: LocationEditPanelProps) => {
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setPendingGeocode(null)}>Peruuta</Button>
+            <Button variant="outline" onClick={() => setPendingGeocode(null)}>
+              {messages.editor.cancel}
+            </Button>
             <Button
               onClick={() => {
                 if (!pendingGeocode) return;
@@ -865,7 +967,7 @@ export const LocationEditPanel = (props: LocationEditPanelProps) => {
                 setPendingGeocode(null);
               }}
             >
-              Päivitä osoite
+              {messages.adminLocationPanel.updateAddress}
             </Button>
           </DialogFooter>
         </DialogContent>
