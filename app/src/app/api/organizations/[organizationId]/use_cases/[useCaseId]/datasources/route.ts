@@ -1,6 +1,7 @@
 import db from "@/services/db";
 import { checkOrganizationAuthorization } from "@/lib/authorization";
 import { encryptSecret } from "@/lib/crypto";
+import { isSupportedSourceCrsValue, normalizeSourceCrsValue } from "@/lib/datasource";
 import { Datasource } from "@/types";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
@@ -9,7 +10,7 @@ const CreateDatasourceBody = z.object({
   name: z.string().trim().min(1),
   url: z.string().url(),
   status: z.enum(["draft", "active", "disabled"]).default("draft"),
-  source_format: z.enum(["json", "geojson"]).default("json"),
+  source_format: z.enum(["json", "geojson", "wfs"]).default("json"),
   auth_type: z.enum(["none", "api_key", "basic", "query_param"]).default("none"),
   auth_header: z.string().nullable().optional(),
   auth_credential: z.string().nullable().optional(),
@@ -17,7 +18,15 @@ const CreateDatasourceBody = z.object({
   name_source_field: z.string().nullable().optional(),
   external_id_source_field: z.string().nullable().optional(),
   coordinate_type: z.enum(["latlon", "geojson"]).default("latlon"),
-  source_crs: z.enum(["wgs84", "etrs_tm35fin"]).default("wgs84"),
+  source_crs: z
+    .string()
+    .trim()
+    .refine(
+      (value) => isSupportedSourceCrsValue(value),
+      "Invalid source CRS. Use an EPSG code such as 4326 or EPSG:3067."
+    )
+    .transform((value) => normalizeSourceCrsValue(value))
+    .default("4326"),
   lat_source_field: z.string().nullable().optional(),
   lon_source_field: z.string().nullable().optional(),
   geometry_source_field: z.string().nullable().optional(),
@@ -92,7 +101,7 @@ export async function POST(request: NextRequest, { params }: Params) {
     "auth_type", "auth_header", "auth_credentials_last4",
     db.raw("auth_credentials_ciphertext IS NOT NULL AS auth_credentials_configured"),
     "data_path", "name_source_field", "external_id_source_field",
-    "coordinate_type", "lat_source_field", "lon_source_field",
+    "coordinate_type", "source_crs", "lat_source_field", "lon_source_field",
     "geometry_source_field", "schedule", "created_at", "updated_at",
   ]);
 
