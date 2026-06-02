@@ -8,7 +8,7 @@ import { FieldMaterials, FieldSelections } from "@/components/field-materials";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 export const MaterialsPageContent = ({
   initialSelectedCodes = [],
@@ -46,6 +46,17 @@ export const MaterialsPageContent = ({
   const [selectedFieldValues, setSelectedFieldValues] = useState<FieldSelections>(
     initialSelectedFieldValues
   );
+  const initialSelectedCodesKey = useMemo(
+    () => initialSelectedCodes.join(","),
+    [initialSelectedCodes]
+  );
+  const initialSelectedFieldValuesKey = useMemo(() => {
+    const normalizedEntries = Object.entries(initialSelectedFieldValues)
+      .sort(([left], [right]) => left.localeCompare(right))
+      .map(([fieldId, values]) => [fieldId, [...values].sort((left, right) => left - right)]);
+
+    return JSON.stringify(normalizedEntries);
+  }, [initialSelectedFieldValues]);
   const resolvedResultsBasePath =
     resultsBasePath ??
     (organizationId && useCaseId
@@ -58,11 +69,11 @@ export const MaterialsPageContent = ({
 
   useEffect(() => {
     setSelectedCodes(initialSelectedCodes);
-  }, [initialSelectedCodes]);
+  }, [initialSelectedCodesKey]);
 
   useEffect(() => {
     setSelectedFieldValues(initialSelectedFieldValues);
-  }, [initialSelectedFieldValues]);
+  }, [initialSelectedFieldValuesKey]);
 
   const buildResultsHref = () => {
     const params = new URLSearchParams();

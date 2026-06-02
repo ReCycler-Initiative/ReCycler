@@ -243,6 +243,7 @@ const baseFi = {
 		deleteFailed: "Poisto epäonnistui.",
 	},
 	datasourceEditor: {
+		editTitle: "Muokkaa datalähdettä",
 		connectionError:
 			"Yhteyden testaus epäonnistui. Tarkista URL, tunnistautuminen ja mahdolliset rajapintarajoitteet.",
 		testBeforeStart:
@@ -297,6 +298,14 @@ const baseFi = {
 		latitudeField: "Leveysasteen kenttä (lat / N)",
 		longitudeField: "Pituusasteen kenttä (lon / E)",
 		geometryField: "Geometria-kenttä",
+		geometryImportOptions: "Geometriatuonnin valinnat",
+		importPointGeometries: "Tuo pistekohteet",
+		importNonPointGeometries: "Tuo alue- ja viivakohteet",
+		generatePointFromNonPointGeometries: "Luo alue- ja viivakohteille edustava piste",
+		geometryImportOptionsHelp:
+			"Voit tuoda vain pisteet, vain alueet/viivat tai molemmat. Alue- ja viivakohteet tarvitsevat tällä hetkellä edustavan pisteen, jotta ne toimivat kohdenäkymissä.",
+		nonPointRequiresGeneratedPoint:
+			"Alue- ja viivakohteiden tuonti vaatii tällä hetkellä edustavan pisteen luonnin.",
 		addMapping: "+ Lisää mäppäys",
 		noMappings: "Ei mäppäyksiä. Testaa yhteys ensin ja lisää sitten mäppäyksiä.",
 		targetField: "Kohdekenttä",
@@ -319,7 +328,7 @@ const baseFi = {
 		geometryType: "Geometriatyyppi",
 		pointOption: "Piste (point)",
 		geometryHelp:
-			"Aluksi tuetaan vain pistekohteita. Muita geometriatyyppejä voidaan lisätä myöhemmin.",
+			"Pistekohteet näkyvät kartalla merkkeinä. Alue- ja viivakohteille luodaan lisäksi edustava piste, mutta alkuperäinen geometria säilytetään kartalla.",
 		locationTypeSection: "Kohdetyyppi",
 		typeField: "Tyyppikenttä",
 		typeAttributes: "Tyyppikohtaiset attribuutit",
@@ -879,6 +888,7 @@ const baseEn = {
 		deleteFailed: "Delete failed.",
 	},
 	datasourceEditor: {
+		editTitle: "Edit data source",
 		connectionError:
 			"Connection test failed. Check the URL, authentication, and possible API limits.",
 		testBeforeStart:
@@ -934,6 +944,14 @@ const baseEn = {
 		latitudeField: "Latitude field (lat / N)",
 		longitudeField: "Longitude field (lon / E)",
 		geometryField: "Geometry field",
+		geometryImportOptions: "Geometry import options",
+		importPointGeometries: "Import point locations",
+		importNonPointGeometries: "Import area and line locations",
+		generatePointFromNonPointGeometries: "Generate a representative point for area and line locations",
+		geometryImportOptionsHelp:
+			"You can import only points, only areas/lines, or both. Area and line locations currently require a representative point so they work in location views.",
+		nonPointRequiresGeneratedPoint:
+			"Importing area and line locations currently requires generating a representative point.",
 		addMapping: "+ Add mapping",
 		noMappings: "No mappings yet. Test the connection first and then add mappings.",
 		targetField: "Target field",
@@ -956,7 +974,7 @@ const baseEn = {
 		geometryType: "Geometry type",
 		pointOption: "Point",
 		geometryHelp:
-			"Initially only point locations are supported. Other geometry types can be added later.",
+			"Point locations appear as map markers. Area and line locations also get a representative point, while the original geometry remains visible on the map.",
 		locationTypeSection: "Location type",
 		typeField: "Type field",
 		typeAttributes: "Type-specific attributes",

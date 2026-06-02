@@ -331,6 +331,9 @@ type DatasourceBody = {
   external_id_source_field?: string | null;
   coordinate_type: "latlon" | "geojson";
   source_crs?: string | null;
+  import_point_geometries: boolean;
+  import_non_point_geometries: boolean;
+  generate_point_from_non_point_geometries: boolean;
   lat_source_field?: string | null;
   lon_source_field?: string | null;
   geometry_source_field?: string | null;

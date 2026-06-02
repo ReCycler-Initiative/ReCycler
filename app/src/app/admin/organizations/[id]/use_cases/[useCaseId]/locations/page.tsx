@@ -206,6 +206,7 @@ const LocationsPage = () => {
           map={
             <AdminMapView
               locations={displayLocations}
+              geoJson={data ?? null}
               selectedId={selectedId}
               onMarkerClick={selectLocation}
               addMode={addMode || relocateMode}

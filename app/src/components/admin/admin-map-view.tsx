@@ -6,6 +6,10 @@ import Map, {
   MapRef,
   NavigationControl,
   FullscreenControl,
+  Source,
+  Layer,
+  FillLayer,
+  LineLayer,
 } from "react-map-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { cn } from "@/lib/utils";
@@ -20,6 +24,7 @@ export interface LocationMarker {
 
 export interface AdminMapViewProps {
   locations: LocationMarker[];
+  geoJson?: GeoJSON.FeatureCollection<GeoJSON.Geometry> | null;
   selectedId?: string | null;
   onMarkerClick?: (id: string) => void;
   addMode?: boolean;
@@ -35,8 +40,118 @@ const finlandBounds: [[number, number], [number, number]] = [
   [40.0, 75.0], // Northeast corner
 ];
 
+const areaFillLayer: FillLayer = {
+  id: "admin-source-areas-fill",
+  type: "fill",
+  source: "admin-collection-shapes",
+  filter: [
+    "any",
+    ["==", ["geometry-type"], "Polygon"],
+    ["==", ["geometry-type"], "MultiPolygon"],
+  ],
+  paint: {
+    "fill-color": "#ef4444",
+    "fill-opacity": 0.2,
+  },
+};
+
+const areaOutlineLayer: LineLayer = {
+  id: "admin-source-areas-line",
+  type: "line",
+  source: "admin-collection-shapes",
+  filter: [
+    "any",
+    ["==", ["geometry-type"], "Polygon"],
+    ["==", ["geometry-type"], "MultiPolygon"],
+    ["==", ["geometry-type"], "LineString"],
+    ["==", ["geometry-type"], "MultiLineString"],
+  ],
+  paint: {
+    "line-color": "#b91c1c",
+    "line-width": 3,
+    "line-opacity": 0.9,
+  },
+};
+
+const shapeInteractionLayer: LineLayer = {
+  id: "admin-source-shapes-hitbox",
+  type: "line",
+  source: "admin-collection-shapes",
+  filter: [
+    "any",
+    ["==", ["geometry-type"], "Polygon"],
+    ["==", ["geometry-type"], "MultiPolygon"],
+    ["==", ["geometry-type"], "LineString"],
+    ["==", ["geometry-type"], "MultiLineString"],
+  ],
+  paint: {
+    "line-color": "#000000",
+    "line-width": 16,
+    "line-opacity": 0,
+  },
+};
+
+const selectedAreaFillLayer: FillLayer = {
+  id: "admin-selected-source-area-fill",
+  type: "fill",
+  source: "admin-collection-shapes",
+  filter: [
+    "any",
+    ["==", ["geometry-type"], "Polygon"],
+    ["==", ["geometry-type"], "MultiPolygon"],
+  ],
+  paint: {
+    "fill-color": "#facc15",
+    "fill-opacity": 0.35,
+  },
+};
+
+const selectedAreaOutlineLayer: LineLayer = {
+  id: "admin-selected-source-area-line",
+  type: "line",
+  source: "admin-collection-shapes",
+  filter: [
+    "any",
+    ["==", ["geometry-type"], "Polygon"],
+    ["==", ["geometry-type"], "MultiPolygon"],
+    ["==", ["geometry-type"], "LineString"],
+    ["==", ["geometry-type"], "MultiLineString"],
+  ],
+  paint: {
+    "line-color": "#f59e0b",
+    "line-width": 5,
+    "line-opacity": 1,
+  },
+};
+
+function buildShapeCollection(
+  geoJson: GeoJSON.FeatureCollection<GeoJSON.Geometry>
+): GeoJSON.FeatureCollection<GeoJSON.Geometry> {
+  return {
+    type: "FeatureCollection",
+    features: geoJson.features.flatMap((feature) => {
+      const sourceGeometry = (feature.properties as Record<string, unknown> | undefined)
+        ?.source_geometry as GeoJSON.Geometry | undefined;
+
+      if (!sourceGeometry || sourceGeometry.type === "Point") {
+        return [];
+      }
+
+      return [{
+        type: "Feature" as const,
+        geometry: sourceGeometry,
+        properties: {
+          id: feature.properties?.id,
+          name: feature.properties?.name,
+        },
+      }];
+    }),
+  };
+}
+
 export const AdminMapView = ({
   locations,
+  geoJson,
   selectedId,
   onMarkerClick,
   addMode,
@@ -52,6 +167,7 @@ export const AdminMapView = ({
   const prevSelectedId = useRef<string | null | undefined>(null);
   const prevDraftMarker = useRef<{ longitude: number; latitude: number } | undefined>(undefined);
   const lastAutoFitKeyRef = useRef<string | null>(null);
+  const shapeGeoJson = geoJson ? buildShapeCollection(geoJson) : null;
 
   useEffect(() => {
     const map = mapRef.current?.getMap();
@@ -159,9 +275,26 @@ export const AdminMapView = ({
           zoom: 5,
         }}
         mapStyle={process.env.NEXT_PUBLIC_MAPBOX_STYLE_DETAIL as string}
+        interactiveLayerIds={[
+          "admin-source-shapes-hitbox",
+          "admin-source-areas-fill",
+          "admin-source-areas-line",
+          "admin-selected-source-area-fill",
+          "admin-selected-source-area-line",
+        ]}
         onLoad={() => setMapLoaded(true)}
         maxBounds={finlandBounds}
         onClick={(e) => {
+          const clickedShape = e.features?.find((feature) => {
+            const featureId = feature.properties?.id;
+            return typeof featureId === "string" && featureId.length > 0;
+          });
+
+          if (clickedShape && !addMode) {
+            onMarkerClick?.(clickedShape.properties!.id as string);
+            return;
+          }
+
           if (!addMode) return;
           onMapClick?.({ longitude: e.lngLat.lng, latitude: e.lngLat.lat });
         }}
@@ -169,6 +302,34 @@ export const AdminMapView = ({
       >
         <NavigationControl position="top-right" />
         <FullscreenControl position="top-right" />
+
+        {shapeGeoJson && shapeGeoJson.features.length > 0 && (
+          <Source id="admin-collection-shapes" type="geojson" data={shapeGeoJson}>
+            <Layer {...shapeInteractionLayer} />
+            <Layer {...areaFillLayer} />
+            <Layer {...areaOutlineLayer} />
+            {selectedId && (
+              <>
+                <Layer
+                  {...selectedAreaFillLayer}
+                  filter={[
+                    "all",
+                    selectedAreaFillLayer.filter!,
+                    ["==", ["get", "id"], selectedId],
+                  ]}
+                />
+                <Layer
+                  {...selectedAreaOutlineLayer}
+                  filter={[
+                    "all",
+                    selectedAreaOutlineLayer.filter!,
+                    ["==", ["get", "id"], selectedId],
+                  ]}
+                />
+              </>
+            )}
+          </Source>
+        )}
 
         {draftMarker && (
           <Marker

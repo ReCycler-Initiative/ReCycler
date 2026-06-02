@@ -1,11 +1,8 @@
 import { checkOrganizationAuthorization } from "@/lib/authorization";
 import {
-  detectGeoJsonGeometryType,
   detectGeoJsonSourceCrs,
   getWfsConfigurationHint,
-  getUnsupportedGeometryHint,
   isGeoJsonLikeSourceFormat,
-  isSupportedLocationGeometryType,
   resolveWfsUrl,
 } from "@/lib/datasource";
 import { DatasourceTestResult } from "@/types";
@@ -36,24 +33,52 @@ function getNestedValue(obj: unknown, path: string): unknown {
   }, obj);
 }
 
-/** Flatten an object into dot-path → sample value pairs (max depth 3) */
+/** Flatten an object into dot-path → sample value pairs (max depth 6) */
 function extractDotPaths(
   obj: unknown,
   prefix = "",
   depth = 0
 ): { path: string; sampleValue: string }[] {
-  if (depth > 3 || obj == null) return [];
-  if (typeof obj !== "object" || Array.isArray(obj)) {
+  if (depth > 6 || obj == null) return [];
+  if (typeof obj !== "object") {
     return [{ path: prefix, sampleValue: String(obj ?? "") }];
   }
+
+  if (Array.isArray(obj)) {
+    if (obj.length === 0) {
+      return [{ path: prefix, sampleValue: "[]" }];
+    }
+
+    const firstItem = obj[0];
+    const indexedPath = prefix ? `${prefix}.0` : "0";
+    const currentEntry = prefix
+      ? [{ path: prefix, sampleValue: JSON.stringify(obj).slice(0, 80) }]
+      : [];
+    if (typeof firstItem === "object" && firstItem !== null) {
+      return [...currentEntry, ...extractDotPaths(firstItem, indexedPath, depth + 1)];
+    }
+
+    return [
+      ...currentEntry,
+      { path: indexedPath, sampleValue: String(firstItem ?? "") },
+    ];
+  }
+
   const record = obj as Record<string, unknown>;
-  return Object.entries(record).flatMap(([key, value]) => {
+  const currentEntry = prefix
+    ? [{ path: prefix, sampleValue: JSON.stringify(obj).slice(0, 80) }]
+    : [];
+
+  return [
+    ...currentEntry,
+    ...Object.entries(record).flatMap(([key, value]) => {
     const path = prefix ? `${prefix}.${key}` : key;
-    if (typeof value === "object" && value !== null && !Array.isArray(value)) {
+    if (typeof value === "object" && value !== null) {
       return extractDotPaths(value, path, depth + 1);
     }
     return [{ path, sampleValue: String(value ?? "") }];
-  });
+    }),
+  ];
 }
 
 function buildHeaders(
@@ -151,13 +176,6 @@ export async function POST(request: NextRequest, { params }: Params) {
     const first = fc?.features?.[0] as Record<string, unknown> | undefined;
     if (!first) {
       return NextResponse.json({ error: "GeoJSON has no features" }, { status: 422 });
-    }
-    const detectedGeometryType = detectGeoJsonGeometryType(responseData);
-    if (!isSupportedLocationGeometryType(detectedGeometryType)) {
-      return NextResponse.json(
-        { error: getUnsupportedGeometryHint(detectedGeometryType) },
-        { status: 422 }
-      );
     }
     // Return geometry path + properties keys
     const propertyPaths = extractDotPaths(first.properties ?? {}, "properties");

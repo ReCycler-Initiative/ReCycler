@@ -27,11 +27,20 @@ const CreateDatasourceBody = z.object({
     )
     .transform((value) => normalizeSourceCrsValue(value))
     .default("4326"),
+  import_point_geometries: z.boolean().default(true),
+  import_non_point_geometries: z.boolean().default(true),
+  generate_point_from_non_point_geometries: z.boolean().default(true),
   lat_source_field: z.string().nullable().optional(),
   lon_source_field: z.string().nullable().optional(),
   geometry_source_field: z.string().nullable().optional(),
   schedule: z.string().nullable().optional(),
-});
+}).refine(
+  (value) => !value.import_non_point_geometries || value.generate_point_from_non_point_geometries,
+  {
+    message: "Non-point geometries currently require a generated representative point.",
+    path: ["generate_point_from_non_point_geometries"],
+  }
+);
 
 type Params = { params: Promise<{ organizationId: string; useCaseId: string }> };
 
@@ -52,6 +61,9 @@ export async function GET(request: NextRequest, { params }: Params) {
       "recycler.datasources.data_path", "recycler.datasources.name_source_field",
       "recycler.datasources.external_id_source_field",
       "recycler.datasources.coordinate_type", "recycler.datasources.source_crs",
+      "recycler.datasources.import_point_geometries",
+      "recycler.datasources.import_non_point_geometries",
+      "recycler.datasources.generate_point_from_non_point_geometries",
       "recycler.datasources.lat_source_field",
       "recycler.datasources.lon_source_field", "recycler.datasources.geometry_source_field",
       "recycler.datasources.schedule", "recycler.datasources.created_at",
@@ -101,7 +113,10 @@ export async function POST(request: NextRequest, { params }: Params) {
     "auth_type", "auth_header", "auth_credentials_last4",
     db.raw("auth_credentials_ciphertext IS NOT NULL AS auth_credentials_configured"),
     "data_path", "name_source_field", "external_id_source_field",
-    "coordinate_type", "source_crs", "lat_source_field", "lon_source_field",
+    "coordinate_type", "source_crs",
+    "import_point_geometries", "import_non_point_geometries",
+    "generate_point_from_non_point_geometries",
+    "lat_source_field", "lon_source_field",
     "geometry_source_field", "schedule", "created_at", "updated_at",
   ]);
 

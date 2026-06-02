@@ -28,18 +28,30 @@ const UpdateDatasourceBody = z.object({
     )
     .transform((value) => normalizeSourceCrsValue(value))
     .optional(),
+  import_point_geometries: z.boolean(),
+  import_non_point_geometries: z.boolean(),
+  generate_point_from_non_point_geometries: z.boolean(),
   lat_source_field: z.string().nullable().optional(),
   lon_source_field: z.string().nullable().optional(),
   geometry_source_field: z.string().nullable().optional(),
   schedule: z.string().nullable().optional(),
-});
+}).refine(
+  (value) => !value.import_non_point_geometries || value.generate_point_from_non_point_geometries,
+  {
+    message: "Non-point geometries currently require a generated representative point.",
+    path: ["generate_point_from_non_point_geometries"],
+  }
+);
 
 const RETURNING_COLS = [
   "id", "name", "url", "use_case_id", "status", "source_format",
   "auth_type", "auth_header", "auth_credentials_last4",
   db.raw("auth_credentials_ciphertext IS NOT NULL AS auth_credentials_configured"),
   "data_path", "name_source_field", "external_id_source_field",
-  "coordinate_type", "source_crs", "lat_source_field", "lon_source_field",
+  "coordinate_type", "source_crs",
+  "import_point_geometries", "import_non_point_geometries",
+  "generate_point_from_non_point_geometries",
+  "lat_source_field", "lon_source_field",
   "geometry_source_field", "schedule", "created_at", "updated_at",
 ] as const;
 

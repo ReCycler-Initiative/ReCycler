@@ -30,6 +30,7 @@ export async function GET(
         f.field_type,
         lf.value AS field_values,
         ST_AsGeoJSON(l.geom)::jsonb AS location_geom,
+        ST_AsGeoJSON(l.source_geom)::jsonb AS location_source_geom,
         l.id AS location_id,
         l.name AS location_name,
         l.address AS location_address,
@@ -58,6 +59,7 @@ export async function GET(
         id: row.location_id,
         name: row.location_name,
         geom: row.location_geom,
+        sourceGeom: row.location_source_geom,
         fields: [],
       });
     }
@@ -82,6 +84,7 @@ export async function GET(
       })),
       post_office: loc.fields[0]?.location_post_office ?? undefined,
       postal_code: loc.fields[0]?.location_postal_code ?? undefined,
+      source_geometry: loc.sourceGeom ?? undefined,
     },
   }));
 

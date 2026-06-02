@@ -68,6 +68,10 @@ export const Point = z.object({
   coordinates: z.tuple([z.number(), z.number()]),
 });
 
+export const Geometry = z.object({
+  type: z.string(),
+}).passthrough();
+
 export const DbLocation = z.object({
   field_id: z.string().uuid().nullable(),
   field_name: z.string().nullable(),
@@ -76,6 +80,7 @@ export const DbLocation = z.object({
   field_values: FieldValue.nullable(),
   location_address: z.string().nullable().optional(),
   location_geom: Point,
+  location_source_geom: Geometry.nullable().optional(),
   location_id: z.string().uuid(),
   location_name: z.string(),
   location_post_office: z.string().nullable().optional(),
@@ -94,6 +99,7 @@ export const LocationProperties = z.object({
   ),
   post_office: z.string().optional(),
   postal_code: z.string().optional(),
+  source_geometry: Geometry.optional(),
 });
 
 export const LocationGeoJson = z.object({
@@ -209,6 +215,9 @@ export const Datasource = z.object({
   external_id_source_field: z.string().nullable().optional(),
   coordinate_type: DatasourceCoordinateType.default("latlon"),
   source_crs: DatasourceSourceCrs.default("4326"),
+  import_point_geometries: z.boolean().default(true),
+  import_non_point_geometries: z.boolean().default(true),
+  generate_point_from_non_point_geometries: z.boolean().default(true),
   lat_source_field: z.string().nullable().optional(),
   lon_source_field: z.string().nullable().optional(),
   geometry_source_field: z.string().nullable().optional(),

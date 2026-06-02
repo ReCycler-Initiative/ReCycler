@@ -1,6 +1,7 @@
 "use client";
 
 import { FormFooter } from "@/components/editor-template";
+import FormCheckbox from "@/components/form/form-checkbox";
 import FormInput from "@/components/form/form-input";
 import FormSelect from "@/components/form/form-select";
 import { useMessages } from "@/i18n/locale-provider";
@@ -64,6 +65,9 @@ const createDatasourceFormSchema = (messages: any) =>
       .string()
       .trim()
       .regex(/^(?:epsg:)?\d+$/i, messages.datasourceEditor.validEpsgRequired),
+    import_point_geometries: z.boolean(),
+    import_non_point_geometries: z.boolean(),
+    generate_point_from_non_point_geometries: z.boolean(),
     lat_source_field: z.string().nullable().optional(),
     lon_source_field: z.string().nullable().optional(),
     geometry_source_field: z.string().nullable().optional(),
@@ -74,7 +78,13 @@ const createDatasourceFormSchema = (messages: any) =>
         field_id: z.string().uuid(),
       })
     ),
-  });
+  }).refine(
+    (value) => !value.import_non_point_geometries || value.generate_point_from_non_point_geometries,
+    {
+      message: messages.datasourceEditor.nonPointRequiresGeneratedPoint,
+      path: ["generate_point_from_non_point_geometries"],
+    }
+  );
 
 type DatasourceFormValues = z.infer<typeof DatasourceFormSchema>;
 
@@ -131,6 +141,9 @@ export const DataSourceEditor = ({
       external_id_source_field: null,
       coordinate_type: "latlon",
       source_crs: "4326",
+      import_point_geometries: true,
+      import_non_point_geometries: true,
+      generate_point_from_non_point_geometries: true,
       lat_source_field: null,
       lon_source_field: null,
       geometry_source_field: null,
@@ -180,6 +193,10 @@ export const DataSourceEditor = ({
           external_id_source_field: ds.external_id_source_field ?? null,
           coordinate_type: ds.coordinate_type,
           source_crs: normalizeSourceCrsValue(ds.source_crs ?? "4326"),
+          import_point_geometries: ds.import_point_geometries ?? true,
+          import_non_point_geometries: ds.import_non_point_geometries ?? true,
+          generate_point_from_non_point_geometries:
+            ds.generate_point_from_non_point_geometries ?? true,
           lat_source_field: ds.lat_source_field ?? null,
           lon_source_field: ds.lon_source_field ?? null,
           geometry_source_field: ds.geometry_source_field ?? null,
@@ -369,7 +386,23 @@ export const DataSourceEditor = ({
         />
 
         {sourceFormat === "json" && (
-          <FormInput name="data_path" label={messages.datasourceEditor.dataPath} />
+          <FormField
+            control={control}
+            name="data_path"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{messages.datasourceEditor.dataPath}</FormLabel>
+                <FormControl>
+                  <FieldPathSelect
+                    options={fieldPathOptions}
+                    value={field.value ?? ""}
+                    onChange={field.onChange}
+                    placeholder={messages.datasourceEditor.selectSourceField}
+                  />
+                </FormControl>
+              </FormItem>
+            )}
+          />
         )}
 
         <FormSelect
@@ -485,6 +518,34 @@ export const DataSourceEditor = ({
               </FormItem>
             )}
           />
+
+          <div className="space-y-2 rounded-md border p-3">
+            <p className="text-sm font-medium">
+              {messages.datasourceEditor.geometryImportOptions}
+            </p>
+            <div className="space-y-2">
+              <FormCheckbox
+                name="import_point_geometries"
+                label={messages.datasourceEditor.importPointGeometries}
+              />
+              <FormCheckbox
+                name="import_non_point_geometries"
+                label={messages.datasourceEditor.importNonPointGeometries}
+              />
+              <FormCheckbox
+                name="generate_point_from_non_point_geometries"
+                label={messages.datasourceEditor.generatePointFromNonPointGeometries}
+              />
+            </div>
+            <p className="text-xs text-muted-foreground">
+              {messages.datasourceEditor.geometryImportOptionsHelp}
+            </p>
+            {formState.errors.generate_point_from_non_point_geometries && (
+              <p className="text-xs text-destructive">
+                {formState.errors.generate_point_from_non_point_geometries.message}
+              </p>
+            )}
+          </div>
 
           {coordinateType === "latlon" && (
             <>
@@ -643,6 +704,7 @@ function FieldPathSelect({
       />
     );
   }
+
   return (
     <Select value={value} onValueChange={onChange}>
       <SelectTrigger>

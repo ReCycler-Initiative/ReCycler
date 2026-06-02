@@ -201,6 +201,39 @@ const openStatusLayer: CircleLayer = {
   },
 };
 
+const areaFillLayer: Layer = {
+  id: "source-areas-fill",
+  type: "fill",
+  source: "collection_shapes",
+  filter: [
+    "any",
+    ["==", ["geometry-type"], "Polygon"],
+    ["==", ["geometry-type"], "MultiPolygon"],
+  ],
+  paint: {
+    "fill-color": "#ef4444",
+    "fill-opacity": 0.2,
+  },
+};
+
+const areaOutlineLayer: Layer = {
+  id: "source-areas-line",
+  type: "line",
+  source: "collection_shapes",
+  filter: [
+    "any",
+    ["==", ["geometry-type"], "Polygon"],
+    ["==", ["geometry-type"], "MultiPolygon"],
+    ["==", ["geometry-type"], "LineString"],
+    ["==", ["geometry-type"], "MultiLineString"],
+  ],
+  paint: {
+    "line-color": "#b91c1c",
+    "line-width": 3,
+    "line-opacity": 0.9,
+  },
+};
+
 type PopupField = { id: string; name: string; field_type: string; order: number | null; value: string[] };
 
 const parseFeatureFields = (rawFields: unknown): PopupField[] => {
@@ -347,6 +380,45 @@ const applyAllFilters = (
   return { ...afterFields, features };
 };
 
+const buildShapeCollection = (
+  geoJson: GeoJSON.FeatureCollection<GeoJSON.Geometry>
+): GeoJSON.FeatureCollection<GeoJSON.Geometry> => {
+  const features = geoJson.features.flatMap((feature) => {
+    const sourceGeometry = (feature.properties as Record<string, unknown> | undefined)
+      ?.source_geometry as GeoJSON.Geometry | undefined;
+
+    if (!sourceGeometry || sourceGeometry.type === "Point") {
+      return [];
+    }
+
+    const pointGeometry = feature.geometry;
+    if (pointGeometry.type !== "Point") {
+      return [];
+    }
+
+    return [{
+      type: "Feature" as const,
+      geometry: sourceGeometry,
+      properties: {
+        ...feature.properties,
+        popup_lon: pointGeometry.coordinates[0],
+        popup_lat: pointGeometry.coordinates[1],
+      },
+    }];
+  });
+
+  return {
+    type: "FeatureCollection",
+    features,
+  };
+};
+
+type PopupState = {
+  feature: MapboxGeoJSONFeature;
+  longitude: number;
+  latitude: number;
+};
+
 type LocationsMapProps = {
   geoJson: GeoJSON.FeatureCollection<GeoJSON.Geometry> | null;
 };
@@ -357,7 +429,7 @@ export default function LocationsMap({ geoJson }: LocationsMapProps) {
   const { user } = useUser();
   const [mapLoaded, setMapLoaded] = useState(false);
   const [styleLoaded, setStyleLoaded] = useState(true);
-  const [details, setDetails] = useState<MapboxGeoJSONFeature | null>(null);
+  const [details, setDetails] = useState<PopupState | null>(null);
   const [mapStyle, setStyle] = useState<"detail" | "satellite">("detail");
   const mapRef = useRef<MapRef>(null);
   const router = useRouter();
@@ -401,6 +473,19 @@ export default function LocationsMap({ geoJson }: LocationsMapProps) {
   const [showMaterials, setShowMaterials] = useState(false);
   const [pendingResultsHref, setPendingResultsHref] = useState(currentResultsHref);
   const previousSearchParamsKey = useRef(searchParamsKey);
+  const filteredGeoJson = useMemo(() => {
+    if (!geoJson) return null;
+    return applyAllFilters(
+      selectedMaterials,
+      selectedFieldFilters,
+      fieldChoices,
+      geoJson
+    );
+  }, [fieldChoices, geoJson, selectedFieldFilters, selectedMaterials]);
+  const shapeGeoJson = useMemo(() => {
+    if (!filteredGeoJson) return null;
+    return buildShapeCollection(filteredGeoJson);
+  }, [filteredGeoJson]);
 
   useEffect(() => {
     setPendingResultsHref(currentResultsHref);
@@ -479,16 +564,27 @@ export default function LocationsMap({ geoJson }: LocationsMapProps) {
               ? (process.env.NEXT_PUBLIC_MAPBOX_STYLE_DETAIL as string)
               : (process.env.NEXT_PUBLIC_MAPBOX_STYLE_SATELLITE as string)
           }
-          interactiveLayerIds={["point"]}
+          interactiveLayerIds={["point", "source-areas-fill", "source-areas-line"]}
           onClick={(e) => {
             if (e.features) {
               const feature = e.features[0];
-              if (
-                !feature?.properties?.cluster &&
-                feature?.geometry &&
-                feature?.geometry.type === "Point"
-              ) {
-                setDetails(feature);
+              if (!feature?.properties?.cluster && feature?.geometry) {
+                const popupLon = Number(feature.properties?.popup_lon);
+                const popupLat = Number(feature.properties?.popup_lat);
+
+                if (feature.geometry.type === "Point") {
+                  setDetails({
+                    feature,
+                    longitude: feature.geometry.coordinates[0],
+                    latitude: feature.geometry.coordinates[1],
+                  });
+                } else if (Number.isFinite(popupLon) && Number.isFinite(popupLat)) {
+                  setDetails({
+                    feature,
+                    longitude: popupLon,
+                    latitude: popupLat,
+                  });
+                }
               }
             }
           }}
@@ -535,35 +631,38 @@ export default function LocationsMap({ geoJson }: LocationsMapProps) {
             bbox={[19.0, 59.0, 32.0, 71.0]}
           />
 
-          {geoJson && (
+          {filteredGeoJson && (
             <>
               {styleLoaded && (
-                <Source
-                  id="collection_spots"
-                  type="geojson"
-                  data={applyAllFilters(
-                    selectedMaterials,
-                    selectedFieldFilters,
-                    fieldChoices,
-                    geoJson
+                <>
+                  {shapeGeoJson && shapeGeoJson.features.length > 0 && (
+                    <Source id="collection_shapes" type="geojson" data={shapeGeoJson}>
+                      <Layer {...areaFillLayer} />
+                      <Layer {...areaOutlineLayer} />
+                    </Source>
                   )}
-                  cluster
-                  clusterMaxZoom={14}
-                  clusterRadius={50}
-                >
-                  <Layer {...highlighLayer} />
-                  <Layer {...layerStyle} />
-                  <Layer {...openStatusLayer} />
-                  <Layer {...clusters} />
-                  <Layer {...clusterCount} />
-                </Source>
+                  <Source
+                    id="collection_spots"
+                    type="geojson"
+                    data={filteredGeoJson}
+                    cluster
+                    clusterMaxZoom={14}
+                    clusterRadius={50}
+                  >
+                    <Layer {...highlighLayer} />
+                    <Layer {...layerStyle} />
+                    <Layer {...openStatusLayer} />
+                    <Layer {...clusters} />
+                    <Layer {...clusterCount} />
+                  </Source>
+                </>
               )}
               <CollectionPointIcon />
               {details && (
                 <Popup
                   key={new Date().getTime()}
-                  longitude={(details.geometry as GeoJSON.Point).coordinates[0]}
-                  latitude={(details.geometry as GeoJSON.Point).coordinates[1]}
+                  longitude={details.longitude}
+                  latitude={details.latitude}
                   onClose={() => setDetails(null)}
                   anchor="bottom"
                   maxWidth="360px"
@@ -571,11 +670,11 @@ export default function LocationsMap({ geoJson }: LocationsMapProps) {
                 >
                   {(() => {
                     const openingHours = getLocalizedOpeningHours(
-                      details.properties as Record<string, unknown> | undefined,
+                      details.feature.properties as Record<string, unknown> | undefined,
                       locale
                     );
                     const description = getLocalizedDescription(
-                      details.properties as Record<string, unknown> | undefined,
+                      details.feature.properties as Record<string, unknown> | undefined,
                       locale
                     );
 
@@ -583,15 +682,15 @@ export default function LocationsMap({ geoJson }: LocationsMapProps) {
                       <>
                   <div className="p-3 border-b">
                     <h2 className="text-base font-semibold mb-1">
-                      {details.properties?.name}
+                      {details.feature.properties?.name}
                     </h2>
-                    {(details.properties?.address || details.properties?.postal_code || details.properties?.post_office) && (
+                    {(details.feature.properties?.address || details.feature.properties?.postal_code || details.feature.properties?.post_office) && (
                       <div className="flex gap-2 justify-between">
                         <address className="text-sm text-gray-900 not-italic flex flex-col leading-5 ">
-                          {details.properties?.address}
+                          {details.feature.properties?.address}
                           <span>
-                            {details.properties?.postal_code}{" "}
-                            {details.properties?.post_office}
+                            {details.feature.properties?.postal_code}{" "}
+                            {details.feature.properties?.post_office}
                           </span>
                         </address>
                       </div>
@@ -609,13 +708,13 @@ export default function LocationsMap({ geoJson }: LocationsMapProps) {
                       />
                     </div>
                   )}
-                  {parseFeatureMaterials(details.properties?.materials).length > 0 && (
+                  {parseFeatureMaterials(details.feature.properties?.materials).length > 0 && (
                     <div className="p-3 border-b">
                       <h3 className="text-xs font-medium text-muted-foreground mb-1">
                         {messages.mapPopup.materials}
                       </h3>
                       <ul className="text-sm leading-6 list-disc columns-2">
-                        {localizeMaterials(parseFeatureMaterials(details.properties?.materials), locale)
+                        {localizeMaterials(parseFeatureMaterials(details.feature.properties?.materials), locale)
                           .sort((a: Material, b: Material) =>
                             a.name.localeCompare(b.name)
                           )
@@ -636,7 +735,7 @@ export default function LocationsMap({ geoJson }: LocationsMapProps) {
                     </div>
                   )}
                   {(() => {
-                    const ohField = parseFeatureFields(details.properties?.fields)
+                    const ohField = parseFeatureFields(details.feature.properties?.fields)
                       .find((f) => f.field_type === "opening_hours");
                     if (!ohField || ohField.value.length === 0) return null;
                     const status = getOpenStatus(ohField.value);
@@ -653,7 +752,7 @@ export default function LocationsMap({ geoJson }: LocationsMapProps) {
                       </div>
                     );
                   })()}
-                  {parseFeatureFields(details.properties?.fields)
+                  {parseFeatureFields(details.feature.properties?.fields)
                     .sort((a, b) => (a.order ?? 999) - (b.order ?? 999))
                     .filter((field) => field.value.length > 0)
                     .map((field) => (
@@ -709,7 +808,7 @@ export default function LocationsMap({ geoJson }: LocationsMapProps) {
                       asChild
                     >
                       <a
-                        href={`https://www.google.com/maps/search/?api=1&query=${(details.geometry as GeoJSON.Point).coordinates[1]},${(details.geometry as GeoJSON.Point).coordinates[0]}`}
+                        href={`https://www.google.com/maps/search/?api=1&query=${details.latitude},${details.longitude}`}
                         target="_blank"
                       >
                         <span>{messages.mapPopup.openInGoogleMaps}</span>

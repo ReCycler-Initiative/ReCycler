@@ -2,6 +2,7 @@
 
 import { DataSourceEditor } from "@/components/admin/datasource-editor";
 import { PageTemplate } from "@/components/admin/page-template";
+import { useMessages } from "@/i18n/locale-provider";
 import { useParams, useRouter } from "next/navigation";
 
 const EditDataSourcePage = () => {
@@ -11,9 +12,10 @@ const EditDataSourcePage = () => {
     dataSourceId: string;
   }>();
   const router = useRouter();
+  const messages = useMessages();
 
   return (
-    <PageTemplate title="Muokkaa datalähdettä">
+    <PageTemplate title={messages.datasourceEditor.editTitle}>
       <DataSourceEditor
         organizationId={params.id}
         useCaseId={params.useCaseId}
