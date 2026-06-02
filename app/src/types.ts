@@ -254,6 +254,8 @@ export const SampleField = z.object({
 
 export const DatasourceTestResult = z.object({
   sample_fields: z.array(SampleField),
+  detected_source_crs: z.string().nullable().optional(),
+  resolved_url: z.string().url().nullable().optional(),
 });
 
 export type DatasourceTestResult = z.infer<typeof DatasourceTestResult>;

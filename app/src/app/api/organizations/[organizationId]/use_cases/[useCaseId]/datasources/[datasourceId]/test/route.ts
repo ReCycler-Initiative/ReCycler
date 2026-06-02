@@ -1,8 +1,12 @@
 import { checkOrganizationAuthorization } from "@/lib/authorization";
 import {
+  detectGeoJsonGeometryType,
+  detectGeoJsonSourceCrs,
   getWfsConfigurationHint,
+  getUnsupportedGeometryHint,
   isGeoJsonLikeSourceFormat,
-  isWfsCapabilitiesRequest,
+  isSupportedLocationGeometryType,
+  resolveWfsUrl,
 } from "@/lib/datasource";
 import { DatasourceTestResult } from "@/types";
 import { NextRequest, NextResponse } from "next/server";
@@ -97,19 +101,28 @@ export async function POST(request: NextRequest, { params }: Params) {
   const { url, source_format, auth_type, auth_header, auth_credential, data_path } =
     parsed.data;
 
-  if (source_format === "wfs" && isWfsCapabilitiesRequest(url)) {
-    return NextResponse.json({ error: getWfsConfigurationHint(url) }, { status: 422 });
-  }
-
   const headers = buildHeaders(auth_type, auth_header, auth_credential);
-  const fetchUrl = appendQueryParam(url, auth_type, auth_header, auth_credential);
+  const initialFetchUrl = appendQueryParam(url, auth_type, auth_header, auth_credential);
+
+  let fetchUrl = initialFetchUrl;
+  let resolvedSourceCrs: string | null = null;
+  if (source_format === "wfs") {
+    try {
+      const resolved = await resolveWfsUrl(initialFetchUrl);
+      fetchUrl = resolved.resolvedUrl;
+      resolvedSourceCrs = resolved.sourceCrs;
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err);
+      return NextResponse.json({ error: message }, { status: 422 });
+    }
+  }
 
   let responseData: unknown;
   try {
     const res = await fetch(fetchUrl, { headers, signal: AbortSignal.timeout(15_000) });
 
     if (!res.ok) {
-      const detail = source_format === "wfs" ? ` ${getWfsConfigurationHint(url)}` : "";
+      const detail = source_format === "wfs" ? ` ${getWfsConfigurationHint(fetchUrl)}` : "";
       return NextResponse.json(
         { error: `Source API responded with ${res.status} ${res.statusText}.${detail}`.trim() },
         { status: 422 }
@@ -118,13 +131,13 @@ export async function POST(request: NextRequest, { params }: Params) {
 
     const contentType = res.headers.get("content-type") ?? "";
     if (source_format === "wfs" && !contentType.toLowerCase().includes("json")) {
-      return NextResponse.json({ error: getWfsConfigurationHint(url) }, { status: 422 });
+      return NextResponse.json({ error: getWfsConfigurationHint(fetchUrl) }, { status: 422 });
     }
 
     responseData = await res.json();
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : String(err);
-    const detail = source_format === "wfs" ? ` ${getWfsConfigurationHint(url)}` : "";
+    const detail = source_format === "wfs" ? ` ${getWfsConfigurationHint(fetchUrl)}` : "";
     return NextResponse.json(
       { error: `Failed to reach URL: ${message}.${detail}`.trim() },
       { status: 422 }
@@ -139,11 +152,23 @@ export async function POST(request: NextRequest, { params }: Params) {
     if (!first) {
       return NextResponse.json({ error: "GeoJSON has no features" }, { status: 422 });
     }
+    const detectedGeometryType = detectGeoJsonGeometryType(responseData);
+    if (!isSupportedLocationGeometryType(detectedGeometryType)) {
+      return NextResponse.json(
+        { error: getUnsupportedGeometryHint(detectedGeometryType) },
+        { status: 422 }
+      );
+    }
     // Return geometry path + properties keys
     const propertyPaths = extractDotPaths(first.properties ?? {}, "properties");
     const geomPaths = [{ path: "geometry", sampleValue: JSON.stringify(first.geometry).slice(0, 80) }];
+    const detectedSourceCrs = detectGeoJsonSourceCrs(responseData, fetchUrl) ?? resolvedSourceCrs;
     return NextResponse.json(
-      DatasourceTestResult.parse({ sample_fields: [...geomPaths, ...propertyPaths] })
+      DatasourceTestResult.parse({
+        sample_fields: [...geomPaths, ...propertyPaths],
+        detected_source_crs: detectedSourceCrs,
+        resolved_url: source_format === "wfs" ? fetchUrl : null,
+      })
     );
   }
 
@@ -174,5 +199,11 @@ export async function POST(request: NextRequest, { params }: Params) {
 
   const sample_fields = extractDotPaths(sampleItem);
 
-  return NextResponse.json(DatasourceTestResult.parse({ sample_fields }));
+  return NextResponse.json(
+    DatasourceTestResult.parse({
+      sample_fields,
+      detected_source_crs: null,
+      resolved_url: null,
+    })
+  );
 }

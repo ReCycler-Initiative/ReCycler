@@ -10,6 +10,7 @@ import {
 } from "@/components/admin/admin-map-view";
 import { SplitMapLayout } from "@/components/admin/split-map-layout";
 import { PageTemplate } from "@/components/admin/page-template";
+import { UseCasePageIntro } from "@/components/admin/use-case-page-intro";
 import { LocationEditPanel } from "@/components/admin/location-edit-panel";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -159,32 +160,35 @@ const LocationsPage = () => {
   }, [relocateMode, pickedLngLat, editId, locations]);
 
   return (
-    <PageTemplate
-      title={messages.adminLocations.title}
-      actions={!addMode ? (
-        <Button
-          type="button"
-          onClick={() => {
-            setAddMode((current) => {
-              const next = !current;
-              if (next) {
-                setEditId(null);
-                setSelectedId(null);
-                setRelocateMode(false);
-                setPickedLngLat(null);
-              } else {
-                setAddDraft(null);
-              }
-              return next;
-            });
-          }}
-        >
-          <Plus className="h-4 w-4" />
-          {messages.adminLocations.addLocation}
-        </Button>
-      ) : undefined}
-      mode="fullScreen"
-    >
+    <PageTemplate mode="fullScreen">
+      <div className="flex-none px-4 py-6">
+        <UseCasePageIntro
+          title={messages.adminLocations.title}
+          description={messages.admin.useCaseHomeHighlights[1]}
+          actions={!addMode ? (
+            <Button
+              type="button"
+              onClick={() => {
+                setAddMode((current) => {
+                  const next = !current;
+                  if (next) {
+                    setEditId(null);
+                    setSelectedId(null);
+                    setRelocateMode(false);
+                    setPickedLngLat(null);
+                  } else {
+                    setAddDraft(null);
+                  }
+                  return next;
+                });
+              }}
+            >
+              <Plus className="h-4 w-4" />
+              {messages.adminLocations.addLocation}
+            </Button>
+          ) : undefined}
+        />
+      </div>
       {isLoading && (
         <div className="flex items-center justify-center h-96">
           <p className="text-muted-foreground">{messages.adminLocations.loadingLocations}</p>

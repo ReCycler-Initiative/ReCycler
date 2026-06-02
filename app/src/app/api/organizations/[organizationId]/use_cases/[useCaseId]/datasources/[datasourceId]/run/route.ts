@@ -2,10 +2,13 @@ import db from "@/services/db";
 import { checkOrganizationAuthorization } from "@/lib/authorization";
 import { decryptSecret } from "@/lib/crypto";
 import {
+  detectGeoJsonGeometryType,
   getWfsConfigurationHint,
+  getUnsupportedGeometryHint,
   isGeoJsonLikeSourceFormat,
-  isWfsCapabilitiesRequest,
+  isSupportedLocationGeometryType,
   parseSourceSrid,
+  resolveWfsUrl,
 } from "@/lib/datasource";
 import { DatasourceRun } from "@/types";
 import { NextRequest, NextResponse } from "next/server";
@@ -103,19 +106,16 @@ export async function POST(request: NextRequest, { params }: Params) {
       datasource.auth_credentials_ciphertext
     );
 
-    const fetchUrl = appendQueryParam(
+    const initialFetchUrl = appendQueryParam(
       datasource.url,
       datasource.auth_type,
       datasource.auth_header,
       datasource.auth_credentials_ciphertext
     );
 
-    if (
-      datasource.source_format === "wfs" &&
-      isWfsCapabilitiesRequest(fetchUrl)
-    ) {
-      throw new Error(getWfsConfigurationHint(fetchUrl));
-    }
+    const fetchUrl = datasource.source_format === "wfs"
+      ? (await resolveWfsUrl(initialFetchUrl)).resolvedUrl
+      : initialFetchUrl;
 
     const res = await fetch(fetchUrl, {
       headers,
@@ -141,6 +141,13 @@ export async function POST(request: NextRequest, { params }: Params) {
     }
 
     const responseData: unknown = await res.json();
+    if (isGeoJsonLikeSourceFormat(datasource.source_format as string | undefined)) {
+      const detectedGeometryType = detectGeoJsonGeometryType(responseData);
+      if (!isSupportedLocationGeometryType(detectedGeometryType)) {
+        throw new Error(getUnsupportedGeometryHint(detectedGeometryType));
+      }
+    }
+
     const items = extractItems(datasource, responseData);
 
     for (const item of items) {

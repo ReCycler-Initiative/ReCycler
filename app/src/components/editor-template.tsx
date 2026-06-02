@@ -4,10 +4,12 @@ import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 import { useMessages } from "@/i18n/locale-provider";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { LucideIcon } from "lucide-react";
 import Link from "next/link";
 import { ReactNode } from "react";
 import { DefaultValues, FieldValues, useForm } from "react-hook-form";
 import { toast } from "sonner";
+import { UseCasePageIntro } from "@/components/admin/use-case-page-intro";
 
 // ---------- FormFooter ----------
 
@@ -138,19 +140,26 @@ export const EditorTemplate = <ApiData, FormData extends FieldValues>({
   query,
   mutation,
   title,
-}: { children: ReactNode; title: string } & UseEditorReturn<
+  introDescription,
+  introIcon,
+}: { children: ReactNode; title: string; introDescription?: string; introIcon?: LucideIcon } & UseEditorReturn<
   ApiData,
   FormData
 >) => {
-  const messages = useMessages();
-
   return (
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit((values) => mutation.mutateAsync(values))}
         className="space-y-4"
       >
-        <PageTemplate title={title}>
+        <PageTemplate>
+          {introDescription ? (
+            <UseCasePageIntro
+              title={title}
+              description={introDescription}
+              icon={introIcon}
+            />
+          ) : null}
           <LoadingState isLoading={query.isLoading} error={!!query.error}>
             {children}
             <FormFooter

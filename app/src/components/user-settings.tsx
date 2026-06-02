@@ -10,6 +10,7 @@ import { z } from "zod";
 import Container from "./container";
 import LoadingSpinner from "./loading-spinner";
 import { useMessages } from "@/i18n/locale-provider";
+import { UseCasePageIntro } from "@/components/admin/use-case-page-intro";
 
 function OrganizationCard({ org }: { org: z.infer<typeof Organization> }) {
   const messages = useMessages();
@@ -80,7 +81,10 @@ export default function UserSettings() {
   return (
     <Container>
       <div className="max-w-3xl mx-auto space-y-6 py-6">
-        <h1 className="text-2xl font-semibold mb-4">{messages.userSettings.pageTitle}</h1>
+        <UseCasePageIntro
+          title={messages.userSettings.pageTitle}
+          description={messages.userSettings.pageDescription}
+        />
 
         {/* User data */}
         <section className="rounded-lg border border-gray-200 p-4 bg-white shadow-sm">

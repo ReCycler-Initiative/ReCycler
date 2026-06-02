@@ -34,7 +34,11 @@ const UseCaseInfoPage = () => {
   });
 
   return (
-    <EditorTemplate {...editor} title={messages.adminUseCaseEditor.title}>
+    <EditorTemplate
+      {...editor}
+      title={messages.adminUseCaseEditor.title}
+      introDescription={messages.adminUseCaseEditor.description}
+    >
       <Tabs defaultValue="info" className="my-2 max-w-6xl">
         <TabsList className="w-full mb-6">
           <TabsTrigger value="info" className="flex-1">

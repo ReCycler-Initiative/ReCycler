@@ -1,6 +1,7 @@
 "use client";
 
 import { PageTemplate } from "@/components/admin/page-template";
+import { UseCasePageIntro } from "@/components/admin/use-case-page-intro";
 import { Button } from "@/components/ui/button";
 import {
   getDatasourceRuns,
@@ -11,12 +12,7 @@ import { Datasource, DatasourceRun } from "@/types";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
 import { toast } from "sonner";
-
-const statusLabel: Record<string, string> = {
-  running: "Käynnissä",
-  completed: "Valmis",
-  failed: "Epäonnistui",
-};
+import { useLocale, useMessages } from "@/i18n/locale-provider";
 
 const statusPillClass: Record<string, string> = {
   running: "bg-blue-100 text-blue-800",
@@ -24,12 +20,13 @@ const statusPillClass: Record<string, string> = {
   failed: "bg-red-100 text-red-800",
 };
 
-function formatDate(date: Date | undefined | null) {
+function formatDate(date: Date | undefined | null, locale: string) {
   if (!date) return "—";
-  return new Date(date).toLocaleString("fi-FI");
+  return new Date(date).toLocaleString(locale);
 }
 
 export default function RunsPage() {
+  const messages = useMessages();
   const params = useParams<{ id: string; useCaseId: string }>();
   const organizationId = params.id;
   const { useCaseId } = params;
@@ -44,21 +41,27 @@ export default function RunsPage() {
     mutationFn: (datasourceId: string) =>
       runDatasource(organizationId, useCaseId, datasourceId),
     onSuccess: (run, datasourceId) => {
-      toast.success(`Synkronointi valmis — ${run.rows_synced ?? 0} sijaintia`);
+      const synced = run.rows_synced ?? 0;
+      const failed = run.rows_failed ?? 0;
+      toast.success(
+        `${messages.admin.syncCompleted} - ${synced} ${messages.admin.rowsImported}, ${failed} ${messages.admin.rowsFailedLabel}`
+      );
       queryClient.invalidateQueries({
         queryKey: ["datasource-runs", organizationId, useCaseId, datasourceId],
       });
     },
-    onError: () => toast.error("Synkronointi epäonnistui"),
+    onError: () => toast.error(messages.admin.syncFailed),
   });
 
   return (
-    <PageTemplate title="Synkronointiajot">
+    <PageTemplate>
       <div className="flex flex-col gap-6">
+        <UseCasePageIntro
+          title={messages.admin.runsPageTitle}
+          description={messages.admin.runsIntro}
+        />
         {datasources.length === 0 && (
-          <p className="text-sm text-gray-500">
-            Ei datalähteitä. Luo ensin datalähde Datayhteydet-välilehdellä.
-          </p>
+          <p className="text-sm text-gray-500">{messages.admin.noDatasources}</p>
         )}
         {datasources.map((ds: Datasource) => (
           <DatasourceRunsSection
@@ -88,6 +91,15 @@ function DatasourceRunsSection({
   onRun: () => void;
   isRunning: boolean;
 }) {
+  const { locale } = useLocale();
+  const messages = useMessages();
+
+  const statusLabel: Record<string, string> = {
+    running: messages.admin.statusRunning,
+    completed: messages.admin.statusSuccess,
+    failed: messages.admin.statusError,
+  };
+
   const { data: runs = [], isLoading } = useQuery({
     queryKey: ["datasource-runs", organizationId, useCaseId, datasource.id],
     queryFn: () => getDatasourceRuns(organizationId, useCaseId, datasource.id),
@@ -105,13 +117,13 @@ function DatasourceRunsSection({
           </p>
         </div>
         <Button size="sm" onClick={onRun} disabled={isRunning}>
-          {isRunning ? "Ajetaan..." : "Käynnistä ajo"}
+          {isRunning ? `${messages.admin.runInProgress}...` : messages.admin.startRun}
         </Button>
       </div>
 
-      {isLoading && <p className="p-4 text-sm text-gray-500">Ladataan...</p>}
+      {isLoading && <p className="p-4 text-sm text-gray-500">{messages.admin.loadingRuns}</p>}
       {!isLoading && runs.length === 0 && (
-        <p className="p-4 text-sm text-gray-500">Ei ajoja.</p>
+        <p className="p-4 text-sm text-gray-500">{messages.admin.noRuns}</p>
       )}
       <div className="divide-y divide-gray-100">
         {runs.map((run: DatasourceRun) => (
@@ -129,21 +141,21 @@ function DatasourceRunsSection({
                 {statusLabel[run.status] ?? run.status}
               </span>
               <span className="text-gray-700">
-                {formatDate(run.started_at)}
+                {formatDate(run.started_at, locale)}
               </span>
               {run.finished_at && (
                 <span className="text-gray-400 text-xs">
-                  → {formatDate(run.finished_at)}
+                  → {formatDate(run.finished_at, locale)}
                 </span>
               )}
             </div>
             <div className="flex gap-4 text-xs text-gray-500">
               {run.rows_synced != null && (
-                <span>{run.rows_synced} päivitetty</span>
+                <span>{run.rows_synced} {messages.admin.rowsUpdated}</span>
               )}
               {run.rows_failed != null && run.rows_failed > 0 && (
                 <span className="text-red-600">
-                  {run.rows_failed} virheellistä
+                  {run.rows_failed} {messages.admin.rowsFailedLabel}
                 </span>
               )}
               {run.error_message && (

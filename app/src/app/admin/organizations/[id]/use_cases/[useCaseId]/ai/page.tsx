@@ -1,6 +1,7 @@
 "use client";
 
 import { PageTemplate } from "@/components/admin/page-template";
+import { UseCasePageIntro } from "@/components/admin/use-case-page-intro";
 import { Button } from "@/components/ui/button";
 import { FileText, Files, HardDrive, Trash2, Upload } from "lucide-react";
 import { useMessages } from "@/i18n/locale-provider";
@@ -53,13 +54,14 @@ export default function AiPage() {
   });
 
   return (
-    <PageTemplate title={messages.adminAiPage.title}>
+    <PageTemplate>
       <div className="flex flex-col gap-6">
+        <UseCasePageIntro
+          title={messages.adminAiPage.title}
+          description={messages.adminAiPage.description}
+        />
         <section className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
           <h2 className="text-lg font-medium text-gray-900">{messages.adminAiPage.trainingMaterials}</h2>
-          <p className="mt-2 text-sm text-gray-600">
-            {messages.adminAiPage.description}
-          </p>
 
           <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-3">
             <div className="rounded-lg border border-gray-200 bg-white p-4">

@@ -135,7 +135,7 @@ export const DataSourceEditor = ({
     },
   });
 
-  const { register, control, handleSubmit, getValues, formState, reset } = form;
+  const { register, control, handleSubmit, getValues, formState, reset, setValue } = form;
 
   const {
     fields: mappingRows,
@@ -234,6 +234,18 @@ export const DataSourceEditor = ({
       });
 
       setSampleFields(result.sample_fields);
+      if (result.detected_source_crs) {
+        setValue("source_crs", result.detected_source_crs, {
+          shouldDirty: true,
+          shouldValidate: true,
+        });
+      }
+      if (result.resolved_url && result.resolved_url !== values.url) {
+        setValue("url", result.resolved_url, {
+          shouldDirty: true,
+          shouldValidate: true,
+        });
+      }
       setConnectionStatus("success");
     } catch (err: unknown) {
       setConnectionStatus("error");
@@ -460,6 +472,11 @@ export const DataSourceEditor = ({
                   Anna lähdedatan EPSG-koodi, esim. 4326 tai 3067. Kohteet muunnetaan
                   automaattisesti WGS84 / Mapbox-muotoon tuonnin aikana.
                 </p>
+                {sourceFormat === "wfs" && (
+                  <p className="text-xs text-muted-foreground">
+                    Testaa yhteys yrittää lukea koordinaatiston automaattisesti WFS-vastauksesta.
+                  </p>
+                )}
               </FormItem>
             )}
           />
