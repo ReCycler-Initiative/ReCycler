@@ -10,6 +10,7 @@ import {
 } from "@/services/api";
 import { Datasource, DatasourceRun } from "@/types";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { Play } from "lucide-react";
 import { useParams } from "next/navigation";
 import { toast } from "sonner";
 import { useLocale, useMessages } from "@/i18n/locale-provider";
@@ -23,6 +24,19 @@ const statusPillClass: Record<string, string> = {
 function formatDate(date: Date | undefined | null, locale: string) {
   if (!date) return "—";
   return new Date(date).toLocaleString(locale);
+}
+
+function formatRunToast(
+  messages: ReturnType<typeof useMessages>,
+  synced: number,
+  skipped: number,
+  failed: number
+) {
+  if (synced === 0 && skipped > 0 && failed === 0) {
+    return `${messages.admin.syncCompleted} - ${messages.admin.noChangedOrImportedRows}`;
+  }
+
+  return `${messages.admin.syncCompleted} - ${synced} ${messages.admin.rowsChangedOrImported}, ${skipped} ${messages.admin.rowsSkippedLabel}, ${failed} ${messages.admin.rowsFailedLabel}`;
 }
 
 export default function RunsPage() {
@@ -42,10 +56,9 @@ export default function RunsPage() {
       runDatasource(organizationId, useCaseId, datasourceId),
     onSuccess: (run, datasourceId) => {
       const synced = run.rows_synced ?? 0;
+      const skipped = run.rows_skipped ?? 0;
       const failed = run.rows_failed ?? 0;
-      toast.success(
-        `${messages.admin.syncCompleted} - ${synced} ${messages.admin.rowsImported}, ${failed} ${messages.admin.rowsFailedLabel}`
-      );
+      toast.success(formatRunToast(messages, synced, skipped, failed));
       queryClient.invalidateQueries({
         queryKey: ["datasource-runs", organizationId, useCaseId, datasourceId],
       });
@@ -117,6 +130,7 @@ function DatasourceRunsSection({
           </p>
         </div>
         <Button size="sm" onClick={onRun} disabled={isRunning}>
+          <Play className={isRunning ? "mr-2 h-4 w-4 animate-bounce" : "mr-2 h-4 w-4"} />
           {isRunning ? `${messages.admin.runInProgress}...` : messages.admin.startRun}
         </Button>
       </div>
@@ -152,6 +166,9 @@ function DatasourceRunsSection({
             <div className="flex gap-4 text-xs text-gray-500">
               {run.rows_synced != null && (
                 <span>{run.rows_synced} {messages.admin.rowsUpdated}</span>
+              )}
+              {run.rows_skipped != null && run.rows_skipped > 0 && (
+                <span>{run.rows_skipped} {messages.admin.rowsSkippedLabel}</span>
               )}
               {run.rows_failed != null && run.rows_failed > 0 && (
                 <span className="text-red-600">

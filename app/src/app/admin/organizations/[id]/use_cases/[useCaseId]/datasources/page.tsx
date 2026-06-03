@@ -28,6 +28,19 @@ const statusPillClass: Record<string, string> = {
   disabled: "bg-yellow-100 text-yellow-800",
 };
 
+function formatRunToast(
+  messages: ReturnType<typeof useMessages>,
+  synced: number,
+  skipped: number,
+  failed: number
+) {
+  if (synced === 0 && skipped > 0 && failed === 0) {
+    return `${messages.admin.syncCompleted} - ${messages.admin.noChangedOrImportedRows}`;
+  }
+
+  return `${messages.admin.syncCompleted} - ${synced} ${messages.admin.rowsChangedOrImported}, ${skipped} ${messages.admin.rowsSkippedLabel}, ${failed} ${messages.admin.rowsFailedLabel}`;
+}
+
 const DatasourcesPage = () => {
   const messages = useMessages();
   const params = useParams<{ id: string; useCaseId: string }>();
@@ -46,10 +59,9 @@ const DatasourcesPage = () => {
       runDatasource(organizationId, useCaseId, datasourceId),
     onSuccess: (run) => {
       const synced = run.rows_synced ?? 0;
+      const skipped = run.rows_skipped ?? 0;
       const failed = run.rows_failed ?? 0;
-      toast.success(
-        `Synkronointi valmis — ${synced} kohdetta tuotu, ${failed} epäonnistui`
-      );
+      toast.success(formatRunToast(messages, synced, skipped, failed));
       queryClient.invalidateQueries({
         queryKey: ["datasources", organizationId, useCaseId],
       });
@@ -161,6 +173,10 @@ const DatasourcesPage = () => {
                     </td>
                     <td className="px-4 py-4">
                       <div className="flex gap-1 justify-end">
+                        {(() => {
+                          const isRunning = runMutation.isPending && runMutation.variables === ds.id;
+
+                          return (
                         <Button
                           variant="ghost"
                           size="icon"
@@ -169,8 +185,10 @@ const DatasourcesPage = () => {
                           aria-label="Aja synkronointi"
                           title="Aja synkronointi"
                         >
-                          <Play className="h-4 w-4" />
+                          <Play className={isRunning ? "h-4 w-4 animate-bounce" : "h-4 w-4"} />
                         </Button>
+                          );
+                        })()}
                         <Button
                           variant="ghost"
                           size="icon"

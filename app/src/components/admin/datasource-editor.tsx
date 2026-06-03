@@ -40,7 +40,7 @@ import {
 } from "@/types";
 import axios from "axios";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Trash2 } from "lucide-react";
+import { Cable, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useFieldArray, useForm, useWatch } from "react-hook-form";
 import { toast } from "sonner";
@@ -355,6 +355,13 @@ export const DataSourceEditor = ({
               onClick={handleTestConnection}
               disabled={connectionStatus === "testing"}
             >
+              <Cable
+                className={
+                  connectionStatus === "testing"
+                    ? "mr-2 h-4 w-4 animate-bounce"
+                    : "mr-2 h-4 w-4"
+                }
+              />
               {connectionStatus === "testing"
                 ? messages.datasourceEditor.testing
                 : messages.datasourceEditor.testConnection}

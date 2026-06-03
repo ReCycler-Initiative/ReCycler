@@ -238,6 +238,7 @@ async function fetchJsonPages(
     .returning("*");
 
   let rowsSynced = 0;
+  let rowsSkipped = 0;
   let rowsFailed = 0;
   let errorMessage: string | null = null;
 
@@ -332,33 +333,77 @@ async function fetchJsonPages(
               ?::uuid AS use_case_id,
               ST_Transform(ST_SetSRID(ST_MakePoint(?, ?), ?), 4326) AS fallback_geom,
               CASE
-                WHEN ? IS NULL THEN NULL
-                ELSE ST_Transform(ST_Force2D(ST_SetSRID(ST_GeomFromGeoJSON(?), ?)), 4326)
+                WHEN ?::text IS NULL THEN NULL
+                ELSE ST_Transform(ST_Force2D(ST_SetSRID(ST_GeomFromGeoJSON(?::text), ?)), 4326)
               END AS source_geom,
               ?::text AS external_id,
               ?::uuid AS datasource_id
+          ),
+          upserted AS (
+            INSERT INTO recycler.locations (id, name, use_case_id, geom, source_geom, external_id, datasource_id)
+            SELECT
+              id,
+              name,
+              use_case_id,
+              CASE
+                WHEN source_geom IS NULL THEN fallback_geom
+                ELSE ST_PointOnSurface(source_geom)
+              END AS geom,
+              source_geom,
+              external_id,
+              datasource_id
+            FROM incoming
+            ON CONFLICT (datasource_id, external_id)
+            WHERE datasource_id IS NOT NULL AND external_id IS NOT NULL
+            DO UPDATE SET
+              name = EXCLUDED.name,
+              geom = EXCLUDED.geom,
+              source_geom = EXCLUDED.source_geom,
+              updated_at = now()
+            WHERE
+              recycler.locations.name IS DISTINCT FROM EXCLUDED.name
+              OR NOT ST_Equals(recycler.locations.geom, EXCLUDED.geom)
+              OR (
+                (recycler.locations.source_geom IS NULL) <> (EXCLUDED.source_geom IS NULL)
+              )
+              OR (
+                recycler.locations.source_geom IS NOT NULL
+                AND EXCLUDED.source_geom IS NOT NULL
+                AND NOT ST_Equals(recycler.locations.source_geom, EXCLUDED.source_geom)
+              )
+            RETURNING id, true AS changed
+          ),
+          existing AS (
+            SELECT l.id, false AS changed
+            FROM recycler.locations l
+            CROSS JOIN incoming
+            WHERE l.datasource_id = incoming.datasource_id
+              AND (
+                l.external_id IS NOT DISTINCT FROM incoming.external_id
+                OR (
+                  incoming.external_id IS NULL
+                  AND l.external_id IS NULL
+                  AND l.name = incoming.name
+                  AND (
+                    (
+                      incoming.source_geom IS NOT NULL
+                      AND l.source_geom IS NOT NULL
+                      AND ST_Equals(l.source_geom, incoming.source_geom)
+                    )
+                    OR (
+                      incoming.source_geom IS NULL
+                      AND l.source_geom IS NULL
+                      AND ST_Equals(l.geom, incoming.fallback_geom)
+                    )
+                  )
+                )
+              )
           )
-          INSERT INTO recycler.locations (id, name, use_case_id, geom, source_geom, external_id, datasource_id)
-          SELECT
-            id,
-            name,
-            use_case_id,
-            CASE
-              WHEN source_geom IS NULL THEN fallback_geom
-              ELSE ST_PointOnSurface(source_geom)
-            END AS geom,
-            source_geom,
-            external_id,
-            datasource_id
-          FROM incoming
-          ON CONFLICT (datasource_id, external_id)
-          WHERE datasource_id IS NOT NULL AND external_id IS NOT NULL
-          DO UPDATE SET
-            name = EXCLUDED.name,
-            geom = EXCLUDED.geom,
-            source_geom = EXCLUDED.source_geom,
-            updated_at = now()
-          RETURNING id
+          SELECT id, changed FROM upserted
+          UNION ALL
+          SELECT id, changed FROM existing
+          WHERE NOT EXISTS (SELECT 1 FROM upserted)
+          LIMIT 1
           `,
           [
             locationName,
@@ -374,7 +419,13 @@ async function fetchJsonPages(
           ]
         );
 
+        if (upsertResult.rows.length === 0) {
+          rowsFailed++;
+          continue;
+        }
+
         const locationId: string = upsertResult.rows[0].id;
+        const changed = Boolean(upsertResult.rows[0].changed);
 
         // Upsert field values
         for (const mapping of mappings) {
@@ -398,7 +449,11 @@ async function fetchJsonPages(
           );
         }
 
-        rowsSynced++;
+        if (changed) {
+          rowsSynced++;
+        } else {
+          rowsSkipped++;
+        }
       } catch (rowErr: unknown) {
         console.error("[datasource run] row failed:", rowErr);
         rowsFailed++;
@@ -409,7 +464,9 @@ async function fetchJsonPages(
 
   const finishedAt = new Date();
   const finalStatus =
-    errorMessage || (rowsFailed > 0 && rowsSynced === 0) ? "failed" : "completed";
+    errorMessage || (rowsFailed > 0 && rowsSynced === 0 && rowsSkipped === 0)
+      ? "failed"
+      : "completed";
 
   const [updatedRun] = await db("recycler.datasource_runs")
     .where({ id: run.id })
@@ -417,6 +474,7 @@ async function fetchJsonPages(
       status: finalStatus,
       finished_at: finishedAt,
       rows_synced: rowsSynced,
+      rows_skipped: rowsSkipped,
       rows_failed: rowsFailed,
       error_message: errorMessage,
     })
