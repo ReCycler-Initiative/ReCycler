@@ -102,24 +102,38 @@ const selectedAreaFillLayer: FillLayer = {
   ],
   paint: {
     "fill-color": "#facc15",
-    "fill-opacity": 0.35,
+    "fill-opacity": 0.42,
   },
 };
 
-const selectedAreaOutlineLayer: LineLayer = {
-  id: "admin-selected-source-area-line",
+const selectedPolygonOutlineLayer: LineLayer = {
+  id: "admin-selected-source-polygon-line",
   type: "line",
   source: "admin-collection-shapes",
   filter: [
     "any",
     ["==", ["geometry-type"], "Polygon"],
     ["==", ["geometry-type"], "MultiPolygon"],
+  ],
+  paint: {
+    "line-color": "#f59e0b",
+    "line-width": 5,
+    "line-opacity": 1,
+  },
+};
+
+const selectedLineHighlightLayer: LineLayer = {
+  id: "admin-selected-source-line",
+  type: "line",
+  source: "admin-selected-shapes",
+  filter: [
+    "any",
     ["==", ["geometry-type"], "LineString"],
     ["==", ["geometry-type"], "MultiLineString"],
   ],
   paint: {
     "line-color": "#f59e0b",
-    "line-width": 5,
+    "line-width": 7,
     "line-opacity": 1,
   },
 };
@@ -149,6 +163,24 @@ function buildShapeCollection(
   };
 }
 
+function buildSelectedShapeCollection(
+  geoJson: GeoJSON.FeatureCollection<GeoJSON.Geometry>,
+  selectedId: string | null | undefined
+): GeoJSON.FeatureCollection<GeoJSON.Geometry> | null {
+  if (!selectedId) return null;
+
+  const selectedFeatures = buildShapeCollection(geoJson).features.filter(
+    (feature) => feature.properties?.id === selectedId
+  );
+
+  if (selectedFeatures.length === 0) return null;
+
+  return {
+    type: "FeatureCollection",
+    features: selectedFeatures,
+  };
+}
+
 export const AdminMapView = ({
   locations,
   geoJson,
@@ -168,6 +200,9 @@ export const AdminMapView = ({
   const prevDraftMarker = useRef<{ longitude: number; latitude: number } | undefined>(undefined);
   const lastAutoFitKeyRef = useRef<string | null>(null);
   const shapeGeoJson = geoJson ? buildShapeCollection(geoJson) : null;
+  const selectedShapeGeoJson = geoJson
+    ? buildSelectedShapeCollection(geoJson, selectedId)
+    : null;
 
   useEffect(() => {
     const map = mapRef.current?.getMap();
@@ -280,7 +315,8 @@ export const AdminMapView = ({
           "admin-source-areas-fill",
           "admin-source-areas-line",
           "admin-selected-source-area-fill",
-          "admin-selected-source-area-line",
+          "admin-selected-source-polygon-line",
+          "admin-selected-source-line",
         ]}
         onLoad={() => setMapLoaded(true)}
         maxBounds={finlandBounds}
@@ -308,26 +344,20 @@ export const AdminMapView = ({
             <Layer {...shapeInteractionLayer} />
             <Layer {...areaFillLayer} />
             <Layer {...areaOutlineLayer} />
-            {selectedId && (
-              <>
-                <Layer
-                  {...selectedAreaFillLayer}
-                  filter={[
-                    "all",
-                    selectedAreaFillLayer.filter!,
-                    ["==", ["get", "id"], selectedId],
-                  ]}
-                />
-                <Layer
-                  {...selectedAreaOutlineLayer}
-                  filter={[
-                    "all",
-                    selectedAreaOutlineLayer.filter!,
-                    ["==", ["get", "id"], selectedId],
-                  ]}
-                />
-              </>
-            )}
+          </Source>
+        )}
+
+        {selectedShapeGeoJson && selectedShapeGeoJson.features.length > 0 && (
+          <Source id="admin-selected-shapes" type="geojson" data={selectedShapeGeoJson}>
+            <Layer
+              {...selectedAreaFillLayer}
+              source="admin-selected-shapes"
+            />
+            <Layer
+              {...selectedPolygonOutlineLayer}
+              source="admin-selected-shapes"
+            />
+            <Layer {...selectedLineHighlightLayer} />
           </Source>
         )}
 
