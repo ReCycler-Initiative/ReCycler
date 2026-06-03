@@ -555,6 +555,10 @@ export default function LocationsMap({ geoJson }: LocationsMapProps) {
   const [showMaterials, setShowMaterials] = useState(false);
   const [pendingResultsHref, setPendingResultsHref] = useState(currentResultsHref);
   const previousSearchParamsKey = useRef(searchParamsKey);
+  const selectedLocationId =
+    typeof details?.feature.properties?.id === "string"
+      ? details.feature.properties.id
+      : null;
   const filteredGeoJson = useMemo(() => {
     if (!geoJson) return null;
     return applyAllFilters(
@@ -568,6 +572,14 @@ export default function LocationsMap({ geoJson }: LocationsMapProps) {
     if (!filteredGeoJson) return null;
     return buildShapeCollection(filteredGeoJson);
   }, [filteredGeoJson]);
+  const selectedShapeGeoJson = useMemo(() => {
+    if (!filteredGeoJson) return null;
+    return buildSelectedShapeCollection(filteredGeoJson, selectedLocationId);
+  }, [filteredGeoJson, selectedLocationId]);
+  const selectedPointGeoJson = useMemo(() => {
+    if (!filteredGeoJson) return null;
+    return buildSelectedPointCollection(filteredGeoJson, selectedLocationId);
+  }, [filteredGeoJson, selectedLocationId]);
 
   useEffect(() => {
     setPendingResultsHref(currentResultsHref);
@@ -599,6 +611,10 @@ export default function LocationsMap({ geoJson }: LocationsMapProps) {
 
     map.on("mouseenter", "point", showPointer);
     map.on("mouseleave", "point", hidePointer);
+    map.on("mouseenter", "source-areas-fill", showPointer);
+    map.on("mouseleave", "source-areas-fill", hidePointer);
+    map.on("mouseenter", "source-areas-line", showPointer);
+    map.on("mouseleave", "source-areas-line", hidePointer);
     map.on("style.load", onStyleLoad);
 
     geolocateControlRef.current?.trigger();
@@ -646,7 +662,13 @@ export default function LocationsMap({ geoJson }: LocationsMapProps) {
               ? (process.env.NEXT_PUBLIC_MAPBOX_STYLE_DETAIL as string)
               : (process.env.NEXT_PUBLIC_MAPBOX_STYLE_SATELLITE as string)
           }
-          interactiveLayerIds={["point", "source-areas-fill", "source-areas-line"]}
+          interactiveLayerIds={[
+            "point",
+            "source-areas-fill",
+            "source-areas-line",
+            "selected-source-areas-fill",
+            "selected-source-areas-line",
+          ]}
           onClick={(e) => {
             if (e.features) {
               const feature = e.features[0];
@@ -721,6 +743,17 @@ export default function LocationsMap({ geoJson }: LocationsMapProps) {
                     <Source id="collection_shapes" type="geojson" data={shapeGeoJson}>
                       <Layer {...areaFillLayer} />
                       <Layer {...areaOutlineLayer} />
+                    </Source>
+                  )}
+                  {selectedShapeGeoJson && selectedShapeGeoJson.features.length > 0 && (
+                    <Source id="selected_shapes" type="geojson" data={selectedShapeGeoJson}>
+                      <Layer {...selectedAreaFillLayer} />
+                      <Layer {...selectedAreaOutlineLayer} />
+                    </Source>
+                  )}
+                  {selectedPointGeoJson && selectedPointGeoJson.features.length > 0 && (
+                    <Source id="selected_point" type="geojson" data={selectedPointGeoJson}>
+                      <Layer {...selectedPointLayer} />
                     </Source>
                   )}
                   <Source
