@@ -234,6 +234,52 @@ const areaOutlineLayer: Layer = {
   },
 };
 
+const selectedAreaFillLayer: Layer = {
+  id: "selected-source-areas-fill",
+  type: "fill",
+  source: "selected_shapes",
+  filter: [
+    "any",
+    ["==", ["geometry-type"], "Polygon"],
+    ["==", ["geometry-type"], "MultiPolygon"],
+  ],
+  paint: {
+    "fill-color": "#facc15",
+    "fill-opacity": 0.38,
+  },
+};
+
+const selectedAreaOutlineLayer: Layer = {
+  id: "selected-source-areas-line",
+  type: "line",
+  source: "selected_shapes",
+  filter: [
+    "any",
+    ["==", ["geometry-type"], "Polygon"],
+    ["==", ["geometry-type"], "MultiPolygon"],
+    ["==", ["geometry-type"], "LineString"],
+    ["==", ["geometry-type"], "MultiLineString"],
+  ],
+  paint: {
+    "line-color": "#f59e0b",
+    "line-width": 5,
+    "line-opacity": 1,
+  },
+};
+
+const selectedPointLayer: CircleLayer = {
+  id: "selected-point",
+  type: "circle",
+  source: "selected_point",
+  paint: {
+    "circle-color": "#fde68a",
+    "circle-radius": 18,
+    "circle-stroke-width": 3,
+    "circle-stroke-color": "#f59e0b",
+    "circle-opacity": 0.95,
+  },
+};
+
 type PopupField = { id: string; name: string; field_type: string; order: number | null; value: string[] };
 
 const parseFeatureFields = (rawFields: unknown): PopupField[] => {
@@ -406,6 +452,42 @@ const buildShapeCollection = (
       },
     }];
   });
+
+  return {
+    type: "FeatureCollection",
+    features,
+  };
+};
+
+const buildSelectedShapeCollection = (
+  geoJson: GeoJSON.FeatureCollection<GeoJSON.Geometry>,
+  selectedId: string | null | undefined
+): GeoJSON.FeatureCollection<GeoJSON.Geometry> | null => {
+  if (!selectedId) return null;
+
+  const features = buildShapeCollection(geoJson).features.filter(
+    (feature) => feature.properties?.id === selectedId
+  );
+
+  if (features.length === 0) return null;
+
+  return {
+    type: "FeatureCollection",
+    features,
+  };
+};
+
+const buildSelectedPointCollection = (
+  geoJson: GeoJSON.FeatureCollection<GeoJSON.Geometry>,
+  selectedId: string | null | undefined
+): GeoJSON.FeatureCollection<GeoJSON.Geometry> | null => {
+  if (!selectedId) return null;
+
+  const features = geoJson.features.filter(
+    (feature) => feature.properties?.id === selectedId && feature.geometry.type === "Point"
+  );
+
+  if (features.length === 0) return null;
 
   return {
     type: "FeatureCollection",
