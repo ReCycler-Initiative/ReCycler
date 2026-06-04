@@ -12,7 +12,7 @@ const NewDataSourcePage = () => {
   const datasourcesHref = `/admin/organizations/${params.id}/use_cases/${params.useCaseId}/datasources`;
 
   return (
-    <PageTemplate title={messages.adminDatasourcePage.newTitle}>
+    <PageTemplate>
       <DataSourceEditor
         organizationId={params.id}
         useCaseId={params.useCaseId}

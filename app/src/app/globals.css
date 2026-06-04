@@ -373,12 +373,112 @@
     color: rgb(15 23 42) !important;
   }
 
+  [data-admin-theme="dark"] .field-editor-dialog,
+  [data-admin-theme="dark"] .field-editor-popover,
+  [data-admin-theme="dark"] .field-editor-select-content {
+    background-color: rgb(15 23 42) !important;
+    border-color: rgb(51 65 85) !important;
+    color: rgb(248 250 252) !important;
+  }
+
+  [data-admin-theme="dark"] .field-editor-dialog [data-slot="select-trigger"],
+  [data-admin-theme="dark"] .field-editor-dialog input,
+  [data-admin-theme="dark"] .field-editor-dialog button[role="combobox"],
+  [data-admin-theme="dark"] .field-editor-popover button,
+  [data-admin-theme="dark"] .field-editor-popover input {
+    background-color: rgb(30 41 59) !important;
+    border-color: rgb(51 65 85) !important;
+    color: rgb(248 250 252) !important;
+  }
+
+  [data-admin-theme="dark"] .field-editor-dialog label,
+  [data-admin-theme="dark"] .field-editor-dialog h2,
+  [data-admin-theme="dark"] .field-editor-dialog h3,
+  [data-admin-theme="dark"] .field-editor-dialog .text-foreground,
+  [data-admin-theme="dark"] .field-editor-dialog .text-card-foreground,
+  [data-admin-theme="dark"] .field-editor-dialog .text-popover-foreground,
+  [data-admin-theme="dark"] .field-editor-select-content,
+  [data-admin-theme="dark"] .field-editor-select-content [data-slot="select-item"] {
+    color: rgb(248 250 252) !important;
+  }
+
+  [data-admin-theme="dark"] .field-editor-dialog .text-muted-foreground,
+  [data-admin-theme="dark"] .field-editor-popover .text-muted-foreground,
+  [data-admin-theme="dark"] .field-editor-dialog [data-placeholder],
+  [data-admin-theme="dark"] .field-editor-dialog input::placeholder {
+    color: rgb(203 213 225) !important;
+  }
+
+  [data-admin-theme="dark"] .field-editor-dialog hr,
+  [data-admin-theme="dark"] .field-editor-dialog .border,
+  [data-admin-theme="dark"] .field-editor-dialog .border-input,
+  [data-admin-theme="dark"] .field-editor-select-content,
+  [data-admin-theme="dark"] .field-editor-popover {
+    border-color: rgb(51 65 85) !important;
+  }
+
+  [data-admin-theme="dark"] .field-editor-dialog [data-state="checked"],
+  [data-admin-theme="dark"] .field-editor-dialog .bg-accent,
+  [data-admin-theme="dark"] .field-editor-select-content [data-highlighted] {
+    background-color: rgb(51 65 85) !important;
+    color: rgb(248 250 252) !important;
+  }
+
   .run-error-text {
     color: rgb(17 24 39);
   }
 
   .admin-shell[data-admin-theme="dark"] .run-error-text {
     color: rgb(248 250 252) !important;
+  }
+
+  .datasource-run-status-pill {
+    background-color: rgb(243 244 246);
+    color: rgb(55 65 81);
+  }
+
+  .datasource-run-status-pill-running {
+    background-color: rgb(219 234 254);
+    color: rgb(30 64 175);
+  }
+
+  .datasource-run-status-pill-completed {
+    background-color: rgb(220 252 231);
+    color: rgb(22 101 52);
+  }
+
+  .datasource-run-status-pill-failed {
+    background-color: rgb(254 226 226);
+    color: rgb(153 27 27);
+  }
+
+  .admin-shell[data-admin-theme="dark"] .datasource-runs-card .datasource-run-status-pill {
+    background-color: rgb(51 65 85) !important;
+    color: rgb(226 232 240) !important;
+  }
+
+  .admin-shell[data-admin-theme="dark"] .datasource-runs-card .datasource-run-status-pill-running {
+    background-color: rgb(30 41 59) !important;
+    color: rgb(147 197 253) !important;
+  }
+
+  .admin-shell[data-admin-theme="dark"] .datasource-runs-card .datasource-run-status-pill-completed {
+    background-color: rgb(20 83 45) !important;
+    color: rgb(187 247 208) !important;
+  }
+
+  .admin-shell[data-admin-theme="dark"] .datasource-runs-card .datasource-run-status-pill-failed {
+    background-color: rgb(127 29 29) !important;
+    color: rgb(254 202 202) !important;
+  }
+
+  .admin-shell[data-admin-theme="dark"] .datasource-runs-card .datasource-run-started-at,
+  .admin-shell[data-admin-theme="dark"] .datasource-runs-card .datasource-run-summary {
+    color: rgb(203 213 225) !important;
+  }
+
+  .admin-shell[data-admin-theme="dark"] .datasource-runs-card .datasource-run-finished-at {
+    color: rgb(148 163 184) !important;
   }
 
   .admin-shell[data-admin-theme="dark"] .ai-choose-file-button {
@@ -476,6 +576,38 @@
   .admin-shell[data-admin-theme="dark"] .locations-outline-button:disabled,
   .admin-shell[data-admin-theme="dark"] .datasource-editor-outline-button:disabled {
     opacity: 0.5;
+  }
+
+  .admin-shell[data-admin-theme="dark"] .datasource-editor-card,
+  .admin-shell[data-admin-theme="dark"] .datasource-editor-subsection,
+  .admin-shell[data-admin-theme="dark"] .datasource-editor-mapping-row {
+    background-color: rgb(15 23 42) !important;
+    border-color: rgb(51 65 85) !important;
+    color: rgb(248 250 252) !important;
+  }
+
+  .admin-shell[data-admin-theme="dark"] .datasource-editor-subsection,
+  .admin-shell[data-admin-theme="dark"] .datasource-editor-mapping-row {
+    background-color: rgb(30 41 59) !important;
+  }
+
+  .admin-shell[data-admin-theme="dark"] .datasource-editor-section-header h2,
+  .admin-shell[data-admin-theme="dark"] .datasource-editor-card .text-slate-900 {
+    color: rgb(248 250 252) !important;
+  }
+
+  .admin-shell[data-admin-theme="dark"] .datasource-editor-section-header p,
+  .admin-shell[data-admin-theme="dark"] .datasource-editor-card .text-slate-600,
+  .admin-shell[data-admin-theme="dark"] .datasource-editor-card .text-muted-foreground {
+    color: rgb(203 213 225) !important;
+  }
+
+  .admin-shell[data-admin-theme="dark"] .datasource-editor-success {
+    color: rgb(134 239 172) !important;
+  }
+
+  .admin-shell[data-admin-theme="dark"] .datasource-editor-error {
+    color: rgb(248 250 252) !important;
   }
 
   .admin-shell[data-admin-theme="dark"] .admin-content input,

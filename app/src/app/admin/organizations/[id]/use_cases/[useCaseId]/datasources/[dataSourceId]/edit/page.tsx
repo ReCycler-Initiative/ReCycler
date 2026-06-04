@@ -16,7 +16,7 @@ const EditDataSourcePage = () => {
   const datasourcesHref = `/admin/organizations/${params.id}/use_cases/${params.useCaseId}/datasources`;
 
   return (
-    <PageTemplate title={messages.datasourceEditor.editTitle}>
+    <PageTemplate>
       <DataSourceEditor
         organizationId={params.id}
         useCaseId={params.useCaseId}

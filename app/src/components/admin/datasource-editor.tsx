@@ -1,6 +1,7 @@
 "use client";
 
 import { FormFooter } from "@/components/editor-template";
+import { UseCasePageIntro } from "@/components/admin/use-case-page-intro";
 import FormCheckbox from "@/components/form/form-checkbox";
 import FormInput from "@/components/form/form-input";
 import FormSelect from "@/components/form/form-select";
@@ -426,147 +427,166 @@ export const DataSourceEditor = ({
   };
 
   const fieldPathOptions = sampleFields.map((f) => f.path);
+  const editorTitle = isEdit
+    ? messages.datasourceEditor.editTitle
+    : messages.adminDatasourcePage.newTitle;
 
   return (
     <Form {...form}>
       <form
         onSubmit={handleSubmit(onSubmit)}
-        className="datasource-editor space-y-6 max-w-xl"
+        className="datasource-editor space-y-6 pb-10"
       >
-        {/* ─── Perustiedot ─── */}
-        <h2 className="text-base font-semibold">
-          {messages.datasourceEditor.connectionSettingsTitle}
-        </h2>
-
-        <FormInput name="name" label={messages.datasourceEditor.connectorName} />
-
-        <FormSelect
-          name="status"
-          label={messages.datasourceEditor.status}
-          items={[
-            { value: "draft", label: messages.datasourceEditor.draft },
-            { value: "active", label: messages.datasourceEditor.active },
-            { value: "disabled", label: messages.datasourceEditor.disabled },
-          ]}
+        <UseCasePageIntro
+          title={editorTitle}
+          description={messages.admin.datasourcesIntro}
+          icon={Cable}
         />
 
-        <div className="space-y-1.5">
-          <Label htmlFor="ds-url">{messages.datasourceEditor.url}</Label>
-          <div className="flex gap-2">
-            <Input
-              id="ds-url"
-              className="flex-1"
-              {...register("url")}
-              placeholder="https://api.example.com/collection-points"
-            />
-            <Button
-              type="button"
-              variant="outline"
-              className="datasource-editor-outline-button"
-              onClick={handleTestConnection}
-              disabled={connectionStatus === "testing"}
-            >
-              <Cable
-                className={
-                  connectionStatus === "testing"
-                    ? "mr-2 h-4 w-4 animate-bounce"
-                    : "mr-2 h-4 w-4"
-                }
-              />
-              {connectionStatus === "testing"
-                ? messages.datasourceEditor.testing
-                : messages.datasourceEditor.testConnection}
-            </Button>
+        <section className="datasource-editor-card rounded-2xl border border-slate-200 bg-white p-5 shadow-sm md:p-6">
+          <div className="datasource-editor-section-header">
+            <h2 className="text-lg font-semibold text-slate-900">
+              {messages.datasourceEditor.connectionSettingsTitle}
+            </h2>
+            <p className="mt-1 text-sm text-slate-600">
+              {messages.admin.datasourcesIntro}
+            </p>
           </div>
-          {connectionStatus === "success" && (
-            <p className="text-xs text-green-600">
-              {messages.datasourceEditor.connectionOk}
-            </p>
-          )}
-          {connectionError && (
-            <p className="text-xs text-destructive">{connectionError}</p>
-          )}
-          {formState.errors.url && (
-            <p className="text-xs text-destructive">
-              {formState.errors.url.message}
-            </p>
-          )}
-        </div>
 
-        <FormSelect
-          name="source_format"
-          label={messages.datasourceEditor.sourceFormat}
-          items={[
-            { value: "json", label: "JSON" },
-            { value: "geojson", label: "GeoJSON" },
-            { value: "wfs", label: messages.datasourceEditor.wfsOption },
-          ]}
-        />
+          <div className="mt-5 max-w-xl space-y-6">
+            <FormInput name="name" label={messages.datasourceEditor.connectorName} />
 
-        {sourceFormat === "json" && (
-          <FormField
-            control={control}
-            name="data_path"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{messages.datasourceEditor.dataPath}</FormLabel>
-                <FormControl>
-                  <FieldPathSelect
-                    options={fieldPathOptions}
-                    value={field.value ?? ""}
-                    onChange={field.onChange}
-                    placeholder={messages.datasourceEditor.selectSourceField}
+            <FormSelect
+              name="status"
+              label={messages.datasourceEditor.status}
+              items={[
+                { value: "draft", label: messages.datasourceEditor.draft },
+                { value: "active", label: messages.datasourceEditor.active },
+                { value: "disabled", label: messages.datasourceEditor.disabled },
+              ]}
+            />
+
+            <div className="space-y-1.5">
+              <Label htmlFor="ds-url">{messages.datasourceEditor.url}</Label>
+              <div className="flex flex-col gap-2 sm:flex-row">
+                <Input
+                  id="ds-url"
+                  className="flex-1"
+                  {...register("url")}
+                  placeholder="https://api.example.com/collection-points"
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="datasource-editor-outline-button border-slate-300 bg-white text-slate-700 hover:bg-slate-50 hover:text-slate-900"
+                  onClick={handleTestConnection}
+                  disabled={connectionStatus === "testing"}
+                >
+                  <Cable
+                    className={
+                      connectionStatus === "testing"
+                        ? "mr-2 h-4 w-4 animate-bounce"
+                        : "mr-2 h-4 w-4"
+                    }
                   />
-                </FormControl>
-              </FormItem>
+                  {connectionStatus === "testing"
+                    ? messages.datasourceEditor.testing
+                    : messages.datasourceEditor.testConnection}
+                </Button>
+              </div>
+              {connectionStatus === "success" && (
+                <p className="datasource-editor-success text-xs text-green-600">
+                  {messages.datasourceEditor.connectionOk}
+                </p>
+              )}
+              {connectionError && (
+                <p className="datasource-editor-error text-xs text-destructive">{connectionError}</p>
+              )}
+              {formState.errors.url && (
+                <p className="datasource-editor-error text-xs text-destructive">
+                  {formState.errors.url.message}
+                </p>
+              )}
+            </div>
+
+            <FormSelect
+              name="source_format"
+              label={messages.datasourceEditor.sourceFormat}
+              items={[
+                { value: "json", label: "JSON" },
+                { value: "geojson", label: "GeoJSON" },
+                { value: "wfs", label: messages.datasourceEditor.wfsOption },
+              ]}
+            />
+
+            {sourceFormat === "json" && (
+              <FormField
+                control={control}
+                name="data_path"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{messages.datasourceEditor.dataPath}</FormLabel>
+                    <FormControl>
+                      <FieldPathSelect
+                        options={fieldPathOptions}
+                        value={field.value ?? ""}
+                        onChange={field.onChange}
+                        placeholder={messages.datasourceEditor.selectSourceField}
+                      />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
             )}
-          />
-        )}
 
-        <FormSelect
-          name="auth_type"
-          label={messages.datasourceEditor.authentication}
-          items={[
-            { value: "none", label: messages.datasourceEditor.noAuth },
-            { value: "api_key", label: messages.datasourceEditor.apiKeyHeader },
-            { value: "basic", label: messages.datasourceEditor.basicAuth },
-            { value: "query_param", label: messages.datasourceEditor.queryParam },
-          ]}
-        />
+            <FormSelect
+              name="auth_type"
+              label={messages.datasourceEditor.authentication}
+              items={[
+                { value: "none", label: messages.datasourceEditor.noAuth },
+                { value: "api_key", label: messages.datasourceEditor.apiKeyHeader },
+                { value: "basic", label: messages.datasourceEditor.basicAuth },
+                { value: "query_param", label: messages.datasourceEditor.queryParam },
+              ]}
+            />
 
-        {authType === "api_key" && (
-          <>
-            <FormInput name="auth_header" label={messages.datasourceEditor.headerName} />
-            <FormInput name="auth_credential" label={messages.datasourceEditor.apiKey} />
-          </>
-        )}
+            {authType === "api_key" && (
+              <>
+                <FormInput name="auth_header" label={messages.datasourceEditor.headerName} />
+                <FormInput name="auth_credential" label={messages.datasourceEditor.apiKey} />
+              </>
+            )}
 
-        {authType === "basic" && (
-          <FormInput name="auth_credential" label={messages.datasourceEditor.usernamePassword} />
-        )}
+            {authType === "basic" && (
+              <FormInput name="auth_credential" label={messages.datasourceEditor.usernamePassword} />
+            )}
 
-        {authType === "query_param" && (
-          <>
-            <FormInput name="auth_header" label={messages.datasourceEditor.parameterName} />
-            <FormInput name="auth_credential" label={messages.datasourceEditor.value} />
-          </>
-        )}
+            {authType === "query_param" && (
+              <>
+                <FormInput name="auth_header" label={messages.datasourceEditor.parameterName} />
+                <FormInput name="auth_credential" label={messages.datasourceEditor.value} />
+              </>
+            )}
 
-        <FormInput name="schedule" label={messages.datasourceEditor.schedule} />
+            <FormInput name="schedule" label={messages.datasourceEditor.schedule} />
+          </div>
+        </section>
 
-        {/* ─── Koordinaatit ja nimikenttä ─── */}
-        <h2 className="text-base font-semibold pt-2">
-          {messages.datasourceEditor.coordinatesAndNameField}
-        </h2>
+        <section className="datasource-editor-card rounded-2xl border border-slate-200 bg-white p-5 shadow-sm md:p-6">
+          <div className="datasource-editor-section-header">
+            <h2 className="text-lg font-semibold text-slate-900">
+              {messages.datasourceEditor.coordinatesAndNameField}
+            </h2>
+          </div>
 
-        <fieldset
-          disabled={mappingDisabled}
-          className={
-            mappingDisabled
-              ? "space-y-6 opacity-50 pointer-events-none"
-              : "space-y-6"
-          }
-        >
+          <fieldset
+            disabled={mappingDisabled}
+            className={
+              mappingDisabled
+                ? "mt-5 max-w-xl space-y-6 opacity-50 pointer-events-none"
+                : "mt-5 max-w-xl space-y-6"
+            }
+          >
           <FormField
             control={control}
             name="name_source_field"
@@ -637,7 +657,7 @@ export const DataSourceEditor = ({
             )}
           />
 
-          <div className="space-y-2 rounded-md border p-3">
+          <div className="datasource-editor-subsection space-y-2 rounded-xl border border-slate-200 bg-slate-50 p-4">
             <p className="text-sm font-medium">
               {messages.datasourceEditor.geometryImportOptions}
             </p>
@@ -723,38 +743,47 @@ export const DataSourceEditor = ({
               )}
             />
           )}
-        </fieldset>
+          </fieldset>
+        </section>
 
-        {/* ─── Kenttämäppäykset ─── */}
-        <div className="flex items-center justify-between pt-2">
-          <h2 className="text-base font-semibold">{messages.datasourceEditor.fieldMappingsTitle}</h2>
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            className="datasource-editor-outline-button"
+        <section className="datasource-editor-card rounded-2xl border border-slate-200 bg-white p-5 shadow-sm md:p-6">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <h2 className="text-lg font-semibold text-slate-900">{messages.datasourceEditor.fieldMappingsTitle}</h2>
+              <p className="mt-1 text-sm text-slate-600">
+                {messages.datasourceEditor.selectSourceField}
+              </p>
+            </div>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              className="datasource-editor-outline-button border-slate-300 bg-white text-slate-700 hover:bg-slate-50 hover:text-slate-900"
+              disabled={mappingDisabled}
+              onClick={() => appendMapping({ source_field: "", field_id: "" })}
+            >
+              {messages.datasourceEditor.addMapping}
+            </Button>
+          </div>
+
+          <fieldset
             disabled={mappingDisabled}
-            onClick={() => appendMapping({ source_field: "", field_id: "" })}
+            className={
+              mappingDisabled
+                ? "mt-5 space-y-3 opacity-50 pointer-events-none"
+                : "mt-5 space-y-3"
+            }
           >
-            {messages.datasourceEditor.addMapping}
-          </Button>
-        </div>
-
-        <fieldset
-          disabled={mappingDisabled}
-          className={
-            mappingDisabled
-              ? "space-y-3 opacity-50 pointer-events-none"
-              : "space-y-3"
-          }
-        >
           {mappingRows.length === 0 && (
             <p className="text-sm text-muted-foreground">
               {messages.datasourceEditor.noMappings}
             </p>
           )}
           {mappingRows.map((row, index) => (
-            <div key={row.id} className="flex gap-2 items-end">
+            <div
+              key={row.id}
+              className="datasource-editor-mapping-row flex flex-col gap-3 rounded-xl border border-slate-200 bg-slate-50 p-3 md:flex-row md:items-end"
+            >
               <FormField
                 control={control}
                 name={`mappings.${index}.source_field`}
@@ -785,23 +814,26 @@ export const DataSourceEditor = ({
                 type="button"
                 variant="ghost"
                 size="icon"
-                className="datasource-editor-ghost-button text-muted-foreground hover:text-destructive mb-0.5"
+                className="datasource-editor-ghost-button mb-0.5 text-slate-500 hover:bg-slate-100 hover:text-slate-900"
                 onClick={() => removeMapping(index)}
               >
                 <Trash2 className="h-4 w-4" />
               </Button>
             </div>
           ))}
-        </fieldset>
+          </fieldset>
+        </section>
 
-        {/* ─── Footer ─── */}
-        <FormFooter
-          isSubmitting={isSaving}
-          isDirty={formState.isDirty}
-          cancelHref={cancelHref}
-          cancelButtonClassName="datasource-editor-outline-button"
-          saveButtonClassName="datasource-editor-save-button"
-        />
+        <section className="datasource-editor-card rounded-2xl border border-slate-200 bg-white p-5 shadow-sm md:p-6">
+          <FormFooter
+            isSubmitting={isSaving}
+            isDirty={formState.isDirty}
+            cancelHref={cancelHref}
+            showDivider={false}
+            cancelButtonClassName="datasource-editor-outline-button border-slate-300 bg-white text-slate-700 hover:bg-slate-50 hover:text-slate-900"
+            saveButtonClassName="datasource-editor-save-button border border-slate-900 bg-slate-900 text-white hover:bg-slate-800 hover:text-white disabled:border-slate-300 disabled:bg-slate-300"
+          />
+        </section>
       </form>
     </Form>
   );

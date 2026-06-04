@@ -251,6 +251,7 @@ export const DatasourceRun = z.object({
   started_at: z.coerce.date(),
   finished_at: z.coerce.date().nullable().optional(),
   rows_synced: z.number().nullable().optional(),
+  rows_deleted: z.number().nullable().optional(),
   rows_skipped: z.number().nullable().optional(),
   rows_failed: z.number().nullable().optional(),
   error_message: z.string().nullable().optional(),

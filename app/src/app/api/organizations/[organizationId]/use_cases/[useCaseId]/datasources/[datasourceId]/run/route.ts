@@ -238,9 +238,11 @@ async function fetchJsonPages(
     .returning("*");
 
   let rowsSynced = 0;
+  let rowsDeleted = 0;
   let rowsSkipped = 0;
   let rowsFailed = 0;
   let errorMessage: string | null = null;
+  const seenLocationIds = new Set<string>();
 
   try {
     const headers = buildHeaders(
@@ -426,6 +428,7 @@ async function fetchJsonPages(
 
         const locationId: string = upsertResult.rows[0].id;
         const changed = Boolean(upsertResult.rows[0].changed);
+        seenLocationIds.add(locationId);
 
         // Upsert field values
         for (const mapping of mappings) {
@@ -436,7 +439,12 @@ async function fetchJsonPages(
               ? [String(rawValue)]
               : [];
 
-          if (values.length === 0) continue;
+          if (values.length === 0) {
+            await db("recycler.location_fields")
+              .where({ location_id: locationId, field_id: mapping.field_id })
+              .del();
+            continue;
+          }
 
           await db.raw(
             `
@@ -457,7 +465,22 @@ async function fetchJsonPages(
       } catch (rowErr: unknown) {
         console.error("[datasource run] row failed:", rowErr);
         rowsFailed++;
-      }    }
+      }
+    }
+
+    if (rowsFailed === 0) {
+      const staleLocationsQuery = db("recycler.locations")
+        .where({
+          use_case_id: useCaseId,
+          datasource_id: datasourceId,
+        });
+
+      if (seenLocationIds.size > 0) {
+        staleLocationsQuery.whereNotIn("id", Array.from(seenLocationIds));
+      }
+
+      rowsDeleted = await staleLocationsQuery.del();
+    }
   } catch (err: unknown) {
     errorMessage = err instanceof Error ? err.message : String(err);
   }
@@ -474,6 +497,7 @@ async function fetchJsonPages(
       status: finalStatus,
       finished_at: finishedAt,
       rows_synced: rowsSynced,
+      rows_deleted: rowsDeleted,
       rows_skipped: rowsSkipped,
       rows_failed: rowsFailed,
       error_message: errorMessage,

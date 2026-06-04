@@ -16,9 +16,9 @@ import { toast } from "sonner";
 import { useLocale, useMessages } from "@/i18n/locale-provider";
 
 const statusPillClass: Record<string, string> = {
-  running: "bg-blue-100 text-blue-800",
-  completed: "bg-green-100 text-green-800",
-  failed: "bg-red-100 text-red-800",
+  running: "datasource-run-status-pill datasource-run-status-pill-running",
+  completed: "datasource-run-status-pill datasource-run-status-pill-completed",
+  failed: "datasource-run-status-pill datasource-run-status-pill-failed",
 };
 
 function formatDate(date: Date | undefined | null, locale: string) {
@@ -29,14 +29,28 @@ function formatDate(date: Date | undefined | null, locale: string) {
 function formatRunToast(
   messages: ReturnType<typeof useMessages>,
   synced: number,
+  deleted: number,
   skipped: number,
   failed: number
 ) {
-  if (synced === 0 && skipped > 0 && failed === 0) {
+  if (synced === 0 && deleted === 0 && failed === 0) {
     return `${messages.admin.syncCompleted} - ${messages.admin.noChangedOrImportedRows}`;
   }
 
-  return `${messages.admin.syncCompleted} - ${synced} ${messages.admin.rowsChangedOrImported}, ${skipped} ${messages.admin.rowsSkippedLabel}, ${failed} ${messages.admin.rowsFailedLabel}`;
+  const parts = [
+    `${synced} ${messages.admin.rowsChangedOrImported}`,
+    `${deleted} ${messages.admin.rowsDeletedLabel}`,
+  ];
+
+  if (skipped > 0) {
+    parts.push(`${skipped} ${messages.admin.rowsSkippedLabel}`);
+  }
+
+  if (failed > 0) {
+    parts.push(`${failed} ${messages.admin.rowsFailedLabel}`);
+  }
+
+  return `${messages.admin.syncCompleted} - ${parts.join(", ")}`;
 }
 
 export default function RunsPage() {
@@ -56,9 +70,10 @@ export default function RunsPage() {
       runDatasource(organizationId, useCaseId, datasourceId),
     onSuccess: (run, datasourceId) => {
       const synced = run.rows_synced ?? 0;
+      const deleted = run.rows_deleted ?? 0;
       const skipped = run.rows_skipped ?? 0;
       const failed = run.rows_failed ?? 0;
-      toast.success(formatRunToast(messages, synced, skipped, failed));
+      toast.success(formatRunToast(messages, synced, deleted, skipped, failed));
       queryClient.invalidateQueries({
         queryKey: ["datasource-runs", organizationId, useCaseId, datasourceId],
       });
@@ -119,7 +134,7 @@ function DatasourceRunsSection({
   });
 
   return (
-    <section className="rounded-xl border border-gray-200 bg-white shadow-sm">
+    <section className="datasource-runs-card rounded-xl border border-gray-200 bg-white shadow-sm">
       <div className="flex items-center justify-between border-b border-gray-200 p-5">
         <div>
           <h2 className="text-base font-semibold text-gray-900">
@@ -149,23 +164,26 @@ function DatasourceRunsSection({
               <span
                 className={[
                   "inline-flex rounded-full px-2 py-0.5 text-xs font-medium",
-                  statusPillClass[run.status] ?? "bg-gray-100 text-gray-700",
+                  statusPillClass[run.status] ?? "datasource-run-status-pill",
                 ].join(" ")}
               >
                 {statusLabel[run.status] ?? run.status}
               </span>
-              <span className="text-gray-700">
+              <span className="datasource-run-started-at text-gray-700">
                 {formatDate(run.started_at, locale)}
               </span>
               {run.finished_at && (
-                <span className="text-gray-400 text-xs">
+                <span className="datasource-run-finished-at text-gray-400 text-xs">
                   → {formatDate(run.finished_at, locale)}
                 </span>
               )}
             </div>
-            <div className="flex gap-4 text-xs text-gray-500">
+            <div className="datasource-run-summary flex gap-4 text-xs text-gray-500">
               {run.rows_synced != null && (
-                <span>{run.rows_synced} {messages.admin.rowsUpdated}</span>
+                <span>{run.rows_synced} {messages.admin.rowsChangedOrImported}</span>
+              )}
+              {run.rows_deleted != null && run.rows_deleted > 0 && (
+                <span>{run.rows_deleted} {messages.admin.rowsDeletedLabel}</span>
               )}
               {run.rows_skipped != null && run.rows_skipped > 0 && (
                 <span>{run.rows_skipped} {messages.admin.rowsSkippedLabel}</span>

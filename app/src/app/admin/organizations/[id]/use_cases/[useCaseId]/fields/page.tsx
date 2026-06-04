@@ -274,7 +274,7 @@ export default function FieldsPage() {
       </PageTemplate>
 
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto">
+        <DialogContent className="field-editor-dialog sm:max-w-lg max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>
               {editingField ? "Muokkaa kenttää" : "Uusi kenttä"}

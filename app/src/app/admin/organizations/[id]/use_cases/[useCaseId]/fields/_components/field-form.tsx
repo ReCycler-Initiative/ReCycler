@@ -129,7 +129,7 @@ const ColorPickerPopover = ({
         />
       </PopoverTrigger>
       <PopoverContent
-        className="w-auto p-3 space-y-3"
+        className="field-editor-popover w-auto p-3 space-y-3"
         align="start"
         container={containerRef.current}
         onInteractOutside={(e) => e.preventDefault()}
@@ -235,7 +235,7 @@ export const FieldFormFields = ({
           <SelectTrigger>
             <SelectValue />
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent className="field-editor-select-content">
             <SelectItem value="text_input">Tekstikenttä</SelectItem>
             <SelectItem value="multi_select">Monivalinta</SelectItem>
             <SelectItem value="address">Osoite</SelectItem>

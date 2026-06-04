@@ -20,6 +20,7 @@ export const FormFooter = ({
   cancelHref,
   cancelButtonClassName,
   saveButtonClassName,
+  showDivider = true,
 }: {
   isSubmitting: boolean;
   isDirty: boolean;
@@ -27,12 +28,13 @@ export const FormFooter = ({
   cancelHref?: string;
   cancelButtonClassName?: string;
   saveButtonClassName?: string;
+  showDivider?: boolean;
 }) => {
   const messages = useMessages();
 
   return (
     <>
-      <hr />
+      {showDivider ? <hr /> : null}
       <div className="flex justify-between items-center">
         {onCancel ? (
           <Button

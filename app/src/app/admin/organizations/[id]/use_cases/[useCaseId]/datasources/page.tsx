@@ -31,14 +31,28 @@ const statusPillClass: Record<string, string> = {
 function formatRunToast(
   messages: ReturnType<typeof useMessages>,
   synced: number,
+  deleted: number,
   skipped: number,
   failed: number
 ) {
-  if (synced === 0 && skipped > 0 && failed === 0) {
+  if (synced === 0 && deleted === 0 && failed === 0) {
     return `${messages.admin.syncCompleted} - ${messages.admin.noChangedOrImportedRows}`;
   }
 
-  return `${messages.admin.syncCompleted} - ${synced} ${messages.admin.rowsChangedOrImported}, ${skipped} ${messages.admin.rowsSkippedLabel}, ${failed} ${messages.admin.rowsFailedLabel}`;
+  const parts = [
+    `${synced} ${messages.admin.rowsChangedOrImported}`,
+    `${deleted} ${messages.admin.rowsDeletedLabel}`,
+  ];
+
+  if (skipped > 0) {
+    parts.push(`${skipped} ${messages.admin.rowsSkippedLabel}`);
+  }
+
+  if (failed > 0) {
+    parts.push(`${failed} ${messages.admin.rowsFailedLabel}`);
+  }
+
+  return `${messages.admin.syncCompleted} - ${parts.join(", ")}`;
 }
 
 const DatasourcesPage = () => {
@@ -59,9 +73,10 @@ const DatasourcesPage = () => {
       runDatasource(organizationId, useCaseId, datasourceId),
     onSuccess: (run) => {
       const synced = run.rows_synced ?? 0;
+      const deleted = run.rows_deleted ?? 0;
       const skipped = run.rows_skipped ?? 0;
       const failed = run.rows_failed ?? 0;
-      toast.success(formatRunToast(messages, synced, skipped, failed));
+      toast.success(formatRunToast(messages, synced, deleted, skipped, failed));
       queryClient.invalidateQueries({
         queryKey: ["datasources", organizationId, useCaseId],
       });
