@@ -282,6 +282,35 @@
     background-color: rgb(15 23 42) !important;
   }
 
+  .admin-shell[data-admin-theme="dark"] .location-edit-panel,
+  .admin-shell[data-admin-theme="dark"] .locations-sidebar-card {
+    background-color: rgb(15 23 42) !important;
+    border-color: rgb(51 65 85) !important;
+    color: rgb(248 250 252) !important;
+  }
+
+  .admin-shell[data-admin-theme="dark"] .location-edit-panel .bg-white,
+  .admin-shell[data-admin-theme="dark"] .location-edit-panel .bg-gray-50,
+  .admin-shell[data-admin-theme="dark"] .location-edit-panel .bg-gray-50\/60,
+  .admin-shell[data-admin-theme="dark"] .location-edit-panel .hover\:bg-gray-50:hover {
+    background-color: rgb(30 41 59) !important;
+  }
+
+  .admin-shell[data-admin-theme="dark"] .location-edit-panel .border-gray-100,
+  .admin-shell[data-admin-theme="dark"] .location-edit-panel .border-gray-200,
+  .admin-shell[data-admin-theme="dark"] .location-edit-panel .border-gray-300,
+  .admin-shell[data-admin-theme="dark"] .locations-sidebar-card.border-gray-200 {
+    border-color: rgb(51 65 85) !important;
+  }
+
+  .admin-shell[data-admin-theme="dark"] .location-edit-panel .text-gray-500,
+  .admin-shell[data-admin-theme="dark"] .location-edit-panel .text-gray-600,
+  .admin-shell[data-admin-theme="dark"] .location-edit-panel .text-gray-700,
+  .admin-shell[data-admin-theme="dark"] .location-edit-panel .text-muted-foreground,
+  .admin-shell[data-admin-theme="dark"] .locations-sidebar-card .text-muted-foreground {
+    color: rgb(203 213 225) !important;
+  }
+
   .admin-shell[data-admin-theme="dark"] .admin-content .bg-slate-50,
   .admin-shell[data-admin-theme="dark"] .admin-content .bg-gray-50,
   .admin-shell[data-admin-theme="dark"] .admin-content .hover\:bg-slate-50\/70:hover {
@@ -331,6 +360,17 @@
   .admin-shell[data-admin-theme="dark"] .field-required-yes,
   .admin-shell[data-admin-theme="dark"] .field-required-no {
     color: rgb(248 250 252) !important;
+  }
+
+  .admin-shell[data-admin-theme="dark"] .admin-checkbox {
+    border-color: rgb(148 163 184) !important;
+    background-color: rgb(15 23 42) !important;
+  }
+
+  .admin-shell[data-admin-theme="dark"] .admin-checkbox[data-state="checked"] {
+    border-color: rgb(248 250 252) !important;
+    background-color: rgb(248 250 252) !important;
+    color: rgb(15 23 42) !important;
   }
 
   .run-error-text {
@@ -392,6 +432,50 @@
     border-color: rgb(148 163 184) !important;
     background-color: rgb(30 41 59) !important;
     color: rgb(255 255 255) !important;
+  }
+
+  .admin-shell[data-admin-theme="dark"] .datasource-editor-outline-button,
+  .admin-shell[data-admin-theme="dark"] .locations-outline-button {
+    border-color: rgb(71 85 105) !important;
+    background-color: rgb(15 23 42) !important;
+    color: rgb(248 250 252) !important;
+  }
+
+  .admin-shell[data-admin-theme="dark"] .datasource-editor-outline-button:hover,
+  .admin-shell[data-admin-theme="dark"] .locations-outline-button:hover {
+    border-color: rgb(148 163 184) !important;
+    background-color: rgb(30 41 59) !important;
+    color: rgb(255 255 255) !important;
+  }
+
+  .admin-shell[data-admin-theme="dark"] .datasource-editor-ghost-button {
+    color: rgb(203 213 225) !important;
+  }
+
+  .admin-shell[data-admin-theme="dark"] .datasource-editor-ghost-button:hover {
+    background-color: rgb(30 41 59) !important;
+    color: rgb(248 250 252) !important;
+  }
+
+  .admin-shell[data-admin-theme="dark"] .datasource-editor-save-button,
+  .admin-shell[data-admin-theme="dark"] .locations-primary-button {
+    border-color: rgb(148 163 184) !important;
+    background-color: rgb(15 23 42) !important;
+    color: rgb(248 250 252) !important;
+  }
+
+  .admin-shell[data-admin-theme="dark"] .datasource-editor-save-button:hover,
+  .admin-shell[data-admin-theme="dark"] .locations-primary-button:hover {
+    border-color: rgb(226 232 240) !important;
+    background-color: rgb(30 41 59) !important;
+    color: rgb(255 255 255) !important;
+  }
+
+  .admin-shell[data-admin-theme="dark"] .datasource-editor-save-button:disabled,
+  .admin-shell[data-admin-theme="dark"] .locations-primary-button:disabled,
+  .admin-shell[data-admin-theme="dark"] .locations-outline-button:disabled,
+  .admin-shell[data-admin-theme="dark"] .datasource-editor-outline-button:disabled {
+    opacity: 0.5;
   }
 
   .admin-shell[data-admin-theme="dark"] .admin-content input,

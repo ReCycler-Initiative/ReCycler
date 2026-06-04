@@ -13,6 +13,7 @@ const EditDataSourcePage = () => {
   }>();
   const router = useRouter();
   const messages = useMessages();
+  const datasourcesHref = `/admin/organizations/${params.id}/use_cases/${params.useCaseId}/datasources`;
 
   return (
     <PageTemplate title={messages.datasourceEditor.editTitle}>
@@ -20,11 +21,8 @@ const EditDataSourcePage = () => {
         organizationId={params.id}
         useCaseId={params.useCaseId}
         datasourceId={params.dataSourceId}
-        onSaved={() =>
-          router.push(
-            `/admin/organizations/${params.id}/use_cases/${params.useCaseId}/datasources`
-          )
-        }
+        cancelHref={datasourcesHref}
+        onSaved={() => router.push(datasourcesHref)}
       />
     </PageTemplate>
   );

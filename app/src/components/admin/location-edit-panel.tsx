@@ -387,7 +387,7 @@ export const LocationEditPanel = (props: LocationEditPanelProps) => {
 
   return (
     <>
-    <div className="flex flex-col h-full bg-white border border-gray-200 rounded-xl overflow-hidden">
+    <div className="location-edit-panel flex flex-col h-full bg-white border border-gray-200 rounded-xl overflow-hidden">
       {/* Header */}
       <div className="flex items-center justify-between gap-2 px-4 py-3 border-b border-gray-200 shrink-0">
         <h2 className="text-sm font-semibold truncate flex-1">{title}</h2>

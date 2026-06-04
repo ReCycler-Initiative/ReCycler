@@ -41,7 +41,7 @@ import {
 import axios from "axios";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Cable, Trash2 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useFieldArray, useForm, useWatch } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -163,9 +163,15 @@ export const DataSourceEditor = ({
   } = useFieldArray({ control, name: "mappings" });
 
   const authType = useWatch({ control, name: "auth_type" });
+  const url = useWatch({ control, name: "url" });
+  const name = useWatch({ control, name: "name" });
+  const authHeader = useWatch({ control, name: "auth_header" });
+  const authCredential = useWatch({ control, name: "auth_credential" });
+  const dataPath = useWatch({ control, name: "data_path" });
   const sourceFormat = useWatch({ control, name: "source_format" });
   const coordinateType = useWatch({ control, name: "coordinate_type" });
   const mappingDisabled = !isEdit && connectionStatus !== "success";
+  const lastAutoFetchSignatureRef = useRef<string | null>(null);
 
   // Load use case fields
   useEffect(() => {
@@ -210,32 +216,63 @@ export const DataSourceEditor = ({
         });
       })
         .catch(() => toast.error(messages.datasourceEditor.datasourceLoadFailed));
-  }, [isEdit, datasourceId, organizationId, useCaseId, reset]);
+  }, [
+    datasourceId,
+    isEdit,
+    messages.datasourceEditor.datasourceLoadFailed,
+    organizationId,
+    reset,
+    useCaseId,
+  ]);
 
-  const handleTestConnection = async () => {
+  const fetchSampleFields = useCallback(async ({
+    silent = false,
+  }: {
+    silent?: boolean;
+  } = {}) => {
+    const values = getValues();
+
+    if (!values.name.trim() || !values.url.trim()) {
+      if (!silent) {
+        setConnectionStatus("error");
+        setConnectionError(messages.datasourceEditor.fillRequiredBeforeTest);
+      }
+      return false;
+    }
+
+    try {
+      new URL(values.url);
+    } catch {
+      if (!silent) {
+        setConnectionStatus("error");
+        setConnectionError(messages.datasourceEditor.fillRequiredBeforeTest);
+      }
+      return false;
+    }
+
     setConnectionError(null);
     setConnectionStatus("testing");
 
-    const isValid = await form.trigger([
-      "name",
-      "url",
-      "status",
-      "source_format",
-      "auth_type",
-      "coordinate_type",
-      "source_crs",
-    ]);
+    if (!silent) {
+      const isValid = await form.trigger([
+        "name",
+        "url",
+        "status",
+        "source_format",
+        "auth_type",
+        "coordinate_type",
+        "source_crs",
+      ]);
 
-    if (!isValid) {
-      setConnectionStatus("error");
-      setConnectionError(messages.datasourceEditor.fillRequiredBeforeTest);
-      return;
+      if (!isValid) {
+        setConnectionStatus("error");
+        setConnectionError(messages.datasourceEditor.fillRequiredBeforeTest);
+        return false;
+      }
     }
 
-    const values = getValues();
-
     try {
-      // Need a datasourceId for the test endpoint — create a draft first if in create mode
+      // Need a datasourceId for the test endpoint — create a draft first if in create mode.
       let dsId = createdDatasourceId;
       if (!dsId) {
         const created = await createDatasource(organizationId, useCaseId, {
@@ -270,7 +307,14 @@ export const DataSourceEditor = ({
         });
       }
       setConnectionStatus("success");
+      return true;
     } catch (err: unknown) {
+      setSampleFields([]);
+      if (silent) {
+        setConnectionStatus("idle");
+        return false;
+      }
+
       setConnectionStatus("error");
       const msg = axios.isAxiosError(err)
         ? ((err.response?.data as { error?: string } | undefined)?.error ?? err.message)
@@ -278,8 +322,69 @@ export const DataSourceEditor = ({
           ? err.message
           : messages.datasourceEditor.connectionError;
       setConnectionError(msg);
+      return false;
     }
+  }, [
+    createdDatasourceId,
+    form,
+    getValues,
+    messages.datasourceEditor.connectionError,
+    messages.datasourceEditor.fillRequiredBeforeTest,
+    organizationId,
+    setValue,
+    useCaseId,
+  ]);
+
+  const handleTestConnection = async () => {
+    await fetchSampleFields();
   };
+
+  const autoFetchSignature = useMemo(
+    () =>
+      JSON.stringify({
+        authCredential: authCredential ?? "",
+        authHeader: authHeader ?? "",
+        authType,
+        dataPath: dataPath ?? "",
+        name: name.trim(),
+        sourceFormat,
+        url: url.trim(),
+      }),
+    [authCredential, authHeader, authType, dataPath, name, sourceFormat, url]
+  );
+
+  useEffect(() => {
+    const parsedSignature = JSON.parse(autoFetchSignature) as {
+      name: string;
+      url: string;
+    };
+
+    if (!parsedSignature.name || !parsedSignature.url) {
+      setSampleFields([]);
+      setConnectionStatus("idle");
+      lastAutoFetchSignatureRef.current = null;
+      return;
+    }
+
+    if (lastAutoFetchSignatureRef.current === autoFetchSignature) {
+      return;
+    }
+
+    let cancelled = false;
+    const timeoutId = window.setTimeout(async () => {
+      if (cancelled) return;
+      const success = await fetchSampleFields({ silent: true });
+      if (cancelled) return;
+      if (success) {
+        lastAutoFetchSignatureRef.current = autoFetchSignature;
+      }
+    }, 500);
+
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timeoutId);
+    };
+  }, [autoFetchSignature, fetchSampleFields]);
 
   const onSubmit = async (values: DatasourceFormValues) => {
     setIsSaving(true);
@@ -324,7 +429,10 @@ export const DataSourceEditor = ({
 
   return (
     <Form {...form}>
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 max-w-xl">
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        className="datasource-editor space-y-6 max-w-xl"
+      >
         {/* ─── Perustiedot ─── */}
         <h2 className="text-base font-semibold">
           {messages.datasourceEditor.connectionSettingsTitle}
@@ -354,6 +462,7 @@ export const DataSourceEditor = ({
             <Button
               type="button"
               variant="outline"
+              className="datasource-editor-outline-button"
               onClick={handleTestConnection}
               disabled={connectionStatus === "testing"}
             >
@@ -623,6 +732,7 @@ export const DataSourceEditor = ({
             type="button"
             variant="outline"
             size="sm"
+            className="datasource-editor-outline-button"
             disabled={mappingDisabled}
             onClick={() => appendMapping({ source_field: "", field_id: "" })}
           >
@@ -675,7 +785,7 @@ export const DataSourceEditor = ({
                 type="button"
                 variant="ghost"
                 size="icon"
-                className="text-muted-foreground hover:text-destructive mb-0.5"
+                className="datasource-editor-ghost-button text-muted-foreground hover:text-destructive mb-0.5"
                 onClick={() => removeMapping(index)}
               >
                 <Trash2 className="h-4 w-4" />
@@ -689,6 +799,8 @@ export const DataSourceEditor = ({
           isSubmitting={isSaving}
           isDirty={formState.isDirty}
           cancelHref={cancelHref}
+          cancelButtonClassName="datasource-editor-outline-button"
+          saveButtonClassName="datasource-editor-save-button"
         />
       </form>
     </Form>

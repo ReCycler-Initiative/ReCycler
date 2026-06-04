@@ -161,12 +161,13 @@ const LocationsPage = () => {
 
   return (
     <PageTemplate mode="fullScreen">
-      <div className="flex-none px-4 py-6">
+      <div className="locations-page flex-none px-4 py-6">
         <UseCasePageIntro
           title={messages.adminLocations.title}
           description={messages.admin.useCaseHomeHighlights[1]}
           actions={!addMode ? (
             <Button
+              className="locations-primary-button"
               type="button"
               onClick={() => {
                 setAddMode((current) => {
@@ -264,7 +265,7 @@ const LocationsPage = () => {
           }
         >
           <div className="space-y-4 p-1">
-            <div className="space-y-3 rounded-xl border border-gray-200 bg-white p-4">
+            <div className="locations-sidebar-card space-y-3 rounded-xl border border-gray-200 bg-white p-4">
               <Input
                 value={searchQuery}
                 onChange={(event) => setSearchQuery(event.target.value)}
@@ -297,11 +298,12 @@ const LocationsPage = () => {
             />
 
             {filteredLocations.length > ITEMS_PER_PAGE && (
-              <div className="flex items-center justify-between gap-3 rounded-xl border border-gray-200 bg-white p-3">
+              <div className="locations-sidebar-card flex items-center justify-between gap-3 rounded-xl border border-gray-200 bg-white p-3">
                 <Button
                   type="button"
                   variant="outline"
                   size="sm"
+                  className="locations-outline-button"
                   disabled={currentPage === 1}
                   onClick={() => setCurrentPage((page) => Math.max(1, page - 1))}
                 >
@@ -314,6 +316,7 @@ const LocationsPage = () => {
                   type="button"
                   variant="outline"
                   size="sm"
+                  className="locations-outline-button"
                   disabled={currentPage === totalPages}
                   onClick={() =>
                     setCurrentPage((page) => Math.min(totalPages, page + 1))
@@ -349,6 +352,7 @@ const LocationsPage = () => {
             <Button
               type="button"
               variant="outline"
+              className="locations-outline-button"
               onClick={() => setDeleteDialogOpen(false)}
               disabled={deleteMutation.isPending}
             >
@@ -357,6 +361,7 @@ const LocationsPage = () => {
             <Button
               type="button"
               variant="destructive"
+              className="locations-primary-button"
               isLoading={deleteMutation.isPending}
               disabled={!deleteTarget?.id || deleteMutation.isPending}
               onClick={() => {

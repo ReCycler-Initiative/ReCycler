@@ -18,11 +18,15 @@ export const FormFooter = ({
   isDirty,
   onCancel,
   cancelHref,
+  cancelButtonClassName,
+  saveButtonClassName,
 }: {
   isSubmitting: boolean;
   isDirty: boolean;
   onCancel?: () => void;
   cancelHref?: string;
+  cancelButtonClassName?: string;
+  saveButtonClassName?: string;
 }) => {
   const messages = useMessages();
 
@@ -31,11 +35,16 @@ export const FormFooter = ({
       <hr />
       <div className="flex justify-between items-center">
         {onCancel ? (
-          <Button variant="outline" type="button" onClick={onCancel}>
+          <Button
+            variant="outline"
+            type="button"
+            onClick={onCancel}
+            className={cancelButtonClassName}
+          >
             {messages.editor.cancel}
           </Button>
         ) : cancelHref ? (
-          <Button variant="outline" asChild>
+          <Button variant="outline" asChild className={cancelButtonClassName}>
             <Link href={cancelHref}>{messages.editor.cancel}</Link>
           </Button>
         ) : (
@@ -43,7 +52,7 @@ export const FormFooter = ({
         )}
         <Button
           type="submit"
-          className="sm:w-fit ml-auto"
+          className={`sm:w-fit ml-auto ${saveButtonClassName ?? ""}`.trim()}
           disabled={!isDirty}
           isLoading={isSubmitting}
         >
