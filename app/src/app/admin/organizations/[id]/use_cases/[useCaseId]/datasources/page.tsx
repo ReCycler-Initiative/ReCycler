@@ -180,6 +180,7 @@ const DatasourcesPage = () => {
                         <Button
                           variant="ghost"
                           size="icon"
+                          className="datasource-action-button"
                           disabled={runMutation.isPending}
                           onClick={() => runMutation.mutate(ds.id)}
                           aria-label="Aja synkronointi"
@@ -192,6 +193,7 @@ const DatasourcesPage = () => {
                         <Button
                           variant="ghost"
                           size="icon"
+                          className="datasource-action-button"
                           asChild
                           aria-label="Muokkaa"
                         >
@@ -204,7 +206,7 @@ const DatasourcesPage = () => {
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="text-destructive hover:text-destructive"
+                          className="datasource-action-button datasource-delete-button text-slate-900 hover:bg-slate-100 hover:text-slate-900"
                           disabled={deleteMutation.isPending}
                           onClick={() => {
                             if (confirm(`Poistetaanko datalähde "${ds.name}"?`)) {

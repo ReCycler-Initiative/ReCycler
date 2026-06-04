@@ -22,7 +22,7 @@ export default async function RootLayout({
   const locale = resolveLocale(cookieStore.get(LOCALE_COOKIE_NAME)?.value);
 
   return (
-    <html lang={locale} className="h-full">
+    <html lang={locale} className="h-full" suppressHydrationWarning>
       <body className={`${inter.className} h-full`}>
         <Analytics />
         <Providers initialLocale={locale}>

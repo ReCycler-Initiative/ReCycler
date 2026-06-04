@@ -171,13 +171,13 @@ function DatasourceRunsSection({
                 <span>{run.rows_skipped} {messages.admin.rowsSkippedLabel}</span>
               )}
               {run.rows_failed != null && run.rows_failed > 0 && (
-                <span className="text-red-600">
+                <span className="run-error-text">
                   {run.rows_failed} {messages.admin.rowsFailedLabel}
                 </span>
               )}
               {run.error_message && (
                 <span
-                  className="text-red-600 max-w-xs truncate"
+                  className="run-error-text max-w-xs truncate"
                   title={run.error_message}
                 >
                   {run.error_message}

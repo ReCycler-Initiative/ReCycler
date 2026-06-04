@@ -109,6 +109,7 @@ export default function AiPage() {
             <Button
               size="sm"
               variant="outline"
+              className="ai-choose-file-button"
               onClick={() => fileInputRef.current?.click()}
               disabled={uploadMutation.isPending}
             >
@@ -139,7 +140,7 @@ export default function AiPage() {
           </div>
 
           {uploadMutation.isError && (
-            <div className="mt-3 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800">
+            <div className="ai-error-banner mt-3 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800">
               {messages.adminAiPage.uploadFailed}
             </div>
           )}
@@ -157,7 +158,7 @@ export default function AiPage() {
               )}
 
               {trainingMaterialsQuery.isError && (
-                <div className="px-4 py-3 text-sm text-red-700">
+                <div className="ai-error-text px-4 py-3 text-sm text-red-700">
                   {messages.adminAiPage.fetchFailed}
                 </div>
               )}
@@ -182,7 +183,8 @@ export default function AiPage() {
 
                       <Button
                         size="sm"
-                        variant="destructive"
+                        variant="outline"
+                        className="ai-delete-button"
                         isLoading={deleteMutation.isPending}
                         onClick={() => {
                           const ok = window.confirm(
@@ -204,7 +206,7 @@ export default function AiPage() {
           </div>
 
           {deleteMutation.isError && (
-            <div className="mt-3 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800">
+            <div className="ai-error-banner mt-3 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800">
               {messages.adminAiPage.deleteFailed}
             </div>
           )}

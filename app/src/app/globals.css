@@ -174,6 +174,321 @@
     @apply bg-background text-foreground;
   }
 
+  .admin-shell[data-admin-theme="dark"] {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 210 40% 98%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 212.7 26.8% 83.9%;
+    background-color: rgb(2 6 23) !important;
+    color: rgb(248 250 252) !important;
+    color-scheme: dark;
+  }
+
+  .admin-shell[data-admin-theme="dark"] header {
+    background-color: rgb(15 23 42) !important;
+    color: rgb(248 250 252) !important;
+    border-color: rgb(51 65 85) !important;
+  }
+
+  .admin-shell[data-admin-theme="dark"] main {
+    background-color: rgb(15 23 42) !important;
+  }
+
+  .admin-shell[data-admin-theme="dark"] .admin-theme-toggle {
+    color: rgb(203 213 225) !important;
+  }
+
+  .admin-shell[data-admin-theme="dark"] .admin-theme-toggle:hover {
+    background-color: rgb(51 65 85) !important;
+    color: rgb(248 250 252) !important;
+  }
+
+  .admin-shell[data-admin-theme="dark"] .admin-nav-link {
+    color: rgb(226 232 240) !important;
+  }
+
+  .admin-shell[data-admin-theme="dark"] .admin-nav-link:hover {
+    background-color: rgb(30 41 59) !important;
+    color: rgb(248 250 252) !important;
+  }
+
+  .admin-shell[data-admin-theme="dark"] .admin-nav-link-active {
+    background: linear-gradient(to bottom, rgb(248 250 252), rgb(203 213 225)) !important;
+    color: rgb(15 23 42) !important;
+  }
+
+  .admin-shell[data-admin-theme="dark"] .admin-nav-link-active:hover {
+    background: linear-gradient(to bottom, rgb(255 255 255), rgb(226 232 240)) !important;
+    color: rgb(15 23 42) !important;
+  }
+
+  .admin-shell[data-admin-theme="dark"] .admin-open-link:hover {
+    background: linear-gradient(to bottom, rgb(248 250 252), rgb(203 213 225)) !important;
+    color: rgb(15 23 42) !important;
+  }
+
+  .admin-shell[data-admin-theme="dark"] .admin-usecase-label,
+  .admin-shell[data-admin-theme="dark"] .admin-settings-trigger {
+    color: rgb(226 232 240) !important;
+  }
+
+  .admin-shell[data-admin-theme="dark"] .admin-settings-trigger:hover {
+    background-color: rgb(30 41 59) !important;
+    color: rgb(248 250 252) !important;
+  }
+
+  .admin-shell[data-admin-theme="dark"] .language-switcher-button {
+    border-color: rgb(71 85 105) !important;
+    color: rgb(226 232 240) !important;
+    background-color: transparent !important;
+  }
+
+  .admin-shell[data-admin-theme="dark"] .language-switcher-button:hover {
+    background-color: rgb(30 41 59) !important;
+    color: rgb(248 250 252) !important;
+  }
+
+  .admin-shell[data-admin-theme="dark"] .language-switcher-button-active {
+    background-color: rgb(248 250 252) !important;
+    color: rgb(15 23 42) !important;
+    border-color: rgb(248 250 252) !important;
+  }
+
+  .admin-shell[data-admin-theme="dark"] .admin-usecase-select {
+    background-color: rgb(15 23 42) !important;
+    color: rgb(248 250 252) !important;
+    border-color: rgb(51 65 85) !important;
+  }
+
+  .admin-shell[data-admin-theme="dark"] .admin-usecase-select svg,
+  .admin-shell[data-admin-theme="dark"] .admin-usecase-select span {
+    color: rgb(248 250 252) !important;
+  }
+
+  .admin-shell[data-admin-theme="dark"] .admin-content .bg-white {
+    background-color: rgb(15 23 42) !important;
+  }
+
+  .admin-shell[data-admin-theme="dark"] .admin-content .bg-slate-50,
+  .admin-shell[data-admin-theme="dark"] .admin-content .bg-gray-50,
+  .admin-shell[data-admin-theme="dark"] .admin-content .hover\:bg-slate-50\/70:hover {
+    background-color: rgb(30 41 59) !important;
+  }
+
+  .admin-shell[data-admin-theme="dark"] .admin-content .bg-slate-100,
+  .admin-shell[data-admin-theme="dark"] .admin-content .bg-gray-100,
+  .admin-shell[data-admin-theme="dark"] .admin-content .hover\:bg-gray-100:hover,
+  .admin-shell[data-admin-theme="dark"] .admin-content .hover\:bg-slate-100:hover {
+    background-color: rgb(51 65 85) !important;
+  }
+
+  .admin-shell[data-admin-theme="dark"] .admin-content .border-slate-100,
+  .admin-shell[data-admin-theme="dark"] .admin-content .border-slate-200,
+  .admin-shell[data-admin-theme="dark"] .admin-content .border-slate-300,
+  .admin-shell[data-admin-theme="dark"] .admin-content .border-gray-100,
+  .admin-shell[data-admin-theme="dark"] .admin-content .border-gray-200,
+  .admin-shell[data-admin-theme="dark"] .admin-content .border-gray-300,
+  .admin-shell[data-admin-theme="dark"] .admin-content .border-gray-400 {
+    border-color: rgb(51 65 85) !important;
+  }
+
+  .admin-shell[data-admin-theme="dark"] .admin-content .text-slate-900,
+  .admin-shell[data-admin-theme="dark"] .admin-content .text-gray-900,
+  .admin-shell[data-admin-theme="dark"] .admin-content .text-foreground {
+    color: rgb(248 250 252) !important;
+  }
+
+  .admin-shell[data-admin-theme="dark"] .admin-content .text-slate-700,
+  .admin-shell[data-admin-theme="dark"] .admin-content .text-slate-600,
+  .admin-shell[data-admin-theme="dark"] .admin-content .text-gray-700,
+  .admin-shell[data-admin-theme="dark"] .admin-content .text-gray-600,
+  .admin-shell[data-admin-theme="dark"] .admin-content .text-gray-500,
+  .admin-shell[data-admin-theme="dark"] .admin-content .text-muted-foreground {
+    color: rgb(203 213 225) !important;
+  }
+
+  .admin-shell[data-admin-theme="dark"] .text-destructive,
+  .admin-shell[data-admin-theme="dark"] .hover\:text-destructive:hover,
+  .admin-shell[data-admin-theme="dark"] .focus\:text-destructive:focus,
+  .admin-shell[data-admin-theme="dark"] .text-destructive svg,
+  .admin-shell[data-admin-theme="dark"] svg.text-destructive {
+    color: rgb(248 250 252) !important;
+  }
+
+  .admin-shell[data-admin-theme="dark"] .field-required-yes,
+  .admin-shell[data-admin-theme="dark"] .field-required-no {
+    color: rgb(248 250 252) !important;
+  }
+
+  .run-error-text {
+    color: rgb(17 24 39);
+  }
+
+  .admin-shell[data-admin-theme="dark"] .run-error-text {
+    color: rgb(248 250 252) !important;
+  }
+
+  .admin-shell[data-admin-theme="dark"] .ai-choose-file-button {
+    border-color: rgb(71 85 105) !important;
+    background-color: rgb(15 23 42) !important;
+    color: rgb(248 250 252) !important;
+  }
+
+  .admin-shell[data-admin-theme="dark"] .ai-choose-file-button:hover {
+    border-color: rgb(148 163 184) !important;
+    background-color: rgb(30 41 59) !important;
+    color: rgb(255 255 255) !important;
+  }
+
+  .ai-error-text,
+  .ai-error-banner {
+    color: rgb(17 24 39) !important;
+  }
+
+  .ai-error-banner {
+    border-color: rgb(209 213 219) !important;
+    background-color: rgb(255 255 255) !important;
+  }
+
+  .admin-shell[data-admin-theme="dark"] .ai-error-text,
+  .admin-shell[data-admin-theme="dark"] .ai-error-banner {
+    color: rgb(248 250 252) !important;
+  }
+
+  .admin-shell[data-admin-theme="dark"] .ai-error-banner {
+    border-color: rgb(71 85 105) !important;
+    background-color: rgb(15 23 42) !important;
+  }
+
+  .ai-delete-button {
+    color: rgb(17 24 39) !important;
+  }
+
+  .ai-delete-button:hover {
+    background-color: rgb(243 244 246) !important;
+    color: rgb(17 24 39) !important;
+  }
+
+  .admin-shell[data-admin-theme="dark"] .ai-delete-button {
+    border-color: rgb(71 85 105) !important;
+    background-color: rgb(15 23 42) !important;
+    color: rgb(248 250 252) !important;
+  }
+
+  .admin-shell[data-admin-theme="dark"] .ai-delete-button:hover {
+    border-color: rgb(148 163 184) !important;
+    background-color: rgb(30 41 59) !important;
+    color: rgb(255 255 255) !important;
+  }
+
+  .admin-shell[data-admin-theme="dark"] .admin-content input,
+  .admin-shell[data-admin-theme="dark"] .admin-content textarea,
+  .admin-shell[data-admin-theme="dark"] .admin-content button[role="combobox"],
+  .admin-shell[data-admin-theme="dark"] .admin-content [data-slot="select-trigger"] {
+    background-color: rgb(15 23 42) !important;
+    color: rgb(248 250 252) !important;
+    border-color: rgb(51 65 85) !important;
+  }
+
+  .admin-shell[data-admin-theme="dark"] .admin-content button[role="combobox"] span,
+  .admin-shell[data-admin-theme="dark"] .admin-content button[role="combobox"] svg {
+    color: rgb(248 250 252) !important;
+  }
+
+  .admin-shell[data-admin-theme="dark"] .admin-usecase-select-content,
+  .admin-shell[data-admin-theme="dark"] .admin-settings-menu {
+    background-color: rgb(15 23 42) !important;
+    color: rgb(248 250 252) !important;
+    border-color: rgb(51 65 85) !important;
+  }
+
+  .admin-shell[data-admin-theme="dark"] .admin-usecase-select-content [data-slot="select-item"],
+  .admin-shell[data-admin-theme="dark"] .admin-settings-menu [data-slot="dropdown-menu-item"] {
+    color: rgb(226 232 240) !important;
+  }
+
+  .admin-shell[data-admin-theme="dark"] .admin-usecase-select-content [data-slot="select-item"][data-highlighted],
+  .admin-shell[data-admin-theme="dark"] .admin-settings-menu [data-slot="dropdown-menu-item"][data-highlighted] {
+    background-color: rgb(30 41 59) !important;
+    color: rgb(248 250 252) !important;
+  }
+
+  .admin-shell[data-admin-theme="dark"] .admin-usecase-select-content [data-slot="select-item"] svg,
+  .admin-shell[data-admin-theme="dark"] .admin-settings-menu [data-slot="dropdown-menu-item"] svg {
+    color: rgb(203 213 225) !important;
+  }
+
+  .admin-shell[data-admin-theme="dark"] .datasource-action-button {
+    color: rgb(226 232 240) !important;
+  }
+
+  .admin-shell[data-admin-theme="dark"] .datasource-action-button:hover {
+    background-color: rgb(51 65 85) !important;
+    color: rgb(248 250 252) !important;
+  }
+
+  .admin-shell[data-admin-theme="dark"] .datasource-delete-button {
+    color: rgb(248 250 252) !important;
+  }
+
+  .admin-shell[data-admin-theme="dark"] .datasource-delete-button:hover {
+    background-color: rgb(248 250 252) !important;
+    color: rgb(15 23 42) !important;
+  }
+
+  .admin-shell[data-admin-theme="dark"] .admin-intro-card,
+  .admin-shell[data-admin-theme="dark"] .admin-home-hero {
+    background: radial-gradient(circle at top left, rgb(30 41 59), rgb(15 23 42) 42%) !important;
+    border-color: rgb(51 65 85) !important;
+  }
+
+  .admin-shell[data-admin-theme="dark"] .admin-intro-icon,
+  .admin-shell[data-admin-theme="dark"] .admin-home-badge,
+  .admin-shell[data-admin-theme="dark"] .admin-home-panel,
+  .admin-shell[data-admin-theme="dark"] .admin-home-section,
+  .admin-shell[data-admin-theme="dark"] .admin-home-action-icon,
+  .admin-shell[data-admin-theme="dark"] .admin-home-secondary-cta {
+    background-color: rgb(15 23 42) !important;
+    border-color: rgb(51 65 85) !important;
+    color: rgb(248 250 252) !important;
+  }
+
+  .admin-shell[data-admin-theme="dark"] .admin-home-primary-cta {
+    border: 1px solid rgb(148 163 184) !important;
+    background-color: rgb(15 23 42) !important;
+    color: rgb(248 250 252) !important;
+  }
+
+  .admin-shell[data-admin-theme="dark"] .admin-home-primary-cta:hover {
+    border-color: rgb(226 232 240) !important;
+    background-color: rgb(30 41 59) !important;
+    color: rgb(255 255 255) !important;
+  }
+
+  .admin-shell[data-admin-theme="dark"] .admin-home-step,
+  .admin-shell[data-admin-theme="dark"] .admin-home-action-card {
+    background-color: rgb(30 41 59) !important;
+    border-color: rgb(51 65 85) !important;
+  }
+
+  .admin-shell[data-admin-theme="dark"] .admin-home-action-card:hover {
+    background-color: rgb(51 65 85) !important;
+    border-color: rgb(71 85 105) !important;
+  }
+
   .fade-in-once {
     animation: fadeInOnce 500ms ease-out forwards;
   }

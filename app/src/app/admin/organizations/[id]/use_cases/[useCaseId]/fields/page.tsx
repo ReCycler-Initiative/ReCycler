@@ -226,11 +226,11 @@ export default function FieldsPage() {
                     </td>
                     <td className="px-4 py-3">
                       {field.required ? (
-                        <span className="text-xs font-medium text-primary">
+                        <span className="field-required-yes text-xs font-medium text-primary">
                           Kyllä
                         </span>
                       ) : (
-                        <span className="text-xs text-muted-foreground">
+                        <span className="field-required-no text-xs text-muted-foreground">
                           Ei
                         </span>
                       )}

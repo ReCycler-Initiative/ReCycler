@@ -1,6 +1,7 @@
 "use client";
 
 import TitleBar from "@/components/title-bar";
+import AdminThemeToggle from "@/components/admin/admin-theme-toggle";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -36,7 +37,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useParams, usePathname, useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { PageLoadingSpinner } from "@/components/page-loading-spinner";
 import { useMessages } from "@/i18n/locale-provider";
 import { LucideIcon } from "lucide-react";
@@ -61,6 +62,18 @@ const Content = ({
   const { id } = useParams<{ id: string }>();
   const pathname = usePathname();
   const router = useRouter();
+  const [adminTheme, setAdminTheme] = useState<"light" | "dark">("light");
+
+  useEffect(() => {
+    const savedTheme = window.localStorage.getItem("recycler-admin-theme");
+    if (savedTheme === "dark" || savedTheme === "light") {
+      setAdminTheme(savedTheme);
+    }
+  }, []);
+
+  useEffect(() => {
+    window.localStorage.setItem("recycler-admin-theme", adminTheme);
+  }, [adminTheme]);
 
   const useCasesQuery = useQuery({
     queryKey: ["use_cases", id],
@@ -80,9 +93,9 @@ const Content = ({
   // Same visual style as "Avaa ReCycler-demo"
   const navButtonClass = (isActive: boolean) =>
     cn(
-      "inline-flex items-center rounded-full px-5 py-2 text-sm font-normal transition",
+      "admin-nav-link inline-flex items-center rounded-full px-5 py-2 text-sm font-normal transition",
       isActive
-        ? "bg-gradient-to-b from-slate-900 to-slate-800 text-white shadow-sm"
+        ? "admin-nav-link-active bg-gradient-to-b from-slate-900 to-slate-800 text-white shadow-sm"
         : "text-gray-700 hover:bg-gray-100"
     );
 
@@ -118,7 +131,10 @@ const Content = ({
   ];
 
   return (
-    <div className="flex flex-col h-full">
+    <div
+      className="admin-shell flex flex-col h-full bg-white text-slate-950"
+      data-admin-theme={adminTheme}
+    >
       <TitleBar logo={null} toHomeHref="/">
         <div className="flex flex-1 h-full items-center gap-x-4">
           <nav className="flex ml-4 h-10 gap-1">
@@ -136,7 +152,7 @@ const Content = ({
             ))}
           </nav>
           <div className="flex items-center ml-auto mr-2">
-            <Label className="mr-4 inline-flex items-center gap-2 font-normal text-gray-700">
+            <Label className="admin-usecase-label mr-4 inline-flex items-center gap-2 font-normal text-gray-700">
               <BriefcaseBusiness className="h-4 w-4" aria-hidden="true" />
               {messages.admin.useCaseLabel}
             </Label>
@@ -149,10 +165,10 @@ const Content = ({
                 );
               }}
             >
-              <SelectTrigger className="w-[180px]">
+              <SelectTrigger className="admin-usecase-select w-[180px]">
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="admin-usecase-select-content">
                 {useCasesQuery.data?.map((useCase) => (
                   <SelectItem key={useCase.id} value={useCase.id}>
                     {useCase.name}
@@ -165,7 +181,7 @@ const Content = ({
           {selectedUseCaseId && (
             <Link
               href={`/organizations/${id}/use_cases/${selectedUseCaseId}`}
-              className={navButtonClass(true)}
+              className={cn(navButtonClass(true), "admin-open-link")}
               aria-label={messages.admin.openSelectedUseCase}
               target="_blank"
               title={messages.admin.openSelectedUseCase}
@@ -175,11 +191,20 @@ const Content = ({
             </Link>
           )}
 
+          <AdminThemeToggle
+            isDark={adminTheme === "dark"}
+            onToggle={() =>
+              setAdminTheme((currentTheme) =>
+                currentTheme === "dark" ? "light" : "dark"
+              )
+            }
+          />
+
           <DropdownMenu>
-            <DropdownMenuTrigger className="mr-1 px-3">
+            <DropdownMenuTrigger className="admin-settings-trigger mr-1 rounded-full px-3 py-2 text-slate-700 transition hover:bg-gray-100 hover:text-slate-900">
               <SettingsIcon />
             </DropdownMenuTrigger>
-            <DropdownMenuContent>
+            <DropdownMenuContent className="admin-settings-menu">
               <DropdownMenuItem asChild>
                 <Link href={`${orgRootPath}/general_info`}>
                   <AppWindow className="mr-2 h-4 w-4 text-slate-500" />
@@ -200,7 +225,9 @@ const Content = ({
         </div>
       </TitleBar>
 
-      <main className="flex-1 flex flex-col bg-gray-100">{children}</main>
+      <main className="admin-content flex-1 flex flex-col bg-gray-100">
+        {children}
+      </main>
     </div>
   );
 };

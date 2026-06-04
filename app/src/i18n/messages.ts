@@ -74,6 +74,9 @@ const baseFi = {
 	},
 	admin: {
 		useCaseLabel: "Käyttötapaus",
+		toggleTheme: "Vaihda teema",
+		useDarkTheme: "Käytä tummaa teemaa",
+		useLightTheme: "Käytä vaaleaa teemaa",
 		openSelectedUseCase: "Avaa valittu käyttötapaus",
 		open: "Avaa",
 		organizationDetails: "Organisaation tiedot",
@@ -722,6 +725,9 @@ const baseEn = {
 	},
 	admin: {
 		useCaseLabel: "Use case",
+		toggleTheme: "Toggle theme",
+		useDarkTheme: "Use dark theme",
+		useLightTheme: "Use light theme",
 		openSelectedUseCase: "Open selected use case",
 		open: "Open",
 		organizationDetails: "Organization details",
