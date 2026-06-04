@@ -89,6 +89,7 @@ export const DbLocation = z.object({
 
 export const LocationProperties = z.object({
   address: z.string().optional(),
+  datasource_name: z.string().optional(),
   id: z.string().uuid(),
   name: z.string(),
   fields: z.array(
@@ -99,6 +100,7 @@ export const LocationProperties = z.object({
   ),
   post_office: z.string().optional(),
   postal_code: z.string().optional(),
+  source_type: z.enum(["manual", "datasource"]).optional(),
   source_geometry: Geometry.optional(),
 });
 
@@ -128,11 +130,13 @@ export const LocationDetail = z.object({
   geometry: Point,
   properties: z.object({
     address: z.string().optional(),
+    datasource_name: z.string().optional(),
     id: z.string().uuid(),
     name: z.string(),
     fields: z.array(LocationDetailField),
     post_office: z.string().optional(),
     postal_code: z.string().optional(),
+    source_type: z.enum(["manual", "datasource"]).optional(),
   }),
 });
 

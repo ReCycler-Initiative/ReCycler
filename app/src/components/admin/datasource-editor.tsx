@@ -95,6 +95,7 @@ export type DataSourceEditorProps = {
   useCaseId: string;
   /** Omit for create mode */
   datasourceId?: string;
+  cancelHref?: string;
   onSaved?: (datasource: Datasource) => void;
 };
 
@@ -106,6 +107,7 @@ export const DataSourceEditor = ({
   organizationId,
   useCaseId,
   datasourceId,
+  cancelHref,
   onSaved,
 }: DataSourceEditorProps) => {
   const messages = useMessages();
@@ -683,7 +685,11 @@ export const DataSourceEditor = ({
         </fieldset>
 
         {/* ─── Footer ─── */}
-        <FormFooter isSubmitting={isSaving} isDirty={formState.isDirty} />
+        <FormFooter
+          isSubmitting={isSaving}
+          isDirty={formState.isDirty}
+          cancelHref={cancelHref}
+        />
       </form>
     </Form>
   );

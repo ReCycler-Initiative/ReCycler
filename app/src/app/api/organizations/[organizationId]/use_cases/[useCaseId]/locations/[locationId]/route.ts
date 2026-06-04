@@ -37,6 +37,11 @@ export async function GET(
           l.address,
           l.postal_code,
           l.post_office,
+          ds.name AS datasource_name,
+          CASE
+            WHEN l.datasource_id IS NULL THEN 'manual'
+            ELSE 'datasource'
+          END AS source_type,
           ST_AsGeoJSON(l.geom)::jsonb as geom,
           f.id         AS field_id,
           f.name       AS field_name,
@@ -47,6 +52,7 @@ export async function GET(
           lf.value     AS field_value
         FROM recycler.locations l
         INNER JOIN recycler.use_cases uc ON l.use_case_id = uc.id
+        LEFT JOIN recycler.datasources ds ON l.datasource_id = ds.id
         LEFT JOIN recycler.fields f ON f.use_case_id = uc.id
         LEFT JOIN recycler.location_fields lf
           ON lf.location_id = l.id AND lf.field_id = f.id
@@ -81,11 +87,13 @@ export async function GET(
     geometry: first.geom,
     properties: {
       address: first.address ?? undefined,
+      datasource_name: first.datasource_name ?? undefined,
       id: first.id,
       name: first.name,
       fields,
       post_office: first.post_office ?? undefined,
       postal_code: first.postal_code ?? undefined,
+      source_type: first.source_type ?? undefined,
     },
   });
 }

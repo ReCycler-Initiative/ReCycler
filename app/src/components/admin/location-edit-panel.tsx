@@ -437,6 +437,18 @@ export const LocationEditPanel = (props: LocationEditPanelProps) => {
         )}
         {isReady && (
           <div className="p-4 space-y-5">
+            {props.mode === "edit" && data?.properties.source_type && (
+              <div className="rounded-lg border border-gray-200 bg-gray-50 px-3 py-2">
+                <p className="text-xs font-medium text-muted-foreground">
+                  {messages.adminLocationPanel.source}
+                </p>
+                <p className="mt-1 text-sm text-foreground">
+                  {data.properties.source_type === "datasource"
+                    ? (data.properties.datasource_name ?? messages.admin.datasources)
+                    : messages.adminLocationPanel.sourceManual}
+                </p>
+              </div>
+            )}
             <div className="space-y-1.5">
               <Label htmlFor="panel-location-name">{messages.adminLocationPanel.name}</Label>
               <Input
