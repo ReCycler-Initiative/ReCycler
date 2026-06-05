@@ -73,7 +73,7 @@ const PricingCard = ({
 
       {ctaNode ?? (
         <Link
-          href={ctaHref ?? "/api/auth/login?screen_hint=signup"}
+          href={ctaHref ?? "/auth/login?screen_hint=signup"}
           className={[
             "mt-6 inline-flex w-full items-center justify-center rounded-full px-5 py-3 text-sm font-medium transition",
             featured

@@ -87,7 +87,9 @@ const createDatasourceFormSchema = (messages: any) =>
     }
   );
 
-type DatasourceFormValues = z.infer<typeof DatasourceFormSchema>;
+type DatasourceFormValues = z.infer<
+  ReturnType<typeof createDatasourceFormSchema>
+>;
 
 // ---------- Props ----------
 

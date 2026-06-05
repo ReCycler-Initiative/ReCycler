@@ -7,6 +7,11 @@ import { BarChart3, Bot, MousePointerClick, Search } from "lucide-react";
 
 const icons = [Search, BarChart3, Bot] as const;
 
+type UsageStatsCard = {
+  title: string;
+  description: string;
+};
+
 export default function UsageStatsPage() {
   const messages = useMessages();
 
@@ -19,7 +24,8 @@ export default function UsageStatsPage() {
         />
 
         <section className="grid gap-4 md:grid-cols-3">
-          {messages.admin.usageStatsCards.map((card, index) => {
+          {messages.admin.usageStatsCards.map(
+            (card: UsageStatsCard, index: number) => {
             const Icon = icons[index] ?? MousePointerClick;
             return (
               <div
@@ -37,7 +43,8 @@ export default function UsageStatsPage() {
                 </p>
               </div>
             );
-          })}
+            }
+          )}
         </section>
 
         <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm md:p-6">
@@ -45,7 +52,7 @@ export default function UsageStatsPage() {
             {messages.admin.usageStatsFutureTitle}
           </h2>
           <div className="mt-4 grid gap-3 md:grid-cols-2">
-            {messages.admin.usageStatsFutureItems.map((item) => (
+            {messages.admin.usageStatsFutureItems.map((item: string) => (
               <div
                 key={item}
                 className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-700"

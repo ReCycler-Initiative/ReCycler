@@ -253,7 +253,7 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
     if (accessQuery.error) {
       const error = accessQuery.error as any;
       if (error.response?.status === 401) {
-        router.push("/api/auth/login");
+        router.push("/auth/login");
       } else if (error.response?.status === 403) {
         router.push("/unauthorized");
       } else {

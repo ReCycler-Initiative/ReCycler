@@ -50,7 +50,13 @@ export async function GET(
   // get_locations returns one row per field (LEFT JOIN) — group by location
   const locationMap = new Map<
     string,
-    { id: string; name: string; geom: unknown; fields: typeof rows }
+    {
+      id: string;
+      name: string;
+      geom: unknown;
+      sourceGeom: unknown;
+      fields: typeof rows;
+    }
   >();
 
   for (const row of rows) {

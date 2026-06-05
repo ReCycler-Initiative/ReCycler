@@ -34,9 +34,11 @@ import { useQuery } from "@tanstack/react-query";
 import { getFields } from "@/services/api";
 import Map, {
   CircleLayer,
+  FillLayer,
   FullscreenControl,
   GeolocateControl,
   Layer,
+  LineLayer,
   MapboxGeoJSONFeature,
   MapRef,
   NavigationControl,
@@ -201,7 +203,7 @@ const openStatusLayer: CircleLayer = {
   },
 };
 
-const areaFillLayer: Layer = {
+const areaFillLayer: FillLayer = {
   id: "source-areas-fill",
   type: "fill",
   source: "collection_shapes",
@@ -216,7 +218,7 @@ const areaFillLayer: Layer = {
   },
 };
 
-const areaOutlineLayer: Layer = {
+const areaOutlineLayer: LineLayer = {
   id: "source-areas-line",
   type: "line",
   source: "collection_shapes",
@@ -234,7 +236,7 @@ const areaOutlineLayer: Layer = {
   },
 };
 
-const selectedAreaFillLayer: Layer = {
+const selectedAreaFillLayer: FillLayer = {
   id: "selected-source-areas-fill",
   type: "fill",
   source: "selected_shapes",
@@ -249,7 +251,7 @@ const selectedAreaFillLayer: Layer = {
   },
 };
 
-const selectedAreaOutlineLayer: Layer = {
+const selectedAreaOutlineLayer: LineLayer = {
   id: "selected-source-areas-line",
   type: "line",
   source: "selected_shapes",
