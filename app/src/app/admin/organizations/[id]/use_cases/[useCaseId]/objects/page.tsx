@@ -18,7 +18,7 @@ const ObjectsPage = () => {
 
   const queryKey = ["objects", organizationId, useCaseId];
 
-  const { data: fields = [], isLoading } = useQuery({
+  const { data: objects = [], isLoading } = useQuery({
     queryKey,
     queryFn: () => getObjects(organizationId, useCaseId),
   });
@@ -37,7 +37,7 @@ const ObjectsPage = () => {
       />
       {isLoading ? (
         <p className="text-sm text-muted-foreground">Ladataan...</p>
-      ) : fields.length === 0 ? (
+      ) : objects.length === 0 ? (
         <p className="text-sm text-muted-foreground">
           Ei sisältömalleja. Lisää ensimmäinen sisältömalli
         </p>
@@ -49,12 +49,18 @@ const ObjectsPage = () => {
                 <th className="px-4 py-3 text-left font-medium text-muted-foreground">
                   Nimi
                 </th>
+                <th className="px-4 py-3 text-center font-medium text-muted-foreground">
+                  Kenttiä
+                </th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
-              {fields.map((field, index) => (
-                <tr key={field.id} className="bg-white hover:bg-gray-50">
-                  <td className="px-4 py-3 font-medium">{field.name}</td>
+              {objects.map((object) => (
+                <tr key={object.id} className="bg-white hover:bg-gray-50">
+                  <td className="px-4 py-3 font-medium">{object.name}</td>
+                  <td className="px-4 py-3 font-medium text-center">
+                    {object.fields.length}
+                  </td>
                 </tr>
               ))}
             </tbody>

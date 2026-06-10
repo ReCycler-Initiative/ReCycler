@@ -61,17 +61,19 @@ export const Field = z.object({
   required: z.boolean().optional(),
 });
 
+export const FieldRecord = Field.extend({
+  id: z.string().uuid(),
+  use_case_id: z.string().uuid(),
+});
+
 export const Object = z.object({
+  fields: z.array(Field),
   name: z.string(),
 });
 
 export const ObjectRecord = Object.extend({
   id: z.string().uuid(),
-  use_case_id: z.string().uuid(),
-});
-
-export const FieldRecord = Field.extend({
-  id: z.string().uuid(),
+  fields: z.array(FieldRecord),
   use_case_id: z.string().uuid(),
 });
 
