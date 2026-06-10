@@ -74,7 +74,11 @@ const ObjectsPage = () => {
                       // onClick={() => openEdit(field)}
                       aria-label="Muokkaa kenttää"
                     >
-                      <Pencil className="h-4 w-4" />
+                      <Link
+                        href={`/admin/organizations/${organizationId}/use_cases/${useCaseId}/objects/${object.id}/edit`}
+                      >
+                        <Pencil className="h-4 w-4" />
+                      </Link>
                     </Button>
                   </td>
                 </tr>

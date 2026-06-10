@@ -295,6 +295,17 @@ export const createField = (
     )
     .then((response) => FieldRecord.parse(response.data));
 
+export const getObject = (
+  organizationId: string,
+  useCaseId: string,
+  objectId: string
+): Promise<z.infer<typeof ObjectRecord>> =>
+  axios
+    .get(
+      `/api/organizations/${organizationId}/use_cases/${useCaseId}/objects/${objectId}`
+    )
+    .then((response) => ObjectRecord.parse(response.data));
+
 export const createObject = (
   organizationId: string,
   useCaseId: string,
@@ -303,6 +314,19 @@ export const createObject = (
   axios
     .post(
       `/api/organizations/${organizationId}/use_cases/${useCaseId}/objects`,
+      data
+    )
+    .then((response) => ObjectRecord.parse(response.data));
+
+export const updateObject = (
+  organizationId: string,
+  useCaseId: string,
+  objectId: string,
+  data: z.infer<typeof Object>
+): Promise<z.infer<typeof ObjectRecord>> =>
+  axios
+    .put(
+      `/api/organizations/${organizationId}/use_cases/${useCaseId}/objects/${objectId}`,
       data
     )
     .then((response) => ObjectRecord.parse(response.data));
