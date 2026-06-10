@@ -10,6 +10,8 @@ import {
   fieldFormDefaultValues,
   toApiData,
 } from "../_components/field-form";
+import { PageIntro } from "@/components/admin/page-intro";
+import { PageTemplate } from "@/components/admin/page-template";
 
 export default function NewFieldPage() {
   const { id: organizationId, useCaseId } = useParams<{
@@ -38,8 +40,10 @@ export default function NewFieldPage() {
   });
 
   return (
-    <EditorTemplate {...editor} title="Uusi kenttä">
-      <FieldFormFields form={editor.form} />
-    </EditorTemplate>
+    <PageTemplate title="Uusi kenttä">
+      <EditorTemplate {...editor}>
+        <FieldFormFields form={editor.form} />
+      </EditorTemplate>
+    </PageTemplate>
   );
 }

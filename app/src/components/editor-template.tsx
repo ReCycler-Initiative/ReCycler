@@ -154,35 +154,22 @@ export const EditorTemplate = <ApiData, FormData extends FieldValues>({
   form,
   query,
   mutation,
-  title,
-  introDescription,
-  introIcon,
-}: { children: ReactNode; title?: string; introDescription?: string; introIcon?: LucideIcon } & UseEditorReturn<
-  ApiData,
-  FormData
->) => {
+}: {
+  children: ReactNode;
+} & UseEditorReturn<ApiData, FormData>) => {
   return (
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit((values) => mutation.mutateAsync(values))}
         className="space-y-4"
       >
-        <PageTemplate>
-          {introDescription ? (
-            <PageIntro
-              title={title}
-              description={introDescription}
-              icon={introIcon}
-            />
-          ) : null}
-          <LoadingState isLoading={query.isLoading} error={!!query.error}>
-            {children}
-            <FormFooter
-              isSubmitting={form.formState.isSubmitting}
-              isDirty={form.formState.isDirty}
-            />
-          </LoadingState>
-        </PageTemplate>
+        <LoadingState isLoading={query.isLoading} error={!!query.error}>
+          {children}
+          <FormFooter
+            isSubmitting={form.formState.isSubmitting}
+            isDirty={form.formState.isDirty}
+          />
+        </LoadingState>
       </form>
     </Form>
   );

@@ -2,7 +2,7 @@
 
 import { createObject } from "@/services/api";
 import { useRouter } from "next/navigation";
-import { objectFormDefaultValues, toApiData } from "../_components/field-form";
+import { objectFormDefaultValues, toApiData } from "../_components/object-form";
 import ObjectEditor from "../_components/object-editor";
 
 export default function NewObjectPage() {
