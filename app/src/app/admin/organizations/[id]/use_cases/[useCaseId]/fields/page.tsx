@@ -1,7 +1,7 @@
 "use client";
 
 import { PageTemplate } from "@/components/admin/page-template";
-import { UseCasePageIntro } from "@/components/admin/use-case-page-intro";
+import { PageIntro } from "@/components/admin/page-intro";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -148,7 +148,7 @@ export default function FieldsPage() {
   return (
     <>
       <PageTemplate>
-        <UseCasePageIntro
+        <PageIntro
           title={messages.admin.fields}
           description={messages.admin.useCaseHomeHighlights[2]}
           actions={

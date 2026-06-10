@@ -9,7 +9,7 @@ import Link from "next/link";
 import { ReactNode } from "react";
 import { DefaultValues, FieldValues, useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { UseCasePageIntro } from "@/components/admin/use-case-page-intro";
+import { PageIntro } from "@/components/admin/page-intro";
 
 // ---------- FormFooter ----------
 
@@ -169,7 +169,7 @@ export const EditorTemplate = <ApiData, FormData extends FieldValues>({
       >
         <PageTemplate>
           {introDescription ? (
-            <UseCasePageIntro
+            <PageIntro
               title={title}
               description={introDescription}
               icon={introIcon}

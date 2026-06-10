@@ -1,7 +1,7 @@
 "use client";
 
 import { PageTemplate } from "@/components/admin/page-template";
-import { UseCasePageIntro } from "@/components/admin/use-case-page-intro";
+import { PageIntro } from "@/components/admin/page-intro";
 import { useMessages } from "@/i18n/locale-provider";
 import { BarChart3, Bot, MousePointerClick, Search } from "lucide-react";
 
@@ -18,7 +18,7 @@ export default function UsageStatsPage() {
   return (
     <PageTemplate>
       <div className="grid gap-6">
-        <UseCasePageIntro
+        <PageIntro
           title={messages.admin.usageStatsTitle}
           description={messages.admin.usageStatsIntro}
         />

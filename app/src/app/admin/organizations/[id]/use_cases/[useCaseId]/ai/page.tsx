@@ -1,7 +1,7 @@
 "use client";
 
 import { PageTemplate } from "@/components/admin/page-template";
-import { UseCasePageIntro } from "@/components/admin/use-case-page-intro";
+import { PageIntro } from "@/components/admin/page-intro";
 import { Button } from "@/components/ui/button";
 import { FileText, Files, HardDrive, Trash2, Upload } from "lucide-react";
 import { useMessages } from "@/i18n/locale-provider";
@@ -56,7 +56,7 @@ export default function AiPage() {
   return (
     <PageTemplate>
       <div className="flex flex-col gap-6">
-        <UseCasePageIntro
+        <PageIntro
           title={messages.adminAiPage.title}
           description={messages.adminAiPage.description}
         />

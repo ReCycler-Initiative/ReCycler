@@ -1,7 +1,7 @@
 "use client";
 
 import { PageTemplate } from "@/components/admin/page-template";
-import { UseCasePageIntro } from "@/components/admin/use-case-page-intro";
+import { PageIntro } from "@/components/admin/page-intro";
 import { Button } from "@/components/ui/button";
 import {
   deleteDatasource,
@@ -103,7 +103,7 @@ const DatasourcesPage = () => {
   return (
     <PageTemplate>
       <div className="space-y-6">
-        <UseCasePageIntro
+        <PageIntro
           title={messages.admin.datasourcesPageTitle}
           description={messages.admin.datasourcesIntro}
           actions={

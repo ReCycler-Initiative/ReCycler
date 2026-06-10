@@ -1,7 +1,7 @@
 "use client";
 
 import { FormFooter } from "@/components/editor-template";
-import { UseCasePageIntro } from "@/components/admin/use-case-page-intro";
+import { PageIntro } from "@/components/admin/page-intro";
 import FormCheckbox from "@/components/form/form-checkbox";
 import FormInput from "@/components/form/form-input";
 import FormSelect from "@/components/form/form-select";
@@ -439,7 +439,7 @@ export const DataSourceEditor = ({
         onSubmit={handleSubmit(onSubmit)}
         className="datasource-editor space-y-6 pb-10"
       >
-        <UseCasePageIntro
+        <PageIntro
           title={editorTitle}
           description={messages.admin.datasourcesIntro}
           icon={Cable}

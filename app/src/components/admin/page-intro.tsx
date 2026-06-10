@@ -9,7 +9,7 @@ type UseCasePageIntroProps = {
   icon?: LucideIcon;
 };
 
-export function UseCasePageIntro({
+export function PageIntro({
   title,
   description,
   actions,

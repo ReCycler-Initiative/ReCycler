@@ -10,7 +10,7 @@ import {
 } from "@/components/admin/admin-map-view";
 import { SplitMapLayout } from "@/components/admin/split-map-layout";
 import { PageTemplate } from "@/components/admin/page-template";
-import { UseCasePageIntro } from "@/components/admin/use-case-page-intro";
+import { PageIntro } from "@/components/admin/page-intro";
 import { LocationEditPanel } from "@/components/admin/location-edit-panel";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -162,7 +162,7 @@ const LocationsPage = () => {
   return (
     <PageTemplate mode="fullScreen">
       <div className="locations-page flex-none px-4 py-6">
-        <UseCasePageIntro
+        <PageIntro
           title={messages.adminLocations.title}
           description={messages.admin.useCaseHomeHighlights[1]}
           actions={!addMode ? (
