@@ -10,6 +10,7 @@ import {
   LocationDetail,
   LocationGeoJsonCollection,
   Material,
+  ObjectRecord,
   Organization,
   UseCase,
 } from "@/types";
@@ -68,7 +69,9 @@ export const getLocations = (
   useCaseId: string
 ): Promise<z.infer<typeof LocationGeoJsonCollection>> =>
   axios
-    .get(`/api/organizations/${organizationId}/use_cases/${useCaseId}/locations`)
+    .get(
+      `/api/organizations/${organizationId}/use_cases/${useCaseId}/locations`
+    )
     .then((response) => response.data);
 
 export const createLocation = (
@@ -85,7 +88,10 @@ export const createLocation = (
   }
 ): Promise<any> =>
   axios
-    .post(`/api/organizations/${organizationId}/use_cases/${useCaseId}/locations`, body)
+    .post(
+      `/api/organizations/${organizationId}/use_cases/${useCaseId}/locations`,
+      body
+    )
     .then((response) => response.data);
 
 export const getLocation = (
@@ -190,7 +196,9 @@ export const getUserOrganizations = (): Promise<
 > =>
   axios
     .get("/api/users/me/organizations")
-    .then((response) => response.data.map((org: any) => Organization.parse(org)));
+    .then((response) =>
+      response.data.map((org: any) => Organization.parse(org))
+    );
 
 export type UseCaseTrainingMaterialListItem = {
   id: string;
@@ -247,14 +255,20 @@ type FieldBody = {
   } | null;
 };
 
+export const getObjects = (
+  organizationId: string,
+  useCaseId: string
+): Promise<z.infer<typeof ObjectRecord>[]> =>
+  axios
+    .get(`/api/organizations/${organizationId}/use_cases/${useCaseId}/objects`)
+    .then((response) => z.array(ObjectRecord).parse(response.data));
+
 export const getFields = (
   organizationId: string,
   useCaseId: string
 ): Promise<z.infer<typeof FieldRecord>[]> =>
   axios
-    .get(
-      `/api/organizations/${organizationId}/use_cases/${useCaseId}/fields`
-    )
+    .get(`/api/organizations/${organizationId}/use_cases/${useCaseId}/fields`)
     .then((response) => z.array(FieldRecord).parse(response.data));
 
 export const getField = (
@@ -347,7 +361,9 @@ export const getDatasources = (
   organizationId: string,
   useCaseId: string
 ): Promise<Datasource[]> =>
-  axios.get(base(organizationId, useCaseId)).then((r) => z.array(Datasource).parse(r.data));
+  axios
+    .get(base(organizationId, useCaseId))
+    .then((r) => z.array(Datasource).parse(r.data));
 
 export const getDatasource = (
   organizationId: string,
@@ -363,7 +379,9 @@ export const createDatasource = (
   useCaseId: string,
   data: DatasourceBody
 ): Promise<Datasource> =>
-  axios.post(base(organizationId, useCaseId), data).then((r) => Datasource.parse(r.data));
+  axios
+    .post(base(organizationId, useCaseId), data)
+    .then((r) => Datasource.parse(r.data));
 
 export const updateDatasource = (
   organizationId: string,
@@ -380,7 +398,9 @@ export const deleteDatasource = (
   useCaseId: string,
   datasourceId: string
 ): Promise<void> =>
-  axios.delete(`${base(organizationId, useCaseId)}/${datasourceId}`).then(() => undefined);
+  axios
+    .delete(`${base(organizationId, useCaseId)}/${datasourceId}`)
+    .then(() => undefined);
 
 export const testDatasource = (
   organizationId: string,
@@ -415,7 +435,9 @@ export const saveDatasourceMappings = (
   mappings: { source_field: string; field_id: string }[]
 ): Promise<DatasourceFieldMapping[]> =>
   axios
-    .post(`${base(organizationId, useCaseId)}/${datasourceId}/mappings`, { mappings })
+    .post(`${base(organizationId, useCaseId)}/${datasourceId}/mappings`, {
+      mappings,
+    })
     .then((r) => z.array(DatasourceFieldMapping).parse(r.data));
 
 export const runDatasource = (
@@ -435,4 +457,3 @@ export const getDatasourceRuns = (
   axios
     .get(`${base(organizationId, useCaseId)}/${datasourceId}/runs`)
     .then((r) => z.array(DatasourceRun).parse(r.data));
-
