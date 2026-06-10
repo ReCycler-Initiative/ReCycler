@@ -107,14 +107,14 @@ const Content = ({
       icon: AppWindow,
     },
     {
-      href: `${orgRootPath}/datasources`,
-      label: messages.admin.datasources,
-      icon: Database,
-    },
-    {
       href: `${orgRootPath}/fields`,
       label: messages.admin.fields,
       icon: Blocks,
+    },
+    {
+      href: `${orgRootPath}/datasources`,
+      label: messages.admin.datasources,
+      icon: Database,
     },
     {
       href: `${orgRootPath}/locations`,
