@@ -1,7 +1,7 @@
 import { cn } from "@/lib/utils";
 import { LucideIcon } from "lucide-react";
 
-type UseCasePageIntroProps = {
+type PageIntroProps = {
   title: string;
   description: string;
   actions?: React.ReactNode;
@@ -15,7 +15,7 @@ export function PageIntro({
   actions,
   className,
   icon: Icon,
-}: UseCasePageIntroProps) {
+}: PageIntroProps) {
   return (
     <section
       className={cn(
