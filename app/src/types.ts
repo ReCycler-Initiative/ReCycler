@@ -1,4 +1,7 @@
-import { isSupportedSourceCrsValue, normalizeSourceCrsValue } from "@/lib/datasource";
+import {
+  isSupportedSourceCrsValue,
+  normalizeSourceCrsValue,
+} from "@/lib/datasource";
 import { z } from "zod";
 
 export type CollectionSpot = {
@@ -58,6 +61,15 @@ export const Field = z.object({
   required: z.boolean().optional(),
 });
 
+export const Object = z.object({
+  name: z.string(),
+});
+
+export const ObjectRecord = Object.extend({
+  id: z.string().uuid(),
+  use_case_id: z.string().uuid(),
+});
+
 export const FieldRecord = Field.extend({
   id: z.string().uuid(),
   use_case_id: z.string().uuid(),
@@ -68,9 +80,11 @@ export const Point = z.object({
   coordinates: z.tuple([z.number(), z.number()]),
 });
 
-export const Geometry = z.object({
-  type: z.string(),
-}).passthrough();
+export const Geometry = z
+  .object({
+    type: z.string(),
+  })
+  .passthrough();
 
 export const DbLocation = z.object({
   field_id: z.string().uuid().nullable(),
@@ -191,7 +205,12 @@ export const CreateOrganizationResponse = z.object({
 
 export const DatasourceStatus = z.enum(["draft", "active", "disabled"]);
 export const DatasourceSourceFormat = z.enum(["json", "geojson", "wfs"]);
-export const DatasourceAuthType = z.enum(["none", "api_key", "basic", "query_param"]);
+export const DatasourceAuthType = z.enum([
+  "none",
+  "api_key",
+  "basic",
+  "query_param",
+]);
 export const DatasourceCoordinateType = z.enum(["latlon", "geojson"]);
 export const DatasourceSourceCrs = z
   .string()
