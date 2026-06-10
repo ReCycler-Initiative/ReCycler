@@ -1,6 +1,6 @@
 import { checkOrganizationAuthorization } from "@/lib/authorization";
 import db from "@/services/db";
-import { ObjectRecord } from "@/types";
+import { ObjectRecord, Object } from "@/types";
 import { NextRequest, NextResponse } from "next/server";
 import z from "zod";
 
@@ -37,4 +37,31 @@ export async function GET(
   );
 
   return NextResponse.json(z.array(ObjectRecord).parse(result.rows));
+}
+
+export async function POST(
+  request: NextRequest,
+  { params }: { params: Promise<{ organizationId: string; useCaseId: string }> }
+) {
+  const { organizationId, useCaseId } = await params;
+
+  const authResult = await checkOrganizationAuthorization(
+    request,
+    organizationId
+  );
+  if (!authResult.authorized) return authResult.response!;
+
+  const body = await request.json();
+  const data = Object.parse(body);
+
+  const result = await db.raw(
+    `
+    INSERT INTO recycler.objects (name, use_case_id)
+    VALUES (?::text, ?::uuid)
+    RETURNING *, '[]'::json as fields
+    `,
+    [data.name, useCaseId]
+  );
+
+  return NextResponse.json(ObjectRecord.parse(result.rows[0]), { status: 201 });
 }

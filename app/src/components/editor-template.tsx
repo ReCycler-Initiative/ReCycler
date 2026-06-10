@@ -157,7 +157,7 @@ export const EditorTemplate = <ApiData, FormData extends FieldValues>({
   title,
   introDescription,
   introIcon,
-}: { children: ReactNode; title: string; introDescription?: string; introIcon?: LucideIcon } & UseEditorReturn<
+}: { children: ReactNode; title?: string; introDescription?: string; introIcon?: LucideIcon } & UseEditorReturn<
   ApiData,
   FormData
 >) => {

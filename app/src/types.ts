@@ -67,7 +67,6 @@ export const FieldRecord = Field.extend({
 });
 
 export const Object = z.object({
-  fields: z.array(Field),
   name: z.string(),
 });
 

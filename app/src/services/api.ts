@@ -10,6 +10,7 @@ import {
   LocationDetail,
   LocationGeoJsonCollection,
   Material,
+  Object,
   ObjectRecord,
   Organization,
   UseCase,
@@ -293,6 +294,18 @@ export const createField = (
       data
     )
     .then((response) => FieldRecord.parse(response.data));
+
+export const createObject = (
+  organizationId: string,
+  useCaseId: string,
+  data: z.infer<typeof Object>
+): Promise<z.infer<typeof ObjectRecord>> =>
+  axios
+    .post(
+      `/api/organizations/${organizationId}/use_cases/${useCaseId}/objects`,
+      data
+    )
+    .then((response) => ObjectRecord.parse(response.data));
 
 export const updateField = (
   organizationId: string,

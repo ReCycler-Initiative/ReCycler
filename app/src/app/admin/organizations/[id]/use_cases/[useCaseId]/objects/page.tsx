@@ -7,6 +7,7 @@ import { useMessages } from "@/i18n/locale-provider";
 import { getObjects } from "@/services/api";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowDown, Pencil, Plus, Trash2 } from "lucide-react";
+import Link from "next/link";
 import { useParams } from "next/navigation";
 
 const ObjectsPage = () => {
@@ -29,9 +30,13 @@ const ObjectsPage = () => {
         title={messages.admin.fields}
         description={messages.admin.useCaseHomeHighlights[2]}
         actions={
-          <Button onClick={() => undefined}>
-            <Plus className="h-4 w-4 mr-2" />
-            Lisää sisältömalli
+          <Button asChild>
+            <Link
+              href={`/admin/organizations/${organizationId}/use_cases/${useCaseId}/objects/new`}
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              Lisää sisältömalli
+            </Link>
           </Button>
         }
       />
@@ -52,6 +57,7 @@ const ObjectsPage = () => {
                 <th className="px-4 py-3 text-center font-medium text-muted-foreground">
                   Kenttiä
                 </th>
+                <th className="w-24"></th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
@@ -60,6 +66,16 @@ const ObjectsPage = () => {
                   <td className="px-4 py-3 font-medium">{object.name}</td>
                   <td className="px-4 py-3 font-medium text-center">
                     {object.fields.length}
+                  </td>
+                  <td>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      // onClick={() => openEdit(field)}
+                      aria-label="Muokkaa kenttää"
+                    >
+                      <Pencil className="h-4 w-4" />
+                    </Button>
                   </td>
                 </tr>
               ))}
