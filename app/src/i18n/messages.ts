@@ -575,7 +575,7 @@ const baseFi = {
 		{
 			name: "Käynnistys",
 			audience: "Nopea käynnistys",
-			price: "xxx €/kk",
+			price: "Julkaistaan myöh. €/kk",
 			description:
 				"Sopii ensimmäiseen julkaistavaan palveluun, kun halutaan nopeasti käyttöön yksi palvelu oikealla datalla.",
 			highlights: [
@@ -587,7 +587,7 @@ const baseFi = {
 		{
 			name: "Kasvu",
 			audience: "Organisaatiokäyttö",
-			price: "xxxx €/kk",
+			price: "Julkaistaan myöh. €/kk",
 			description:
 				"Tarkoitettu organisaatioille, jotka haluavat useampia palveluita saman alustan päälle.",
 			highlights: [
@@ -1143,7 +1143,7 @@ const baseEn = {
 		{
 			name: "Launch",
 			audience: "Fast launch",
-			price: "xxx €/month",
+			price: "TBD €/month",
 			description:
 				"Fits a first published service when you want to quickly launch one service with real data.",
 			highlights: [
@@ -1155,7 +1155,7 @@ const baseEn = {
 		{
 			name: "Growth",
 			audience: "Organization-wide use",
-			price: "xxxx €/month",
+			price: "TBD €/month",
 			description:
 				"Designed for organizations that want multiple services on the same platform.",
 			highlights: [
