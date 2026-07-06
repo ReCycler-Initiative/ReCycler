@@ -37,10 +37,11 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useParams, usePathname, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { PageLoadingSpinner } from "@/components/page-loading-spinner";
 import { useMessages } from "@/i18n/locale-provider";
 import { LucideIcon } from "lucide-react";
+import { CreateUseCaseDialog } from "@/components/dialogs/create-use-case-dialog";
 
 type NavLink = {
   exact?: boolean;
@@ -56,13 +57,14 @@ const Content = ({
 }: {
   children: React.ReactNode;
   organization: any;
-  selectedUseCaseId: string;
+  selectedUseCaseId?: string;
 }) => {
   const messages = useMessages();
   const { id } = useParams<{ id: string }>();
   const pathname = usePathname();
   const router = useRouter();
   const [adminTheme, setAdminTheme] = useState<"light" | "dark">("light");
+  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
 
   useEffect(() => {
     const savedTheme = window.localStorage.getItem("recycler-admin-theme");
@@ -80,7 +82,18 @@ const Content = ({
     queryFn: () => getUseCases(id),
   });
 
-  const orgRootPath = `/admin/organizations/${id}/use_cases/${selectedUseCaseId}`;
+  const resolvedUseCaseId = useMemo(() => {
+    if (selectedUseCaseId) {
+      return selectedUseCaseId;
+    }
+
+    const match = pathname?.match(/\/use_cases\/([^/]+)/);
+    return match?.[1];
+  }, [pathname, selectedUseCaseId]);
+
+  const orgRootPath = resolvedUseCaseId
+    ? `/admin/organizations/${id}/use_cases/${resolvedUseCaseId}`
+    : `/admin/organizations/${id}/use_cases`;
 
   const isActiveSection = (segment: string, exact?: boolean) => {
     if (exact) {
@@ -157,16 +170,19 @@ const Content = ({
               {messages.admin.useCaseLabel}
             </Label>
             <Select
-              defaultValue={useCasesQuery.data?.[0]?.id}
-              value={selectedUseCaseId}
-              onValueChange={() => {
-                router.push(
-                  `/admin/organizations/${id}/use_cases/${selectedUseCaseId}`
-                );
+              value={resolvedUseCaseId || ""}
+              onValueChange={(value) => {
+                if (value === "create_new") {
+                  setIsCreateDialogOpen(true);
+                } else {
+                  router.push(
+                    `/admin/organizations/${id}/use_cases/${value}`
+                  );
+                }
               }}
             >
-              <SelectTrigger className="admin-usecase-select w-[180px]">
-                <SelectValue />
+              <SelectTrigger className="admin-usecase-select w-[200px]">
+                <SelectValue placeholder="Valitse käyttötapaus" />
               </SelectTrigger>
               <SelectContent className="admin-usecase-select-content">
                 {useCasesQuery.data?.map((useCase) => (
@@ -174,13 +190,16 @@ const Content = ({
                     {useCase.name}
                   </SelectItem>
                 ))}
+                <SelectItem value="create_new" className="font-semibold">
+                  + Uusi käyttötapaus
+                </SelectItem>
               </SelectContent>
             </Select>
           </div>
 
-          {selectedUseCaseId && (
+          {resolvedUseCaseId && (
             <Link
-              href={`/organizations/${id}/use_cases/${selectedUseCaseId}`}
+              href={`/organizations/${id}/use_cases/${resolvedUseCaseId}`}
               className={cn(navButtonClass(true), "admin-open-link")}
               aria-label={messages.admin.openSelectedUseCase}
               target="_blank"
@@ -212,7 +231,7 @@ const Content = ({
                 </Link>
               </DropdownMenuItem>
 
-              {selectedUseCaseId && (
+              {resolvedUseCaseId && (
                 <DropdownMenuItem asChild>
                   <Link href={`${orgRootPath}/edit`}>
                     <BriefcaseBusiness className="mr-2 h-4 w-4 text-slate-500" />
@@ -220,6 +239,7 @@ const Content = ({
                   </Link>
                 </DropdownMenuItem>
               )}
+
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
@@ -228,13 +248,19 @@ const Content = ({
       <main className="admin-content flex-1 flex flex-col bg-gray-100">
         {children}
       </main>
+
+      <CreateUseCaseDialog
+        organizationId={id}
+        isOpen={isCreateDialogOpen}
+        onOpenChange={setIsCreateDialogOpen}
+      />
     </div>
   );
 };
 
 const AdminLayout = ({ children }: { children: React.ReactNode }) => {
   const messages = useMessages();
-  const { id, useCaseId } = useParams<{ id: string; useCaseId: string }>();
+  const { id, useCaseId } = useParams<{ id: string; useCaseId?: string }>();
   const router = useRouter();
 
   const accessQuery = useQuery({

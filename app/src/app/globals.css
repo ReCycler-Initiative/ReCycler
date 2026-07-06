@@ -289,6 +289,32 @@
     color: rgb(248 250 252) !important;
   }
 
+  .admin-shell[data-admin-theme="dark"] .locations-page,
+  .admin-shell[data-admin-theme="dark"] .location-edit-panel,
+  .admin-shell[data-admin-theme="dark"] .locations-sidebar-card {
+    --primary: 217.2 32.6% 17.5%;
+    --primary-foreground: 210 40% 98%;
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+  }
+
+  .admin-shell[data-admin-theme="dark"] .location-edit-panel input,
+  .admin-shell[data-admin-theme="dark"] .locations-sidebar-card input {
+    background-color: rgb(15 23 42) !important;
+    color: rgb(248 250 252) !important;
+    border-color: rgb(71 85 105) !important;
+  }
+
+  .admin-shell[data-admin-theme="dark"] .location-edit-panel input::placeholder,
+  .admin-shell[data-admin-theme="dark"] .locations-sidebar-card input::placeholder {
+    color: rgb(148 163 184) !important;
+  }
+
+  .admin-shell[data-admin-theme="dark"] .location-edit-panel button,
+  .admin-shell[data-admin-theme="dark"] .locations-sidebar-card button {
+    border-color: rgb(71 85 105);
+  }
+
   .admin-shell[data-admin-theme="dark"] .location-edit-panel .bg-white,
   .admin-shell[data-admin-theme="dark"] .location-edit-panel .bg-gray-50,
   .admin-shell[data-admin-theme="dark"] .location-edit-panel .bg-gray-50\/60,
@@ -347,6 +373,26 @@
   .admin-shell[data-admin-theme="dark"] .admin-content .text-gray-500,
   .admin-shell[data-admin-theme="dark"] .admin-content .text-muted-foreground {
     color: rgb(203 213 225) !important;
+  }
+
+  .admin-shell[data-admin-theme="dark"] .admin-content [role="tablist"] {
+    background-color: rgb(30 41 59) !important;
+    border: 1px solid rgb(51 65 85) !important;
+  }
+
+  .admin-shell[data-admin-theme="dark"] .admin-content [role="tab"] {
+    color: rgb(203 213 225) !important;
+  }
+
+  .admin-shell[data-admin-theme="dark"] .admin-content [role="tab"]:hover {
+    background-color: rgb(51 65 85) !important;
+    color: rgb(248 250 252) !important;
+  }
+
+  .admin-shell[data-admin-theme="dark"] .admin-content [role="tab"][data-state="active"] {
+    background-color: rgb(248 250 252) !important;
+    color: rgb(15 23 42) !important;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.25) !important;
   }
 
   .admin-shell[data-admin-theme="dark"] .text-destructive,

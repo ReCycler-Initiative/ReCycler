@@ -1,11 +1,9 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: false,
+  distDir: ".next-runtime",
   output: "standalone",
   serverExternalPackages: ["knex"],
-  experimental: {
-    reactCompiler: true,
-  },
 };
 
 export default nextConfig;

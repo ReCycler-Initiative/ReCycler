@@ -77,6 +77,7 @@ const baseFi = {
 		toggleTheme: "Vaihda teema",
 		useDarkTheme: "Käytä tummaa teemaa",
 		useLightTheme: "Käytä vaaleaa teemaa",
+		help: "Ohjeet",
 		openSelectedUseCase: "Avaa valittu käyttötapaus",
 		open: "Avaa",
 		organizationDetails: "Organisaation tiedot",
@@ -90,13 +91,13 @@ const baseFi = {
 		useCaseHomeTitle: "Määritä käyttötapaus ja sen data",
 		useCaseHomeBadge: "Käyttötapauksen aloitusnäkymä",
 		useCaseHomeDescription:
-			"Tässä näkymässä rakennat käyttötapauksen, datayhteydet ja käyttäjälle näkyvät sisällöt.",
+			"Tässä näkymässä hallitset käyttötapauksen asetuksia, datayhteyksiä, sisältömallia, kohteita ja ajojen seurantaa.",
 		useCaseHomeProgressTitle: "Suositeltu eteneminen",
 		useCaseHomeProgressDescription:
 			"Aloita datayhteyksistä ja etene siitä sisältömallin kautta kohteisiin ja lokeihin.",
 		useCaseHomeHighlights: [
 			"Liitä ja ylläpidä datayhteydet käyttötapaukseen",
-			"Määritä mitä kohteita näytetään ja millä ehdoilla",
+			"Tarkastele, lisää, muokkaa ja poista kohteita",
 			"Muokkaa kenttiä ja ominaisuuksia ilman koodausta",
 			"Tarkista lokit muutosten jälkeen",
 		],
@@ -171,6 +172,8 @@ const baseFi = {
 	},
 	adminLocations: {
 		title: "Kohteet",
+		description:
+			"Tarkastele, lisää, muokkaa ja poista kohteita sekä hallitse niiden tietoja.",
 		cancelAdding: "Peruuta lisääminen",
 		addLocation: "Lisää kohde",
 		loadingLocations: "Ladataan kohteita...",
@@ -422,6 +425,27 @@ const baseFi = {
 		description:
 			"Muokkaa organisaation perustietoja, joita käytetään hallinnassa ja palvelun yhteydessä.",
 		nameLabel: "Nimi",
+	},
+	adminHelp: {
+		title: "Ylläpidon käyttöohje",
+		description:
+			"Tällä sivulla näet, miten käyttötapaus rakennetaan alusta loppuun: datayhteydet, sisältömalli, kohteet, tekoälytuki ja ajot.",
+		quickStartTitle: "Nopea aloitus",
+		quickStartSteps: [
+			"Lisää ensin datayhteydet ja varmista, että yhteystesti menee läpi.",
+			"Määritä sisältömalli (kentät), joita kohteissa käytetään.",
+			"Tuo tai lisää kohteet ja varmista, että tiedot näkyvät oikein.",
+			"Tarkista ajot ja lokit muutosten jälkeen.",
+		],
+		sectionsTitle: "Ylläpidon osa-alueet",
+		sectionsDescription:
+			"Voit käyttää alla olevia linkkejä suoraan ylläpidon eri näkymiin.",
+		tipsTitle: "Hyvät käytännöt",
+		tips: [
+			"Tee muutokset pienissä osissa ja tarkista vaikutus jokaisen vaiheen jälkeen.",
+			"Pidä kenttien nimet ja suodatinlogiikka mahdollisimman selkeinä ylläpidon helpottamiseksi.",
+			"Käy lokit läpi aina isompien datamuutosten jälkeen.",
+		],
 	},
 	adminDatasourcePage: {
 		newTitle: "Uusi datalähde",
@@ -729,6 +753,7 @@ const baseEn = {
 		toggleTheme: "Toggle theme",
 		useDarkTheme: "Use dark theme",
 		useLightTheme: "Use light theme",
+		help: "Help",
 		openSelectedUseCase: "Open selected use case",
 		open: "Open",
 		organizationDetails: "Organization details",
@@ -742,13 +767,13 @@ const baseEn = {
 		useCaseHomeTitle: "Configure the use case and its data",
 		useCaseHomeBadge: "Use case overview",
 		useCaseHomeDescription:
-			"In this view you build the use case, its data connections, and the content shown to end users.",
+			"In this view you manage use case settings, data connections, the content model, locations, and run monitoring.",
 		useCaseHomeProgressTitle: "Recommended order",
 		useCaseHomeProgressDescription:
 			"Start with data connections, then continue through the content model to locations and logs.",
 		useCaseHomeHighlights: [
 			"Attach and maintain data connections for the use case",
-			"Define which locations are shown and under what conditions",
+			"Browse, add, edit, and delete locations",
 			"Edit fields and properties without coding",
 			"Review logs after changes",
 		],
@@ -824,6 +849,8 @@ const baseEn = {
 	},
 	adminLocations: {
 		title: "Locations",
+		description:
+			"Browse, add, edit, and delete locations, and manage their details.",
 		cancelAdding: "Cancel adding",
 		addLocation: "Add location",
 		loadingLocations: "Loading locations...",
@@ -1036,6 +1063,27 @@ const baseEn = {
 		description:
 			"Edit the core organization information used throughout the admin experience and service context.",
 		nameLabel: "Name",
+	},
+	adminHelp: {
+		title: "Admin guide",
+		description:
+			"This page explains the end-to-end setup flow for a use case: data connections, content model, locations, AI support, and runs.",
+		quickStartTitle: "Quick start",
+		quickStartSteps: [
+			"Add data connections first and verify the connection test succeeds.",
+			"Define the content model (fields) used by locations.",
+			"Import or add locations and verify the data renders correctly.",
+			"Review runs and logs after your changes.",
+		],
+		sectionsTitle: "Admin areas",
+		sectionsDescription:
+			"Use the links below to jump directly into each admin area.",
+		tipsTitle: "Best practices",
+		tips: [
+			"Apply changes in small steps and validate each step before continuing.",
+			"Keep field names and filter logic clear to make maintenance easier.",
+			"Always review logs after larger data updates.",
+		],
 	},
 	marketing: {
 		...baseFi.marketing,

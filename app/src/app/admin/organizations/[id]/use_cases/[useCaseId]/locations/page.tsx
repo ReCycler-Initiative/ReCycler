@@ -164,7 +164,7 @@ const LocationsPage = () => {
       <div className="locations-page flex-none px-4 py-6">
         <PageIntro
           title={messages.adminLocations.title}
-          description={messages.admin.useCaseHomeHighlights[1]}
+          description={messages.adminLocations.description}
           actions={!addMode ? (
             <Button
               className="locations-primary-button"

@@ -10,6 +10,7 @@ import {
   LocationDetail,
   LocationGeoJsonCollection,
   Material,
+  NewUseCase,
   Object,
   ObjectRecord,
   Organization,
@@ -169,6 +170,14 @@ export const updateUseCase = (
       `/api/organizations/${organizationId}/use_cases/${useCase.id}`,
       useCase
     )
+    .then((response) => UseCase.parse(response.data));
+
+export const createUseCase = (
+  organizationId: string,
+  data: z.infer<typeof NewUseCase>
+): Promise<z.infer<typeof UseCase>> =>
+  axios
+    .post(`/api/organizations/${organizationId}/use_cases`, data)
     .then((response) => UseCase.parse(response.data));
 
 export const getOrganizationById = (
