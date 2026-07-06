@@ -100,6 +100,11 @@ export async function GET(
   });
 }
 
+const GeoJsonGeometry = z.object({
+  type: z.string(),
+  coordinates: z.unknown(),
+});
+
 const CreateLocationBody = z.object({
   longitude: z.number().finite(),
   latitude: z.number().finite(),
@@ -107,6 +112,7 @@ const CreateLocationBody = z.object({
   address: OptionalLocationString,
   postal_code: OptionalLocationString,
   post_office: OptionalLocationString,
+  source_geometry: GeoJsonGeometry.optional(),
   fieldValues: z
     .array(
       z.object({
@@ -158,18 +164,33 @@ export async function POST(
     address,
     postal_code,
     post_office,
+    source_geometry,
     fieldValues,
   } = parsed.data;
 
   const row = await db.transaction(async (trx) => {
-    const insertResult = await trx.raw(
-      `
-        INSERT INTO recycler.locations (name, use_case_id, geom, address, postal_code, post_office)
-        VALUES (?, ?::uuid, ST_SetSRID(ST_Point(?, ?), 4326), ?, ?, ?)
-        RETURNING id, name, address, postal_code, post_office, ST_AsGeoJSON(geom)::jsonb as geom
-      `,
-      [name, useCaseId, longitude, latitude, address || null, postal_code || null, post_office || null]
-    );
+    let insertResult;
+    if (source_geometry) {
+      insertResult = await trx.raw(
+        `
+          INSERT INTO recycler.locations (name, use_case_id, geom, source_geom, address, postal_code, post_office)
+          VALUES (?, ?::uuid, ST_SetSRID(ST_Point(?, ?), 4326), ST_SetSRID(ST_GeomFromGeoJSON(?), 4326), ?, ?, ?)
+          RETURNING id, name, address, postal_code, post_office,
+            ST_AsGeoJSON(geom)::jsonb as geom,
+            ST_AsGeoJSON(source_geom)::jsonb as source_geom
+        `,
+        [name, useCaseId, longitude, latitude, JSON.stringify(source_geometry), address || null, postal_code || null, post_office || null]
+      );
+    } else {
+      insertResult = await trx.raw(
+        `
+          INSERT INTO recycler.locations (name, use_case_id, geom, address, postal_code, post_office)
+          VALUES (?, ?::uuid, ST_SetSRID(ST_Point(?, ?), 4326), ?, ?, ?)
+          RETURNING id, name, address, postal_code, post_office, ST_AsGeoJSON(geom)::jsonb as geom
+        `,
+        [name, useCaseId, longitude, latitude, address || null, postal_code || null, post_office || null]
+      );
+    }
 
     const createdRow = insertResult.rows[0];
 

@@ -86,6 +86,7 @@ export const createLocation = (
     address?: string;
     postal_code?: string;
     post_office?: string;
+    source_geometry?: GeoJSON.Polygon | GeoJSON.MultiPolygon;
     fieldValues?: { fieldId: string; values: string[] }[];
   }
 ): Promise<any> =>
@@ -118,6 +119,7 @@ export const updateLocation = (
     address?: string;
     postal_code?: string;
     post_office?: string;
+    source_geometry?: GeoJSON.Polygon | GeoJSON.MultiPolygon | null;
     fieldValues?: { fieldId: string; values: string[] }[];
   }
 ): Promise<void> =>

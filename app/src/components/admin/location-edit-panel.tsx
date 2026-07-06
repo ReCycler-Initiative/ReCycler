@@ -14,6 +14,68 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+
+// ---------------------------------------------------------------------------
+// Geometry helpers
+// ---------------------------------------------------------------------------
+
+/** Cross product of vectors (b-a) and (c-a) */
+function cross(a: [number, number], b: [number, number], c: [number, number]): number {
+  return (b[0] - a[0]) * (c[1] - a[1]) - (b[1] - a[1]) * (c[0] - a[0]);
+}
+
+/** True if point p lies on segment [a, b] (collinear & within bounding box) */
+function onSegment(a: [number, number], b: [number, number], p: [number, number]): boolean {
+  return (
+    Math.min(a[0], b[0]) <= p[0] &&
+    p[0] <= Math.max(a[0], b[0]) &&
+    Math.min(a[1], b[1]) <= p[1] &&
+    p[1] <= Math.max(a[1], b[1])
+  );
+}
+
+/** True if segment (p1,p2) properly intersects segment (p3,p4) */
+function segmentsIntersect(
+  p1: [number, number],
+  p2: [number, number],
+  p3: [number, number],
+  p4: [number, number]
+): boolean {
+  const d1 = cross(p3, p4, p1);
+  const d2 = cross(p3, p4, p2);
+  const d3 = cross(p1, p2, p3);
+  const d4 = cross(p1, p2, p4);
+
+  if (((d1 > 0 && d2 < 0) || (d1 < 0 && d2 > 0)) && ((d3 > 0 && d4 < 0) || (d3 < 0 && d4 > 0))) {
+    return true;
+  }
+  if (d1 === 0 && onSegment(p3, p4, p1)) return true;
+  if (d2 === 0 && onSegment(p3, p4, p2)) return true;
+  if (d3 === 0 && onSegment(p1, p2, p3)) return true;
+  if (d4 === 0 && onSegment(p1, p2, p4)) return true;
+  return false;
+}
+
+/**
+ * Returns true if the polygon defined by `nodes` has any self-intersecting edges.
+ * Checks all non-adjacent edge pairs (O(n²)).
+ */
+function polygonSelfIntersects(nodes: [number, number][]): boolean {
+  if (nodes.length < 4) return false; // a triangle can never self-intersect
+  const n = nodes.length;
+  for (let i = 0; i < n; i++) {
+    const a = nodes[i];
+    const b = nodes[(i + 1) % n];
+    for (let j = i + 2; j < n; j++) {
+      // Skip adjacent edges (they share an endpoint)
+      if (i === 0 && j === n - 1) continue;
+      const c = nodes[j];
+      const d = nodes[(j + 1) % n];
+      if (segmentsIntersect(a, b, c, d)) return true;
+    }
+  }
+  return false;
+}
 import {
   ChevronDown,
   ChevronRight,
@@ -43,6 +105,11 @@ type AddProps = {
   mode: "add";
   lngLat?: { longitude: number; latitude: number };
   onSaved: (newId: string) => void;
+  /** In polygon draw mode, the nodes accumulated so far */
+  polygonNodes?: [number, number][];
+  onPolygonNodesChange?: (nodes: [number, number][]) => void;
+  locationTypeMode?: "point" | "polygon";
+  onLocationTypeModeChange?: (type: "point" | "polygon") => void;
 };
 
 type EditProps = {
@@ -50,6 +117,10 @@ type EditProps = {
   locationId: string;
   onSaved: () => void;
   onDelete?: () => void;
+  polygonNodes?: [number, number][];
+  onPolygonNodesChange?: (nodes: [number, number][]) => void;
+  locationTypeMode?: "point" | "polygon";
+  onLocationTypeModeChange?: (type: "point" | "polygon") => void;
 };
 
 export type LocationEditPanelProps = {
@@ -78,6 +149,11 @@ export const LocationEditPanel = (props: LocationEditPanelProps) => {
     onCancelRelocate,
     pickedLngLat,
   } = props;
+
+  const polygonNodes = props.polygonNodes ?? [];
+  const onPolygonNodesChange = props.onPolygonNodesChange;
+  const locationTypeMode = props.locationTypeMode ?? "point";
+  const onLocationTypeModeChange = props.onLocationTypeModeChange;
   const queryClient = useQueryClient();
 
   const locationId = props.mode === "edit" ? props.locationId : undefined;
@@ -273,11 +349,43 @@ export const LocationEditPanel = (props: LocationEditPanelProps) => {
       initial[f.id] = f.value;
     }
     setFieldValues(initial);
+
+    // Populate polygon nodes from existing source_geometry
+    const sg = data.properties.source_geometry;
+    if (sg && (sg.type === "Polygon" || sg.type === "MultiPolygon")) {
+      const ring =
+        sg.type === "Polygon"
+          ? (sg.coordinates[0] as [number, number][])
+          : (sg.coordinates[0][0] as [number, number][]);
+      // Drop the closing duplicate node
+      const nodes: [number, number][] =
+        ring.length > 1 &&
+        ring[0][0] === ring[ring.length - 1][0] &&
+        ring[0][1] === ring[ring.length - 1][1]
+          ? ring.slice(0, -1)
+          : ring;
+      onPolygonNodesChange?.(nodes);
+      onLocationTypeModeChange?.("polygon");
+    } else {
+      onPolygonNodesChange?.([]);
+      onLocationTypeModeChange?.("point");
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data, props.mode]);
 
   const mutation = useMutation({
     mutationFn: async () => {
       if (props.mode === "add") {
+        // Build source_geometry for polygon mode
+        let source_geometry: GeoJSON.Polygon | undefined;
+        if (locationTypeMode === "polygon" && polygonNodes.length >= 3) {
+          const closed: [number, number][] = [
+            ...polygonNodes,
+            polygonNodes[0],
+          ];
+          source_geometry = { type: "Polygon", coordinates: [closed] };
+        }
+
         const created = await createLocation(organizationId, useCaseId, {
           address: address.trim() || undefined,
           fieldValues: Object.entries(fieldValues).map(([fieldId, values]) => ({
@@ -289,8 +397,17 @@ export const LocationEditPanel = (props: LocationEditPanelProps) => {
           longitude: parseFloat(longitude),
           post_office: postOffice.trim() || undefined,
           postal_code: postalCode.trim() || undefined,
+          source_geometry,
         });
         return created;
+      }
+      // Build source_geometry for edit polygon mode
+      let editSourceGeometry: GeoJSON.Polygon | null = null;
+      if (locationTypeMode === "polygon" && polygonNodes.length >= 3) {
+        editSourceGeometry = {
+          type: "Polygon",
+          coordinates: [[...polygonNodes, polygonNodes[0]]],
+        };
       }
       return updateLocation(organizationId, useCaseId, locationId!, {
         address: address.trim() || undefined,
@@ -299,6 +416,7 @@ export const LocationEditPanel = (props: LocationEditPanelProps) => {
         longitude: parseFloat(longitude),
         post_office: postOffice.trim() || undefined,
         postal_code: postalCode.trim() || undefined,
+        source_geometry: editSourceGeometry,
         fieldValues: Object.entries(fieldValues).map(([fieldId, values]) => ({
           fieldId,
           values,
@@ -322,10 +440,27 @@ export const LocationEditPanel = (props: LocationEditPanelProps) => {
     },
   });
 
+  const polygonInvalid =
+    locationTypeMode === "polygon" &&
+    polygonNodes.length >= 4 &&
+    polygonSelfIntersects(polygonNodes);
+
   const isValid =
     name.trim().length > 0 &&
-    !isNaN(parseFloat(longitude)) &&
-    !isNaN(parseFloat(latitude));
+    !polygonInvalid &&
+    (locationTypeMode === "polygon"
+      ? polygonNodes.length >= 3
+      : !isNaN(parseFloat(longitude)) && !isNaN(parseFloat(latitude)));
+
+  // Compute centroid of polygon nodes (simple average) and keep coords in sync
+  useEffect(() => {
+    if (locationTypeMode !== "polygon" || polygonNodes.length < 3) return;
+    const lng = polygonNodes.reduce((s, c) => s + c[0], 0) / polygonNodes.length;
+    const lat = polygonNodes.reduce((s, c) => s + c[1], 0) / polygonNodes.length;
+    setLongitude(String(lng));
+    setLatitude(String(lat));
+    onCoordinatesChange?.({ longitude: lng, latitude: lat });
+  }, [locationTypeMode, polygonNodes, onCoordinatesChange]);
 
   const normalizeFieldValues = (values: Record<string, string[]>) =>
     Object.fromEntries(
@@ -449,6 +584,80 @@ export const LocationEditPanel = (props: LocationEditPanelProps) => {
                 </p>
               </div>
             )}
+
+            {/* Location type selector – add and edit modes */}
+            <div className="space-y-1.5">
+              <Label>{messages.adminLocationPanel.locationTypeLabel}</Label>
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    onLocationTypeModeChange?.("point");
+                    onPolygonNodesChange?.([]);
+                  }}
+                  className={`location-type-btn flex-1 rounded-md border px-3 py-1.5 text-sm font-medium transition ${
+                    locationTypeMode === "point"
+                      ? "location-type-btn-active"
+                      : "location-type-btn-inactive"
+                  }`}
+                >
+                  {messages.adminLocationPanel.locationTypePoint}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => onLocationTypeModeChange?.("polygon")}
+                  className={`location-type-btn flex-1 rounded-md border px-3 py-1.5 text-sm font-medium transition ${
+                    locationTypeMode === "polygon"
+                      ? "location-type-btn-active"
+                      : "location-type-btn-inactive"
+                  }`}
+                >
+                  {messages.adminLocationPanel.locationTypePolygon}
+                </button>
+              </div>
+            </div>
+
+            {/* Polygon draw controls */}
+            {locationTypeMode === "polygon" && (
+              <div className="polygon-draw-panel space-y-2 rounded-lg border p-3">
+                <p className="polygon-draw-hint text-xs">{messages.adminLocationPanel.polygonDrawHint}</p>
+                <p className="polygon-draw-count text-xs font-medium">
+                  {messages.adminLocationPanel.polygonNodeCount.replace(
+                    "{count}",
+                    String(polygonNodes.length)
+                  )}
+                </p>
+                <div className="flex gap-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="flex-1 locations-outline-button"
+                    disabled={polygonNodes.length < 1}
+                    onClick={() => onPolygonNodesChange?.(polygonNodes.slice(0, -1))}
+                  >
+                    {messages.adminLocationPanel.polygonUndo}
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="flex-1 locations-outline-button"
+                    disabled={polygonNodes.length < 1}
+                    onClick={() => onPolygonNodesChange?.([])}
+                  >
+                    {messages.adminLocationPanel.polygonClear}
+                  </Button>
+                </div>
+                {polygonNodes.length >= 3 && !polygonInvalid && (
+                  <p className="polygon-draw-hint text-xs">{messages.adminLocationPanel.polygonCenterHint}</p>
+                )}
+                {polygonInvalid && (
+                  <p className="polygon-draw-error text-xs font-medium">{messages.adminLocationPanel.polygonSelfIntersects}</p>
+                )}
+              </div>
+            )}
+
             <div className="space-y-1.5">
               <Label htmlFor="panel-location-name">{messages.adminLocationPanel.name}</Label>
               <Input
@@ -870,7 +1079,13 @@ export const LocationEditPanel = (props: LocationEditPanelProps) => {
                 <Button
                   type="button"
                   onClick={() => {
-                    if (!relocateMode) onToggleRelocate();
+                    if (!relocateMode) {
+                      // Switch to point mode so polygon draw doesn't capture map clicks
+                      if (locationTypeMode === "polygon") {
+                        onLocationTypeModeChange?.("point");
+                      }
+                      onToggleRelocate();
+                    }
                   }}
                   variant={relocateMode ? "default" : "outline"}
                   className="h-auto w-full justify-start gap-2 px-3 py-2 text-left whitespace-normal"

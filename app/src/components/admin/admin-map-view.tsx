@@ -31,6 +31,9 @@ export interface AdminMapViewProps {
   onMapClick?: (lngLat: { longitude: number; latitude: number }) => void;
   ghostMarker?: { longitude: number; latitude: number };
   draftMarker?: { longitude: number; latitude: number };
+  /** When set, map is in polygon-draw mode: clicks add nodes to polygonNodes */
+  polygonNodes?: [number, number][];
+  onPolygonNodeAdd?: (lngLat: [number, number]) => void;
   className?: string;
 }
 
@@ -190,6 +193,8 @@ export const AdminMapView = ({
   onMapClick,
   ghostMarker,
   draftMarker,
+  polygonNodes,
+  onPolygonNodeAdd,
   className,
 }: AdminMapViewProps) => {
   const mapRef = useRef<MapRef>(null);
@@ -204,14 +209,61 @@ export const AdminMapView = ({
     ? buildSelectedShapeCollection(geoJson, selectedId)
     : null;
 
+  // Build a GeoJSON FeatureCollection for the in-progress polygon draw.
+  // When >= 3 nodes: render a closed polygon outline + semi-transparent fill.
+  // When 2 nodes: render an open line.
+  // Always render node circles.
+  const polygonDrawGeoJson: GeoJSON.FeatureCollection<GeoJSON.Geometry> | null =
+    polygonNodes && polygonNodes.length >= 2
+      ? {
+          type: "FeatureCollection",
+          features: [
+            polygonNodes.length >= 3
+              ? {
+                  // Closed ring: append first node to close visually
+                  type: "Feature" as const,
+                  geometry: {
+                    type: "Polygon" as const,
+                    coordinates: [[...polygonNodes, polygonNodes[0]]],
+                  },
+                  properties: {},
+                }
+              : {
+                  type: "Feature" as const,
+                  geometry: {
+                    type: "LineString" as const,
+                    coordinates: polygonNodes,
+                  },
+                  properties: {},
+                },
+            ...polygonNodes.map((coord) => ({
+              type: "Feature" as const,
+              geometry: { type: "Point" as const, coordinates: coord },
+              properties: {},
+            })),
+          ],
+        }
+      : polygonNodes && polygonNodes.length === 1
+      ? {
+          type: "FeatureCollection",
+          features: [
+            {
+              type: "Feature" as const,
+              geometry: { type: "Point" as const, coordinates: polygonNodes[0] },
+              properties: {},
+            },
+          ],
+        }
+      : null;
+
   useEffect(() => {
     const map = mapRef.current?.getMap();
     if (!map) return;
-    map.getCanvas().style.cursor = addMode ? "crosshair" : "";
+    map.getCanvas().style.cursor = (addMode || !!polygonNodes) ? "crosshair" : "";
     return () => {
       map.getCanvas().style.cursor = "";
     };
-  }, [addMode]);
+  }, [addMode, polygonNodes]);
 
   // Fly to selected location only when selectedId actually changes
   useEffect(() => {
@@ -321,6 +373,12 @@ export const AdminMapView = ({
         onLoad={() => setMapLoaded(true)}
         maxBounds={finlandBounds}
         onClick={(e) => {
+          // Polygon draw mode: add a node
+          if (polygonNodes !== undefined) {
+            onPolygonNodeAdd?.([e.lngLat.lng, e.lngLat.lat]);
+            return;
+          }
+
           const clickedShape = e.features?.find((feature) => {
             const featureId = feature.properties?.id;
             return typeof featureId === "string" && featureId.length > 0;
@@ -358,6 +416,34 @@ export const AdminMapView = ({
               source="admin-selected-shapes"
             />
             <Layer {...selectedLineHighlightLayer} />
+          </Source>
+        )}
+
+        {polygonDrawGeoJson && (
+          <Source id="admin-polygon-draw" type="geojson" data={polygonDrawGeoJson}>
+            {/* Semi-transparent fill when polygon is closed (>= 3 nodes) */}
+            <Layer
+              id="admin-polygon-draw-fill"
+              type="fill"
+              source="admin-polygon-draw"
+              filter={["==", ["geometry-type"], "Polygon"]}
+              paint={{ "fill-color": "#f59e0b", "fill-opacity": 0.15 }}
+            />
+            {/* Outline for both line (2 nodes) and polygon (>= 3 nodes) */}
+            <Layer
+              id="admin-polygon-draw-line"
+              type="line"
+              source="admin-polygon-draw"
+              filter={["any", ["==", ["geometry-type"], "LineString"], ["==", ["geometry-type"], "Polygon"]]}
+              paint={{ "line-color": "#f59e0b", "line-width": 2, "line-dasharray": [2, 2] }}
+            />
+            <Layer
+              id="admin-polygon-draw-nodes"
+              type="circle"
+              source="admin-polygon-draw"
+              filter={["==", ["geometry-type"], "Point"]}
+              paint={{ "circle-radius": 5, "circle-color": "#f59e0b", "circle-stroke-width": 2, "circle-stroke-color": "#fff" }}
+            />
           </Source>
         )}
 

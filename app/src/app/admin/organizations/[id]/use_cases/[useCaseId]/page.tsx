@@ -153,12 +153,6 @@ const UseCaseHomePage = () => {
               >
                 {messages.admin.useCaseHomeSecondaryCta}
               </Link>
-              <Link
-                href={`${rootPath}/help`}
-                className="inline-flex items-center rounded-full border border-amber-300 bg-amber-50 px-5 py-2.5 text-sm font-medium text-amber-900 transition hover:bg-amber-100"
-              >
-                {messages.admin.help}
-              </Link>
             </div>
           </div>
         </div>

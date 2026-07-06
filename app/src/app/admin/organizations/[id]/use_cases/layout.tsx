@@ -37,7 +37,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useParams, usePathname, useRouter } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { PageLoadingSpinner } from "@/components/page-loading-spinner";
 import { useMessages } from "@/i18n/locale-provider";
 import { LucideIcon } from "lucide-react";
@@ -57,7 +57,7 @@ const Content = ({
 }: {
   children: React.ReactNode;
   organization: any;
-  selectedUseCaseId?: string;
+  selectedUseCaseId: string;
 }) => {
   const messages = useMessages();
   const { id } = useParams<{ id: string }>();
@@ -82,18 +82,7 @@ const Content = ({
     queryFn: () => getUseCases(id),
   });
 
-  const resolvedUseCaseId = useMemo(() => {
-    if (selectedUseCaseId) {
-      return selectedUseCaseId;
-    }
-
-    const match = pathname?.match(/\/use_cases\/([^/]+)/);
-    return match?.[1];
-  }, [pathname, selectedUseCaseId]);
-
-  const orgRootPath = resolvedUseCaseId
-    ? `/admin/organizations/${id}/use_cases/${resolvedUseCaseId}`
-    : `/admin/organizations/${id}/use_cases`;
+  const orgRootPath = `/admin/organizations/${id}/use_cases/${selectedUseCaseId}`;
 
   const isActiveSection = (segment: string, exact?: boolean) => {
     if (exact) {
@@ -170,7 +159,7 @@ const Content = ({
               {messages.admin.useCaseLabel}
             </Label>
             <Select
-              value={resolvedUseCaseId || ""}
+              value={selectedUseCaseId || ""}
               onValueChange={(value) => {
                 if (value === "create_new") {
                   setIsCreateDialogOpen(true);
@@ -197,9 +186,9 @@ const Content = ({
             </Select>
           </div>
 
-          {resolvedUseCaseId && (
+          {selectedUseCaseId && (
             <Link
-              href={`/organizations/${id}/use_cases/${resolvedUseCaseId}`}
+              href={`/organizations/${id}/use_cases/${selectedUseCaseId}`}
               className={cn(navButtonClass(true), "admin-open-link")}
               aria-label={messages.admin.openSelectedUseCase}
               target="_blank"
@@ -231,7 +220,7 @@ const Content = ({
                 </Link>
               </DropdownMenuItem>
 
-              {resolvedUseCaseId && (
+              {selectedUseCaseId && (
                 <DropdownMenuItem asChild>
                   <Link href={`${orgRootPath}/edit`}>
                     <BriefcaseBusiness className="mr-2 h-4 w-4 text-slate-500" />
@@ -260,7 +249,7 @@ const Content = ({
 
 const AdminLayout = ({ children }: { children: React.ReactNode }) => {
   const messages = useMessages();
-  const { id, useCaseId } = useParams<{ id: string; useCaseId?: string }>();
+  const { id, useCaseId } = useParams<{ id: string; useCaseId: string }>();
   const router = useRouter();
 
   const accessQuery = useQuery({

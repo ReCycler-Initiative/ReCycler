@@ -152,6 +152,7 @@ export const LocationDetail = z.object({
     post_office: z.string().optional(),
     postal_code: z.string().optional(),
     source_type: z.enum(["manual", "datasource"]).optional(),
+    source_geometry: Geometry.optional(),
   }),
 });
 

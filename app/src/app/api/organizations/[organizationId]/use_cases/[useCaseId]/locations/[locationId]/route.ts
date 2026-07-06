@@ -43,6 +43,7 @@ export async function GET(
             ELSE 'datasource'
           END AS source_type,
           ST_AsGeoJSON(l.geom)::jsonb as geom,
+          ST_AsGeoJSON(l.source_geom)::jsonb as source_geom,
           f.id         AS field_id,
           f.name       AS field_name,
           f.field_type,
@@ -94,9 +95,15 @@ export async function GET(
       post_office: first.post_office ?? undefined,
       postal_code: first.postal_code ?? undefined,
       source_type: first.source_type ?? undefined,
+      source_geometry: first.source_geom ?? undefined,
     },
   });
 }
+
+const GeoJsonGeometry = z.object({
+  type: z.string(),
+  coordinates: z.unknown(),
+});
 
 const UpdateLocationBody = z.object({
   name: z.string().trim().min(1),
@@ -105,6 +112,7 @@ const UpdateLocationBody = z.object({
   address: OptionalLocationString,
   postal_code: OptionalLocationString,
   post_office: OptionalLocationString,
+  source_geometry: GeoJsonGeometry.optional(),
   fieldValues: z
     .array(
       z.object({
@@ -147,35 +155,53 @@ export async function PUT(
     );
   }
 
-  const { name, longitude, latitude, address, postal_code, post_office, fieldValues } = parsed.data;
+  const { name, longitude, latitude, address, postal_code, post_office, source_geometry, fieldValues } = parsed.data;
 
   const updated = await db.raw(
-    `
-      UPDATE recycler.locations l
-      SET
-        name = ?,
-        geom = ST_SetSRID(ST_Point(?, ?), 4326),
-        address = ?,
-        postal_code = ?,
-        post_office = ?
-      FROM recycler.use_cases uc
-      WHERE l.use_case_id = uc.id
-        AND uc.organization_id = ?::uuid
-        AND uc.id = ?::uuid
-        AND l.id = ?::uuid
-      RETURNING l.id;
-    `,
-    [
-      name,
-      longitude,
-      latitude,
-      address || null,
-      postal_code || null,
-      post_office || null,
-      organizationId,
-      useCaseId,
-      locationId,
-    ]
+    source_geometry
+      ? `
+          UPDATE recycler.locations l
+          SET
+            name = ?,
+            geom = ST_SetSRID(ST_Point(?, ?), 4326),
+            source_geom = ST_SetSRID(ST_GeomFromGeoJSON(?), 4326),
+            address = ?,
+            postal_code = ?,
+            post_office = ?
+          FROM recycler.use_cases uc
+          WHERE l.use_case_id = uc.id
+            AND uc.organization_id = ?::uuid
+            AND uc.id = ?::uuid
+            AND l.id = ?::uuid
+          RETURNING l.id;
+        `
+      : `
+          UPDATE recycler.locations l
+          SET
+            name = ?,
+            geom = ST_SetSRID(ST_Point(?, ?), 4326),
+            source_geom = NULL,
+            address = ?,
+            postal_code = ?,
+            post_office = ?
+          FROM recycler.use_cases uc
+          WHERE l.use_case_id = uc.id
+            AND uc.organization_id = ?::uuid
+            AND uc.id = ?::uuid
+            AND l.id = ?::uuid
+          RETURNING l.id;
+        `,
+    source_geometry
+      ? [
+          name, longitude, latitude, JSON.stringify(source_geometry),
+          address || null, postal_code || null, post_office || null,
+          organizationId, useCaseId, locationId,
+        ]
+      : [
+          name, longitude, latitude,
+          address || null, postal_code || null, post_office || null,
+          organizationId, useCaseId, locationId,
+        ]
   );
 
   if (!updated.rows?.[0]) {

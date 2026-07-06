@@ -77,7 +77,6 @@ const baseFi = {
 		toggleTheme: "Vaihda teema",
 		useDarkTheme: "Käytä tummaa teemaa",
 		useLightTheme: "Käytä vaaleaa teemaa",
-		help: "Ohjeet",
 		openSelectedUseCase: "Avaa valittu käyttötapaus",
 		open: "Avaa",
 		organizationDetails: "Organisaation tiedot",
@@ -234,6 +233,17 @@ const baseFi = {
 		save: "Tallenna",
 		locationAdded: "Kohde lisätty",
 		locationSaved: "Kohde tallennettu",
+		locationDeleted: "Kohde poistettu",
+		locationTypePoint: "Piste",
+		locationTypePolygon: "Alue",
+		locationTypeLabel: "Kohteen tyyppi",
+		polygonDrawHint: "Klikkaa kartalle solmupisteitä. Vähintään 3 pistettä tarvitaan.",
+		polygonCloseArea: "Sulje alue",
+		polygonUndo: "Poista viimeisin piste",
+		polygonClear: "Tyhjennä piirros",
+		polygonNodeCount: "{count} pistettä",
+		polygonCenterHint: "Keskipiste lasketaan automaattisesti. Voit siirtää sitä tallennuksen jälkeen.",
+		polygonSelfIntersects: "Alueen reunat leikkaavat toisiaan. Korjaa piirros ennen tallennusta.",
 		locationDeleted: "Kohde poistettu",
 	},
 	adminAiPage: {
@@ -425,27 +435,6 @@ const baseFi = {
 		description:
 			"Muokkaa organisaation perustietoja, joita käytetään hallinnassa ja palvelun yhteydessä.",
 		nameLabel: "Nimi",
-	},
-	adminHelp: {
-		title: "Ylläpidon käyttöohje",
-		description:
-			"Tällä sivulla näet, miten käyttötapaus rakennetaan alusta loppuun: datayhteydet, sisältömalli, kohteet, tekoälytuki ja ajot.",
-		quickStartTitle: "Nopea aloitus",
-		quickStartSteps: [
-			"Lisää ensin datayhteydet ja varmista, että yhteystesti menee läpi.",
-			"Määritä sisältömalli (kentät), joita kohteissa käytetään.",
-			"Tuo tai lisää kohteet ja varmista, että tiedot näkyvät oikein.",
-			"Tarkista ajot ja lokit muutosten jälkeen.",
-		],
-		sectionsTitle: "Ylläpidon osa-alueet",
-		sectionsDescription:
-			"Voit käyttää alla olevia linkkejä suoraan ylläpidon eri näkymiin.",
-		tipsTitle: "Hyvät käytännöt",
-		tips: [
-			"Tee muutokset pienissä osissa ja tarkista vaikutus jokaisen vaiheen jälkeen.",
-			"Pidä kenttien nimet ja suodatinlogiikka mahdollisimman selkeinä ylläpidon helpottamiseksi.",
-			"Käy lokit läpi aina isompien datamuutosten jälkeen.",
-		],
 	},
 	adminDatasourcePage: {
 		newTitle: "Uusi datalähde",
@@ -753,7 +742,6 @@ const baseEn = {
 		toggleTheme: "Toggle theme",
 		useDarkTheme: "Use dark theme",
 		useLightTheme: "Use light theme",
-		help: "Help",
 		openSelectedUseCase: "Open selected use case",
 		open: "Open",
 		organizationDetails: "Organization details",
@@ -913,6 +901,17 @@ const baseEn = {
 		locationAdded: "Location added",
 		locationSaved: "Location saved",
 		locationDeleted: "Location deleted",
+		locationTypePoint: "Point",
+		locationTypePolygon: "Area",
+		locationTypeLabel: "Location type",
+		polygonDrawHint: "Click on the map to add nodes. At least 3 nodes are required.",
+		polygonCloseArea: "Close area",
+		polygonUndo: "Remove last node",
+		polygonClear: "Clear drawing",
+		polygonNodeCount: "{count} nodes",
+		polygonCenterHint: "The centre point is calculated automatically. You can move it after saving.",
+		polygonSelfIntersects: "The area boundary crosses itself. Fix the drawing before saving.",
+		locationDeleted: "Location deleted",
 	},
 	adminAiPage: {
 		title: "AI",
@@ -1063,27 +1062,6 @@ const baseEn = {
 		description:
 			"Edit the core organization information used throughout the admin experience and service context.",
 		nameLabel: "Name",
-	},
-	adminHelp: {
-		title: "Admin guide",
-		description:
-			"This page explains the end-to-end setup flow for a use case: data connections, content model, locations, AI support, and runs.",
-		quickStartTitle: "Quick start",
-		quickStartSteps: [
-			"Add data connections first and verify the connection test succeeds.",
-			"Define the content model (fields) used by locations.",
-			"Import or add locations and verify the data renders correctly.",
-			"Review runs and logs after your changes.",
-		],
-		sectionsTitle: "Admin areas",
-		sectionsDescription:
-			"Use the links below to jump directly into each admin area.",
-		tipsTitle: "Best practices",
-		tips: [
-			"Apply changes in small steps and validate each step before continuing.",
-			"Keep field names and filter logic clear to make maintenance easier.",
-			"Always review logs after larger data updates.",
-		],
 	},
 	marketing: {
 		...baseFi.marketing,

@@ -321,8 +321,6 @@
   .admin-shell[data-admin-theme="dark"] .location-edit-panel .hover\:bg-gray-50:hover {
     background-color: rgb(30 41 59) !important;
   }
-
-  .admin-shell[data-admin-theme="dark"] .location-edit-panel .border-gray-100,
   .admin-shell[data-admin-theme="dark"] .location-edit-panel .border-gray-200,
   .admin-shell[data-admin-theme="dark"] .location-edit-panel .border-gray-300,
   .admin-shell[data-admin-theme="dark"] .locations-sidebar-card.border-gray-200 {
@@ -622,6 +620,110 @@
   .admin-shell[data-admin-theme="dark"] .locations-outline-button:disabled,
   .admin-shell[data-admin-theme="dark"] .datasource-editor-outline-button:disabled {
     opacity: 0.5;
+  }
+
+  /* location-edit-panel: outline-napit (osoitehaku, tallenna, peruuta ym.) */
+  .admin-shell[data-admin-theme="dark"] .location-edit-panel button {
+    background-color: rgb(30 41 59) !important;
+    border-color: rgb(71 85 105) !important;
+    color: rgb(248 250 252) !important;
+  }
+
+  .admin-shell[data-admin-theme="dark"] .location-edit-panel button:hover:not(:disabled) {
+    background-color: rgb(51 65 85) !important;
+    border-color: rgb(148 163 184) !important;
+    color: rgb(255 255 255) !important;
+  }
+
+  .admin-shell[data-admin-theme="dark"] .location-edit-panel button:disabled {
+    opacity: 0.5;
+  }
+
+  /* ---- Kohdetyyppi-valintanapit (Piste / Alue) – vaalea teema ---- */
+  .location-type-btn {
+    cursor: pointer;
+  }
+
+  .location-type-btn-inactive {
+    border-color: rgb(203 213 225);
+    background-color: rgb(255 255 255);
+    color: rgb(51 65 85);
+  }
+
+  .location-type-btn-inactive:hover {
+    background-color: rgb(248 250 252);
+  }
+
+  .location-type-btn-active {
+    border-color: rgb(15 23 42);
+    background-color: rgb(15 23 42);
+    color: rgb(255 255 255);
+  }
+
+  /* ---- Kohdetyyppi-valintanapit – tumma teema ---- */
+  .admin-shell[data-admin-theme="dark"] .location-type-btn-inactive {
+    border-color: rgb(71 85 105) !important;
+    background-color: rgb(30 41 59) !important;
+    color: rgb(203 213 225) !important;
+  }
+
+  .admin-shell[data-admin-theme="dark"] .location-type-btn-inactive:hover {
+    background-color: rgb(51 65 85) !important;
+    color: rgb(248 250 252) !important;
+  }
+
+  .admin-shell[data-admin-theme="dark"] .location-type-btn-active {
+    border-color: rgb(226 232 240) !important;
+    background-color: rgb(248 250 252) !important;
+    color: rgb(15 23 42) !important;
+  }
+
+  /* ---- Polygon-piirrospalkki – vaalea teema ---- */
+  .polygon-draw-panel {
+    border-color: rgb(203 213 225);
+    background-color: rgb(248 250 252);
+  }
+
+  .polygon-draw-hint {
+    color: rgb(71 85 105);
+  }
+
+  .polygon-draw-count {
+    color: rgb(30 41 59);
+  }
+
+  .polygon-draw-error {
+    color: rgb(185 28 28);
+  }
+
+  /* ---- Polygon-piirrospalkki – tumma teema ---- */
+  .admin-shell[data-admin-theme="dark"] .polygon-draw-panel {
+    border-color: rgb(71 85 105) !important;
+    background-color: rgb(30 41 59) !important;
+  }
+
+  .admin-shell[data-admin-theme="dark"] .polygon-draw-hint {
+    color: rgb(148 163 184) !important;
+  }
+
+  .admin-shell[data-admin-theme="dark"] .polygon-draw-count {
+    color: rgb(226 232 240) !important;
+  }
+
+  .admin-shell[data-admin-theme="dark"] .polygon-draw-error {
+    color: rgb(252 165 165) !important;
+  }
+
+  /* locations-page Lisää kohde -nappi (tumma tausta valkoisella tekstillä) */
+  .admin-shell[data-admin-theme="dark"] .locations-page .locations-primary-button {
+    background-color: rgb(248 250 252) !important;
+    border-color: rgb(148 163 184) !important;
+    color: rgb(15 23 42) !important;
+  }
+
+  .admin-shell[data-admin-theme="dark"] .locations-page .locations-primary-button:hover:not(:disabled) {
+    background-color: rgb(226 232 240) !important;
+    color: rgb(15 23 42) !important;
   }
 
   .admin-shell[data-admin-theme="dark"] .datasource-editor-card,
