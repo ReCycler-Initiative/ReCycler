@@ -112,7 +112,7 @@ const UpdateLocationBody = z.object({
   address: OptionalLocationString,
   postal_code: OptionalLocationString,
   post_office: OptionalLocationString,
-  source_geometry: GeoJsonGeometry.optional(),
+  source_geometry: GeoJsonGeometry.nullable().optional(),
   fieldValues: z
     .array(
       z.object({
@@ -155,10 +155,22 @@ export async function PUT(
     );
   }
 
-  const { name, longitude, latitude, address, postal_code, post_office, source_geometry, fieldValues } = parsed.data;
+  const {
+    name,
+    longitude,
+    latitude,
+    address,
+    postal_code,
+    post_office,
+    source_geometry,
+    fieldValues,
+  } = parsed.data;
+
+  const hasSourceGeometryField =
+    json !== null && typeof json === "object" && "source_geometry" in json;
 
   const updated = await db.raw(
-    source_geometry
+    hasSourceGeometryField && source_geometry
       ? `
           UPDATE recycler.locations l
           SET
@@ -175,32 +187,61 @@ export async function PUT(
             AND l.id = ?::uuid
           RETURNING l.id;
         `
-      : `
-          UPDATE recycler.locations l
-          SET
-            name = ?,
-            geom = ST_SetSRID(ST_Point(?, ?), 4326),
-            source_geom = NULL,
-            address = ?,
-            postal_code = ?,
-            post_office = ?
-          FROM recycler.use_cases uc
-          WHERE l.use_case_id = uc.id
-            AND uc.organization_id = ?::uuid
-            AND uc.id = ?::uuid
-            AND l.id = ?::uuid
-          RETURNING l.id;
-        `,
-    source_geometry
+      : hasSourceGeometryField
+        ? `
+            UPDATE recycler.locations l
+            SET
+              name = ?,
+              geom = ST_SetSRID(ST_Point(?, ?), 4326),
+              source_geom = NULL,
+              address = ?,
+              postal_code = ?,
+              post_office = ?
+            FROM recycler.use_cases uc
+            WHERE l.use_case_id = uc.id
+              AND uc.organization_id = ?::uuid
+              AND uc.id = ?::uuid
+              AND l.id = ?::uuid
+            RETURNING l.id;
+          `
+        : `
+            UPDATE recycler.locations l
+            SET
+              name = ?,
+              geom = ST_SetSRID(ST_Point(?, ?), 4326),
+              address = ?,
+              postal_code = ?,
+              post_office = ?
+            FROM recycler.use_cases uc
+            WHERE l.use_case_id = uc.id
+              AND uc.organization_id = ?::uuid
+              AND uc.id = ?::uuid
+              AND l.id = ?::uuid
+            RETURNING l.id;
+          `,
+    hasSourceGeometryField && source_geometry
       ? [
-          name, longitude, latitude, JSON.stringify(source_geometry),
-          address || null, postal_code || null, post_office || null,
-          organizationId, useCaseId, locationId,
+          name,
+          longitude,
+          latitude,
+          JSON.stringify(source_geometry),
+          address || null,
+          postal_code || null,
+          post_office || null,
+          organizationId,
+          useCaseId,
+          locationId,
         ]
       : [
-          name, longitude, latitude,
-          address || null, postal_code || null, post_office || null,
-          organizationId, useCaseId, locationId,
+          name,
+          longitude,
+          latitude,
+          address || null,
+          postal_code || null,
+          post_office || null,
+          organizationId,
+          useCaseId,
+          locationId,
         ]
   );
 
