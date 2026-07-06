@@ -34,6 +34,8 @@ export interface AdminMapViewProps {
   /** When set, map is in polygon-draw mode: clicks add nodes to polygonNodes */
   polygonNodes?: [number, number][];
   onPolygonNodeAdd?: (lngLat: [number, number]) => void;
+  /** Completed polygon parts (MultiPolygon rings) */
+  polygonParts?: [number, number][][];
   className?: string;
 }
 
@@ -195,6 +197,7 @@ export const AdminMapView = ({
   draftMarker,
   polygonNodes,
   onPolygonNodeAdd,
+  polygonParts,
   className,
 }: AdminMapViewProps) => {
   const mapRef = useRef<MapRef>(null);
@@ -253,6 +256,32 @@ export const AdminMapView = ({
               properties: {},
             },
           ],
+        }
+      : null;
+
+  // Color palette for polygon parts
+  const partColors = [
+    "#f59e0b", // amber
+    "#fbbf24", // yellow
+    "#10b981", // emerald
+    "#06b6d4", // cyan
+    "#8b5cf6", // violet
+    "#ec4899", // pink
+  ];
+
+  // Build GeoJSON for completed polygon parts
+  const polygonPartsGeoJson: GeoJSON.FeatureCollection<GeoJSON.Geometry> | null =
+    polygonParts && polygonParts.length > 0
+      ? {
+          type: "FeatureCollection",
+          features: polygonParts.map((ring, idx) => ({
+            type: "Feature" as const,
+            geometry: {
+              type: "Polygon" as const,
+              coordinates: [[...ring, ring[0]]],
+            },
+            properties: { color: partColors[idx % partColors.length] },
+          })),
         }
       : null;
 
@@ -416,6 +445,30 @@ export const AdminMapView = ({
               source="admin-selected-shapes"
             />
             <Layer {...selectedLineHighlightLayer} />
+          </Source>
+        )}
+
+        {polygonPartsGeoJson && (
+          <Source id="admin-polygon-parts" type="geojson" data={polygonPartsGeoJson}>
+            {/* Completed polygon parts */}
+            <Layer
+              id="admin-polygon-parts-fill"
+              type="fill"
+              source="admin-polygon-parts"
+              paint={{
+                "fill-color": ["get", "color"],
+                "fill-opacity": 0.25,
+              }}
+            />
+            <Layer
+              id="admin-polygon-parts-line"
+              type="line"
+              source="admin-polygon-parts"
+              paint={{
+                "line-color": ["get", "color"],
+                "line-width": 2.5,
+              }}
+            />
           </Source>
         )}
 

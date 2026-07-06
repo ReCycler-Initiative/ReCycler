@@ -44,6 +44,7 @@ const LocationsPage = () => {
   } | null>(null);
   const [locationTypeMode, setLocationTypeMode] = useState<"point" | "polygon">("point");
   const [polygonNodes, setPolygonNodes] = useState<[number, number][]>([]);
+  const [polygonParts, setPolygonParts] = useState<[number, number][][]>([]);
 
   const [editId, setEditId] = useState<string | null>(null);
   const [relocateMode, setRelocateMode] = useState(false);
@@ -53,6 +54,7 @@ const LocationsPage = () => {
   } | null>(null);
   const [editLocationTypeMode, setEditLocationTypeMode] = useState<"point" | "polygon">("point");
   const [editPolygonNodes, setEditPolygonNodes] = useState<[number, number][]>([]);
+  const [editPolygonParts, setEditPolygonParts] = useState<[number, number][][]>([]);
 
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<
@@ -136,6 +138,7 @@ const LocationsPage = () => {
       setAddMode(false);
       setAddDraft(null);
       setPolygonNodes([]);
+      setPolygonParts([]);
       setLocationTypeMode("point");
     }
 
@@ -173,7 +176,8 @@ const LocationsPage = () => {
           description={messages.adminLocations.description}
           actions={!addMode ? (
             <Button
-              className="locations-primary-button"
+              variant="outline"
+              className="locations-outline-button"
               type="button"
               onClick={() => {
                 setAddMode((current) => {
@@ -228,6 +232,13 @@ const LocationsPage = () => {
                   ? editPolygonNodes
                   : undefined
               }
+              polygonParts={
+                (addMode && locationTypeMode === "polygon")
+                  ? polygonParts
+                  : (editId && editLocationTypeMode === "polygon")
+                  ? editPolygonParts
+                  : undefined
+              }
               onPolygonNodeAdd={(coord) => {
                 if (addMode && locationTypeMode === "polygon") {
                   setPolygonNodes((prev) => [...prev, coord]);
@@ -255,11 +266,12 @@ const LocationsPage = () => {
                 organizationId={organizationId}
                 useCaseId={params.useCaseId}
                 onCoordinatesChange={setAddDraft}
-                onClose={() => { setAddDraft(null); setAddMode(false); setPolygonNodes([]); setLocationTypeMode("point"); }}
+                onClose={() => { setAddDraft(null); setAddMode(false); setPolygonNodes([]); setPolygonParts([]); setLocationTypeMode("point"); }}
                 onSaved={(newId) => {
                   setAddDraft(null);
                   setAddMode(false);
                   setPolygonNodes([]);
+                  setPolygonParts([]);
                   setLocationTypeMode("point");
                   if (newId) setSelectedId(newId);
                 }}
@@ -267,10 +279,13 @@ const LocationsPage = () => {
                 onLocationTypeModeChange={(type) => {
                   setLocationTypeMode(type);
                   setPolygonNodes([]);
+                  setPolygonParts([]);
                   setAddDraft(null);
                 }}
                 polygonNodes={polygonNodes}
                 onPolygonNodesChange={setPolygonNodes}
+                polygonParts={polygonParts}
+                onPolygonPartsChange={setPolygonParts}
               />
             ) : editId ? (
               <LocationEditPanel
@@ -280,7 +295,7 @@ const LocationsPage = () => {
                 organizationId={organizationId}
                 useCaseId={params.useCaseId}
                 onCoordinatesChange={setPickedLngLat}
-                onClose={() => { setEditId(null); setRelocateMode(false); setPickedLngLat(null); setEditPolygonNodes([]); setEditLocationTypeMode("point"); }}
+                onClose={() => { setEditId(null); setRelocateMode(false); setPickedLngLat(null); setEditPolygonNodes([]); setEditPolygonParts([]); setEditLocationTypeMode("point"); }}
                 onSaved={() => { setRelocateMode(false); setPickedLngLat(null); }}
                 onDelete={() => {
                   const loc = locations.find((l) => l.id === editId);
@@ -296,10 +311,13 @@ const LocationsPage = () => {
                 onLocationTypeModeChange={(type) => {
                   setEditLocationTypeMode(type);
                   setEditPolygonNodes([]);
+                  setEditPolygonParts([]);
                   if (type === "polygon") setRelocateMode(false);
                 }}
                 polygonNodes={editPolygonNodes}
                 onPolygonNodesChange={setEditPolygonNodes}
+                polygonParts={editPolygonParts}
+                onPolygonPartsChange={setEditPolygonParts}
               />
             ) : undefined
           }

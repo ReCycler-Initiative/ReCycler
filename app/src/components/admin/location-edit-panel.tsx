@@ -108,6 +108,9 @@ type AddProps = {
   /** In polygon draw mode, the nodes accumulated so far */
   polygonNodes?: [number, number][];
   onPolygonNodesChange?: (nodes: [number, number][]) => void;
+  /** Completed polygon parts (for MultiPolygon) */
+  polygonParts?: [number, number][][];
+  onPolygonPartsChange?: (parts: [number, number][][]) => void;
   locationTypeMode?: "point" | "polygon";
   onLocationTypeModeChange?: (type: "point" | "polygon") => void;
 };
@@ -119,6 +122,9 @@ type EditProps = {
   onDelete?: () => void;
   polygonNodes?: [number, number][];
   onPolygonNodesChange?: (nodes: [number, number][]) => void;
+  /** Completed polygon parts (for MultiPolygon) */
+  polygonParts?: [number, number][][];
+  onPolygonPartsChange?: (parts: [number, number][][]) => void;
   locationTypeMode?: "point" | "polygon";
   onLocationTypeModeChange?: (type: "point" | "polygon") => void;
 };
@@ -152,6 +158,8 @@ export const LocationEditPanel = (props: LocationEditPanelProps) => {
 
   const polygonNodes = props.polygonNodes ?? [];
   const onPolygonNodesChange = props.onPolygonNodesChange;
+  const polygonParts = props.polygonParts ?? [];
+  const onPolygonPartsChange = props.onPolygonPartsChange;
   const locationTypeMode = props.locationTypeMode ?? "point";
   const onLocationTypeModeChange = props.onLocationTypeModeChange;
   const queryClient = useQueryClient();
@@ -350,24 +358,38 @@ export const LocationEditPanel = (props: LocationEditPanelProps) => {
     }
     setFieldValues(initial);
 
-    // Populate polygon nodes from existing source_geometry
+    // Populate polygon nodes and parts from existing source_geometry
     const sg = data.properties.source_geometry;
     if (sg && (sg.type === "Polygon" || sg.type === "MultiPolygon")) {
-      const ring =
-        sg.type === "Polygon"
-          ? (sg.coordinates[0] as [number, number][])
-          : (sg.coordinates[0][0] as [number, number][]);
-      // Drop the closing duplicate node
-      const nodes: [number, number][] =
-        ring.length > 1 &&
-        ring[0][0] === ring[ring.length - 1][0] &&
-        ring[0][1] === ring[ring.length - 1][1]
-          ? ring.slice(0, -1)
-          : ring;
-      onPolygonNodesChange?.(nodes);
+      if (sg.type === "MultiPolygon") {
+        // Load all rings as parts
+        const parts = sg.coordinates.map((polygon) => {
+          const ring = polygon[0] as [number, number][];
+          // Drop closing duplicate node
+          return ring.length > 1 &&
+            ring[0][0] === ring[ring.length - 1][0] &&
+            ring[0][1] === ring[ring.length - 1][1]
+            ? ring.slice(0, -1)
+            : ring;
+        });
+        onPolygonPartsChange?.(parts);
+        onPolygonNodesChange?.([]);
+      } else {
+        // Polygon: load first ring as current nodes, rest as parts
+        const ring = sg.coordinates[0] as [number, number][];
+        const nodes: [number, number][] =
+          ring.length > 1 &&
+          ring[0][0] === ring[ring.length - 1][0] &&
+          ring[0][1] === ring[ring.length - 1][1]
+            ? ring.slice(0, -1)
+            : ring;
+        onPolygonNodesChange?.(nodes);
+        onPolygonPartsChange?.([]);
+      }
       onLocationTypeModeChange?.("polygon");
     } else {
       onPolygonNodesChange?.([]);
+      onPolygonPartsChange?.([]);
       onLocationTypeModeChange?.("point");
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -375,16 +397,28 @@ export const LocationEditPanel = (props: LocationEditPanelProps) => {
 
   const mutation = useMutation({
     mutationFn: async () => {
-      if (props.mode === "add") {
-        // Build source_geometry for polygon mode
-        let source_geometry: GeoJSON.Polygon | undefined;
-        if (locationTypeMode === "polygon" && polygonNodes.length >= 3) {
-          const closed: [number, number][] = [
-            ...polygonNodes,
-            polygonNodes[0],
-          ];
-          source_geometry = { type: "Polygon", coordinates: [closed] };
+      // Helper to build source_geometry from nodes and parts
+      const buildSourceGeometry = () => {
+        if (locationTypeMode !== "polygon") return undefined;
+        
+        // Collect all completed parts + current nodes (if any)
+        const allParts: [number, number][][] = [];
+        for (const part of polygonParts) {
+          allParts.push([...part, part[0]]); // Close ring
         }
+        if (polygonNodes.length >= 3) {
+          allParts.push([...polygonNodes, polygonNodes[0]]); // Close current ring
+        }
+        
+        if (allParts.length === 0) return undefined;
+        if (allParts.length === 1) {
+          return { type: "Polygon" as const, coordinates: allParts };
+        }
+        return { type: "MultiPolygon" as const, coordinates: allParts.map((ring) => [ring]) };
+      };
+
+      if (props.mode === "add") {
+        const source_geometry = buildSourceGeometry();
 
         const created = await createLocation(organizationId, useCaseId, {
           address: address.trim() || undefined,
@@ -401,14 +435,8 @@ export const LocationEditPanel = (props: LocationEditPanelProps) => {
         });
         return created;
       }
-      // Build source_geometry for edit polygon mode
-      let editSourceGeometry: GeoJSON.Polygon | null = null;
-      if (locationTypeMode === "polygon" && polygonNodes.length >= 3) {
-        editSourceGeometry = {
-          type: "Polygon",
-          coordinates: [[...polygonNodes, polygonNodes[0]]],
-        };
-      }
+      // Edit mode
+      const editSourceGeometry = buildSourceGeometry() ?? null;
       return updateLocation(organizationId, useCaseId, locationId!, {
         address: address.trim() || undefined,
         name: name.trim(),
@@ -445,22 +473,30 @@ export const LocationEditPanel = (props: LocationEditPanelProps) => {
     polygonNodes.length >= 4 &&
     polygonSelfIntersects(polygonNodes);
 
+  const polygonVertexGroups = [
+    ...polygonParts,
+    ...(polygonNodes.length >= 3 ? [polygonNodes] : []),
+  ];
+
+  const hasPolygonGeometry = polygonVertexGroups.length > 0;
+
   const isValid =
     name.trim().length > 0 &&
     !polygonInvalid &&
     (locationTypeMode === "polygon"
-      ? polygonNodes.length >= 3
+      ? hasPolygonGeometry
       : !isNaN(parseFloat(longitude)) && !isNaN(parseFloat(latitude)));
 
-  // Compute centroid of polygon nodes (simple average) and keep coords in sync
+  // Compute centroid of all polygon vertices (current ring + completed parts) and keep coords in sync.
   useEffect(() => {
-    if (locationTypeMode !== "polygon" || polygonNodes.length < 3) return;
-    const lng = polygonNodes.reduce((s, c) => s + c[0], 0) / polygonNodes.length;
-    const lat = polygonNodes.reduce((s, c) => s + c[1], 0) / polygonNodes.length;
+    if (locationTypeMode !== "polygon" || polygonVertexGroups.length === 0) return;
+    const vertices = polygonVertexGroups.flat();
+    const lng = vertices.reduce((sum, coord) => sum + coord[0], 0) / vertices.length;
+    const lat = vertices.reduce((sum, coord) => sum + coord[1], 0) / vertices.length;
     setLongitude(String(lng));
     setLatitude(String(lat));
     onCoordinatesChange?.({ longitude: lng, latitude: lat });
-  }, [locationTypeMode, polygonNodes, onCoordinatesChange]);
+  }, [locationTypeMode, onCoordinatesChange, polygonVertexGroups]);
 
   const normalizeFieldValues = (values: Record<string, string[]>) =>
     Object.fromEntries(
@@ -512,6 +548,30 @@ export const LocationEditPanel = (props: LocationEditPanelProps) => {
   const isLoading_ = props.mode === "edit" && isLoading;
   const isError_ = props.mode === "edit" && isError;
   const isReady = props.mode === "add" || (!isLoading_ && !isError_ && !!data);
+
+  const relocateSaveDisabled =
+    mutation.isPending ||
+    !name.trim().length ||
+    Number.isNaN(Number.parseFloat(longitude)) ||
+    Number.isNaN(Number.parseFloat(latitude));
+
+  const handleRestoreRelocate = () => {
+    if (savedLngLat.current) {
+      setLongitude(savedLngLat.current.longitude);
+      setLatitude(savedLngLat.current.latitude);
+      const lng = Number.parseFloat(savedLngLat.current.longitude);
+      const lat = Number.parseFloat(savedLngLat.current.latitude);
+      if (!Number.isNaN(lng) && !Number.isNaN(lat)) {
+        onCoordinatesChange?.({ longitude: lng, latitude: lat });
+      }
+    }
+    onCancelRelocate?.();
+  };
+
+  const handleFinishRelocate = () => {
+    if (relocateSaveDisabled) return;
+    mutation.mutate();
+  };
 
   const title =
     props.mode === "add"
@@ -617,6 +677,55 @@ export const LocationEditPanel = (props: LocationEditPanelProps) => {
               </div>
             </div>
 
+            {/* Relocate – move the centre point on the map */}
+            {onToggleRelocate && (
+              <div className="space-y-2">
+                <Button
+                  type="button"
+                  onClick={() => {
+                    if (!relocateMode) {
+                      // Switch to point mode so polygon draw doesn't capture map clicks
+                      if (locationTypeMode === "polygon") {
+                        onLocationTypeModeChange?.("point");
+                      }
+                      onToggleRelocate();
+                    }
+                  }}
+                  variant={relocateMode ? "default" : "outline"}
+                  className="h-auto w-full justify-start gap-2 px-3 py-2 text-left whitespace-normal"
+                >
+                  <Crosshair className="h-4 w-4 shrink-0" />
+                  <span className="min-w-0 leading-snug">
+                    {relocateMode
+                      ? messages.adminLocationPanel.chooseLocationOnMap
+                      : messages.adminLocationPanel.updateLocationOnMap}
+                  </span>
+                </Button>
+
+                {relocateMode && (
+                  <div className="flex flex-col gap-2 min-w-0 sm:flex-row">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="flex-1 min-w-0 whitespace-normal text-center"
+                      onClick={handleRestoreRelocate}
+                    >
+                      {messages.adminLocationPanel.restoreOriginal}
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="flex-1 min-w-0 whitespace-normal text-center"
+                      disabled={relocateSaveDisabled}
+                      onClick={handleFinishRelocate}
+                    >
+                      {messages.adminLocationPanel.finishUpdate}
+                    </Button>
+                  </div>
+                )}
+              </div>
+            )}
+
             {/* Polygon draw controls */}
             {locationTypeMode === "polygon" && (
               <div className="polygon-draw-panel space-y-2 rounded-lg border p-3">
@@ -627,28 +736,67 @@ export const LocationEditPanel = (props: LocationEditPanelProps) => {
                     String(polygonNodes.length)
                   )}
                 </p>
-                <div className="flex gap-2">
+                {polygonParts.length > 0 && (
+                  <p className="polygon-draw-count text-xs font-medium">
+                    {messages.adminLocationPanel.polygonPartCount.replace(
+                      "{count}",
+                      String(polygonParts.length)
+                    )}
+                  </p>
+                )}
+                <div className="flex gap-2 min-w-0">
                   <Button
                     type="button"
                     variant="outline"
                     size="sm"
-                    className="flex-1 locations-outline-button"
+                    className="flex-1 min-w-0 truncate locations-outline-button"
                     disabled={polygonNodes.length < 1}
                     onClick={() => onPolygonNodesChange?.(polygonNodes.slice(0, -1))}
                   >
-                    {messages.adminLocationPanel.polygonUndo}
+                    <span className="truncate">{messages.adminLocationPanel.polygonUndo}</span>
                   </Button>
                   <Button
                     type="button"
                     variant="outline"
                     size="sm"
-                    className="flex-1 locations-outline-button"
+                    className="flex-1 min-w-0 truncate locations-outline-button"
                     disabled={polygonNodes.length < 1}
-                    onClick={() => onPolygonNodesChange?.([])}
+                    onClick={() => onPolygonNodesChange?.([])}  
                   >
-                    {messages.adminLocationPanel.polygonClear}
+                    <span className="truncate">{messages.adminLocationPanel.polygonClear}</span>
                   </Button>
                 </div>
+                {polygonParts.length > 0 && (
+                  <div className="flex gap-2 min-w-0">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      className="flex-1 min-w-0 truncate locations-outline-button"
+                      onClick={() => onPolygonPartsChange?.(polygonParts.slice(0, -1))}
+                    >
+                      <span className="truncate">{messages.adminLocationPanel.polygonRemoveLastPart}</span>
+                    </Button>
+                  </div>
+                )}
+                {polygonNodes.length >= 3 && (
+                  <div className="flex gap-2 min-w-0">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      className="flex-1 min-w-0 truncate locations-outline-button"
+                      disabled={polygonInvalid}
+                      onClick={() => {
+                        // Close current part and add to polygonParts
+                        onPolygonPartsChange?.([...polygonParts, polygonNodes]);
+                        onPolygonNodesChange?.([]);
+                      }}
+                    >
+                      <span className="truncate">{messages.adminLocationPanel.polygonClosePart}</span>
+                    </Button>
+                  </div>
+                )}
                 {polygonNodes.length >= 3 && !polygonInvalid && (
                   <p className="polygon-draw-hint text-xs">{messages.adminLocationPanel.polygonCenterHint}</p>
                 )}
@@ -1073,64 +1221,6 @@ export const LocationEditPanel = (props: LocationEditPanelProps) => {
               </div>
               );
             })}
-
-            {onToggleRelocate && (
-              <div className="space-y-2">
-                <Button
-                  type="button"
-                  onClick={() => {
-                    if (!relocateMode) {
-                      // Switch to point mode so polygon draw doesn't capture map clicks
-                      if (locationTypeMode === "polygon") {
-                        onLocationTypeModeChange?.("point");
-                      }
-                      onToggleRelocate();
-                    }
-                  }}
-                  variant={relocateMode ? "default" : "outline"}
-                  className="h-auto w-full justify-start gap-2 px-3 py-2 text-left whitespace-normal"
-                >
-                  <Crosshair className="h-4 w-4 shrink-0" />
-                  <span className="min-w-0 leading-snug">
-                    {relocateMode
-                      ? messages.adminLocationPanel.chooseLocationOnMap
-                      : messages.adminLocationPanel.updateLocationOnMap}
-                  </span>
-                </Button>
-
-                {relocateMode && (
-                  <div className="flex gap-2">
-                    <Button
-                      type="button"
-                      variant="outline"
-                      className="flex-1"
-                      onClick={() => {
-                        if (savedLngLat.current) {
-                          setLongitude(savedLngLat.current.longitude);
-                          setLatitude(savedLngLat.current.latitude);
-                          const lng = Number.parseFloat(savedLngLat.current.longitude);
-                          const lat = Number.parseFloat(savedLngLat.current.latitude);
-                          if (!Number.isNaN(lng) && !Number.isNaN(lat)) {
-                            onCoordinatesChange?.({ longitude: lng, latitude: lat });
-                          }
-                        }
-                        onCancelRelocate?.();
-                      }}
-                    >
-                      {messages.adminLocationPanel.restoreOriginal}
-                    </Button>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      className="flex-1"
-                      onClick={onConfirmRelocate}
-                    >
-                      {messages.adminLocationPanel.finishUpdate}
-                    </Button>
-                  </div>
-                )}
-              </div>
-            )}
           </div>
         )}
       </div>
@@ -1166,7 +1256,7 @@ export const LocationEditPanel = (props: LocationEditPanelProps) => {
       )}
     </div>
 
-      {/* Geocode confirmation dialog */}
+    {/* Geocode confirmation dialog */}
       <Dialog open={!!pendingGeocode} onOpenChange={(open) => { if (!open) setPendingGeocode(null); }}>
         <DialogContent>
           <DialogHeader>
