@@ -156,9 +156,9 @@ export const LocationEditPanel = (props: LocationEditPanelProps) => {
     pickedLngLat,
   } = props;
 
-  const polygonNodes = props.polygonNodes ?? [];
+  const polygonNodes = useMemo(() => props.polygonNodes ?? [], [props.polygonNodes]);
   const onPolygonNodesChange = props.onPolygonNodesChange;
-  const polygonParts = props.polygonParts ?? [];
+  const polygonParts = useMemo(() => props.polygonParts ?? [], [props.polygonParts]);
   const onPolygonPartsChange = props.onPolygonPartsChange;
   const locationTypeMode = props.locationTypeMode ?? "point";
   const onLocationTypeModeChange = props.onLocationTypeModeChange;
@@ -362,8 +362,9 @@ export const LocationEditPanel = (props: LocationEditPanelProps) => {
     const sg = data.properties.source_geometry;
     if (sg && (sg.type === "Polygon" || sg.type === "MultiPolygon")) {
       if (sg.type === "MultiPolygon") {
+        const coordinates = (sg as unknown as GeoJSON.MultiPolygon).coordinates;
         // Load all rings as parts
-        const parts = sg.coordinates.map((polygon) => {
+        const parts = coordinates.map((polygon) => {
           const ring = polygon[0] as [number, number][];
           // Drop closing duplicate node
           return ring.length > 1 &&
@@ -376,7 +377,7 @@ export const LocationEditPanel = (props: LocationEditPanelProps) => {
         onPolygonNodesChange?.([]);
       } else {
         // Polygon: load first ring as current nodes, rest as parts
-        const ring = sg.coordinates[0] as [number, number][];
+        const ring = (sg as unknown as GeoJSON.Polygon).coordinates[0] as [number, number][];
         const nodes: [number, number][] =
           ring.length > 1 &&
           ring[0][0] === ring[ring.length - 1][0] &&
@@ -436,20 +437,40 @@ export const LocationEditPanel = (props: LocationEditPanelProps) => {
         return created;
       }
       // Edit mode
-      const editSourceGeometry = buildSourceGeometry() ?? null;
-      return updateLocation(organizationId, useCaseId, locationId!, {
+      const editSourceGeometry = buildSourceGeometry();
+      const editPayload: {
+        address?: string;
+        name: string;
+        latitude: number;
+        longitude: number;
+        post_office?: string;
+        postal_code?: string;
+        source_geometry?: any;
+        fieldValues?: { fieldId: string; values: string[] }[];
+      } = {
         address: address.trim() || undefined,
         name: name.trim(),
         latitude: parseFloat(latitude),
         longitude: parseFloat(longitude),
         post_office: postOffice.trim() || undefined,
         postal_code: postalCode.trim() || undefined,
-        source_geometry: editSourceGeometry,
-        fieldValues: Object.entries(fieldValues).map(([fieldId, values]) => ({
-          fieldId,
-          values,
-        })),
-      });
+      };
+
+      // Only include source_geometry if it's defined (not null/undefined)
+      if (editSourceGeometry) {
+        editPayload.source_geometry = editSourceGeometry;
+      }
+
+      // Only include fieldValues if there are any
+      const fieldValuesArray = Object.entries(fieldValues).map(([fieldId, values]) => ({
+        fieldId,
+        values,
+      }));
+      if (fieldValuesArray.length > 0) {
+        editPayload.fieldValues = fieldValuesArray;
+      }
+
+      return updateLocation(organizationId, useCaseId, locationId!, editPayload);
     },
     onSuccess: async (result) => {
       await queryClient.invalidateQueries({
@@ -466,6 +487,9 @@ export const LocationEditPanel = (props: LocationEditPanelProps) => {
         props.onSaved();
       }
     },
+    onError: () => {
+      toast.error(messages.adminLocationPanel.saveFailed);
+    },
   });
 
   const polygonInvalid =
@@ -473,10 +497,13 @@ export const LocationEditPanel = (props: LocationEditPanelProps) => {
     polygonNodes.length >= 4 &&
     polygonSelfIntersects(polygonNodes);
 
-  const polygonVertexGroups = [
-    ...polygonParts,
-    ...(polygonNodes.length >= 3 ? [polygonNodes] : []),
-  ];
+  const polygonVertexGroups = useMemo(
+    () => [
+      ...polygonParts,
+      ...(polygonNodes.length >= 3 ? [polygonNodes] : []),
+    ],
+    [polygonNodes, polygonParts]
+  );
 
   const hasPolygonGeometry = polygonVertexGroups.length > 0;
 
@@ -570,7 +597,14 @@ export const LocationEditPanel = (props: LocationEditPanelProps) => {
 
   const handleFinishRelocate = () => {
     if (relocateSaveDisabled) return;
-    mutation.mutate();
+    mutation.mutate(undefined, {
+      onSuccess: () => {
+        onConfirmRelocate?.();
+      },
+      onError: () => {
+        onCancelRelocate?.();
+      },
+    });
   };
 
   const title =

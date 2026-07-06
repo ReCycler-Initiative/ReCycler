@@ -11,10 +11,8 @@ export default function NewObjectPage() {
   return (
     <ObjectEditor
       defaultValues={objectFormDefaultValues}
-      title="Uusi sisältömalli"
-      introDescription="Luo uusi sisältömalli"
       mutation={async (organizationId, useCaseId, data) => {
-        await createObject(organizationId, useCaseId, toApiData(data));
+        return await createObject(organizationId, useCaseId, toApiData(data));
       }}
       onSuccess={(organizationId, useCaseId) =>
         router.push(

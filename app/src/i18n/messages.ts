@@ -247,7 +247,6 @@ const baseFi = {
 		polygonPartCount: "{count} osaa",
 		polygonCenterHint: "Keskipiste lasketaan automaattisesti. Voit siirtää sitä tallennuksen jälkeen.",
 		polygonSelfIntersects: "Alueen reunat leikkaavat toisiaan. Korjaa piirros ennen tallennusta.",
-		locationDeleted: "Kohde poistettu",
 	},
 	adminAiPage: {
 		title: "Tekoäly",
@@ -917,7 +916,6 @@ const baseEn = {
 		polygonPartCount: "{count} parts",
 		polygonCenterHint: "The centre point is calculated automatically. You can move it after saving.",
 		polygonSelfIntersects: "The area boundary crosses itself. Fix the drawing before saving.",
-		locationDeleted: "Location deleted",
 	},
 	adminAiPage: {
 		title: "AI",

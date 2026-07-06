@@ -547,12 +547,15 @@ export default function LocationsMap({ geoJson }: LocationsMapProps) {
     staleTime: Infinity,
   });
 
-  const fieldChoices: Record<string, string[]> = {};
-  for (const f of fieldsData ?? []) {
-    if (f.field_type === "multi_select") {
-      fieldChoices[f.id] = f.options?.choices ?? [];
+  const fieldChoices = useMemo(() => {
+    const choices: Record<string, string[]> = {};
+    for (const field of fieldsData ?? []) {
+      if (field.field_type === "multi_select") {
+        choices[field.id] = field.options?.choices ?? [];
+      }
     }
-  }
+    return choices;
+  }, [fieldsData]);
 
   const [showMaterials, setShowMaterials] = useState(false);
   const [pendingResultsHref, setPendingResultsHref] = useState(currentResultsHref);

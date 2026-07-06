@@ -46,17 +46,6 @@ export const MaterialsPageContent = ({
   const [selectedFieldValues, setSelectedFieldValues] = useState<FieldSelections>(
     initialSelectedFieldValues
   );
-  const initialSelectedCodesKey = useMemo(
-    () => initialSelectedCodes.join(","),
-    [initialSelectedCodes]
-  );
-  const initialSelectedFieldValuesKey = useMemo(() => {
-    const normalizedEntries = Object.entries(initialSelectedFieldValues)
-      .sort(([left], [right]) => left.localeCompare(right))
-      .map(([fieldId, values]) => [fieldId, [...values].sort((left, right) => left - right)]);
-
-    return JSON.stringify(normalizedEntries);
-  }, [initialSelectedFieldValues]);
   const resolvedResultsBasePath =
     resultsBasePath ??
     (organizationId && useCaseId
@@ -69,11 +58,11 @@ export const MaterialsPageContent = ({
 
   useEffect(() => {
     setSelectedCodes(initialSelectedCodes);
-  }, [initialSelectedCodesKey]);
+  }, [initialSelectedCodes]);
 
   useEffect(() => {
     setSelectedFieldValues(initialSelectedFieldValues);
-  }, [initialSelectedFieldValuesKey]);
+  }, [initialSelectedFieldValues]);
 
   const buildResultsHref = () => {
     const params = new URLSearchParams();
