@@ -53,8 +53,8 @@ export function PageIntro({
               </p>
             </div>
           </div>
-          {actions && <div className="shrink-0">{actions}</div>}
         </div>
+        {actions && <div className="shrink-0">{actions}</div>}
       </div>
     </section>
   );
