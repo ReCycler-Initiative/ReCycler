@@ -94,3 +94,44 @@ export async function PUT(
 
   return NextResponse.json(ObjectRecord.parse(result.rows[0]));
 }
+
+export async function POST(
+  request: NextRequest,
+  {
+    params,
+  }: {
+    params: Promise<{
+      organizationId: string;
+      useCaseId: string;
+    }>;
+  }
+) {
+  const { organizationId, useCaseId } = await params;
+
+  const authResult = await checkOrganizationAuthorization(
+    request,
+    organizationId
+  );
+  if (!authResult.authorized) return authResult.response!;
+
+  const body = await request.json();
+  const data = Object.parse(body);
+
+  const result = await db.raw(
+    `
+    INSERT INTO recycler.objects (use_case_id, name)
+    SELECT uc.id, ?::text
+    FROM recycler.use_cases uc
+    WHERE uc.id = ?::uuid 
+      AND uc.organization_id = ?::uuid
+    RETURNING *, '[]'::json as fields
+    `,
+    [data.name, useCaseId, organizationId]
+  );
+
+  if (result.rows.length === 0) {
+    return NextResponse.json({ error: "Use case not found" }, { status: 404 });
+  }
+
+  return NextResponse.json(ObjectRecord.parse(result.rows[0]), { status: 201 });
+}

@@ -3,15 +3,13 @@
 import { PageIntro } from "@/components/admin/page-intro";
 import { PageTemplate } from "@/components/admin/page-template";
 import { Button } from "@/components/ui/button";
-import { useMessages } from "@/i18n/locale-provider";
 import { getObjects } from "@/services/api";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowDown, Pencil, Plus, Trash2 } from "lucide-react";
+import { Pencil, Plus } from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 
 const ObjectsPage = () => {
-  const messages = useMessages();
   const { id: organizationId, useCaseId } = useParams<{
     id: string;
     useCaseId: string;
@@ -32,7 +30,7 @@ const ObjectsPage = () => {
         actions={
           <Button asChild>
             <Link
-              href={`/admin/organizations/${organizationId}/use_cases/${useCaseId}/objects/new`}
+              href={`/admin/organizations/${organizationId}/use_cases/${useCaseId}/objects/new/edit`}
             >
               <Plus className="h-4 w-4 mr-2" />
               Lisää sisältömalli
