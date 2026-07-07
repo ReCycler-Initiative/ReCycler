@@ -27,8 +27,8 @@ const ObjectsPage = () => {
   return (
     <PageTemplate>
       <PageIntro
-        title={messages.admin.fields}
-        description={messages.admin.useCaseHomeHighlights[2]}
+        title="Sisältömallit"
+        description="Lisää ja muokkaa sisältömalleja"
         actions={
           <Button asChild>
             <Link
