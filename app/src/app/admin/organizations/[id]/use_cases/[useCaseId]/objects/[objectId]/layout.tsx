@@ -4,7 +4,7 @@ import { PageIntro } from "@/components/admin/page-intro";
 import { PageTemplate } from "@/components/admin/page-template";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Link from "next/link";
-import { useParams, usePathname } from "next/navigation";
+import { useParams, usePathname, useRouter } from "next/navigation";
 import { ReactNode } from "react";
 
 const ObjectLayout = ({ children }: { children: ReactNode }) => {
@@ -18,8 +18,10 @@ const ObjectLayout = ({ children }: { children: ReactNode }) => {
     useCaseId: string;
   }>();
 
+  const router = useRouter();
   const pathname = usePathname();
-  const basePath = `/admin/organizations/${organizationId}/use_cases/${useCaseId}/objects/${objectId}`;
+  const baseObjectsPath = `/admin/organizations/${organizationId}/use_cases/${useCaseId}/objects`;
+  const basePath = `${baseObjectsPath}/${objectId}`;
 
   const tabs = [
     { value: "edit", label: "Tiedot", href: `${basePath}/edit` },
@@ -34,7 +36,7 @@ const ObjectLayout = ({ children }: { children: ReactNode }) => {
       <PageIntro
         title="Sisältömalli"
         description="Sisältömallin tiedot"
-        onBack={() => window.history.back()}
+        onBack={() => router.push(baseObjectsPath)}
       />
       <Tabs value={activeTab}>
         <TabsList>
