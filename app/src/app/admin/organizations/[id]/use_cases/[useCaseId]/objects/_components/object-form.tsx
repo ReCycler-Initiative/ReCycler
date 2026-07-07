@@ -3,12 +3,14 @@
 import { FormFooter, FormShell } from "@/components/editor-template";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { FieldRecord } from "@/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
 const ObjectFormSchema = z.object({
   name: z.string().min(1, "Nimi on pakollinen"),
+  fields: z.array(FieldRecord),
 });
 
 export type ObjectFormValues = z.infer<typeof ObjectFormSchema>;
@@ -23,6 +25,7 @@ export const toApiData = (values: ObjectFormValues) => ({
 
 export const objectFormDefaultValues: ObjectFormValues = {
   name: "",
+  fields: [],
 };
 
 export const useObjectForm = (defaults?: ObjectFormDefaultValues) =>

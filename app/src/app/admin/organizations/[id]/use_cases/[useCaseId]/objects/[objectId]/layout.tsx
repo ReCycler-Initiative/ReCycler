@@ -2,10 +2,15 @@
 
 import { PageIntro } from "@/components/admin/page-intro";
 import { PageTemplate } from "@/components/admin/page-template";
+import { PageLoadingSpinner } from "@/components/page-loading-spinner";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { createObject, getObject, updateObject } from "@/services/api";
+import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
 import { useParams, usePathname, useRouter } from "next/navigation";
 import { ReactNode } from "react";
+import ObjectEditor from "../_components/object-editor";
+import { toApiData } from "../_components/object-form";
 
 const ObjectLayout = ({ children }: { children: ReactNode }) => {
   const {
@@ -31,6 +36,17 @@ const ObjectLayout = ({ children }: { children: ReactNode }) => {
   const activeTab =
     tabs.find((tab) => pathname.startsWith(tab.href))?.value ?? tabs[0].value;
 
+  const { data, isLoading } = useQuery({
+    queryKey: [organizationId, useCaseId, objectId],
+    queryFn: () => getObject(organizationId, useCaseId, objectId),
+    enabled:
+      !!organizationId && !!useCaseId && !!objectId && objectId !== "new",
+  });
+
+  if (isLoading) {
+    return <PageLoadingSpinner />;
+  }
+
   return (
     <PageTemplate>
       <PageIntro
@@ -38,16 +54,38 @@ const ObjectLayout = ({ children }: { children: ReactNode }) => {
         description="Sisältömallin tiedot"
         onBack={() => router.push(baseObjectsPath)}
       />
-      <Tabs value={activeTab}>
-        <TabsList>
-          {tabs.map((tab) => (
-            <TabsTrigger key={tab.value} value={tab.value} asChild>
-              <Link href={tab.href}>{tab.label}</Link>
-            </TabsTrigger>
-          ))}
-        </TabsList>
-      </Tabs>
-      {children}
+      <ObjectEditor
+        defaultValues={{
+          name: data?.name ?? "",
+          fields: data?.fields ?? [],
+        }}
+        mutation={async (organizationId, useCaseId, values) => {
+          if (objectId === "new") {
+            return await createObject(
+              organizationId,
+              useCaseId,
+              toApiData(values)
+            );
+          }
+          return await updateObject(
+            organizationId,
+            useCaseId,
+            data?.id!,
+            toApiData(values)
+          );
+        }}
+      >
+        <Tabs value={activeTab}>
+          <TabsList>
+            {tabs.map((tab) => (
+              <TabsTrigger key={tab.value} value={tab.value} asChild>
+                <Link href={tab.href}>{tab.label}</Link>
+              </TabsTrigger>
+            ))}
+          </TabsList>
+        </Tabs>
+        <div className="px-4">{children}</div>
+      </ObjectEditor>
     </PageTemplate>
   );
 };

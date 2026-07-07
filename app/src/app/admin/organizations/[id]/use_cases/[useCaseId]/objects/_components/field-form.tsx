@@ -182,7 +182,6 @@ export const FieldFormFields = ({
 }: {
   form: ReturnType<typeof useFieldForm>;
 }) => {
-  const messages = useMessages();
   const { register, setValue, getValues, control, formState } = form;
 
   const fieldType = useWatch({ control, name: "field_type" });
@@ -361,13 +360,13 @@ export const FieldFormContent = ({
   form,
   backHref,
   onCancel,
-  isPending,
+  isPending = false,
   onSubmit,
 }: {
   form: ReturnType<typeof useFieldForm>;
   backHref?: string;
   onCancel?: () => void;
-  isPending: boolean;
+  isPending?: boolean;
   onSubmit: (values: FieldFormValues) => void;
 }) => (
   <FormShell form={form} onSubmit={onSubmit}>

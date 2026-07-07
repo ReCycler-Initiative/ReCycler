@@ -21,6 +21,7 @@ export const FormFooter = ({
   cancelButtonClassName,
   saveButtonClassName,
   showDivider = true,
+  onSubmit,
 }: {
   isSubmitting: boolean;
   isDirty: boolean;
@@ -29,8 +30,13 @@ export const FormFooter = ({
   cancelButtonClassName?: string;
   saveButtonClassName?: string;
   showDivider?: boolean;
+  onSubmit?: (e: React.FormEvent) => void;
 }) => {
   const messages = useMessages();
+
+  const handleSubmit = (e: React.MouseEvent<HTMLButtonElement>) => {
+    onSubmit?.(e as any);
+  };
 
   return (
     <>
@@ -57,6 +63,7 @@ export const FormFooter = ({
           className={`sm:w-fit ml-auto ${saveButtonClassName ?? ""}`.trim()}
           disabled={!isDirty}
           isLoading={isSubmitting}
+          onClick={handleSubmit}
         >
           {messages.editor.save}
         </Button>
@@ -157,17 +164,19 @@ export const EditorTemplate = <ApiData, FormData extends FieldValues>({
 }: {
   children: ReactNode;
 } & UseEditorReturn<ApiData, FormData>) => {
+  const handleSubmit = form.handleSubmit((values) =>
+    mutation.mutateAsync(values)
+  );
+
   return (
     <Form {...form}>
-      <form
-        onSubmit={form.handleSubmit((values) => mutation.mutateAsync(values))}
-        className="space-y-4"
-      >
+      <form onSubmit={handleSubmit} className="space-y-4">
         <LoadingState isLoading={query.isLoading} error={!!query.error}>
           {children}
           <FormFooter
             isSubmitting={form.formState.isSubmitting}
             isDirty={form.formState.isDirty}
+            onSubmit={handleSubmit}
           />
         </LoadingState>
       </form>
