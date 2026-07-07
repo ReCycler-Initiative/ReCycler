@@ -89,7 +89,10 @@ export const FormShell = <FormData extends FieldValues>({
 }) => (
   <Form {...form}>
     <form
-      onSubmit={form.handleSubmit(onSubmit)}
+      onSubmit={(e) => {
+        e.stopPropagation();
+        return form.handleSubmit(onSubmit)(e);
+      }}
       className={className ?? "space-y-6 max-w-xl"}
     >
       {children}
