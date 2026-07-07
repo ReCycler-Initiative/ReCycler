@@ -8,7 +8,6 @@ import { toApiData } from "../../_components/object-form";
 import ObjectEditor from "../../_components/object-editor";
 
 export default function EditObjectPage() {
-  const router = useRouter();
   const {
     objectId,
     id: organizationId,

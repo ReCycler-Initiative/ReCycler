@@ -31,7 +31,11 @@ const ObjectLayout = ({ children }: { children: ReactNode }) => {
 
   return (
     <PageTemplate>
-      <PageIntro title="Sisältömalli" description="Sisältömallin tiedot" />
+      <PageIntro
+        title="Sisältömalli"
+        description="Sisältömallin tiedot"
+        onBack={() => window.history.back()}
+      />
       <Tabs value={activeTab}>
         <TabsList>
           {tabs.map((tab) => (
