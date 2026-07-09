@@ -69,8 +69,7 @@ const ObjectsPage = () => {
                     <Button
                       variant="ghost"
                       size="icon"
-                      // onClick={() => openEdit(field)}
-                      aria-label="Muokkaa kenttää"
+                      aria-label="Muokkaa sisältömallia"
                     >
                       <Link
                         href={`/admin/organizations/${organizationId}/use_cases/${useCaseId}/objects/${object.id}/edit`}
