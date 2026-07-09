@@ -3,25 +3,57 @@
 import { FormFooter, FormShell } from "@/components/editor-template";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { FieldRecord } from "@/types";
+import { Object, ObjectRecord } from "@/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-const ObjectFormSchema = z.object({
-  name: z.string().min(1, "Nimi on pakollinen"),
-  fields: z.array(FieldRecord),
-});
+const ObjectFormSchema = z.union([Object, ObjectRecord]);
 
 export type ObjectFormValues = z.infer<typeof ObjectFormSchema>;
 
-export type ObjectFormDefaultValues = {
-  name?: string;
+const ObjectFormDefaultValuesSchema = Object;
+
+export type ObjectFormDefaultValues = z.infer<
+  typeof ObjectFormDefaultValuesSchema
+>;
+
+export const toApiData = (values: ObjectFormValues) => {
+  const fields = values.fields.map((field) => {
+    const baseField = {
+      name: field.name,
+      field_type: field.field_type,
+      order: field.order,
+      ...(field.options && { options: field.options }),
+      ...(field.required !== undefined && { required: field.required }),
+    };
+
+    if ('id' in field && field.id) {
+      return {
+        id: field.id,
+        use_case_id: field.use_case_id,
+        ...baseField,
+      };
+    }
+
+    return baseField;
+  });
+
+  if ('id' in values && values.id) {
+    return {
+      id: values.id,
+      name: values.name,
+      use_case_id: values.use_case_id,
+      fields,
+    };
+  }
+
+  return {
+    name: values.name,
+    fields,
+  };
 };
 
-export const toApiData = (values: ObjectFormValues) => ({
-  name: values.name,
-});
 
 export const objectFormDefaultValues: ObjectFormValues = {
   name: "",

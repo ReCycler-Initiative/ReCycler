@@ -2,18 +2,18 @@
 
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader } from "@/components/ui/dialog";
-import { FieldRecord } from "@/types";
+import { Field, FieldRecord } from "@/types";
+import { DialogTitle } from "@radix-ui/react-dialog";
 import { ArrowDown, ArrowUp, Pencil, Plus, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { useFieldArray, useFormContext } from "react-hook-form";
 import { z } from "zod";
-import { ObjectFormValues } from "../../_components/object-form";
 import {
   FieldFormContent,
   fieldFormDefaultValues,
   useFieldForm,
 } from "../../_components/field-form";
-import { DialogTitle } from "@radix-ui/react-dialog";
+import { ObjectFormValues } from "../../_components/object-form";
 
 const FIELD_TYPE_LABELS: Record<string, string> = {
   multi_select: "Monivalinta",
@@ -22,7 +22,9 @@ const FIELD_TYPE_LABELS: Record<string, string> = {
   opening_hours: "Aukioloajat",
 };
 
-type FieldItem = z.infer<typeof FieldRecord>;
+const FieldSchema = z.union([Field, FieldRecord]);
+
+type FieldItem = z.infer<typeof FieldSchema>;
 
 export default function FieldsPage() {
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -68,16 +70,16 @@ export default function FieldsPage() {
   };
 
   return (
-    <>
+    <div className="flex flex-col gap-y-4">
+      <Button className="self-end" onClick={openNew}>
+        <Plus className="h-4 w-4 mr-2" /> Lisää kenttä
+      </Button>
       {fieldsArray.fields.length === 0 ? (
         <p className="text-sm text-muted-foreground">
           Ei kenttiä. Lisää ensimmäinen kenttä.
         </p>
       ) : (
         <div className="flex flex-col gap-y-4">
-          <Button className="self-end" onClick={openNew}>
-            <Plus className="h-4 w-4 mr-2" /> Lisää kenttä
-          </Button>
           <div className="rounded-lg border border-gray-200 overflow-hidden">
             <table className="w-full text-sm">
               <thead className="bg-gray-50 border-b border-gray-200">
@@ -192,19 +194,26 @@ export default function FieldsPage() {
             form={fieldForm}
             onCancel={() => setDialogOpen(false)}
             onSubmit={(values) => {
-              fieldsArray.update(
-                editingField
-                  ? fieldsArray.fields.findIndex(
-                      (f) => f.id === editingField.id
-                    )
-                  : fieldsArray.fields.length,
-                values as any
-              );
+              const existing = editingField
+                ? fieldsArray.fields.findIndex(
+                    (f) => "id" in editingField && f.id === editingField.id
+                  )
+                : -1;
+              if (existing !== -1) {
+                if ("order" in values) {
+                  fieldsArray.update(existing, values);
+                }
+              } else {
+                fieldsArray.append({
+                  ...values,
+                  order: fieldsArray.fields.length,
+                });
+              }
               setDialogOpen(false);
             }}
           />
         </DialogContent>
       </Dialog>
-    </>
+    </div>
   );
 }

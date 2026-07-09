@@ -84,7 +84,7 @@ const ObjectLayout = ({ children }: { children: ReactNode }) => {
             ))}
           </TabsList>
         </Tabs>
-        <div className="px-4">{children}</div>
+        {children}
       </ObjectEditor>
     </PageTemplate>
   );

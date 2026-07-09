@@ -38,6 +38,7 @@ const FieldFormSchema = z.object({
   choiceColors: z.record(z.string()),
   placeholder: z.string(),
   helpText: z.string(),
+  order: z.number().nullable().optional(),
 });
 
 export type FieldFormValues = z.infer<typeof FieldFormSchema>;
