@@ -2,6 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader } from "@/components/ui/dialog";
+import { useMessages } from "@/i18n/locale-provider";
 import { Field, FieldRecord } from "@/types";
 import { DialogTitle } from "@radix-ui/react-dialog";
 import { ArrowDown, ArrowUp, Pencil, Plus, Trash2 } from "lucide-react";
@@ -15,18 +16,12 @@ import {
 } from "../../_components/field-form";
 import { ObjectFormValues } from "../../_components/object-form";
 
-const FIELD_TYPE_LABELS: Record<string, string> = {
-  multi_select: "Monivalinta",
-  text_input: "Tekstikenttä",
-  address: "Osoite",
-  opening_hours: "Aukioloajat",
-};
-
 const FieldSchema = z.union([Field, FieldRecord]);
 
 type FieldItem = z.infer<typeof FieldSchema>;
 
 export default function FieldsPage() {
+  const messages = useMessages();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingField, setEditingField] = useState<FieldItem | null>(null);
   const form = useFormContext<ObjectFormValues>();
@@ -75,11 +70,11 @@ export default function FieldsPage() {
   return (
     <div className="flex flex-col gap-y-4">
       <Button className="self-end" onClick={openNew}>
-        <Plus className="h-4 w-4 mr-2" /> Lisää kenttä
+        <Plus className="h-4 w-4 mr-2" /> {messages.adminFieldsPage.addField}
       </Button>
       {fieldsArray.fields.length === 0 ? (
         <p className="text-sm text-muted-foreground">
-          Ei kenttiä. Lisää ensimmäinen kenttä.
+          {messages.adminFieldsPage.noFields}
         </p>
       ) : (
         <div className="flex flex-col gap-y-4">
@@ -88,19 +83,19 @@ export default function FieldsPage() {
               <thead className="bg-gray-50 border-b border-gray-200">
                 <tr>
                   <th className="px-4 py-3 text-left font-medium text-muted-foreground w-20">
-                    Järjestys
+                    {messages.adminFieldsPage.orderColumn}
                   </th>
                   <th className="px-4 py-3 text-left font-medium text-muted-foreground">
-                    Nimi
+                    {messages.adminFieldsPage.nameColumn}
                   </th>
                   <th className="px-4 py-3 text-left font-medium text-muted-foreground">
-                    Tyyppi
+                    {messages.adminFieldsPage.typeColumn}
                   </th>
                   <th className="px-4 py-3 text-left font-medium text-muted-foreground w-24">
-                    Pakollinen
+                    {messages.adminFieldsPage.requiredColumn}
                   </th>
                   <th className="px-4 py-3 text-right font-medium text-muted-foreground w-24">
-                    Toiminnot
+                    {messages.adminFieldsPage.actionsColumn}
                   </th>
                 </tr>
               </thead>
@@ -114,7 +109,7 @@ export default function FieldsPage() {
                           disabled={index === 0}
                           onClick={() => handleMove(index, "up")}
                           className="p-0.5 rounded hover:bg-gray-200 disabled:opacity-30 disabled:cursor-not-allowed"
-                          aria-label="Siirrä ylöspäin"
+                          aria-label={messages.adminFieldsPage.moveUpAria}
                         >
                           <ArrowUp className="h-3.5 w-3.5" />
                         </button>
@@ -123,7 +118,7 @@ export default function FieldsPage() {
                           disabled={index === fieldsArray.fields.length - 1}
                           onClick={() => handleMove(index, "down")}
                           className="p-0.5 rounded hover:bg-gray-200 disabled:opacity-30 disabled:cursor-not-allowed"
-                          aria-label="Siirrä alaspäin"
+                          aria-label={messages.adminFieldsPage.moveDownAria}
                         >
                           <ArrowDown className="h-3.5 w-3.5" />
                         </button>
@@ -131,22 +126,25 @@ export default function FieldsPage() {
                     </td>
                     <td className="px-4 py-3 font-medium">{field.name}</td>
                     <td className="px-4 py-3 text-muted-foreground">
-                      {FIELD_TYPE_LABELS[field.field_type] ?? field.field_type}
+                      {messages.adminFieldsPage.fieldTypeLabels[
+                        field.field_type
+                      ] ?? field.field_type}
                       {field.field_type === "multi_select" &&
                         field.options?.choices && (
                           <span className="ml-1 text-xs">
-                            ({field.options.choices.length} vaihtoehtoa)
+                            ({field.options.choices.length}{" "}
+                            {messages.adminFieldsPage.optionsCount})
                           </span>
                         )}
                     </td>
                     <td className="px-4 py-3">
                       {field.required ? (
                         <span className="field-required-yes text-xs font-medium text-primary">
-                          Kyllä
+                          {messages.adminFieldsPage.requiredYes}
                         </span>
                       ) : (
                         <span className="field-required-no text-xs text-muted-foreground">
-                          Ei
+                          {messages.adminFieldsPage.requiredNo}
                         </span>
                       )}
                     </td>
@@ -156,7 +154,7 @@ export default function FieldsPage() {
                           variant="ghost"
                           size="icon"
                           onClick={() => openEdit(field)}
-                          aria-label="Muokkaa kenttää"
+                          aria-label={messages.adminFieldsPage.editFieldAria}
                         >
                           <Pencil className="h-4 w-4" />
                         </Button>
@@ -167,13 +165,16 @@ export default function FieldsPage() {
                           onClick={() => {
                             if (
                               confirm(
-                                `Poistetaanko kenttä "${field.name}"?\n\nTämä poistaa myös kaikki kohteiden arvot tältä kentältä.`
+                                messages.adminFieldsPage.deleteConfirm.replace(
+                                  "{name}",
+                                  field.name
+                                )
                               )
                             ) {
                               fieldsArray.remove(index);
                             }
                           }}
-                          aria-label="Poista kenttä"
+                          aria-label={messages.adminFieldsPage.deleteFieldAria}
                         >
                           <Trash2 className="h-4 w-4" />
                         </Button>
@@ -190,7 +191,9 @@ export default function FieldsPage() {
         <DialogContent className="field-editor-dialog sm:max-w-lg max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>
-              {editingField ? "Muokkaa kenttää" : "Uusi kenttä"}
+              {editingField
+                ? messages.adminFieldsPage.editTitle
+                : messages.adminFieldsPage.newTitle}
             </DialogTitle>
           </DialogHeader>
           <FieldFormContent

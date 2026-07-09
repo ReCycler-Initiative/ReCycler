@@ -631,6 +631,31 @@ const baseFi = {
     	title: "Sisältömalli",
     	description: "Sisältömallin tiedot",
 	},
+	adminFieldsPage: {
+		addField: "Lisää kenttä",
+		noFields: "Ei kenttiä. Lisää ensimmäinen kenttä.",
+		orderColumn: "Järjestys",
+		nameColumn: "Nimi",
+		typeColumn: "Tyyppi",
+		requiredColumn: "Pakollinen",
+		actionsColumn: "Toiminnot",
+		moveUpAria: "Siirrä ylöspäin",
+		moveDownAria: "Siirrä alaspäin",
+		fieldTypeLabels: {
+			multi_select: "Monivalinta",
+			text_input: "Tekstikenttä",
+			address: "Osoite",
+			opening_hours: "Aukioloajat",
+		},
+		optionsCount: "vaihtoehtoa",
+		requiredYes: "Kyllä",
+		requiredNo: "Ei",
+		editFieldAria: "Muokkaa kenttää",
+		deleteFieldAria: "Poista kenttä",
+		deleteConfirm: "Poistetaanko kenttä \"{name}\"?\n\nTämä poistaa myös kaikki kohteiden arvot tältä kentältä.",
+		editTitle: "Muokkaa kenttää",
+		newTitle: "Uusi kenttä",
+	},
 };
 
 const baseEn = {
