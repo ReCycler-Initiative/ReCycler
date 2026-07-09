@@ -47,8 +47,6 @@ const ObjectLayout = ({ children }: { children: ReactNode }) => {
     return <PageLoadingSpinner />;
   }
 
-  console.log(data)
-
   return (
     <PageTemplate>
       <PageIntro
