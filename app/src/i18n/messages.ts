@@ -625,6 +625,12 @@ const baseFi = {
 			],
 		},
 	],
+	adminObjectsPage: {
+		edit: "Tiedot",
+    	fields: "Kentät",
+    	title: "Sisältömalli",
+    	description: "Sisältömallin tiedot",
+	},
 };
 
 const baseEn = {
@@ -1208,6 +1214,12 @@ const baseEn = {
 			],
 		},
 	],
+	adminObjectsPage: {
+    	edit: "Details",
+    	fields: "Fields",
+    	title: "Content model",
+    	description: "Content model details",
+	}
 };
 
 const messages: Record<Locale, Messages> = {

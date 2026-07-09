@@ -5,6 +5,7 @@ import { PageTemplate } from "@/components/admin/page-template";
 import { PageLoadingSpinner } from "@/components/page-loading-spinner";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { createObject, getObject, updateObject } from "@/services/api";
+import { useMessages } from "@/i18n/locale-provider";
 import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
 import { useParams, usePathname, useRouter } from "next/navigation";
@@ -13,6 +14,7 @@ import ObjectEditor from "../_components/object-editor";
 import { toApiData } from "../_components/object-form";
 
 const ObjectLayout = ({ children }: { children: ReactNode }) => {
+  const messages = useMessages();
   const {
     objectId,
     id: organizationId,
@@ -29,8 +31,16 @@ const ObjectLayout = ({ children }: { children: ReactNode }) => {
   const basePath = `${baseObjectsPath}/${objectId}`;
 
   const tabs = [
-    { value: "edit", label: "Tiedot", href: `${basePath}/edit` },
-    { value: "fields", label: "Kentät", href: `${basePath}/fields` },
+    {
+      value: "edit",
+      label: messages.adminObjectsPage.tabInfo,
+      href: `${basePath}/edit`,
+    },
+    {
+      value: "fields",
+      label: messages.adminObjectsPage.tabFields,
+      href: `${basePath}/fields`,
+    },
   ];
 
   const activeTab =
@@ -50,8 +60,8 @@ const ObjectLayout = ({ children }: { children: ReactNode }) => {
   return (
     <PageTemplate>
       <PageIntro
-        title="Sisältömalli"
-        description="Sisältömallin tiedot"
+        title={messages.adminObjectsPage.title}
+        description={messages.adminObjectsPage.description}
         onBack={() => router.push(baseObjectsPath)}
       />
       <ObjectEditor
