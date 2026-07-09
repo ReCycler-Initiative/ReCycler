@@ -1244,7 +1244,32 @@ const baseEn = {
     	fields: "Fields",
     	title: "Content model",
     	description: "Content model details",
-	}
+	},
+	adminFieldsPage: {
+		addField: "Add field",
+		noFields: "No fields. Add the first field.",
+		orderColumn: "Order",
+		nameColumn: "Name",
+		typeColumn: "Type",
+		requiredColumn: "Required",
+		actionsColumn: "Actions",
+		moveUpAria: "Move up",
+		moveDownAria: "Move down",
+		fieldTypeLabels: {
+			multi_select: "Multi-select",
+			text_input: "Text field",
+			address: "Address",
+			opening_hours: "Opening hours",
+		},
+		optionsCount: "options",
+		requiredYes: "Yes",
+		requiredNo: "No",
+		editFieldAria: "Edit field",
+		deleteFieldAria: "Delete field",
+		deleteConfirm: "Delete field \"{name}\"?\n\nThis will also remove all location values for this field.",
+		editTitle: "Edit field",
+		newTitle: "New field",
+	},
 };
 
 const messages: Record<Locale, Messages> = {
