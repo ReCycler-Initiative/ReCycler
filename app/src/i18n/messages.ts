@@ -660,7 +660,16 @@ const baseFi = {
 	 	nameLabel: "Nimi",
   		namePlaceholder: "esim. Materiaalit",
 	},
-
+	adminObjectsListPage: {
+		title: "Sisältömallit",
+		description: "Lisää ja muokkaa sisältömalleja",
+		addObject: "Lisää sisältömalli",
+		loading: "Ladataan...",
+		noObjects: "Ei sisältömalleja. Lisää ensimmäinen sisältömalli",
+		nameColumn: "Nimi",
+		fieldsColumn: "Kenttiä",
+		editObjectAria: "Muokkaa sisältömallia",
+	},
 };
 
 const baseEn = {
@@ -1278,7 +1287,17 @@ const baseEn = {
 	adminObjectForm: {
   		nameLabel: "Name",
   		namePlaceholder: "e.g. Materials",
-}	,
+	},
+	adminObjectsListPage: {
+		title: "Content models",
+		description: "Add and edit content models",
+		addObject: "Add content model",
+		loading: "Loading...",
+		noObjects: "No content models. Add the first content model",
+		nameColumn: "Name",
+		fieldsColumn: "Fields",
+		editObjectAria: "Edit content model",
+	},
 };
 
 const messages: Record<Locale, Messages> = {

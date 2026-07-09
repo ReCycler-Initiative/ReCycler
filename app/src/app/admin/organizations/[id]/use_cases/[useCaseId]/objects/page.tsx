@@ -3,6 +3,7 @@
 import { PageIntro } from "@/components/admin/page-intro";
 import { PageTemplate } from "@/components/admin/page-template";
 import { Button } from "@/components/ui/button";
+import { useMessages } from "@/i18n/locale-provider";
 import { getObjects } from "@/services/api";
 import { useQuery } from "@tanstack/react-query";
 import { Pencil, Plus } from "lucide-react";
@@ -10,6 +11,7 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 
 const ObjectsPage = () => {
+  const messages = useMessages();
   const { id: organizationId, useCaseId } = useParams<{
     id: string;
     useCaseId: string;
@@ -25,24 +27,26 @@ const ObjectsPage = () => {
   return (
     <PageTemplate>
       <PageIntro
-        title="Sisältömallit"
-        description="Lisää ja muokkaa sisältömalleja"
+        title={messages.adminObjectsListPage.title}
+        description={messages.adminObjectsListPage.description}
         actions={
           <Button asChild>
             <Link
               href={`/admin/organizations/${organizationId}/use_cases/${useCaseId}/objects/new/edit`}
             >
               <Plus className="h-4 w-4 mr-2" />
-              Lisää sisältömalli
+              {messages.adminObjectsListPage.addObject}
             </Link>
           </Button>
         }
       />
       {isLoading ? (
-        <p className="text-sm text-muted-foreground">Ladataan...</p>
+        <p className="text-sm text-muted-foreground">
+          {messages.adminObjectsListPage.loading}
+        </p>
       ) : objects.length === 0 ? (
         <p className="text-sm text-muted-foreground">
-          Ei sisältömalleja. Lisää ensimmäinen sisältömalli
+          {messages.adminObjectsListPage.noObjects}
         </p>
       ) : (
         <div className="rounded-lg border border-gray-200 overflow-hidden">
@@ -50,10 +54,10 @@ const ObjectsPage = () => {
             <thead className="bg-gray-50 border-b border-gray-200">
               <tr>
                 <th className="px-4 py-3 text-left font-medium text-muted-foreground">
-                  Nimi
+                  {messages.adminObjectsListPage.nameColumn}
                 </th>
                 <th className="px-4 py-3 text-center font-medium text-muted-foreground">
-                  Kenttiä
+                  {messages.adminObjectsListPage.fieldsColumn}
                 </th>
                 <th className="w-24"></th>
               </tr>
@@ -69,7 +73,7 @@ const ObjectsPage = () => {
                     <Button
                       variant="ghost"
                       size="icon"
-                      aria-label="Muokkaa sisältömallia"
+                      aria-label={messages.adminObjectsListPage.editObjectAria}
                     >
                       <Link
                         href={`/admin/organizations/${organizationId}/use_cases/${useCaseId}/objects/${object.id}/edit`}
