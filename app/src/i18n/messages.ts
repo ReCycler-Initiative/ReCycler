@@ -656,6 +656,11 @@ const baseFi = {
 		editTitle: "Muokkaa kenttää",
 		newTitle: "Uusi kenttä",
 	},
+	adminObjectForm: {
+	 	nameLabel: "Nimi",
+  		namePlaceholder: "esim. Materiaalit",
+	},
+
 };
 
 const baseEn = {
@@ -1270,6 +1275,10 @@ const baseEn = {
 		editTitle: "Edit field",
 		newTitle: "New field",
 	},
+	adminObjectForm: {
+  		nameLabel: "Name",
+  		namePlaceholder: "e.g. Materials",
+}	,
 };
 
 const messages: Record<Locale, Messages> = {

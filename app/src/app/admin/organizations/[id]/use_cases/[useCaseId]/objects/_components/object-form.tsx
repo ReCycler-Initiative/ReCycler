@@ -3,6 +3,7 @@
 import { FormFooter, FormShell } from "@/components/editor-template";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useMessages } from "@/i18n/locale-provider";
 import { Object, ObjectRecord } from "@/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -28,7 +29,7 @@ export const toApiData = (values: ObjectFormValues) => {
       ...(field.required !== undefined && { required: field.required }),
     };
 
-    if ('id' in field && field.id) {
+    if ("id" in field && field.id) {
       return {
         id: field.id,
         use_case_id: field.use_case_id,
@@ -39,7 +40,7 @@ export const toApiData = (values: ObjectFormValues) => {
     return baseField;
   });
 
-  if ('id' in values && values.id) {
+  if ("id" in values && values.id) {
     return {
       id: values.id,
       name: values.name,
@@ -53,7 +54,6 @@ export const toApiData = (values: ObjectFormValues) => {
     fields,
   };
 };
-
 
 export const objectFormDefaultValues: ObjectFormValues = {
   name: "",
@@ -73,17 +73,18 @@ export const ObjectFormFields = ({
 }: {
   form: ReturnType<typeof useObjectForm>;
 }) => {
+  const messages = useMessages();
   const { register, setValue, getValues, control, formState } = form;
 
   return (
     <>
       {/* Name */}
       <div className="space-y-1.5">
-        <Label htmlFor="field-name">Nimi</Label>
+        <Label htmlFor="field-name">{messages.adminObjectForm.nameLabel}</Label>
         <Input
           id="field-name"
           {...register("name")}
-          placeholder="esim. Materiaalit"
+          placeholder={messages.adminObjectForm.namePlaceholder}
           autoFocus
         />
         {formState.errors.name && (
