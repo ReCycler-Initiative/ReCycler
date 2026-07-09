@@ -45,13 +45,16 @@ export default function FieldsPage() {
 
   const openEdit = (field: FieldItem) => {
     fieldForm.reset({
-      name: field.name,
-      field_type: field.field_type,
-      required: field.required ?? false,
-      choices: (field.options?.choices ?? []).map((v) => ({ value: v })),
       choiceColors: field.options?.choiceColors ?? {},
-      placeholder: field.options?.placeholder ?? "",
+      choices: (field.options?.choices ?? []).map((v) => ({ value: v })),
+      field_type: field.field_type,
       helpText: field.options?.helpText ?? "",
+      id: "id" in field ? field.id : null,
+      name: field.name,
+      order: field.order,
+      placeholder: field.options?.placeholder ?? "",
+      required: field.required ?? false,
+      use_case_id: "use_case_id" in field ? field.use_case_id : null,
     });
     setEditingField(field);
     setDialogOpen(true);

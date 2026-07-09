@@ -72,8 +72,9 @@ export async function PUT(
   if (!authResult.authorized) return authResult.response!;
 
   const body = await request.json();
-  const data = Object.parse(body);
+  const data = ObjectRecord.parse(body);
 
+  // Update object
   const result = await db.raw(
     `
     UPDATE recycler.objects o
@@ -83,7 +84,7 @@ export async function PUT(
       AND o.use_case_id = uc.id
       AND uc.id = ?::uuid 
       AND uc.organization_id = ?::uuid
-    RETURNING o.*, '[]'::json as fields
+    RETURNING o.*
     `,
     [data.name, objectId, useCaseId, organizationId]
   );
@@ -92,7 +93,69 @@ export async function PUT(
     return NextResponse.json({ error: "Object not found" }, { status: 404 });
   }
 
-  return NextResponse.json(ObjectRecord.parse(result.rows[0]));
+  const updatedObject = result.rows[0];
+
+  // Get existing fields
+  const existingFields = await db("recycler.fields")
+    .where({ object_id: objectId })
+    .select("id");
+
+  const existingFieldIds = new Set(existingFields.map((f) => f.id));
+  const incomingFieldIds = new Set(
+    data.fields
+      .filter((f) => "id" in f && f.id)
+      .map((f) => ("id" in f ? f.id : ""))
+  );
+
+  // Delete removed fields
+  const fieldsToDelete = [...existingFieldIds].filter(
+    (id) => !incomingFieldIds.has(id)
+  );
+  if (fieldsToDelete.length > 0) {
+    await db("recycler.fields").whereIn("id", fieldsToDelete).delete();
+  }
+
+  // Update or insert fields
+  const fields = await Promise.all(
+    data.fields.map(async (field, index) => {
+      if ("id" in field && field.id) {
+        // Update existing field
+        const [row] = await db("recycler.fields")
+          .where({ id: field.id })
+          .update({
+            name: field.name,
+            field_type: field.field_type,
+            required: field.required ?? false,
+            options: field.options ? JSON.stringify(field.options) : null,
+            order: index,
+          })
+          .returning("*");
+
+        return row;
+      } else {
+        // Insert new field
+        const [row] = await db("recycler.fields")
+          .insert({
+            id: db.raw("uuid_generate_v4()"),
+            object_id: objectId,
+            use_case_id: useCaseId,
+            name: field.name,
+            field_type: field.field_type,
+            required: field.required ?? false,
+            options: field.options ? JSON.stringify(field.options) : null,
+            order: index,
+            created_at: db.fn.now(),
+          })
+          .returning("*");
+
+        return row;
+      }
+    })
+  );
+
+  return NextResponse.json(
+    ObjectRecord.parse({ ...updatedObject, fields, use_case_id: useCaseId })
+  );
 }
 
 export async function POST(

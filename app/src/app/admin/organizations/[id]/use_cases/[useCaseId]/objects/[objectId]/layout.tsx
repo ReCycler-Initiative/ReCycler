@@ -47,6 +47,8 @@ const ObjectLayout = ({ children }: { children: ReactNode }) => {
     return <PageLoadingSpinner />;
   }
 
+  console.log(data)
+
   return (
     <PageTemplate>
       <PageIntro
@@ -55,10 +57,7 @@ const ObjectLayout = ({ children }: { children: ReactNode }) => {
         onBack={() => router.push(baseObjectsPath)}
       />
       <ObjectEditor
-        defaultValues={{
-          name: data?.name ?? "",
-          fields: data?.fields ?? [],
-        }}
+        defaultValues={data && "id" in data ? data : { name: "", fields: [] }}
         mutation={async (organizationId, useCaseId, values) => {
           if (objectId === "new") {
             return await createObject(
