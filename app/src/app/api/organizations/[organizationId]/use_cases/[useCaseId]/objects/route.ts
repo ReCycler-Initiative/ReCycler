@@ -54,14 +54,40 @@ export async function POST(
   const body = await request.json();
   const data = Object.parse(body);
 
-  const result = await db.raw(
+  // Insert object
+  const objectResult = await db.raw(
     `
     INSERT INTO recycler.objects (name, use_case_id)
     VALUES (?::text, ?::uuid)
-    RETURNING *, '[]'::json as fields
+    RETURNING *
     `,
     [data.name, useCaseId]
   );
 
-  return NextResponse.json(ObjectRecord.parse(result.rows[0]), { status: 201 });
+  const newObject = objectResult.rows[0];
+
+  // Insert fields
+  const fields = await Promise.all(
+    data.fields.map(async (field, index) => {
+      const [row] = await db("recycler.fields")
+        .insert({
+          id: db.raw("uuid_generate_v4()"),
+          object_id: newObject.id, // Linkitä objektiin
+          use_case_id: useCaseId,
+          name: field.name,
+          field_type: field.field_type,
+          required: field.required ?? false,
+          options: field.options ? JSON.stringify(field.options) : null,
+          order: index, // tai field.order
+          created_at: db.fn.now(),
+        })
+        .returning("*");
+
+      return row;
+    })
+  );
+
+  return NextResponse.json(ObjectRecord.parse({ ...newObject, fields }), {
+    status: 201,
+  });
 }

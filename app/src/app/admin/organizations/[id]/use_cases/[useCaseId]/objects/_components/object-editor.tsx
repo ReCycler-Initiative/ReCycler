@@ -1,13 +1,14 @@
 "use client";
 
 import { EditorTemplate, useEditor } from "@/components/editor-template";
+import { ObjectRecord } from "@/types";
 import { useQueryClient } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
-import { ObjectFormFields, ObjectFormValues, toApiData } from "./object-form";
-import { ObjectRecord } from "@/types";
-import z from "zod";  
+import z from "zod";
+import { ObjectFormValues, toApiData } from "./object-form";
 
 type ObjectEditorProps = {
+  children?: React.ReactNode;
   defaultValues: ObjectFormValues;
   mutation: (
     organizationId: string,
@@ -18,6 +19,7 @@ type ObjectEditorProps = {
 };
 
 export default function ObjectEditor({
+  children,
   defaultValues,
   mutation,
   onSuccess,
@@ -49,11 +51,5 @@ export default function ObjectEditor({
     },
   });
 
-  return (
-    <EditorTemplate {...editor}>
-      <div className="px-4">
-        <ObjectFormFields form={editor.form} />
-      </div>
-    </EditorTemplate>
-  );
+  return <EditorTemplate {...editor}>{children}</EditorTemplate>;
 }

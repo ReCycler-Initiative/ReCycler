@@ -26,6 +26,7 @@ import { useFieldArray, useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
 
 const FieldFormSchema = z.object({
+  id: z.string().nullable(),
   name: z.string().min(1, "Nimi on pakollinen"),
   field_type: z.union([
     z.literal("multi_select"),
@@ -38,6 +39,8 @@ const FieldFormSchema = z.object({
   choiceColors: z.record(z.string()),
   placeholder: z.string(),
   helpText: z.string(),
+  order: z.number().nullable(),
+  use_case_id: z.string().nullable(),
 });
 
 export type FieldFormValues = z.infer<typeof FieldFormSchema>;
@@ -73,13 +76,16 @@ export const toApiData = (values: FieldFormValues) => ({
 });
 
 export const fieldFormDefaultValues: FieldFormValues = {
-  name: "",
-  field_type: "text_input",
-  required: false,
-  choices: [],
   choiceColors: {},
-  placeholder: "",
+  choices: [],
+  field_type: "text_input",
   helpText: "",
+  id: null,
+  name: "",
+  order: null,
+  placeholder: "",
+  required: false,
+  use_case_id: null,
 };
 
 export const useFieldForm = (defaults?: FieldFormDefaultValues) =>
@@ -182,7 +188,6 @@ export const FieldFormFields = ({
 }: {
   form: ReturnType<typeof useFieldForm>;
 }) => {
-  const messages = useMessages();
   const { register, setValue, getValues, control, formState } = form;
 
   const fieldType = useWatch({ control, name: "field_type" });
@@ -361,13 +366,13 @@ export const FieldFormContent = ({
   form,
   backHref,
   onCancel,
-  isPending,
+  isPending = false,
   onSubmit,
 }: {
   form: ReturnType<typeof useFieldForm>;
   backHref?: string;
   onCancel?: () => void;
-  isPending: boolean;
+  isPending?: boolean;
   onSubmit: (values: FieldFormValues) => void;
 }) => (
   <FormShell form={form} onSubmit={onSubmit}>
