@@ -327,6 +327,28 @@
     border-color: rgb(51 65 85) !important;
   }
 
+  .admin-shell[data-admin-theme="dark"] .admin-form-footer-divider {
+    border-color: rgb(51 65 85) !important;
+    margin: 0.5rem 0 1rem;
+  }
+
+  .admin-shell[data-admin-theme="dark"] .admin-form-save-button {
+    background-color: rgb(248 250 252) !important;
+    color: rgb(15 23 42) !important;
+    border-color: rgb(248 250 252) !important;
+  }
+
+  .admin-shell[data-admin-theme="dark"] .admin-form-save-button:hover {
+    background-color: rgb(226 232 240) !important;
+    color: rgb(15 23 42) !important;
+  }
+
+  .admin-shell[data-admin-theme="dark"] .admin-form-save-button:disabled {
+    background-color: rgb(71 85 105) !important;
+    color: rgb(203 213 225) !important;
+    border-color: rgb(71 85 105) !important;
+  }
+
   .admin-shell[data-admin-theme="dark"] .location-edit-panel .text-gray-500,
   .admin-shell[data-admin-theme="dark"] .location-edit-panel .text-gray-600,
   .admin-shell[data-admin-theme="dark"] .location-edit-panel .text-gray-700,

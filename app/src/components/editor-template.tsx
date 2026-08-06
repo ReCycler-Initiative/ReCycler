@@ -34,7 +34,7 @@ export const FormFooter = ({
 
   return (
     <>
-      {showDivider ? <hr /> : null}
+      {showDivider ? <div className="admin-form-footer-divider border-t border-border" /> : null}
       <div className="flex justify-between items-center">
         {onCancel ? (
           <Button
@@ -54,7 +54,7 @@ export const FormFooter = ({
         )}
         <Button
           type="submit"
-          className={`sm:w-fit ml-auto ${saveButtonClassName ?? ""}`.trim()}
+          className={`admin-form-save-button sm:w-fit ml-auto ${saveButtonClassName ?? ""}`.trim()}
           disabled={!isDirty}
           isLoading={isSubmitting}
         >
