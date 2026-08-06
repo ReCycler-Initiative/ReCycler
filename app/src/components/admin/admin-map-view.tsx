@@ -14,6 +14,8 @@ import Map, {
 import "mapbox-gl/dist/mapbox-gl.css";
 import { cn } from "@/lib/utils";
 import { MapPin } from "lucide-react";
+import { resolveUseCaseMapSettings } from "@/lib/map-settings";
+import { UseCaseMapSettings } from "@/types";
 
 export interface LocationMarker {
   id: string;
@@ -25,6 +27,7 @@ export interface LocationMarker {
 export interface AdminMapViewProps {
   locations: LocationMarker[];
   geoJson?: GeoJSON.FeatureCollection<GeoJSON.Geometry> | null;
+  mapSettings?: UseCaseMapSettings | null;
   selectedId?: string | null;
   onMarkerClick?: (id: string) => void;
   addMode?: boolean;
@@ -38,12 +41,6 @@ export interface AdminMapViewProps {
   polygonParts?: [number, number][][];
   className?: string;
 }
-
-// Bounding box to restrict map movement to Finland
-const finlandBounds: [[number, number], [number, number]] = [
-  [10.0, 54.0], // Southwest corner
-  [40.0, 75.0], // Northeast corner
-];
 
 const areaFillLayer: FillLayer = {
   id: "admin-source-areas-fill",
@@ -189,6 +186,7 @@ function buildSelectedShapeCollection(
 export const AdminMapView = ({
   locations,
   geoJson,
+  mapSettings,
   selectedId,
   onMarkerClick,
   addMode,
@@ -211,6 +209,7 @@ export const AdminMapView = ({
   const selectedShapeGeoJson = geoJson
     ? buildSelectedShapeCollection(geoJson, selectedId)
     : null;
+  const resolvedMapSettings = resolveUseCaseMapSettings(mapSettings);
 
   // Build a GeoJSON FeatureCollection for the in-progress polygon draw.
   // When >= 3 nodes: render a closed polygon outline + semi-transparent fill.
@@ -386,9 +385,9 @@ export const AdminMapView = ({
         ref={mapRef}
         mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_TOKEN}
         initialViewState={{
-          longitude: 24.94,
-          latitude: 64.0,
-          zoom: 5,
+          longitude: resolvedMapSettings.initial_center[0],
+          latitude: resolvedMapSettings.initial_center[1],
+          zoom: resolvedMapSettings.initial_zoom,
         }}
         mapStyle={process.env.NEXT_PUBLIC_MAPBOX_STYLE_DETAIL as string}
         interactiveLayerIds={[
@@ -400,7 +399,7 @@ export const AdminMapView = ({
           "admin-selected-source-line",
         ]}
         onLoad={() => setMapLoaded(true)}
-        maxBounds={finlandBounds}
+        maxBounds={resolvedMapSettings.max_bounds}
         onClick={(e) => {
           // Polygon draw mode: add a node
           if (polygonNodes !== undefined) {

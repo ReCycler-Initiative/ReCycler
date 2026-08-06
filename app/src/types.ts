@@ -163,8 +163,47 @@ export const NewOrganization = z.object({
 
 export const NewUseCase = z.object({
   description: z.string().max(2000),
+  map_settings: z
+    .object({
+      initial_center: z.tuple([
+        z.coerce.number().min(-180).max(180),
+        z.coerce.number().min(-90).max(90),
+      ]),
+      initial_zoom: z.coerce.number().min(0).max(22),
+      max_bounds: z
+        .tuple([
+          z.tuple([
+            z.coerce.number().min(-180).max(180),
+            z.coerce.number().min(-90).max(90),
+          ]),
+          z.tuple([
+            z.coerce.number().min(-180).max(180),
+            z.coerce.number().min(-90).max(90),
+          ]),
+        ])
+        .refine(
+          ([[swLng, swLat], [neLng, neLat]]) => swLng <= neLng && swLat <= neLat,
+          "Invalid max bounds. Southwest must be less than or equal to northeast."
+        ),
+      geocoder_bbox: z
+        .tuple([
+          z.coerce.number().min(-180).max(180),
+          z.coerce.number().min(-90).max(90),
+          z.coerce.number().min(-180).max(180),
+          z.coerce.number().min(-90).max(90),
+        ])
+        .refine(
+          ([minLng, minLat, maxLng, maxLat]) =>
+            minLng <= maxLng && minLat <= maxLat,
+          "Invalid geocoder bbox. Minimum values must be less than or equal to maximum values."
+        ),
+    })
+    .nullable()
+    .optional(),
   name: z.string().max(255),
 });
+
+export type UseCaseMapSettings = NonNullable<z.infer<typeof NewUseCase>["map_settings"]>;
 
 export const UseCase = NewUseCase.merge(
   z.object({

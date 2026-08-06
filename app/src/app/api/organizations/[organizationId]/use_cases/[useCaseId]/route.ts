@@ -84,6 +84,7 @@ export async function PUT(
       .update({
         name: body.name,
         description: body.description,
+        map_settings: body.map_settings ?? null,
         intro_title: serializeLocalizedText(body.content?.intro?.title),
         intro_cta: serializeLocalizedText(body.content?.intro?.cta),
         intro_skip: serializeLocalizedText(body.content?.intro?.skip),

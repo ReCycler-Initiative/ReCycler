@@ -3,6 +3,7 @@ import { parseStoredLocalizedText } from "@/lib/use-case-content";
 export function mapDbRowToUseCase(row: any) {
   return {
     ...row,
+    map_settings: row.map_settings ?? null,
     content: {
       intro: {
         title: parseStoredLocalizedText(row.intro_title || ""),

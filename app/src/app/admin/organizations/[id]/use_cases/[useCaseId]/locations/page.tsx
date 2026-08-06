@@ -23,7 +23,7 @@ import {
 } from "@/components/ui/dialog";
 import { Plus, X } from "lucide-react";
 import { useMessages } from "@/i18n/locale-provider";
-import { deleteLocation, getLocations } from "@/services/api";
+import { deleteLocation, getLocations, getUseCaseById } from "@/services/api";
 import { toast } from "sonner";
 
 const ITEMS_PER_PAGE = 15;
@@ -64,6 +64,11 @@ const LocationsPage = () => {
   const { data, isLoading, isError } = useQuery({
     queryKey: ["locations", organizationId, params.useCaseId],
     queryFn: () => getLocations(organizationId, params.useCaseId),
+  });
+
+  const useCaseQuery = useQuery({
+    queryKey: ["use_case", organizationId, params.useCaseId],
+    queryFn: () => getUseCaseById(organizationId, params.useCaseId),
   });
 
   const deleteMutation = useMutation({
@@ -218,6 +223,7 @@ const LocationsPage = () => {
             <AdminMapView
               locations={displayLocations}
               geoJson={data ?? null}
+              mapSettings={useCaseQuery.data?.map_settings ?? null}
               selectedId={selectedId}
               onMarkerClick={selectLocation}
               addMode={(addMode && locationTypeMode === "point") || relocateMode}

@@ -74,6 +74,7 @@ export async function POST(
       organization_id: organizationId,
       name: validatedData.name,
       description: validatedData.description,
+      map_settings: validatedData.map_settings ?? null,
       intro_title: "",
       intro_text: "",
       intro_cta: "",

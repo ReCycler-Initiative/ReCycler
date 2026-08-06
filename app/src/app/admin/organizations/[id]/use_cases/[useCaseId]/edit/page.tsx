@@ -3,8 +3,13 @@
 import { EditorTemplate, useEditor } from "@/components/editor-template";
 import FormInput from "@/components/form/form-input";
 import { FormTextArea } from "@/components/form/form-textarea";
+import { Button } from "@/components/ui/button";
 import { useLocale, useMessages } from "@/i18n/locale-provider";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  DEFAULT_USE_CASE_MAP_SETTINGS,
+  resolveUseCaseMapSettings,
+} from "@/lib/map-settings";
 import { getUseCaseById, updateUseCase } from "@/services/api";
 import { UseCase } from "@/types";
 import { useQueryClient } from "@tanstack/react-query";
@@ -24,11 +29,18 @@ const UseCaseInfoPage = () => {
       id: "",
       name: "",
       description: "",
+      map_settings: DEFAULT_USE_CASE_MAP_SETTINGS,
     },
     queryKey: ["use_case", id, useCaseId],
     queryFn: () => getUseCaseById(id, useCaseId),
     mutationFn: (data) => updateUseCase(id, data),
-    toFormState: UseCase.parse,
+    toFormState: (data) => {
+      const parsed = UseCase.parse(data);
+      return {
+        ...parsed,
+        map_settings: resolveUseCaseMapSettings(parsed.map_settings),
+      };
+    },
     toApiData: UseCase.parse,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["use_cases", id] });
@@ -49,6 +61,9 @@ const UseCaseInfoPage = () => {
             </TabsTrigger>
             <TabsTrigger value="sisaltosivut" className="flex-1">
               {messages.adminUseCaseEditor.contentPagesTab}
+            </TabsTrigger>
+            <TabsTrigger value="kartta" className="flex-1">
+              {messages.adminUseCaseEditor.mapTab}
             </TabsTrigger>
           </TabsList>
 
@@ -192,6 +207,87 @@ const UseCaseInfoPage = () => {
                     />
                   </TabsContent>
                 </Tabs>
+              </div>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="kartta">
+            <div className="space-y-5 rounded-lg border border-gray-200 p-4">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <div>
+                  <h3 className="text-lg font-semibold">
+                    {messages.adminUseCaseEditor.mapSection}
+                  </h3>
+                  <p className="text-sm text-muted-foreground">
+                    {messages.adminUseCaseEditor.mapSectionDescription}
+                  </p>
+                </div>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() =>
+                    editor.form.setValue(
+                      "map_settings",
+                      DEFAULT_USE_CASE_MAP_SETTINGS,
+                      { shouldDirty: true }
+                    )
+                  }
+                >
+                  {messages.adminUseCaseEditor.resetMapDefaults}
+                </Button>
+              </div>
+
+              <div className="grid gap-3 md:grid-cols-2">
+                <FormInput
+                  label={messages.adminUseCaseEditor.mapCenterLngLabel}
+                  name="map_settings.initial_center.0"
+                />
+                <FormInput
+                  label={messages.adminUseCaseEditor.mapCenterLatLabel}
+                  name="map_settings.initial_center.1"
+                />
+                <FormInput
+                  label={messages.adminUseCaseEditor.mapZoomLabel}
+                  name="map_settings.initial_zoom"
+                />
+              </div>
+
+              <div className="grid gap-3 md:grid-cols-2">
+                <FormInput
+                  label={messages.adminUseCaseEditor.mapBoundsSouthWestLngLabel}
+                  name="map_settings.max_bounds.0.0"
+                />
+                <FormInput
+                  label={messages.adminUseCaseEditor.mapBoundsSouthWestLatLabel}
+                  name="map_settings.max_bounds.0.1"
+                />
+                <FormInput
+                  label={messages.adminUseCaseEditor.mapBoundsNorthEastLngLabel}
+                  name="map_settings.max_bounds.1.0"
+                />
+                <FormInput
+                  label={messages.adminUseCaseEditor.mapBoundsNorthEastLatLabel}
+                  name="map_settings.max_bounds.1.1"
+                />
+              </div>
+
+              <div className="grid gap-3 md:grid-cols-2">
+                <FormInput
+                  label={messages.adminUseCaseEditor.geocoderMinLngLabel}
+                  name="map_settings.geocoder_bbox.0"
+                />
+                <FormInput
+                  label={messages.adminUseCaseEditor.geocoderMinLatLabel}
+                  name="map_settings.geocoder_bbox.1"
+                />
+                <FormInput
+                  label={messages.adminUseCaseEditor.geocoderMaxLngLabel}
+                  name="map_settings.geocoder_bbox.2"
+                />
+                <FormInput
+                  label={messages.adminUseCaseEditor.geocoderMaxLatLabel}
+                  name="map_settings.geocoder_bbox.3"
+                />
               </div>
             </div>
           </TabsContent>

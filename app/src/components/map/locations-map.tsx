@@ -23,6 +23,7 @@ import {
   localizeMaterialNameCandidate,
   localizeMaterials,
 } from "@/lib/material-translations";
+import { resolveUseCaseMapSettings } from "@/lib/map-settings";
 import {
   usePathname,
   useParams,
@@ -32,6 +33,7 @@ import {
 import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { getFields } from "@/services/api";
+import { UseCaseMapSettings } from "@/types";
 import Map, {
   CircleLayer,
   FillLayer,
@@ -111,12 +113,6 @@ const getLocalizedDescription = (
     (properties.additional_details as string | undefined) ??
     (properties.description_en as string | undefined);
 };
-
-// Bounding box to restrict map movement to Finland
-const finlandBounds = [
-  [10.0, 54.0], // Southwest corner
-  [40.0, 75.0], // Northeast corner
-];
 
 // Style for rendering point features (icons)
 const layerStyle: SymbolLayer = {
@@ -505,9 +501,10 @@ type PopupState = {
 
 type LocationsMapProps = {
   geoJson: GeoJSON.FeatureCollection<GeoJSON.Geometry> | null;
+  mapSettings?: UseCaseMapSettings | null;
 };
 
-export default function LocationsMap({ geoJson }: LocationsMapProps) {
+export default function LocationsMap({ geoJson, mapSettings }: LocationsMapProps) {
   const { locale } = useLocale();
   const messages = useMessages();
   const { user } = useUser();
@@ -585,6 +582,10 @@ export default function LocationsMap({ geoJson }: LocationsMapProps) {
     if (!filteredGeoJson) return null;
     return buildSelectedPointCollection(filteredGeoJson, selectedLocationId);
   }, [filteredGeoJson, selectedLocationId]);
+  const resolvedMapSettings = useMemo(
+    () => resolveUseCaseMapSettings(mapSettings),
+    [mapSettings]
+  );
 
   useEffect(() => {
     setPendingResultsHref(currentResultsHref);
@@ -657,9 +658,9 @@ export default function LocationsMap({ geoJson }: LocationsMapProps) {
           ref={mapRef}
           mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_TOKEN}
           initialViewState={{
-            longitude: 24.94,
-            latitude: 64.0,
-            zoom: 4,
+            longitude: resolvedMapSettings.initial_center[0],
+            latitude: resolvedMapSettings.initial_center[1],
+            zoom: resolvedMapSettings.initial_zoom,
           }}
           onLoad={onMapLoad}
           mapStyle={
@@ -697,7 +698,7 @@ export default function LocationsMap({ geoJson }: LocationsMapProps) {
               }
             }
           }}
-          maxBounds={finlandBounds as any}
+          maxBounds={resolvedMapSettings.max_bounds as any}
         >
           <MapStyleControl
             onToggle={(selected) => {
@@ -737,7 +738,7 @@ export default function LocationsMap({ geoJson }: LocationsMapProps) {
             mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_TOKEN!}
             position="top-left"
             placeholder={messages.map.searchPlaceholder}
-            bbox={[19.0, 59.0, 32.0, 71.0]}
+            bbox={resolvedMapSettings.geocoder_bbox}
           />
 
           {filteredGeoJson && (
