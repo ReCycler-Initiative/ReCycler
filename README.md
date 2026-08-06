@@ -44,6 +44,15 @@ The goal of the AI integration is to reduce uncertainty and make responsible act
 
 ## How to contribute
 We welcome contributions from developers, designers, and anyone passionate about sustainable practices. Please follow the guidelines outlined in our [contributing.md](contributing.md) file.
+
+## Architecture documentation
+
+Architecture documents are maintained under [docs/architecture](docs/architecture).
+
+- Start from [docs/architecture/README.md](docs/architecture/README.md)
+- Codebase map: [docs/architecture/codebase_structure.md](docs/architecture/codebase_structure.md)
+- Organization and user model: [docs/architecture/organization_registration_and_user_management.md](docs/architecture/organization_registration_and_user_management.md)
+
 ## Installation
 To install the ReCycler application, please take a look at the detailed instructions in the [app](/app/README.md) folders.
 ## About licenses, authors and data sources
