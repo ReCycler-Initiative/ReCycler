@@ -124,12 +124,6 @@ const Content = ({
       icon: MapPin,
     },
     { href: `${orgRootPath}/ai`, label: messages.admin.ai, icon: Bot },
-    { href: `${orgRootPath}/runs`, label: messages.admin.logs, icon: ScrollText },
-    {
-      href: `${orgRootPath}/usage`,
-      label: messages.admin.usageStats,
-      icon: ChartColumn,
-    },
   ];
 
   return (
@@ -138,8 +132,8 @@ const Content = ({
       data-admin-theme={adminTheme}
     >
       <TitleBar logo={null} toHomeHref="/">
-        <div className="flex flex-1 h-full items-center gap-x-4">
-          <nav className="flex ml-4 h-10 gap-1">
+        <div className="flex h-full min-w-0 flex-1 items-center gap-x-4 overflow-hidden">
+          <nav className="ml-4 flex h-10 min-w-0 flex-1 items-center gap-1 overflow-x-auto whitespace-nowrap pr-2">
             {navLinks.map((link) => (
               <Link
                 key={link.href}
@@ -153,7 +147,7 @@ const Content = ({
               </Link>
             ))}
           </nav>
-          <div className="flex items-center ml-auto mr-2">
+          <div className="mr-2 flex shrink-0 items-center">
             <Label className="admin-usecase-label mr-4 inline-flex items-center gap-2 font-normal text-gray-700">
               <BriefcaseBusiness className="h-4 w-4" aria-hidden="true" />
               {messages.admin.useCaseLabel}
@@ -225,6 +219,24 @@ const Content = ({
                   <Link href={`${orgRootPath}/edit`}>
                     <BriefcaseBusiness className="mr-2 h-4 w-4 text-slate-500" />
                     {messages.admin.useCaseDetails}
+                  </Link>
+                </DropdownMenuItem>
+              )}
+
+              {selectedUseCaseId && (
+                <DropdownMenuItem asChild>
+                  <Link href={`${orgRootPath}/usage`}>
+                    <ChartColumn className="mr-2 h-4 w-4 text-slate-500" />
+                    {messages.admin.usageStats}
+                  </Link>
+                </DropdownMenuItem>
+              )}
+
+              {selectedUseCaseId && (
+                <DropdownMenuItem asChild>
+                  <Link href={`${orgRootPath}/runs`}>
+                    <ScrollText className="mr-2 h-4 w-4 text-slate-500" />
+                    {messages.admin.logs}
                   </Link>
                 </DropdownMenuItem>
               )}

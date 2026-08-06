@@ -55,14 +55,23 @@ const UseCaseInfoPage = () => {
       />
       <EditorTemplate {...editor}>
         <Tabs defaultValue="info" className="my-2 max-w-6xl">
-          <TabsList className="w-full mb-6">
-            <TabsTrigger value="info" className="flex-1">
+          <TabsList className="mb-6 grid h-auto w-full grid-cols-1 gap-1 sm:grid-cols-3">
+            <TabsTrigger
+              value="info"
+              className="w-full whitespace-normal py-2 text-center leading-tight"
+            >
               {messages.adminUseCaseEditor.infoTab}
             </TabsTrigger>
-            <TabsTrigger value="sisaltosivut" className="flex-1">
+            <TabsTrigger
+              value="sisaltosivut"
+              className="w-full whitespace-normal py-2 text-center leading-tight"
+            >
               {messages.adminUseCaseEditor.contentPagesTab}
             </TabsTrigger>
-            <TabsTrigger value="kartta" className="flex-1">
+            <TabsTrigger
+              value="kartta"
+              className="w-full whitespace-normal py-2 text-center leading-tight"
+            >
               {messages.adminUseCaseEditor.mapTab}
             </TabsTrigger>
           </TabsList>
