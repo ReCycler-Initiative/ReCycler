@@ -169,7 +169,13 @@ const Content = ({
               <DropdownMenuTrigger className="inline-flex lg:hidden items-center justify-center rounded-full px-3 py-2 text-slate-700 transition hover:bg-gray-100 hover:text-slate-900">
                 <Menu className="h-4 w-4" />
               </DropdownMenuTrigger>
-              <DropdownMenuContent className="admin-settings-menu" align="start">
+              <DropdownMenuContent
+                className={cn(
+                  "admin-settings-menu",
+                  adminTheme === "dark" && "admin-settings-menu--dark"
+                )}
+                align="start"
+              >
                 {navLinks.map((link) => (
                   <DropdownMenuItem key={link.href} asChild>
                     <Link href={link.href} onClick={() => setIsMobileNavOpen(false)}>
@@ -270,7 +276,12 @@ const Content = ({
             <DropdownMenuTrigger className="admin-settings-trigger mr-1 rounded-full px-3 py-2 text-slate-700 transition hover:bg-gray-100 hover:text-slate-900">
               <SettingsIcon />
             </DropdownMenuTrigger>
-            <DropdownMenuContent className="admin-settings-menu">
+            <DropdownMenuContent
+              className={cn(
+                "admin-settings-menu",
+                adminTheme === "dark" && "admin-settings-menu--dark"
+              )}
+            >
               <DropdownMenuItem asChild>
                 <Link href={`${orgRootPath}/general_info`}>
                   <AppWindow className="mr-2 h-4 w-4 text-slate-500" />
