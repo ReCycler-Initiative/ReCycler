@@ -24,6 +24,7 @@ import {
 import { useQuery } from "@tanstack/react-query";
 import { cn } from "@/lib/utils";
 import {
+  Menu,
   AppWindow,
   BriefcaseBusiness,
   ChartColumn,
@@ -65,6 +66,8 @@ const Content = ({
   const router = useRouter();
   const [adminTheme, setAdminTheme] = useState<"light" | "dark">("light");
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+  const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
+  const [isDesktopNav, setIsDesktopNav] = useState(false);
 
   useEffect(() => {
     const savedTheme = window.localStorage.getItem("recycler-admin-theme");
@@ -76,6 +79,34 @@ const Content = ({
   useEffect(() => {
     window.localStorage.setItem("recycler-admin-theme", adminTheme);
   }, [adminTheme]);
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia("(min-width: 1024px)");
+    const handleViewportChange = (matches: boolean) => {
+      setIsDesktopNav(matches);
+      if (matches) {
+        setIsMobileNavOpen(false);
+      }
+    };
+
+    handleViewportChange(mediaQuery.matches);
+
+    const listener = (event: MediaQueryListEvent) =>
+      handleViewportChange(event.matches);
+
+    // Safari compatibility fallback for older MediaQueryList APIs.
+    if (typeof mediaQuery.addEventListener === "function") {
+      mediaQuery.addEventListener("change", listener);
+      return () => mediaQuery.removeEventListener("change", listener);
+    }
+
+    mediaQuery.addListener(listener);
+    return () => mediaQuery.removeListener(listener);
+  }, []);
+
+  useEffect(() => {
+    setIsMobileNavOpen(false);
+  }, [pathname]);
 
   const useCasesQuery = useQuery({
     queryKey: ["use_cases", id],
@@ -132,8 +163,40 @@ const Content = ({
       data-admin-theme={adminTheme}
     >
       <TitleBar logo={null} toHomeHref="/">
-        <div className="flex h-full min-w-0 flex-1 items-center gap-x-4 overflow-hidden">
-          <nav className="ml-4 flex h-10 min-w-0 flex-1 items-center gap-1 overflow-x-auto whitespace-nowrap pr-2">
+        <div className="flex h-full min-w-0 flex-1 items-center gap-x-2 lg:gap-x-4 overflow-hidden">
+          {!isDesktopNav && (
+            <DropdownMenu open={isMobileNavOpen} onOpenChange={setIsMobileNavOpen}>
+              <DropdownMenuTrigger className="inline-flex lg:hidden items-center justify-center rounded-full px-3 py-2 text-slate-700 transition hover:bg-gray-100 hover:text-slate-900">
+                <Menu className="h-4 w-4" />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="admin-settings-menu" align="start">
+                {navLinks.map((link) => (
+                  <DropdownMenuItem key={link.href} asChild>
+                    <Link href={link.href} onClick={() => setIsMobileNavOpen(false)}>
+                      {link.icon && (
+                        <link.icon className="mr-2 h-4 w-4 text-slate-500" />
+                      )}
+                      {link.label}
+                    </Link>
+                  </DropdownMenuItem>
+                ))}
+                {selectedUseCaseId && (
+                  <DropdownMenuItem asChild>
+                    <Link
+                      href={`/organizations/${id}/use_cases/${selectedUseCaseId}`}
+                      target="_blank"
+                      onClick={() => setIsMobileNavOpen(false)}
+                    >
+                      <ExternalLink className="mr-2 h-4 w-4 text-slate-500" />
+                      {messages.admin.open}
+                    </Link>
+                  </DropdownMenuItem>
+                )}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
+
+          <nav className="ml-2 hidden h-10 min-w-0 flex-1 items-center gap-1 pr-2 lg:flex">
             {navLinks.map((link) => (
               <Link
                 key={link.href}
@@ -147,8 +210,8 @@ const Content = ({
               </Link>
             ))}
           </nav>
-          <div className="mr-2 flex shrink-0 items-center">
-            <Label className="admin-usecase-label mr-4 inline-flex items-center gap-2 font-normal text-gray-700">
+          <div className="mr-1 flex shrink-0 items-center lg:mr-2">
+            <Label className="admin-usecase-label mr-2 hidden items-center gap-2 font-normal text-gray-700 md:mr-4 md:inline-flex">
               <BriefcaseBusiness className="h-4 w-4" aria-hidden="true" />
               {messages.admin.useCaseLabel}
             </Label>
@@ -164,7 +227,7 @@ const Content = ({
                 }
               }}
             >
-              <SelectTrigger className="admin-usecase-select w-[200px]">
+              <SelectTrigger className="admin-usecase-select w-[150px] md:w-[200px]">
                 <SelectValue placeholder="Valitse käyttötapaus" />
               </SelectTrigger>
               <SelectContent className="admin-usecase-select-content">
@@ -183,7 +246,7 @@ const Content = ({
           {selectedUseCaseId && (
             <Link
               href={`/organizations/${id}/use_cases/${selectedUseCaseId}`}
-              className={cn(navButtonClass(true), "admin-open-link")}
+              className={cn(navButtonClass(true), "admin-open-link hidden lg:inline-flex")}
               aria-label={messages.admin.openSelectedUseCase}
               target="_blank"
               title={messages.admin.openSelectedUseCase}
