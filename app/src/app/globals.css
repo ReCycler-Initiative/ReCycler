@@ -831,7 +831,11 @@
 
   /* Switch unchecked track clearly visible in dark mode */
   .admin-shell[data-admin-theme="dark"] .admin-content [data-state="unchecked"][role="switch"] {
-    background-color: rgb(71 85 105) !important;
+    background-color: rgb(71 85 105) !important; /* slate-600 */
+  }
+  /* Switch checked track: keep emerald in dark mode too */
+  .admin-shell[data-admin-theme="dark"] .admin-content [data-state="checked"][role="switch"] {
+    background-color: rgb(16 185 129) !important; /* emerald-500 */
   }
 }
 
