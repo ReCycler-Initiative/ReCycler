@@ -623,13 +623,15 @@ export default function LocationsMap({ geoJson, mapSettings }: LocationsMapProps
     map.on("mouseleave", "source-areas-line", hidePointer);
     map.on("style.load", onStyleLoad);
 
-    geolocateControlRef.current?.trigger();
+    if (resolvedMapSettings.enable_geolocation) {
+      geolocateControlRef.current?.trigger();
+    }
     setMapLoaded(true);
 
     if (typeof window !== "undefined") {
       window.dispatchEvent(new Event("map-loaded"));
     }
-  }, []);
+  }, [resolvedMapSettings.enable_geolocation]);
 
   // Camera: do a single initial ease to user position, then let GeolocateControl own the camera
   const handleGeolocateChange = useCallback((position: GeolocationPosition) => {
@@ -700,27 +702,31 @@ export default function LocationsMap({ geoJson, mapSettings }: LocationsMapProps
           }}
           maxBounds={resolvedMapSettings.max_bounds as any}
         >
-          <MapStyleControl
-            onToggle={(selected) => {
-              // Toggle style and force styleLoaded=false so we know when it finishes
-              setStyleLoaded(false);
-              setStyle(selected ? "satellite" : "detail");
-            }}
-            selected={mapStyle === "satellite"}
-          />
+          {resolvedMapSettings.enable_satellite_toggle && (
+            <MapStyleControl
+              onToggle={(selected) => {
+                // Toggle style and force styleLoaded=false so we know when it finishes
+                setStyleLoaded(false);
+                setStyle(selected ? "satellite" : "detail");
+              }}
+              selected={mapStyle === "satellite"}
+            />
+          )}
 
-          <GeolocateControl
-            ref={geolocateControlRef}
-            onGeolocate={handleGeolocateChange}
-            // IMPORTANT: do not flip tracking off here; Mapbox emits End on minor interactions
-            onTrackUserLocationEnd={() => {
-              // keep UI state; let the user decide to turn tracking off explicitly
-            }}
-            positionOptions={{ enableHighAccuracy: true }}
-            position="bottom-right"
-            trackUserLocation
-            showUserHeading
-          />
+          {resolvedMapSettings.enable_geolocation && (
+            <GeolocateControl
+              ref={geolocateControlRef}
+              onGeolocate={handleGeolocateChange}
+              // IMPORTANT: do not flip tracking off here; Mapbox emits End on minor interactions
+              onTrackUserLocationEnd={() => {
+                // keep UI state; let the user decide to turn tracking off explicitly
+              }}
+              positionOptions={{ enableHighAccuracy: true }}
+              position="bottom-right"
+              trackUserLocation
+              showUserHeading
+            />
+          )}
 
           <OnboardingHint />
 
@@ -731,15 +737,21 @@ export default function LocationsMap({ geoJson, mapSettings }: LocationsMapProps
             }
             onClick={() => setShowMaterials(true)}
           />
-          <NavigationControl position="top-right" />
-          <FullscreenControl position="top-right" />
+          {resolvedMapSettings.enable_navigation_controls && (
+            <NavigationControl position="top-right" />
+          )}
+          {resolvedMapSettings.enable_fullscreen_control && (
+            <FullscreenControl position="top-right" />
+          )}
           <ScaleControl position="bottom-left" />
-          <GeocoderControl
-            mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_TOKEN!}
-            position="top-left"
-            placeholder={messages.map.searchPlaceholder}
-            bbox={resolvedMapSettings.geocoder_bbox}
-          />
+          {resolvedMapSettings.enable_search && (
+            <GeocoderControl
+              mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_TOKEN!}
+              position="top-left"
+              placeholder={messages.map.searchPlaceholder}
+              bbox={resolvedMapSettings.geocoder_bbox}
+            />
+          )}
 
           {filteredGeoJson && (
             <>

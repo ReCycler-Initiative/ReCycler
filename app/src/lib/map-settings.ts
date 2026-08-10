@@ -40,6 +40,11 @@ export const DEFAULT_USE_CASE_MAP_SETTINGS: UseCaseMapSettings = {
     [40.0, 75.0],
   ],
   geocoder_bbox: [19.0, 59.0, 32.0, 71.0],
+  enable_geolocation: true,
+  enable_satellite_toggle: true,
+  enable_navigation_controls: true,
+  enable_fullscreen_control: true,
+  enable_search: true,
 };
 
 export const resolveUseCaseMapSettings = (
@@ -64,5 +69,20 @@ export const resolveUseCaseMapSettings = (
     geocoder_bbox: mapSettings.geocoder_bbox
       ? sanitizeGeocoderBbox(mapSettings.geocoder_bbox)
       : fallbackGeocoderBbox,
+    enable_geolocation:
+      mapSettings.enable_geolocation ??
+      DEFAULT_USE_CASE_MAP_SETTINGS.enable_geolocation,
+    enable_satellite_toggle:
+      mapSettings.enable_satellite_toggle ??
+      DEFAULT_USE_CASE_MAP_SETTINGS.enable_satellite_toggle,
+    enable_navigation_controls:
+      mapSettings.enable_navigation_controls ??
+      DEFAULT_USE_CASE_MAP_SETTINGS.enable_navigation_controls,
+    enable_fullscreen_control:
+      mapSettings.enable_fullscreen_control ??
+      DEFAULT_USE_CASE_MAP_SETTINGS.enable_fullscreen_control,
+    enable_search:
+      mapSettings.enable_search ??
+      DEFAULT_USE_CASE_MAP_SETTINGS.enable_search,
   };
 };

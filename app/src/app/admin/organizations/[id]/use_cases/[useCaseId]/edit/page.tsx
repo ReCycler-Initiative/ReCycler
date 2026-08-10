@@ -1,6 +1,7 @@
 "use client";
 
 import { EditorTemplate, useEditor } from "@/components/editor-template";
+import FormCheckbox from "@/components/form/form-checkbox";
 import FormInput from "@/components/form/form-input";
 import { FormTextArea } from "@/components/form/form-textarea";
 import { Button } from "@/components/ui/button";
@@ -296,6 +297,29 @@ const UseCaseInfoPage = () => {
                 <FormInput
                   label={messages.adminUseCaseEditor.geocoderMaxLatLabel}
                   name="map_settings.geocoder_bbox.3"
+                />
+              </div>
+
+              <div className="space-y-2 rounded-md border border-gray-200 p-3">
+                <FormCheckbox
+                  label={messages.adminUseCaseEditor.enableGeolocationLabel}
+                  name="map_settings.enable_geolocation"
+                />
+                <FormCheckbox
+                  label={messages.adminUseCaseEditor.enableSatelliteToggleLabel}
+                  name="map_settings.enable_satellite_toggle"
+                />
+                <FormCheckbox
+                  label={messages.adminUseCaseEditor.enableNavigationControlsLabel}
+                  name="map_settings.enable_navigation_controls"
+                />
+                <FormCheckbox
+                  label={messages.adminUseCaseEditor.enableFullscreenControlLabel}
+                  name="map_settings.enable_fullscreen_control"
+                />
+                <FormCheckbox
+                  label={messages.adminUseCaseEditor.enableSearchLabel}
+                  name="map_settings.enable_search"
                 />
               </div>
             </div>

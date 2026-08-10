@@ -197,6 +197,11 @@ export const NewUseCase = z.object({
             minLng <= maxLng && minLat <= maxLat,
           "Invalid geocoder bbox. Minimum values must be less than or equal to maximum values."
         ),
+      enable_geolocation: z.coerce.boolean().default(true),
+      enable_satellite_toggle: z.coerce.boolean().default(true),
+      enable_navigation_controls: z.coerce.boolean().default(true),
+      enable_fullscreen_control: z.coerce.boolean().default(true),
+      enable_search: z.coerce.boolean().default(true),
     })
     .nullable()
     .optional(),
