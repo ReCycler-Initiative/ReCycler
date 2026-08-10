@@ -437,7 +437,7 @@ const baseFi = {
     mapSection: "Karttanäkymän asetukset",
     mapSectionDescription:
       "Määritä tämän käyttötapauksen kartan keskikohta, zoom ja rajaus (bbox).",
-    resetMapDefaults: "Palauta Suomen oletukset",
+    resetMapDefaults: "Palauta oletukset",
     nameLabel: "Nimi",
     descriptionLabel: "Kuvaus",
     mapCenterLngLabel: "Keskipiste pituusaste (lng)",
@@ -1167,7 +1167,7 @@ const baseEn = {
     mapSection: "Map view settings",
     mapSectionDescription:
       "Configure this use case map center, zoom, and bounding box.",
-    resetMapDefaults: "Reset to Finland defaults",
+    resetMapDefaults: "Reset defaults",
     nameLabel: "Name",
     descriptionLabel: "Description",
     mapCenterLngLabel: "Center longitude (lng)",

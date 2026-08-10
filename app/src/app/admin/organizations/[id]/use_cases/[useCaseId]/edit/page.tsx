@@ -1,7 +1,7 @@
 "use client";
 
 import { EditorTemplate, useEditor } from "@/components/editor-template";
-import FormCheckbox from "@/components/form/form-checkbox";
+import FormSwitch from "@/components/form/form-switch";
 import FormInput from "@/components/form/form-input";
 import { FormTextArea } from "@/components/form/form-textarea";
 import { Button } from "@/components/ui/button";
@@ -235,6 +235,7 @@ const UseCaseInfoPage = () => {
                 <Button
                   type="button"
                   variant="outline"
+                  className="admin-reset-defaults-button"
                   onClick={() =>
                     editor.form.setValue(
                       "map_settings",
@@ -300,24 +301,24 @@ const UseCaseInfoPage = () => {
                 />
               </div>
 
-              <div className="space-y-2 rounded-md border border-gray-200 p-3">
-                <FormCheckbox
+              <div className="space-y-2">
+                <FormSwitch
                   label={messages.adminUseCaseEditor.enableGeolocationLabel}
                   name="map_settings.enable_geolocation"
                 />
-                <FormCheckbox
+                <FormSwitch
                   label={messages.adminUseCaseEditor.enableSatelliteToggleLabel}
                   name="map_settings.enable_satellite_toggle"
                 />
-                <FormCheckbox
+                <FormSwitch
                   label={messages.adminUseCaseEditor.enableNavigationControlsLabel}
                   name="map_settings.enable_navigation_controls"
                 />
-                <FormCheckbox
+                <FormSwitch
                   label={messages.adminUseCaseEditor.enableFullscreenControlLabel}
                   name="map_settings.enable_fullscreen_control"
                 />
-                <FormCheckbox
+                <FormSwitch
                   label={messages.adminUseCaseEditor.enableSearchLabel}
                   name="map_settings.enable_search"
                 />
@@ -331,29 +332,29 @@ const UseCaseInfoPage = () => {
                   {messages.adminUseCaseEditor.onboardingSectionDescription}
                 </p>
 
-                <FormCheckbox
+                <FormSwitch
                   label={messages.adminUseCaseEditor.enableOnboardingLabel}
                   name="map_settings.onboarding.enabled"
                 />
 
                 <div className="grid gap-2 md:grid-cols-2">
-                  <FormCheckbox
+                  <FormSwitch
                     label={messages.adminUseCaseEditor.onboardingStepSearchLabel}
                     name="map_settings.onboarding.steps.search"
                   />
-                  <FormCheckbox
+                  <FormSwitch
                     label={messages.adminUseCaseEditor.onboardingStepLocationLabel}
                     name="map_settings.onboarding.steps.location"
                   />
-                  <FormCheckbox
+                  <FormSwitch
                     label={messages.adminUseCaseEditor.onboardingStepMapStyleLabel}
                     name="map_settings.onboarding.steps.map_style"
                   />
-                  <FormCheckbox
+                  <FormSwitch
                     label={messages.adminUseCaseEditor.onboardingStepFilterLabel}
                     name="map_settings.onboarding.steps.filter"
                   />
-                  <FormCheckbox
+                  <FormSwitch
                     label={messages.adminUseCaseEditor.onboardingStepCompleteLabel}
                     name="map_settings.onboarding.steps.complete"
                   />
@@ -373,7 +374,6 @@ const UseCaseInfoPage = () => {
                   <FormInput
                     label={messages.adminUseCaseEditor.onboardingSearchTipLabel}
                     name="map_settings.onboarding.content.search.tip"
-                    placeholder={messages.onboarding.searchTip}
                   />
 
                   <FormInput
@@ -389,7 +389,6 @@ const UseCaseInfoPage = () => {
                   <FormInput
                     label={messages.adminUseCaseEditor.onboardingLocationTipLabel}
                     name="map_settings.onboarding.content.location.tip"
-                    placeholder={messages.onboarding.locationTip}
                   />
 
                   <FormInput
@@ -405,7 +404,6 @@ const UseCaseInfoPage = () => {
                   <FormInput
                     label={messages.adminUseCaseEditor.onboardingMapStyleTipLabel}
                     name="map_settings.onboarding.content.map_style.tip"
-                    placeholder={messages.onboarding.mapStyleTip}
                   />
 
                   <FormInput
@@ -421,7 +419,6 @@ const UseCaseInfoPage = () => {
                   <FormInput
                     label={messages.adminUseCaseEditor.onboardingFilterTipLabel}
                     name="map_settings.onboarding.content.filter.tip"
-                    placeholder={messages.onboarding.filterTip}
                   />
 
                   <FormInput
