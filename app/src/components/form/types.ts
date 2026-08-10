@@ -6,5 +6,6 @@ export type FormInputProps<
 > = {
   className?: string;
   label: string;
+  placeholder?: string;
   showLabel?: boolean;
 } & Omit<ControllerProps<TFieldValues, TName>, "render">;

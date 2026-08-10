@@ -20,6 +20,7 @@ export function FormTextArea({
   className,
   label,
   name,
+  placeholder,
   rules,
   textareaClassName,
 }: FormInputProps & FormTextAreaProps) {
@@ -30,7 +31,11 @@ export function FormTextArea({
         <FormItem className={className}>
           <FormLabel className="mb-2">{label}</FormLabel>
           <FormControl>
-            <Textarea className={cn("resize-none", textareaClassName)} {...field} />
+            <Textarea
+              className={cn("resize-none", textareaClassName)}
+              {...field}
+              placeholder={placeholder}
+            />
           </FormControl>
           <FormMessage />
         </FormItem>

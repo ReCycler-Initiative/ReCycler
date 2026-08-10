@@ -45,6 +45,23 @@ export const DEFAULT_USE_CASE_MAP_SETTINGS: UseCaseMapSettings = {
   enable_navigation_controls: true,
   enable_fullscreen_control: true,
   enable_search: true,
+  onboarding: {
+    enabled: true,
+    steps: {
+      search: true,
+      location: true,
+      map_style: true,
+      filter: true,
+      complete: true,
+    },
+    content: {
+      search: {},
+      location: {},
+      map_style: {},
+      filter: {},
+      complete: {},
+    },
+  },
 };
 
 export const resolveUseCaseMapSettings = (
@@ -84,5 +101,34 @@ export const resolveUseCaseMapSettings = (
     enable_search:
       mapSettings.enable_search ??
       DEFAULT_USE_CASE_MAP_SETTINGS.enable_search,
+    onboarding: {
+      enabled:
+        mapSettings.onboarding?.enabled ??
+        DEFAULT_USE_CASE_MAP_SETTINGS.onboarding.enabled,
+      steps: {
+        search:
+          mapSettings.onboarding?.steps?.search ??
+          DEFAULT_USE_CASE_MAP_SETTINGS.onboarding.steps.search,
+        location:
+          mapSettings.onboarding?.steps?.location ??
+          DEFAULT_USE_CASE_MAP_SETTINGS.onboarding.steps.location,
+        map_style:
+          mapSettings.onboarding?.steps?.map_style ??
+          DEFAULT_USE_CASE_MAP_SETTINGS.onboarding.steps.map_style,
+        filter:
+          mapSettings.onboarding?.steps?.filter ??
+          DEFAULT_USE_CASE_MAP_SETTINGS.onboarding.steps.filter,
+        complete:
+          mapSettings.onboarding?.steps?.complete ??
+          DEFAULT_USE_CASE_MAP_SETTINGS.onboarding.steps.complete,
+      },
+      content: {
+        search: mapSettings.onboarding?.content?.search ?? {},
+        location: mapSettings.onboarding?.content?.location ?? {},
+        map_style: mapSettings.onboarding?.content?.map_style ?? {},
+        filter: mapSettings.onboarding?.content?.filter ?? {},
+        complete: mapSettings.onboarding?.content?.complete ?? {},
+      },
+    },
   };
 };

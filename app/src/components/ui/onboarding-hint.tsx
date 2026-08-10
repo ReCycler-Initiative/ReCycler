@@ -2,6 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { useMessages } from "@/i18n/locale-provider";
+import { UseCaseMapSettings } from "@/types";
 import Image from "next/image";
 import React, { useEffect, useMemo, useState } from "react";
 import {
@@ -13,6 +14,7 @@ import {
 } from "./dialog";
 
 type Step = {
+  key: "search" | "location" | "map_style" | "filter" | "complete";
   title: string;
   body: React.ReactNode;
   imageSrc?: string | null;
@@ -22,15 +24,26 @@ type Step = {
   ctaLabel?: string; // käytetään viimeisessä stepissä
 };
 
-export default function OnboardingHint() {
+export default function OnboardingHint({
+  mapSettings,
+}: {
+  mapSettings?: UseCaseMapSettings;
+}) {
   const messages = useMessages();
   const [visible, setVisible] = useState(false);
   const [index, setIndex] = useState(0);
+  const onboardingSettings = mapSettings?.onboarding;
 
   // Onboarding steps
   const steps: Step[] = useMemo(
-    () => [
+    () => {
+      if (onboardingSettings?.enabled === false) {
+        return [];
+      }
+
+      const allSteps: Step[] = [
       {
+        key: "search",
         title: messages.onboarding.searchTitle,
         body: (
           <>
@@ -60,6 +73,7 @@ export default function OnboardingHint() {
         imageHeight: 114,
       },
       {
+        key: "location",
         title: messages.onboarding.locationTitle,
         body: (
           <>
@@ -77,6 +91,7 @@ export default function OnboardingHint() {
         imageHeight: 84,
       },
       {
+        key: "map_style",
         title: messages.onboarding.mapStyleTitle,
         body: (
           <>
@@ -94,6 +109,7 @@ export default function OnboardingHint() {
         imageHeight: 82,
       },
       {
+        key: "filter",
         title: messages.onboarding.filterTitle,
         body: (
           <>
@@ -111,15 +127,62 @@ export default function OnboardingHint() {
         imageHeight: 94,
       },
       {
+        key: "complete",
         title: messages.onboarding.completeTitle,
         body: <></>,
         imageSrc: null,
         imageAlt: null,
         ctaLabel: messages.onboarding.completeCta,
       },
-    ],
-    [messages]
+      ];
+
+      const selectedSteps = allSteps
+        .filter((step) => onboardingSettings?.steps?.[step.key] ?? true)
+        .map((step) => {
+          const override =
+            (onboardingSettings?.content?.[step.key] ?? {}) as Record<
+              string,
+              string | undefined
+            >;
+          if (step.key === "complete") {
+            return {
+              ...step,
+              title: override.title?.trim() || step.title,
+              ctaLabel: override.ctaLabel?.trim() || step.ctaLabel,
+            };
+          }
+
+          const hasOverrideBody = typeof override.body === "string" && override.body.trim().length > 0;
+          const hasOverrideTip = typeof override.tip === "string" && override.tip.trim().length > 0;
+
+          return {
+            ...step,
+            title: override.title?.trim() || step.title,
+            body: hasOverrideBody || hasOverrideTip
+              ? (
+                <>
+                  {hasOverrideBody ? override.body : step.body}
+                  {hasOverrideTip && (
+                    <>
+                      <br />
+                      <br />
+                      <small>{override.tip}</small>
+                    </>
+                  )}
+                </>
+              )
+              : step.body,
+          };
+        });
+
+      return selectedSteps;
+    },
+    [messages, onboardingSettings]
   );
+
+  useEffect(() => {
+    setIndex((current) => Math.min(current, Math.max(steps.length - 1, 0)));
+  }, [steps.length]);
 
   // Allow manual reopening via custom event
   useEffect(() => {
@@ -139,6 +202,10 @@ export default function OnboardingHint() {
   const prev = () => setIndex((i) => Math.max(0, i - 1));
   const next = () =>
     index < steps.length - 1 ? setIndex((i) => i + 1) : markDone();
+
+  if (steps.length === 0) {
+    return null;
+  }
 
   const step = steps[index];
   const pct = ((index + 1) / steps.length) * 100;

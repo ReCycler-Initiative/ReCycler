@@ -728,7 +728,7 @@ export default function LocationsMap({ geoJson, mapSettings }: LocationsMapProps
             />
           )}
 
-          <OnboardingHint />
+          <OnboardingHint mapSettings={resolvedMapSettings} />
 
           <SelectedMaterialsControl
             amount={

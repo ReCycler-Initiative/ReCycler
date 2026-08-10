@@ -322,6 +322,120 @@ const UseCaseInfoPage = () => {
                   name="map_settings.enable_search"
                 />
               </div>
+
+              <div className="space-y-3 rounded-md border border-gray-200 p-3">
+                <h4 className="text-base font-semibold">
+                  {messages.adminUseCaseEditor.onboardingSection}
+                </h4>
+                <p className="text-sm text-muted-foreground">
+                  {messages.adminUseCaseEditor.onboardingSectionDescription}
+                </p>
+
+                <FormCheckbox
+                  label={messages.adminUseCaseEditor.enableOnboardingLabel}
+                  name="map_settings.onboarding.enabled"
+                />
+
+                <div className="grid gap-2 md:grid-cols-2">
+                  <FormCheckbox
+                    label={messages.adminUseCaseEditor.onboardingStepSearchLabel}
+                    name="map_settings.onboarding.steps.search"
+                  />
+                  <FormCheckbox
+                    label={messages.adminUseCaseEditor.onboardingStepLocationLabel}
+                    name="map_settings.onboarding.steps.location"
+                  />
+                  <FormCheckbox
+                    label={messages.adminUseCaseEditor.onboardingStepMapStyleLabel}
+                    name="map_settings.onboarding.steps.map_style"
+                  />
+                  <FormCheckbox
+                    label={messages.adminUseCaseEditor.onboardingStepFilterLabel}
+                    name="map_settings.onboarding.steps.filter"
+                  />
+                  <FormCheckbox
+                    label={messages.adminUseCaseEditor.onboardingStepCompleteLabel}
+                    name="map_settings.onboarding.steps.complete"
+                  />
+                </div>
+
+                <div className="space-y-3 pt-2">
+                  <FormInput
+                    label={messages.adminUseCaseEditor.onboardingSearchTitleLabel}
+                    name="map_settings.onboarding.content.search.title"
+                    placeholder={messages.onboarding.searchTitle}
+                  />
+                  <FormTextArea
+                    label={messages.adminUseCaseEditor.onboardingSearchBodyLabel}
+                    name="map_settings.onboarding.content.search.body"
+                    placeholder={messages.onboarding.searchHint}
+                  />
+                  <FormInput
+                    label={messages.adminUseCaseEditor.onboardingSearchTipLabel}
+                    name="map_settings.onboarding.content.search.tip"
+                    placeholder={messages.onboarding.searchTip}
+                  />
+
+                  <FormInput
+                    label={messages.adminUseCaseEditor.onboardingLocationTitleLabel}
+                    name="map_settings.onboarding.content.location.title"
+                    placeholder={messages.onboarding.locationTitle}
+                  />
+                  <FormTextArea
+                    label={messages.adminUseCaseEditor.onboardingLocationBodyLabel}
+                    name="map_settings.onboarding.content.location.body"
+                    placeholder={messages.onboarding.locationBody}
+                  />
+                  <FormInput
+                    label={messages.adminUseCaseEditor.onboardingLocationTipLabel}
+                    name="map_settings.onboarding.content.location.tip"
+                    placeholder={messages.onboarding.locationTip}
+                  />
+
+                  <FormInput
+                    label={messages.adminUseCaseEditor.onboardingMapStyleTitleLabel}
+                    name="map_settings.onboarding.content.map_style.title"
+                    placeholder={messages.onboarding.mapStyleTitle}
+                  />
+                  <FormTextArea
+                    label={messages.adminUseCaseEditor.onboardingMapStyleBodyLabel}
+                    name="map_settings.onboarding.content.map_style.body"
+                    placeholder={messages.onboarding.mapStyleBody}
+                  />
+                  <FormInput
+                    label={messages.adminUseCaseEditor.onboardingMapStyleTipLabel}
+                    name="map_settings.onboarding.content.map_style.tip"
+                    placeholder={messages.onboarding.mapStyleTip}
+                  />
+
+                  <FormInput
+                    label={messages.adminUseCaseEditor.onboardingFilterTitleLabel}
+                    name="map_settings.onboarding.content.filter.title"
+                    placeholder={messages.onboarding.filterTitle}
+                  />
+                  <FormTextArea
+                    label={messages.adminUseCaseEditor.onboardingFilterBodyLabel}
+                    name="map_settings.onboarding.content.filter.body"
+                    placeholder={messages.onboarding.filterBody}
+                  />
+                  <FormInput
+                    label={messages.adminUseCaseEditor.onboardingFilterTipLabel}
+                    name="map_settings.onboarding.content.filter.tip"
+                    placeholder={messages.onboarding.filterTip}
+                  />
+
+                  <FormInput
+                    label={messages.adminUseCaseEditor.onboardingCompleteTitleLabel}
+                    name="map_settings.onboarding.content.complete.title"
+                    placeholder={messages.onboarding.completeTitle}
+                  />
+                  <FormInput
+                    label={messages.adminUseCaseEditor.onboardingCompleteCtaLabel}
+                    name="map_settings.onboarding.content.complete.ctaLabel"
+                    placeholder={messages.onboarding.completeCta}
+                  />
+                </div>
+              </div>
             </div>
           </TabsContent>
         </Tabs>

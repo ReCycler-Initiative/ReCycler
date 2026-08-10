@@ -202,6 +202,86 @@ export const NewUseCase = z.object({
       enable_navigation_controls: z.coerce.boolean().default(true),
       enable_fullscreen_control: z.coerce.boolean().default(true),
       enable_search: z.coerce.boolean().default(true),
+      onboarding: z
+        .object({
+          enabled: z.coerce.boolean().default(true),
+          steps: z
+            .object({
+              search: z.coerce.boolean().default(true),
+              location: z.coerce.boolean().default(true),
+              map_style: z.coerce.boolean().default(true),
+              filter: z.coerce.boolean().default(true),
+              complete: z.coerce.boolean().default(true),
+            })
+            .default({
+              search: true,
+              location: true,
+              map_style: true,
+              filter: true,
+              complete: true,
+            }),
+          content: z
+            .object({
+              search: z
+                .object({
+                  title: z.string().optional(),
+                  body: z.string().optional(),
+                  tip: z.string().optional(),
+                })
+                .default({}),
+              location: z
+                .object({
+                  title: z.string().optional(),
+                  body: z.string().optional(),
+                  tip: z.string().optional(),
+                })
+                .default({}),
+              map_style: z
+                .object({
+                  title: z.string().optional(),
+                  body: z.string().optional(),
+                  tip: z.string().optional(),
+                })
+                .default({}),
+              filter: z
+                .object({
+                  title: z.string().optional(),
+                  body: z.string().optional(),
+                  tip: z.string().optional(),
+                })
+                .default({}),
+              complete: z
+                .object({
+                  title: z.string().optional(),
+                  ctaLabel: z.string().optional(),
+                })
+                .default({}),
+            })
+            .default({
+              search: {},
+              location: {},
+              map_style: {},
+              filter: {},
+              complete: {},
+            }),
+        })
+        .default({
+          enabled: true,
+          steps: {
+            search: true,
+            location: true,
+            map_style: true,
+            filter: true,
+            complete: true,
+          },
+          content: {
+            search: {},
+            location: {},
+            map_style: {},
+            filter: {},
+            complete: {},
+          },
+        }),
     })
     .nullable()
     .optional(),

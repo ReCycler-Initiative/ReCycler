@@ -126,7 +126,7 @@ const Content = ({
   // Same visual style as "Avaa ReCycler-demo"
   const navButtonClass = (isActive: boolean) =>
     cn(
-      "admin-nav-link inline-flex items-center rounded-full px-5 py-2 text-sm font-normal transition",
+      "admin-nav-link inline-flex min-w-0 items-center rounded-full px-5 py-2 text-sm font-normal whitespace-nowrap transition",
       isActive
         ? "admin-nav-link-active bg-gradient-to-b from-slate-900 to-slate-800 text-white shadow-sm"
         : "text-gray-700 hover:bg-gray-100"
@@ -196,17 +196,18 @@ const Content = ({
             </DropdownMenu>
           )}
 
-          <nav className="ml-2 hidden h-10 min-w-0 flex-1 items-center gap-1 pr-2 lg:flex">
-            {navLinks.map((link) => (
+          <nav className="ml-2 hidden h-10 min-w-0 flex-1 items-center gap-1 overflow-hidden pr-2 lg:flex">
+            {navLinks.map((link, index) => (
               <Link
                 key={link.href}
                 href={link.href}
-                className={navButtonClass(
-                  isActiveSection(link.href, link.exact)
+                className={cn(
+                  navButtonClass(isActiveSection(link.href, link.exact)),
+                  index === 0 ? "max-w-[190px] xl:max-w-[260px]" : ""
                 )}
               >
-                {link.icon && <link.icon className="mr-2 h-4 w-4" aria-hidden="true" />}
-                {link.label}
+                {link.icon && <link.icon className="mr-2 h-4 w-4 shrink-0" aria-hidden="true" />}
+                <span className="truncate">{link.label}</span>
               </Link>
             ))}
           </nav>

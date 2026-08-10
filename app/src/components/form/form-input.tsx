@@ -9,6 +9,7 @@ import { FormInputProps } from "./types";
 const FormInput = ({
   className,
   label,
+  placeholder,
   rules,
   name,
   showLabel = true,
@@ -24,7 +25,7 @@ const FormInput = ({
             {label}
           </FormLabel>
           <FormControl>
-            <Input {...field} value={field.value ?? ""} />
+            <Input {...field} value={field.value ?? ""} placeholder={placeholder} />
           </FormControl>
           {/* <FormDescription>This is your public display name.</FormDescription>
         <FormMessage /> */}

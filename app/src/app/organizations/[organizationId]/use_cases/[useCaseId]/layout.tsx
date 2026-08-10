@@ -4,6 +4,7 @@ import { PageLoadingSpinner } from "@/components/page-loading-spinner";
 import TitleBar from "@/components/title-bar";
 import { Button } from "@/components/ui/button";
 import { useMessages } from "@/i18n/locale-provider";
+import { resolveUseCaseMapSettings } from "@/lib/map-settings";
 import { getUseCaseById } from "@/services/api";
 import { useQuery } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
@@ -18,6 +19,9 @@ const OrganizationLayout = ({ children }: { children: React.ReactNode }) => {
   });
 
   const [mapReady, setMapReady] = useState(false);
+  const showOnboardingButton =
+    mapReady &&
+    resolveUseCaseMapSettings(useCaseQuery.data?.map_settings).onboarding.enabled;
 
   useEffect(() => {
     const onLoaded = () => setMapReady(true);
@@ -51,7 +55,7 @@ const OrganizationLayout = ({ children }: { children: React.ReactNode }) => {
         toHomeHref={`/organizations/${params.organizationId}/use_cases/${params.useCaseId}`}
       >
         <div className="flex w-full items-center justify-end">
-          {mapReady && (
+          {showOnboardingButton && (
             <Button
               variant="outline"
               onClick={openOnboarding}
