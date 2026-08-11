@@ -100,7 +100,7 @@ const baseFi = {
       "Muokkaa kenttiä ja ominaisuuksia ilman koodausta",
       "Tarkista lokit muutosten jälkeen",
     ],
-    useCaseHomePrimaryCta: "Aloita datayhteyksistä",
+    useCaseHomePrimaryCta: "Aloita sisältömalleista",
     useCaseHomeSecondaryCta: "Avaa kohteet",
     useCaseHomeAreasTitle: "Käyttötapauksen osa-alueet",
     useCaseHomeAreasDescription:
@@ -868,7 +868,7 @@ const baseEn = {
       "Edit fields and properties without coding",
       "Review logs after changes",
     ],
-    useCaseHomePrimaryCta: "Start with data connections",
+    useCaseHomePrimaryCta: "Start with content model",
     useCaseHomeSecondaryCta: "Open locations",
     useCaseHomeAreasTitle: "Use case areas",
     useCaseHomeAreasDescription:

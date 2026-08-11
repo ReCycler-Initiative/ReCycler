@@ -141,7 +141,7 @@ const UseCaseHomePage = () => {
 
             <div className="mt-8 flex flex-wrap gap-3">
               <Link
-                href={`${rootPath}/datasources`}
+                href={`${rootPath}/fields`}
                 className="admin-home-primary-cta inline-flex items-center rounded-full bg-slate-900 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-slate-800"
               >
                 {messages.admin.useCaseHomePrimaryCta}
