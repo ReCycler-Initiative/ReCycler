@@ -63,21 +63,23 @@ const UseCaseHomePage = () => {
     <PageTemplate>
       <div className="pb-10">
         <div className="admin-home-hero rounded-3xl border border-slate-200 bg-[radial-gradient(circle_at_top_left,_rgba(226,232,240,0.9),_rgba(255,255,255,1)_42%)] p-6 shadow-sm md:p-10">
-          <div className="max-w-4xl">
-            <div className="admin-home-badge inline-flex items-center rounded-full border border-slate-200 bg-white/90 px-3 py-1 text-xs font-medium text-slate-600 shadow-sm">
-              <Sparkles className="mr-2 h-3.5 w-3.5" />
-              {messages.admin.useCaseHomeBadge}
+          <div>
+            <div className="max-w-4xl">
+              <div className="admin-home-badge inline-flex items-center rounded-full border border-slate-200 bg-white/90 px-3 py-1 text-xs font-medium text-slate-600 shadow-sm">
+                <Sparkles className="mr-2 h-3.5 w-3.5" />
+                {messages.admin.useCaseHomeBadge}
+              </div>
+
+              <h1 className="mt-4 max-w-3xl text-3xl font-semibold tracking-tight text-slate-900 md:text-5xl">
+                {messages.admin.useCaseHomeTitle}
+              </h1>
+
+              <p className="mt-4 max-w-2xl text-sm leading-6 text-slate-600 md:text-base">
+                {messages.admin.useCaseHomeDescription}
+              </p>
             </div>
 
-            <h1 className="mt-4 max-w-3xl text-3xl font-semibold tracking-tight text-slate-900 md:text-5xl">
-              {messages.admin.useCaseHomeTitle}
-            </h1>
-
-            <p className="mt-4 max-w-2xl text-sm leading-6 text-slate-600 md:text-base">
-              {messages.admin.useCaseHomeDescription}
-            </p>
-
-            <div className="admin-home-panel mt-8 rounded-2xl border border-slate-200 bg-white/90 p-5 shadow-sm md:p-6">
+            <div className="admin-home-panel mt-8 rounded-2xl border border-slate-200 bg-white/90 p-5 shadow-sm md:p-6 w-full">
               <div className="flex items-center justify-between gap-3">
                 <div>
                   <h2 className="text-lg font-semibold text-slate-900">
@@ -90,53 +92,53 @@ const UseCaseHomePage = () => {
               </div>
 
               <div className="mt-5 grid gap-4 md:grid-cols-2">
-              {[
-                {
-                  step: "1",
-                  title: messages.admin.fields,
-                  description: messages.admin.useCaseHomeHighlights[2],
-                },
-                 {
-                  step: "2",
-                  title: messages.admin.datasources,
-                  description: messages.admin.datasourcesIntro,
-                },
-                {
-                  step: "3",
-                  title: messages.admin.locations,
-                  description: messages.admin.useCaseHomeHighlights[1],
-                },
-                {
-                  step: "4",
-                  title: messages.admin.usageStats,
-                  description: messages.admin.usageStatsIntro,
-                },
-                {
-                  step: "5",
-                  title: messages.admin.logs,
-                  description: messages.admin.runsIntro,
-                },
-              ].map((item) => (
-                <div
-                  key={item.step}
-                  className="admin-home-step rounded-2xl border border-slate-200 bg-slate-50 p-4"
-                >
-                  <div className="flex gap-3">
-                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-slate-900 text-sm font-semibold text-white">
-                      {item.step}
-                    </div>
-                    <div>
-                      <h3 className="text-sm font-semibold text-slate-900">
-                        {item.title}
-                      </h3>
-                      <p className="mt-1 text-sm leading-6 text-slate-600">
-                        {item.description}
-                      </p>
+                {[
+                  {
+                    step: "1",
+                    title: messages.admin.fields,
+                    description: messages.admin.useCaseHomeHighlights[2],
+                  },
+                  {
+                    step: "2",
+                    title: messages.admin.datasources,
+                    description: messages.admin.datasourcesIntro,
+                  },
+                  {
+                    step: "3",
+                    title: messages.admin.locations,
+                    description: messages.admin.useCaseHomeHighlights[1],
+                  },
+                  {
+                    step: "4",
+                    title: messages.admin.usageStats,
+                    description: messages.admin.usageStatsIntro,
+                  },
+                  {
+                    step: "5",
+                    title: messages.admin.logs,
+                    description: messages.admin.runsIntro,
+                  },
+                ].map((item) => (
+                  <div
+                    key={item.step}
+                    className="admin-home-step rounded-2xl border border-slate-200 bg-slate-50 p-4"
+                  >
+                    <div className="flex gap-3">
+                      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-slate-900 text-sm font-semibold text-white">
+                        {item.step}
+                      </div>
+                      <div>
+                        <h3 className="text-sm font-semibold text-slate-900">
+                          {item.title}
+                        </h3>
+                        <p className="mt-1 text-sm leading-6 text-slate-600">
+                          {item.description}
+                        </p>
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
             </div>
 
             <div className="mt-8 flex flex-wrap gap-3">
