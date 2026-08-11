@@ -2,12 +2,12 @@
 
 import { useFormContext } from "react-hook-form";
 import {
-  ObjectFormFields,
-  ObjectFormValues,
-} from "../../_components/object-form";
+  LocationTypeFormFields,
+  LocationTypeFormValues,
+} from "../../_components/location-type-form";
 
-export default function EditObjectPage() {
-  const form = useFormContext<ObjectFormValues>();
+export default function EditLocationTypePage() {
+  const form = useFormContext<LocationTypeFormValues>();
 
-  return <ObjectFormFields form={form} />;
+  return <LocationTypeFormFields form={form} />;
 }

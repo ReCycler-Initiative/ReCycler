@@ -66,12 +66,12 @@ export const FieldRecord = Field.extend({
   use_case_id: z.string().uuid(),
 });
 
-export const Object = z.object({
+export const LocationType = z.object({
   name: z.string(),
   fields: z.array(Field),
 });
 
-export const ObjectRecord = Object.extend({
+export const LocationTypeRecord = LocationType.extend({
   id: z.string().uuid(),
   fields: z.array(z.union([Field, FieldRecord])),
   use_case_id: z.string().uuid(),

@@ -1,6 +1,6 @@
 import { checkOrganizationAuthorization } from "@/lib/authorization";
 import db from "@/services/db";
-import { Object, ObjectRecord } from "@/types";
+import { LocationType, LocationTypeRecord } from "@/types";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(
@@ -11,11 +11,11 @@ export async function GET(
     params: Promise<{
       organizationId: string;
       useCaseId: string;
-      objectId: string;
+      locationTypeId: string;
     }>;
   }
 ) {
-  const { organizationId, useCaseId, objectId } = await params;
+  const { organizationId, useCaseId, locationTypeId } = await params;
 
   const authResult = await checkOrganizationAuthorization(
     request,
@@ -41,14 +41,14 @@ export async function GET(
       AND o.id = ?::uuid
     GROUP BY o.id
     `,
-    [organizationId, useCaseId, objectId]
+    [organizationId, useCaseId, locationTypeId]
   );
 
   if (result.rows.length === 0) {
     return NextResponse.json({ error: "Object not found" }, { status: 404 });
   }
 
-  return NextResponse.json(ObjectRecord.parse(result.rows[0]));
+  return NextResponse.json(LocationTypeRecord.parse(result.rows[0]));
 }
 
 export async function PUT(
@@ -59,11 +59,11 @@ export async function PUT(
     params: Promise<{
       organizationId: string;
       useCaseId: string;
-      objectId: string;
+      locationTypeId: string;
     }>;
   }
 ) {
-  const { organizationId, useCaseId, objectId } = await params;
+  const { organizationId, useCaseId, locationTypeId } = await params;
 
   const authResult = await checkOrganizationAuthorization(
     request,
@@ -72,7 +72,7 @@ export async function PUT(
   if (!authResult.authorized) return authResult.response!;
 
   const body = await request.json();
-  const data = ObjectRecord.parse(body);
+  const data = LocationTypeRecord.parse(body);
 
   // Update object
   const result = await db.raw(
@@ -86,7 +86,7 @@ export async function PUT(
       AND uc.organization_id = ?::uuid
     RETURNING o.*
     `,
-    [data.name, objectId, useCaseId, organizationId]
+    [data.name, locationTypeId, useCaseId, organizationId]
   );
 
   if (result.rows.length === 0) {
@@ -97,7 +97,7 @@ export async function PUT(
 
   // Get existing fields
   const existingFields = await db("recycler.fields")
-    .where({ object_id: objectId })
+    .where({ object_id: locationTypeId })
     .select("id");
 
   const existingFieldIds = new Set(existingFields.map((f) => f.id));
@@ -137,7 +137,7 @@ export async function PUT(
         const [row] = await db("recycler.fields")
           .insert({
             id: db.raw("uuid_generate_v4()"),
-            object_id: objectId,
+            object_id: locationTypeId,
             use_case_id: useCaseId,
             name: field.name,
             field_type: field.field_type,
@@ -154,7 +154,7 @@ export async function PUT(
   );
 
   return NextResponse.json(
-    ObjectRecord.parse({ ...updatedObject, fields, use_case_id: useCaseId })
+    LocationTypeRecord.parse({ ...updatedObject, fields, use_case_id: useCaseId })
   );
 }
 
@@ -178,7 +178,7 @@ export async function POST(
   if (!authResult.authorized) return authResult.response!;
 
   const body = await request.json();
-  const data = Object.parse(body);
+  const data = LocationType.parse(body);
 
   const result = await db.raw(
     `
@@ -196,5 +196,5 @@ export async function POST(
     return NextResponse.json({ error: "Use case not found" }, { status: 404 });
   }
 
-  return NextResponse.json(ObjectRecord.parse(result.rows[0]), { status: 201 });
+  return NextResponse.json(LocationTypeRecord.parse(result.rows[0]), { status: 201 });
 }

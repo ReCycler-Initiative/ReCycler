@@ -679,11 +679,13 @@ const baseFi = {
       ],
     },
   ],
-  adminObjectsPage: {
+  adminLocationTypesPage: {
     edit: "Tiedot",
     fields: "Kentät",
     title: "Kohdetyyppi",
     description: "Kohdetyypin tiedot",
+    nameLabel: "Nimi",
+    namePlaceholder: "esim. Materiaalit",
   },
   adminFieldsPage: {
     addField: "Lisää kenttä",
@@ -715,15 +717,15 @@ const baseFi = {
     nameLabel: "Nimi",
     namePlaceholder: "esim. Materiaalit",
   },
-  adminObjectsListPage: {
+  adminLocationTypesListPage: {
     title: "Kohdetyypit",
     description: "Lisää ja muokkaa kohdetyyppejä",
-    addObject: "Lisää kohdetyyppi",
+    addLocationType: "Lisää kohdetyyppi",
     loading: "Ladataan...",
-    noObjects: "Ei kohdetyyppejä. Lisää ensimmäinen kohdetyyppi",
+    noLocationTypes: "Ei kohdetyyppejä. Lisää ensimmäinen kohdetyyppi",
     nameColumn: "Nimi",
     fieldsColumn: "Kenttiä",
-    editObjectAria: "Muokkaa kohdetyyppiä",
+    editLocationTypeAria: "Muokkaa kohdetyyppiä",
   },
 };
 
@@ -1367,11 +1369,13 @@ const baseEn = {
       ],
     },
   ],
-  adminObjectsPage: {
+  adminLocationTypesPage: {
     edit: "Details",
     fields: "Fields",
     title: "Object type",
     description: "Object type details",
+    nameLabel: "Name",
+    namePlaceholder: "e.g. Materials",
   },
   adminFieldsPage: {
     addField: "Add field",
@@ -1403,15 +1407,15 @@ const baseEn = {
     nameLabel: "Name",
     namePlaceholder: "e.g. Materials",
   },
-  adminObjectsListPage: {
+  adminLocationTypesListPage: {
     title: "Object types",
     description: "Add and edit object types",
-    addObject: "Add object type",
+    addLocationType: "Add location type",
     loading: "Loading...",
-    noObjects: "No object types. Add the first object type",
+    noLocationTypes: "No location types. Add the first location type",
     nameColumn: "Name",
     fieldsColumn: "Fields",
-    editObjectAria: "Edit object type",
+    editLocationTypeAria: "Edit location type",
   },
 };
 

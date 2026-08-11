@@ -1,6 +1,6 @@
 import { checkOrganizationAuthorization } from "@/lib/authorization";
 import db from "@/services/db";
-import { ObjectRecord, Object } from "@/types";
+import { LocationTypeRecord, LocationType } from "@/types";
 import { NextRequest, NextResponse } from "next/server";
 import z from "zod";
 
@@ -36,7 +36,7 @@ export async function GET(
     [organizationId, useCaseId]
   );
 
-  return NextResponse.json(z.array(ObjectRecord).parse(result.rows));
+  return NextResponse.json(z.array(LocationTypeRecord).parse(result.rows));
 }
 
 export async function POST(
@@ -52,7 +52,7 @@ export async function POST(
   if (!authResult.authorized) return authResult.response!;
 
   const body = await request.json();
-  const data = Object.parse(body);
+  const data = LocationType.parse(body);
 
   // Insert object
   const objectResult = await db.raw(
@@ -87,7 +87,7 @@ export async function POST(
     })
   );
 
-  return NextResponse.json(ObjectRecord.parse({ ...newObject, fields }), {
+  return NextResponse.json(LocationTypeRecord.parse({ ...newObject, fields }), {
     status: 201,
   });
 }

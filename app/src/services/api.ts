@@ -1,3 +1,4 @@
+import { Locale } from "@/i18n/messages";
 import {
   ChatResponse,
   CreateOrganizationRequest,
@@ -9,14 +10,13 @@ import {
   FieldRecord,
   LocationDetail,
   LocationGeoJsonCollection,
+  LocationType,
+  LocationTypeRecord,
   Material,
   NewUseCase,
-  Object,
-  ObjectRecord,
   Organization,
   UseCase,
 } from "@/types";
-import { Locale } from "@/i18n/messages";
 import axios from "axios";
 import { z } from "zod";
 
@@ -267,13 +267,13 @@ type FieldBody = {
   } | null;
 };
 
-export const getObjects = (
+export const getLocationTypes = (
   organizationId: string,
   useCaseId: string
-): Promise<z.infer<typeof ObjectRecord>[]> =>
+): Promise<z.infer<typeof LocationTypeRecord>[]> =>
   axios
-    .get(`/api/organizations/${organizationId}/use_cases/${useCaseId}/objects`)
-    .then((response) => z.array(ObjectRecord).parse(response.data));
+    .get(`/api/organizations/${organizationId}/use_cases/${useCaseId}/locationTypes`)
+    .then((response) => z.array(LocationTypeRecord).parse(response.data));
 
 export const getFields = (
   organizationId: string,
@@ -306,41 +306,41 @@ export const createField = (
     )
     .then((response) => FieldRecord.parse(response.data));
 
-export const getObject = (
+export const getLocationType = (
   organizationId: string,
   useCaseId: string,
-  objectId: string
-): Promise<z.infer<typeof ObjectRecord>> =>
+  locationTypeId: string
+): Promise<z.infer<typeof LocationTypeRecord>> =>
   axios
     .get(
-      `/api/organizations/${organizationId}/use_cases/${useCaseId}/objects/${objectId}`
+      `/api/organizations/${organizationId}/use_cases/${useCaseId}/locationTypes/${locationTypeId}`
     )
-    .then((response) => ObjectRecord.parse(response.data));
+    .then((response) => LocationTypeRecord.parse(response.data));
 
-export const createObject = (
+export const createLocationType = (
   organizationId: string,
   useCaseId: string,
-  data: z.infer<typeof Object>
-): Promise<z.infer<typeof ObjectRecord>> =>
+  data: z.infer<typeof LocationType>
+): Promise<z.infer<typeof LocationTypeRecord>> =>
   axios
     .post(
-      `/api/organizations/${organizationId}/use_cases/${useCaseId}/objects`,
+      `/api/organizations/${organizationId}/use_cases/${useCaseId}/locationTypes`,
       data
     )
-    .then((response) => ObjectRecord.parse(response.data));
+    .then((response) => LocationTypeRecord.parse(response.data));
 
-export const updateObject = (
+export const updateLocationType = (
   organizationId: string,
   useCaseId: string,
-  objectId: string,
-  data: z.infer<typeof Object>
-): Promise<z.infer<typeof ObjectRecord>> =>
+  locationTypeId: string,
+  data: z.infer<typeof LocationType>
+): Promise<z.infer<typeof LocationTypeRecord>> =>
   axios
     .put(
-      `/api/organizations/${organizationId}/use_cases/${useCaseId}/objects/${objectId}`,
+      `/api/organizations/${organizationId}/use_cases/${useCaseId}/locationTypes/${locationTypeId}`,
       data
     )
-    .then((response) => ObjectRecord.parse(response.data));
+    .then((response) => LocationTypeRecord.parse(response.data));
 
 export const updateField = (
   organizationId: string,
