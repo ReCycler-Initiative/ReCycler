@@ -93,13 +93,13 @@ const UseCaseHomePage = () => {
               {[
                 {
                   step: "1",
-                  title: messages.admin.datasources,
-                  description: messages.admin.datasourcesIntro,
-                },
-                {
-                  step: "2",
                   title: messages.admin.fields,
                   description: messages.admin.useCaseHomeHighlights[2],
+                },
+                 {
+                  step: "2",
+                  title: messages.admin.datasources,
+                  description: messages.admin.datasourcesIntro,
                 },
                 {
                   step: "3",
