@@ -22,16 +22,16 @@ const UseCaseHomePage = () => {
   const rootPath = `/admin/organizations/${id}/use_cases/${useCaseId}`;
   const actionCards = [
     {
-      href: `${rootPath}/datasources`,
-      icon: Database,
-      label: messages.admin.datasources,
-      description: messages.admin.datasourcesIntro,
-    },
-    {
       href: `${rootPath}/fields`,
       icon: Blocks,
       label: messages.admin.fields,
       description: messages.admin.useCaseHomeHighlights[2],
+    },
+    {
+      href: `${rootPath}/datasources`,
+      icon: Database,
+      label: messages.admin.datasources,
+      description: messages.admin.datasourcesIntro,
     },
     {
       href: `${rootPath}/locations`,
