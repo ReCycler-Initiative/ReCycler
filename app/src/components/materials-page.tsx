@@ -10,9 +10,29 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 
+const EMPTY_SELECTED_CODES: number[] = [];
+const EMPTY_SELECTED_FIELD_VALUES: FieldSelections = {};
+
+const sameNumberArray = (left: number[], right: number[]) =>
+  left.length === right.length && left.every((value, index) => value === right[index]);
+
+const sameFieldSelections = (
+  left: FieldSelections,
+  right: FieldSelections
+) => {
+  const leftKeys = Object.keys(left);
+  const rightKeys = Object.keys(right);
+
+  if (leftKeys.length !== rightKeys.length) {
+    return false;
+  }
+
+  return leftKeys.every((key) => sameNumberArray(left[key] ?? [], right[key] ?? []));
+};
+
 export const MaterialsPageContent = ({
-  initialSelectedCodes = [],
-  initialSelectedFieldValues = {},
+  initialSelectedCodes = EMPTY_SELECTED_CODES,
+  initialSelectedFieldValues = EMPTY_SELECTED_FIELD_VALUES,
   organizationId,
   useCaseId,
   resultsBasePath,
@@ -57,11 +77,19 @@ export const MaterialsPageContent = ({
   const resolvedTabManualText = tabManualText || messages.materials.tabManual;
 
   useEffect(() => {
-    setSelectedCodes(initialSelectedCodes);
+    setSelectedCodes((currentSelectedCodes) =>
+      sameNumberArray(currentSelectedCodes, initialSelectedCodes)
+        ? currentSelectedCodes
+        : initialSelectedCodes
+    );
   }, [initialSelectedCodes]);
 
   useEffect(() => {
-    setSelectedFieldValues(initialSelectedFieldValues);
+    setSelectedFieldValues((currentSelectedFieldValues) =>
+      sameFieldSelections(currentSelectedFieldValues, initialSelectedFieldValues)
+        ? currentSelectedFieldValues
+        : initialSelectedFieldValues
+    );
   }, [initialSelectedFieldValues]);
 
   const buildResultsHref = () => {
