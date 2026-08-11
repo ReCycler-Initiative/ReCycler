@@ -27,12 +27,12 @@ const LocationTypesPage = () => {
   return (
     <PageTemplate>
       <PageIntro
-        title={messages.adminLocationTypesPage.title}
-        description={messages.adminLocationTypesPage.description}
+        title={messages.adminLocationTypesListPage.title}
+        description={messages.adminLocationTypesListPage.description}
         actions={
           <Button asChild>
             <Link
-              href={`/admin/organizations/${organizationId}/use_cases/${useCaseId}/locationTypes/new/edit`}
+              href={`/admin/organizations/${organizationId}/use_cases/${useCaseId}/location-types/new/edit`}
             >
               <Plus className="h-4 w-4 mr-2" />
               {messages.adminLocationTypesListPage.addLocationType}
@@ -78,7 +78,7 @@ const LocationTypesPage = () => {
                       }
                     >
                       <Link
-                        href={`/admin/organizations/${organizationId}/use_cases/${useCaseId}/locationTypes/${locationType.id}/edit`}
+                        href={`/admin/organizations/${organizationId}/use_cases/${useCaseId}/location-types/${locationType.id}/edit`}
                       >
                         <Pencil className="h-4 w-4" />
                       </Link>

@@ -27,7 +27,7 @@ const LocationTypeLayout = ({ children }: { children: ReactNode }) => {
 
   const router = useRouter();
   const pathname = usePathname();
-  const baseLocationTypesPath = `/admin/organizations/${organizationId}/use_cases/${useCaseId}/locationTypes`;
+  const baseLocationTypesPath = `/admin/organizations/${organizationId}/use_cases/${useCaseId}/location-types`;
   const basePath = `${baseLocationTypesPath}/${locationTypeId}`;
 
   const tabs = [
@@ -60,8 +60,8 @@ const LocationTypeLayout = ({ children }: { children: ReactNode }) => {
   return (
     <PageTemplate>
       <PageIntro
-        title={messages.adminLocationTypesPage.title}
-        description={messages.adminLocationTypesPage.description}
+        title={messages.adminLocationTypesListPage.title}
+        description={messages.adminLocationTypesListPage.description}
         onBack={() => router.push(baseLocationTypesPath)}
       />
       <LocationTypeEditor
