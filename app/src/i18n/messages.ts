@@ -100,7 +100,7 @@ const baseFi = {
       "Muokkaa kenttiä ja ominaisuuksia ilman koodausta",
       "Tarkista lokit muutosten jälkeen",
     ],
-    useCaseHomePrimaryCta: "Aloita sisältömalleista",
+    useCaseHomePrimaryCta: "Aloita sisältömallista",
     useCaseHomeSecondaryCta: "Avaa kohteet",
     useCaseHomeAreasTitle: "Käyttötapauksen osa-alueet",
     useCaseHomeAreasDescription:
@@ -716,7 +716,7 @@ const baseFi = {
     namePlaceholder: "esim. Materiaalit",
   },
   adminObjectsListPage: {
-    title: "Sisältömallit",
+    title: "Sisältömalli",
     description: "Lisää ja muokkaa sisältömalleja",
     addObject: "Lisää sisältömalli",
     loading: "Ladataan...",
