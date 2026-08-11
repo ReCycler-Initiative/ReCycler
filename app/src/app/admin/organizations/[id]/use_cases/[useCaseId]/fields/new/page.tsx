@@ -34,7 +34,7 @@ export default function NewFieldPage() {
         queryKey: ["fields", organizationId, useCaseId],
       });
       router.push(
-        `/admin/organizations/${organizationId}/use_cases/${useCaseId}/fields`
+        `/admin/organizations/${organizationId}/use_cases/${useCaseId}/location-types`
       );
     },
   });

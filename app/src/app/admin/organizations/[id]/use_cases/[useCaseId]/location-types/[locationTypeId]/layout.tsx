@@ -39,7 +39,7 @@ const LocationTypeLayout = ({ children }: { children: ReactNode }) => {
     {
       value: "fields",
       label: messages.adminLocationTypesPage.fields,
-      href: `${basePath}/fields`,
+      href: `${basePath}/location-types`,
     },
   ];
 

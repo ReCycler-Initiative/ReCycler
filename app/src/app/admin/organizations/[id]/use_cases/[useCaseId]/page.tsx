@@ -22,7 +22,7 @@ const UseCaseHomePage = () => {
   const rootPath = `/admin/organizations/${id}/use_cases/${useCaseId}`;
   const actionCards = [
     {
-      href: `${rootPath}/fields`,
+      href: `${rootPath}/location-types`,
       icon: Blocks,
       label: messages.admin.fields,
       description: messages.admin.useCaseHomeHighlights[2],
@@ -143,7 +143,7 @@ const UseCaseHomePage = () => {
 
             <div className="mt-8 flex flex-wrap gap-3">
               <Link
-                href={`${rootPath}/fields`}
+                href={`${rootPath}/location-types`}
                 className="admin-home-primary-cta inline-flex items-center rounded-full bg-slate-900 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-slate-800"
               >
                 {messages.admin.useCaseHomePrimaryCta}
