@@ -272,7 +272,7 @@ export const getLocationTypes = (
   useCaseId: string
 ): Promise<z.infer<typeof LocationTypeRecord>[]> =>
   axios
-    .get(`/api/organizations/${organizationId}/use_cases/${useCaseId}/locationTypes`)
+    .get(`/api/organizations/${organizationId}/use_cases/${useCaseId}/location-types`)
     .then((response) => z.array(LocationTypeRecord).parse(response.data));
 
 export const getFields = (
@@ -313,7 +313,7 @@ export const getLocationType = (
 ): Promise<z.infer<typeof LocationTypeRecord>> =>
   axios
     .get(
-      `/api/organizations/${organizationId}/use_cases/${useCaseId}/locationTypes/${locationTypeId}`
+      `/api/organizations/${organizationId}/use_cases/${useCaseId}/location-types/${locationTypeId}`
     )
     .then((response) => LocationTypeRecord.parse(response.data));
 
@@ -324,7 +324,7 @@ export const createLocationType = (
 ): Promise<z.infer<typeof LocationTypeRecord>> =>
   axios
     .post(
-      `/api/organizations/${organizationId}/use_cases/${useCaseId}/locationTypes`,
+      `/api/organizations/${organizationId}/use_cases/${useCaseId}/location-types`,
       data
     )
     .then((response) => LocationTypeRecord.parse(response.data));
@@ -337,7 +337,7 @@ export const updateLocationType = (
 ): Promise<z.infer<typeof LocationTypeRecord>> =>
   axios
     .put(
-      `/api/organizations/${organizationId}/use_cases/${useCaseId}/locationTypes/${locationTypeId}`,
+      `/api/organizations/${organizationId}/use_cases/${useCaseId}/location-types/${locationTypeId}`,
       data
     )
     .then((response) => LocationTypeRecord.parse(response.data));
