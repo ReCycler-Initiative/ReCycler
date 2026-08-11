@@ -60,8 +60,8 @@ const LocationTypeLayout = ({ children }: { children: ReactNode }) => {
   return (
     <PageTemplate>
       <PageIntro
-        title={messages.adminLocationTypesListPage.title}
-        description={messages.adminLocationTypesListPage.description}
+        title={messages.adminLocationTypesPage.title}
+        description={messages.adminLocationTypesPage.description}
         onBack={() => router.push(baseLocationTypesPath)}
       />
       <LocationTypeEditor
