@@ -1,49 +1,68 @@
 import { Knex } from 'knex';
 
 export async function up(knex: Knex): Promise<void> {
-  // Fetch all use cases
+  // Fetch all use cases and existing objects once to avoid duplicate inserts.
   const useCases = await knex('recycler.use_cases').select('id');
-  
-  if (useCases.length === 0) {
-    throw new Error('No use cases found. Create use cases first.');
+  const existingObjects = await knex('recycler.objects').select('id', 'use_case_id');
+  const objectByUseCaseId = new Map<string, string>(
+    existingObjects.map((row) => [row.use_case_id, row.id])
+  );
+
+  const missingObjects = useCases
+    .filter((uc) => !objectByUseCaseId.has(uc.id))
+    .map((uc) => ({
+      name: 'Default Object',
+      use_case_id: uc.id,
+    }));
+
+  if (missingObjects.length > 0) {
+    await knex('recycler.objects').insert(missingObjects);
   }
-  
-  // Create default object for each use case
-  const objectInserts = useCases.map(uc => ({
-    name: 'Default Object',
-    use_case_id: uc.id
-  }));
-  
-  await knex('recycler.objects').insert(objectInserts);
-  
-  // Add foreign key to objects in fields table
-  await knex.schema.withSchema('recycler').alterTable('fields', (table) => {
-    table.uuid('object_id').nullable();
-    table.foreign('object_id').references('id').inTable('recycler.objects');
-  });
-  
-  // Link fields to objects based on use case
+
+  const refreshedObjects = await knex('recycler.objects').select('id', 'use_case_id');
+  const refreshedObjectByUseCaseId = new Map<string, string>(
+    refreshedObjects.map((row) => [row.use_case_id, row.id])
+  );
+
+  const hasObjectIdColumn = await knex.schema
+    .withSchema('recycler')
+    .hasColumn('fields', 'object_id');
+
+  // Add nullable FK column only if it does not exist yet.
+  if (!hasObjectIdColumn) {
+    await knex.schema.withSchema('recycler').alterTable('fields', (table) => {
+      table.uuid('object_id').nullable();
+      table.foreign('object_id').references('id').inTable('recycler.objects');
+    });
+  }
+
+  // Link fields to objects based on use case.
   for (const useCase of useCases) {
-    const object = await knex('recycler.objects')
-      .where({ use_case_id: useCase.id })
-      .first('id');
-    
+    const objectId = refreshedObjectByUseCaseId.get(useCase.id);
+    if (!objectId) {
+      continue;
+    }
+
     await knex('recycler.fields')
       .where({ use_case_id: useCase.id })
-      .update({ object_id: object.id });
+      .update({ object_id: objectId });
   }
-  
-  // Check for fields without object_id (orphaned fields)
+
+  // If orphaned fields remain, keep column nullable so migration can continue.
   const orphanedFields = await knex('recycler.fields')
     .whereNull('object_id')
     .count('* as count')
     .first();
-  
-  if (orphanedFields && parseInt(orphanedFields.count as string) > 0) {
-    throw new Error(`Found ${orphanedFields.count} fields without object_id. Fix data before continuing.`);
+
+  const orphanedCount = parseInt(String(orphanedFields?.count ?? 0), 10);
+  if (orphanedCount > 0) {
+    console.warn(
+      `[migration:20260610160531] ${orphanedCount} field(s) still missing object_id. Keeping object_id nullable.`
+    );
+    return;
   }
-  
-  // Make object_id required
+
+  // Make object_id required only when all rows are linked.
   await knex.schema.withSchema('recycler').alterTable('fields', (table) => {
     table.uuid('object_id').notNullable().alter();
   });

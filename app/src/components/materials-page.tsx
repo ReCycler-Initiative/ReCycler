@@ -136,7 +136,7 @@ export const MaterialsPageContent = ({
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="ai">
+        <TabsContent value="ai" forceMount className="data-[state=inactive]:hidden">
           <AiMaterialPrompt
             selectedCodes={selectedCodes}
             onSelectedCodesChange={setSelectedCodes}

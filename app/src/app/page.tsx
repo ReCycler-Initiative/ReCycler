@@ -146,8 +146,8 @@ const HomePage = () => {
             </div>
           </div>
 
-          {/* PRICING SECTION */}
-          <div className="mt-10">
+          {/* PRICING SECTION — temporarily hidden */}
+          {false && <div className="mt-10">
             <div className="max-w-3xl">
               <h2 className="text-base font-semibold text-gray-900">
                 {messages.marketing.pricingTitle}
@@ -180,7 +180,7 @@ const HomePage = () => {
               ))}
             </div>
 
-          </div>
+          </div>}
 
           {/* INFO SECTION */}
           <div className="mt-8 grid gap-4 lg:grid-cols-2">

@@ -8,10 +8,12 @@ import LanguageSwitcher from "./language-switcher";
 
 const TitleBar = ({
   children,
+  showAuthControls = true,
   logo,
   toHomeHref = "/recycler",
 }: {
   children?: ReactNode;
+  showAuthControls?: boolean;
   logo: ReactNode;
   toHomeHref?: string;
 }) => {
@@ -25,9 +27,11 @@ const TitleBar = ({
       {children}
       <div className="flex items-center ml-auto">
         <LanguageSwitcher />
-        <Suspense fallback={null}>
-          <Auth0Login />
-        </Suspense>
+        {showAuthControls && (
+          <Suspense fallback={null}>
+            <Auth0Login />
+          </Suspense>
+        )}
       </div>
     </header>
   );

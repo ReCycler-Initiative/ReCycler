@@ -1,5 +1,21 @@
 import { UseCaseMapSettings } from "@/types";
 
+type PartialUseCaseMapSettings = Partial<
+  Omit<UseCaseMapSettings, "onboarding">
+> & {
+  onboarding?: {
+    enabled?: boolean;
+    steps?: Partial<UseCaseMapSettings["onboarding"]["steps"]>;
+    content?: {
+      search?: Partial<UseCaseMapSettings["onboarding"]["content"]["search"]>;
+      location?: Partial<UseCaseMapSettings["onboarding"]["content"]["location"]>;
+      map_style?: Partial<UseCaseMapSettings["onboarding"]["content"]["map_style"]>;
+      filter?: Partial<UseCaseMapSettings["onboarding"]["content"]["filter"]>;
+      complete?: Partial<UseCaseMapSettings["onboarding"]["content"]["complete"]>;
+    };
+  };
+};
+
 const clamp = (value: number, min: number, max: number) =>
   Math.min(max, Math.max(min, value));
 
@@ -65,13 +81,20 @@ export const DEFAULT_USE_CASE_MAP_SETTINGS: UseCaseMapSettings = {
 };
 
 export const resolveUseCaseMapSettings = (
-  mapSettings: UseCaseMapSettings | null | undefined
+  mapSettings: PartialUseCaseMapSettings | null | undefined
 ): UseCaseMapSettings => {
   if (!mapSettings) {
     return DEFAULT_USE_CASE_MAP_SETTINGS;
   }
 
-  const sanitizedBounds = sanitizeBounds(mapSettings.max_bounds);
+  const initialCenter =
+    mapSettings.initial_center ?? DEFAULT_USE_CASE_MAP_SETTINGS.initial_center;
+  const initialZoom =
+    mapSettings.initial_zoom ?? DEFAULT_USE_CASE_MAP_SETTINGS.initial_zoom;
+  const maxBounds =
+    mapSettings.max_bounds ?? DEFAULT_USE_CASE_MAP_SETTINGS.max_bounds;
+
+  const sanitizedBounds = sanitizeBounds(maxBounds);
   const fallbackGeocoderBbox: UseCaseMapSettings["geocoder_bbox"] = [
     sanitizedBounds[0][0],
     sanitizedBounds[0][1],
@@ -80,8 +103,8 @@ export const resolveUseCaseMapSettings = (
   ];
 
   return {
-    initial_center: sanitizeCoordinate(mapSettings.initial_center),
-    initial_zoom: clamp(mapSettings.initial_zoom, 0, 22),
+    initial_center: sanitizeCoordinate(initialCenter),
+    initial_zoom: clamp(initialZoom, 0, 22),
     max_bounds: sanitizedBounds,
     geocoder_bbox: mapSettings.geocoder_bbox
       ? sanitizeGeocoderBbox(mapSettings.geocoder_bbox)
