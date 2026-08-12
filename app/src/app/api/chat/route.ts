@@ -296,11 +296,7 @@ ${locale === "en" ? "Important:" : "Tärkeää:"}
       .map((m) => m.code);
 
     const suggestedCodes = materials
-      .filter((m) =>
-        [...((currentSelectedCodes as number[]) ?? []), ...matchedSuggestedCodes].includes(
-          m.code
-        )
-      )
+      .filter((m) => matchedSuggestedCodes.includes(m.code))
       .filter(
         (m) =>
           !resolvedFieldChoiceValues.some((choice) => materialNameMatches(m, choice))
