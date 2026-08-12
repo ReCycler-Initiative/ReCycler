@@ -31,17 +31,18 @@ export const LocaleProvider = ({
   children: React.ReactNode;
   initialLocale?: Locale;
 }) => {
-  const [locale, setLocaleState] = useState<Locale>(() => {
-    if (typeof window === "undefined") {
-      return resolveLocale(initialLocale);
-    }
-
-    return resolveLocale(localStorage.getItem(LOCALE_COOKIE_NAME) ?? initialLocale);
-  });
+  const [locale, setLocaleState] = useState<Locale>(() =>
+    resolveLocale(initialLocale)
+  );
 
   useEffect(() => {
     document.documentElement.lang = locale;
-    localStorage.setItem(LOCALE_COOKIE_NAME, locale);
+    try {
+      localStorage.setItem(LOCALE_COOKIE_NAME, locale);
+    } catch {
+      // Ignore storage failures so browsers with stricter settings still render.
+    }
+
     document.cookie = `${LOCALE_COOKIE_NAME}=${locale}; path=/; max-age=31536000; samesite=lax`;
   }, [locale]);
 

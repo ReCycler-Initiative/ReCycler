@@ -64,20 +64,32 @@ const Content = ({
   const { id } = useParams<{ id: string }>();
   const pathname = usePathname();
   const router = useRouter();
-  const [adminTheme, setAdminTheme] = useState<"light" | "dark">("light");
+  const [adminTheme, setAdminTheme] = useState<"light" | "dark">(() => {
+    if (typeof window === "undefined") {
+      return "light";
+    }
+
+    try {
+      const savedTheme = window.localStorage.getItem("recycler-admin-theme");
+      if (savedTheme === "dark" || savedTheme === "light") {
+        return savedTheme;
+      }
+    } catch {
+      // Fall back to light when browser storage is unavailable.
+    }
+
+    return "light";
+  });
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
   const [isDesktopNav, setIsDesktopNav] = useState(false);
 
   useEffect(() => {
-    const savedTheme = window.localStorage.getItem("recycler-admin-theme");
-    if (savedTheme === "dark" || savedTheme === "light") {
-      setAdminTheme(savedTheme);
+    try {
+      window.localStorage.setItem("recycler-admin-theme", adminTheme);
+    } catch {
+      // Ignore storage failures so the page still works.
     }
-  }, []);
-
-  useEffect(() => {
-    window.localStorage.setItem("recycler-admin-theme", adminTheme);
   }, [adminTheme]);
 
   useEffect(() => {
