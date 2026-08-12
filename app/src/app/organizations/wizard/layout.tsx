@@ -3,13 +3,19 @@
 import TitleBar from "@/components/title-bar";
 import { Button } from "@/components/ui/button";
 import { useMessages } from "@/i18n/locale-provider";
+import { LogOutIcon } from "lucide-react";
 import Image from "next/image";
+import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import logo from "../../recycler-logo.png";
 
 const OrganizationLayout = ({ children }: { children: React.ReactNode }) => {
   const messages = useMessages();
+  const pathname = usePathname();
   const [mapReady, setMapReady] = useState(false);
+
+  // Show logout button only on /recycler* routes (demo mode).
+  const isDemoRoute = pathname?.startsWith("/recycler");
 
   useEffect(() => {
     const onLoaded = () => setMapReady(true);
@@ -35,16 +41,23 @@ const OrganizationLayout = ({ children }: { children: React.ReactNode }) => {
           <Image className="pb-2" src={logo} alt="Recycler logo" width={150} />
         }
       >
-        <div className="flex w-full items-center justify-end">
+        <div className="flex w-full items-center justify-end gap-2">
           {mapReady && (
             <Button
               variant="outline"
               onClick={openOnboarding}
-              className="h-10 px-4 mr-3"
+              className="h-10 px-4"
               aria-label={messages.layout.openOnboarding}
             >
               {messages.layout.instructions}
             </Button>
+          )}
+          {isDemoRoute && (
+            <a href="/api/recycler-logout" title="Kirjaudu ulos demosta">
+              <Button variant="ghost" size="icon" className="h-10 w-10 mr-1">
+                <LogOutIcon size={18} />
+              </Button>
+            </a>
           )}
         </div>
       </TitleBar>
