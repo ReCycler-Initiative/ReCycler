@@ -1,4 +1,5 @@
 import { auth0, managementClient } from "@/lib/auth0";
+import { resolveUseCaseMapSettings } from "@/lib/map-settings";
 import knex from "@/services/db";
 import { CreateOrganizationRequest, CreateOrganizationResponse } from "@/types";
 import { emptyLocalizedText } from "@/lib/use-case-content";
@@ -64,6 +65,9 @@ export const POST = withZodPost(
           useCase: {
             ...useCase,
             id: useCaseRow.id,
+            map_settings: useCase.map_settings
+              ? resolveUseCaseMapSettings(useCase.map_settings)
+              : null,
             content: {
               intro: {
                 title: emptyLocalizedText(),
