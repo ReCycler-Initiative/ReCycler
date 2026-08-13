@@ -1,4 +1,8 @@
+import dotenv from "dotenv";
 import type { Knex } from "knex";
+
+// Load environment variables from .env file
+dotenv.config();
 
 const {
   POSTGRES_DATABASE = "postgres",
