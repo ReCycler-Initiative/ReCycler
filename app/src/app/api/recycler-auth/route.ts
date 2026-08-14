@@ -11,6 +11,7 @@ export async function POST(request: NextRequest) {
     response.cookies.set(BASIC_AUTH_COOKIE, "1", {
       httpOnly: true,
       sameSite: "lax",
+      secure: process.env.NODE_ENV === "production",
       path: "/",
     });
     return response;
@@ -30,6 +31,7 @@ export async function POST(request: NextRequest) {
     response.cookies.set(BASIC_AUTH_COOKIE, "1", {
       httpOnly: true,
       sameSite: "lax",
+      secure: process.env.NODE_ENV === "production",
       path: "/",
     });
     return response;
