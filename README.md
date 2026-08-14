@@ -86,3 +86,21 @@ For any inquiries or suggestions, please reach out to us through GitHub. You can
 #### AI text recognition, speech-to-text feature also available:
 
 <img src="images/Ai-text-recognition-2026-03-12.png" alt="AI text recognition (2026-03-12)" width="60%" />
+
+
+## Licensing & Commercial Usage
+
+ReCycler is available under a dual-licensing model:
+
+1. Open Source (GNU AGPLv3): Free for non-commercial, educational, and open-source derivative works under the terms of the [AGPL-3.0 License](./LICENSE). Any derivative work or service hosted over a network (SaaS) must make its source code publicly available under the same AGPLv3 terms.
+2. Commercial License: Required for enterprise use, proprietary software integration, or commercial deployments where AGPLv3 copyleft restrictions (such as mandatory source code disclosure) cannot be applied.
+
+### Which license fits your needs?
+
+- Non-commercial / Personal use: Open Source (AGPLv3)
+- Educational & Academic Research: Open Source (AGPLv3)
+- Open-source projects sharing code: Open Source (AGPLv3)
+- Proprietary & Closed-source commercial products: Commercial License Required
+- Commercial SaaS without releasing source code: Commercial License Required
+
+For commercial licensing options, enterprise SLAs, or custom deployment terms, please contact: https://www.linkedin.com/in/jussi-niilahti
