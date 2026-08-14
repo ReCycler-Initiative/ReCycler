@@ -1,36 +1,36 @@
 "use client";
 
 import { EditorTemplate, useEditor } from "@/components/editor-template";
-import { ObjectRecord } from "@/types";
+import { LocationTypeRecord } from "@/types";
 import { useQueryClient } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
 import z from "zod";
-import { ObjectFormValues, toApiData } from "./object-form";
+import { LocationTypeFormValues, toApiData } from "./location-type-form";
 
-type ObjectEditorProps = {
+type LocationTypeEditorProps = {
   children?: React.ReactNode;
-  defaultValues: ObjectFormValues;
+  defaultValues: LocationTypeFormValues;
   mutation: (
     organizationId: string,
     useCaseId: string,
-    data: ObjectFormValues
-  ) => Promise<z.infer<typeof ObjectRecord>>;
+    data: LocationTypeFormValues
+  ) => Promise<z.infer<typeof LocationTypeRecord>>;
   onSuccess?: (organizationId: string, useCaseId: string) => void;
 };
 
-export default function ObjectEditor({
+export default function LocationTypeEditor({
   children,
   defaultValues,
   mutation,
   onSuccess,
-}: ObjectEditorProps) {
+}: LocationTypeEditorProps) {
   const { id: organizationId, useCaseId } = useParams<{
     id: string;
     useCaseId: string;
   }>();
   const queryClient = useQueryClient();
 
-  const editor = useEditor<ObjectFormValues, ObjectFormValues>({
+  const editor = useEditor<LocationTypeFormValues, LocationTypeFormValues>({
     defaultValues,
     queryKey: [],
     mutationFn: async (formValues) => {
@@ -45,7 +45,7 @@ export default function ObjectEditor({
     toApiData: (v) => v,
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ["objects", organizationId, useCaseId],
+        queryKey: ["locationTypes", organizationId, useCaseId],
       });
       onSuccess?.(organizationId, useCaseId);
     },

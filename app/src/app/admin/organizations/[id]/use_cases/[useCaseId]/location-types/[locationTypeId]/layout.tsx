@@ -4,42 +4,42 @@ import { PageIntro } from "@/components/admin/page-intro";
 import { PageTemplate } from "@/components/admin/page-template";
 import { PageLoadingSpinner } from "@/components/page-loading-spinner";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { createObject, getObject, updateObject } from "@/services/api";
+import { createLocationType, getLocationType, updateLocationType } from "@/services/api";
 import { useMessages } from "@/i18n/locale-provider";
 import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
 import { useParams, usePathname, useRouter } from "next/navigation";
 import { ReactNode } from "react";
-import ObjectEditor from "../_components/object-editor";
-import { toApiData } from "../_components/object-form";
+import LocationTypeEditor from "../_components/location-type-editor";
+import { toApiData } from "../_components/location-type-form";
 
-const ObjectLayout = ({ children }: { children: ReactNode }) => {
+const LocationTypeLayout = ({ children }: { children: ReactNode }) => {
   const messages = useMessages();
   const {
-    objectId,
+    locationTypeId,
     id: organizationId,
     useCaseId,
   } = useParams<{
-    objectId: string;
+    locationTypeId: string;
     id: string;
     useCaseId: string;
   }>();
 
   const router = useRouter();
   const pathname = usePathname();
-  const baseObjectsPath = `/admin/organizations/${organizationId}/use_cases/${useCaseId}/objects`;
-  const basePath = `${baseObjectsPath}/${objectId}`;
+  const baseLocationTypesPath = `/admin/organizations/${organizationId}/use_cases/${useCaseId}/location-types`;
+  const basePath = `${baseLocationTypesPath}/${locationTypeId}`;
 
   const tabs = [
     {
       value: "edit",
-      label: messages.adminObjectsPage.tabInfo,
+      label: messages.adminLocationTypesPage.edit,
       href: `${basePath}/edit`,
     },
     {
       value: "fields",
-      label: messages.adminObjectsPage.tabFields,
-      href: `${basePath}/fields`,
+      label: messages.adminLocationTypesPage.fields,
+      href: `${basePath}/location-types`,
     },
   ];
 
@@ -47,10 +47,10 @@ const ObjectLayout = ({ children }: { children: ReactNode }) => {
     tabs.find((tab) => pathname.startsWith(tab.href))?.value ?? tabs[0].value;
 
   const { data, isLoading } = useQuery({
-    queryKey: [organizationId, useCaseId, objectId],
-    queryFn: () => getObject(organizationId, useCaseId, objectId),
+    queryKey: [organizationId, useCaseId, locationTypeId],
+    queryFn: () => getLocationType(organizationId, useCaseId, locationTypeId),
     enabled:
-      !!organizationId && !!useCaseId && !!objectId && objectId !== "new",
+      !!organizationId && !!useCaseId && !!locationTypeId && locationTypeId !== "new",
   });
 
   if (isLoading) {
@@ -60,21 +60,21 @@ const ObjectLayout = ({ children }: { children: ReactNode }) => {
   return (
     <PageTemplate>
       <PageIntro
-        title={messages.adminObjectsPage.title}
-        description={messages.adminObjectsPage.description}
-        onBack={() => router.push(baseObjectsPath)}
+        title={messages.adminLocationTypesPage.title}
+        description={messages.adminLocationTypesPage.description}
+        onBack={() => router.push(baseLocationTypesPath)}
       />
-      <ObjectEditor
+      <LocationTypeEditor
         defaultValues={data && "id" in data ? data : { name: "", fields: [] }}
         mutation={async (organizationId, useCaseId, values) => {
-          if (objectId === "new") {
-            return await createObject(
+          if (locationTypeId === "new") {
+            return await createLocationType(
               organizationId,
               useCaseId,
               toApiData(values)
             );
           }
-          return await updateObject(
+          return await updateLocationType(
             organizationId,
             useCaseId,
             data?.id!,
@@ -92,9 +92,9 @@ const ObjectLayout = ({ children }: { children: ReactNode }) => {
           </TabsList>
         </Tabs>
         {children}
-      </ObjectEditor>
+      </LocationTypeEditor>
     </PageTemplate>
   );
 };
 
-export default ObjectLayout;
+export default LocationTypeLayout;

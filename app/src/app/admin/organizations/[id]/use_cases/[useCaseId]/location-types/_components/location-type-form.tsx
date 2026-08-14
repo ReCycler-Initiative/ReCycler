@@ -4,22 +4,22 @@ import { FormFooter, FormShell } from "@/components/editor-template";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useMessages } from "@/i18n/locale-provider";
-import { Object, ObjectRecord } from "@/types";
+import { LocationType, LocationTypeRecord } from "@/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-const ObjectFormSchema = z.union([Object, ObjectRecord]);
+const LocationTypeFormSchema = z.union([LocationType, LocationTypeRecord]);
 
-export type ObjectFormValues = z.infer<typeof ObjectFormSchema>;
+export type LocationTypeFormValues = z.infer<typeof LocationTypeFormSchema>;
 
-const ObjectFormDefaultValuesSchema = Object;
+const LocationTypeFormDefaultValuesSchema = LocationType;
 
-export type ObjectFormDefaultValues = z.infer<
-  typeof ObjectFormDefaultValuesSchema
+export type LocationTypeFormDefaultValues = z.infer<
+  typeof LocationTypeFormDefaultValuesSchema
 >;
 
-export const toApiData = (values: ObjectFormValues) => {
+export const toApiData = (values: LocationTypeFormValues) => {
   const fields = values.fields.map((field) => {
     const baseField = {
       name: field.name,
@@ -55,23 +55,23 @@ export const toApiData = (values: ObjectFormValues) => {
   };
 };
 
-export const objectFormDefaultValues: ObjectFormValues = {
+export const locationTypeFormDefaultValues: LocationTypeFormValues = {
   name: "",
   fields: [],
 };
 
-export const useObjectForm = (defaults?: ObjectFormDefaultValues) =>
-  useForm<ObjectFormValues>({
-    resolver: zodResolver(ObjectFormSchema),
+export const useLocationTypeForm = (defaults?: LocationTypeFormDefaultValues) =>
+  useForm<LocationTypeFormValues>({
+    resolver: zodResolver(LocationTypeFormSchema),
     defaultValues: {
       name: defaults?.name ?? "",
     },
   });
 
-export const ObjectFormFields = ({
+export const LocationTypeFormFields = ({
   form,
 }: {
-  form: ReturnType<typeof useObjectForm>;
+  form: ReturnType<typeof useLocationTypeForm>;
 }) => {
   const messages = useMessages();
   const { register, setValue, getValues, control, formState } = form;
@@ -80,11 +80,11 @@ export const ObjectFormFields = ({
     <>
       {/* Name */}
       <div className="space-y-1.5">
-        <Label htmlFor="field-name">{messages.adminObjectForm.nameLabel}</Label>
+        <Label htmlFor="field-name">{messages.adminLocationTypesPage.nameLabel}</Label>
         <Input
           id="field-name"
           {...register("name")}
-          placeholder={messages.adminObjectForm.namePlaceholder}
+          placeholder={messages.adminLocationTypesPage.namePlaceholder}
           autoFocus
         />
         {formState.errors.name && (
@@ -98,21 +98,21 @@ export const ObjectFormFields = ({
 };
 
 // Convenience wrapper for use inside dialogs (provides its own Form context + footer).
-export const ObjectFormContent = ({
+export const LocationTypeFormContent = ({
   form,
   backHref,
   onCancel,
   isPending,
   onSubmit,
 }: {
-  form: ReturnType<typeof useObjectForm>;
+  form: ReturnType<typeof useLocationTypeForm>;
   backHref?: string;
   onCancel?: () => void;
   isPending: boolean;
-  onSubmit: (values: ObjectFormValues) => void;
+  onSubmit: (values: LocationTypeFormValues) => void;
 }) => (
   <FormShell form={form} onSubmit={onSubmit}>
-    <ObjectFormFields form={form} />
+    <LocationTypeFormFields form={form} />
     <FormFooter
       isSubmitting={isPending}
       isDirty={form.formState.isDirty}

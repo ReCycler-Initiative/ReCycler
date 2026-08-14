@@ -14,7 +14,7 @@ import {
   fieldFormDefaultValues,
   useFieldForm,
 } from "../../_components/field-form";
-import { ObjectFormValues } from "../../_components/object-form";
+import { LocationTypeFormValues } from "../../_components/location-type-form";
 
 const FieldSchema = z.union([Field, FieldRecord]);
 
@@ -24,7 +24,7 @@ export default function FieldsPage() {
   const messages = useMessages();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingField, setEditingField] = useState<FieldItem | null>(null);
-  const form = useFormContext<ObjectFormValues>();
+  const form = useFormContext<LocationTypeFormValues>();
   const fieldsArray = useFieldArray({
     name: "fields",
     control: form.control,

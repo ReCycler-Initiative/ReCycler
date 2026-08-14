@@ -155,7 +155,7 @@ const Content = ({
       icon: AppWindow,
     },
     {
-      href: `${orgRootPath}/fields`,
+      href: `${orgRootPath}/location-types`,
       label: messages.admin.fields,
       icon: Blocks,
     },
