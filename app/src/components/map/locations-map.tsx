@@ -114,6 +114,8 @@ const getLocalizedDescription = (
     (properties.description_en as string | undefined);
 };
 
+const looksLikeHtml = (value: string) => /<\/?[a-z][\s\S]*>/i.test(value);
+
 // Style for rendering point features (icons)
 const layerStyle: SymbolLayer = {
   id: "point",
@@ -860,12 +862,23 @@ export default function LocationsMap({ geoJson, mapSettings }: LocationsMapProps
                     </div>
                   )}
                   {description && (
-                    <div className="p-3 border-b">
-                      <h3 className="text-xs font-medium text-muted-foreground mb-1">
-                        {messages.mapPopup.additionalDetails}
-                      </h3>
-                      <p className="text-sm whitespace-pre-line">{description}</p>
-                    </div>
+                    <details className="border-b group">
+                      <summary className="list-none cursor-pointer px-3 py-3 text-xs font-medium text-muted-foreground flex items-center justify-between">
+                        <span>{messages.mapPopup.additionalDetails}</span>
+                        <span className="text-[11px] text-gray-500 group-open:hidden">Näytä</span>
+                        <span className="text-[11px] text-gray-500 hidden group-open:inline">Piilota</span>
+                      </summary>
+                      <div className="px-3 pb-3">
+                        {looksLikeHtml(description) ? (
+                          <div
+                            className="text-sm whitespace-pre-line [&_a]:text-blue-600 [&_a]:underline [&_a]:underline-offset-2"
+                            dangerouslySetInnerHTML={{ __html: description }}
+                          />
+                        ) : (
+                          <p className="text-sm whitespace-pre-line">{description}</p>
+                        )}
+                      </div>
+                    </details>
                   )}
                   {(() => {
                     const ohField = parseFeatureFields(details.feature.properties?.fields)
