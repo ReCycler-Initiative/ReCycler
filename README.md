@@ -19,7 +19,7 @@ The development of these capabilities is ongoing during H1/2026. This includes t
 
 
 - Define organization- and use case–specific configurations
-- Add and maintain target objects (e.g, Collection spots) and their metadata (attributes)
+- Add and maintain target objects (e.g, collection spots) and their metadata (attributes)
 - Establish connections to new data sources using data connectors
 - Manage users, roles, and access rights securely
 - Auth0 is utilized as the identity and access management (IAM) solution
