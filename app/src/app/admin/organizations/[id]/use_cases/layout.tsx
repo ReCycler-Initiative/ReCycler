@@ -380,7 +380,7 @@ const Content = ({
               )}
 
             </DropdownMenuContent>
-          </DropdownMenu>
+            </DropdownMenu>
           </div>
         </div>
       </TitleBar>
