@@ -15,7 +15,7 @@ ReCycler Platform is designed to support multiple organizations and a wide range
 
 The current development demo (www.recyclerapp.fi) showcases recycling collection points as one example use case, but the underlying platform is not limited to this domain. Core development focuses on building reusable tools and capabilities that enable the creation, configuration, and management of use cases independently of their content or context.
 
-The development of these capabilities is ongoing during H1/2026. This includes the implementation of comprehensive user management and administrative tools that allow organizations to:
+The development of these capabilities is ongoing during H2/2026. This includes the implementation of comprehensive user management and administrative tools that allow organizations to:
 
 
 - Define organization- and use case–specific configurations
