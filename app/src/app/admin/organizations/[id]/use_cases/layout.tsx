@@ -6,6 +6,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Label } from "@/components/ui/label";
@@ -33,8 +34,10 @@ import {
   Database,
   ExternalLink,
   MapPin,
+  Moon,
   ScrollText,
   SettingsIcon,
+  Sun,
 } from "lucide-react";
 import Link from "next/link";
 import { useParams, usePathname, useRouter } from "next/navigation";
@@ -210,6 +213,51 @@ const Content = ({
                     </Link>
                   </DropdownMenuItem>
                 )}
+                <DropdownMenuSeparator />
+                <DropdownMenuItem asChild>
+                  <Link href={`${orgRootPath}/general_info`} onClick={() => setIsMobileNavOpen(false)}>
+                    <AppWindow className="mr-2 h-4 w-4 text-slate-500" />
+                    {messages.admin.organizationDetails}
+                  </Link>
+                </DropdownMenuItem>
+                {selectedUseCaseId && (
+                  <DropdownMenuItem asChild>
+                    <Link href={`${orgRootPath}/edit`} onClick={() => setIsMobileNavOpen(false)}>
+                      <BriefcaseBusiness className="mr-2 h-4 w-4 text-slate-500" />
+                      {messages.admin.useCaseDetails}
+                    </Link>
+                  </DropdownMenuItem>
+                )}
+                {selectedUseCaseId && (
+                  <DropdownMenuItem asChild>
+                    <Link href={`${orgRootPath}/usage`} onClick={() => setIsMobileNavOpen(false)}>
+                      <ChartColumn className="mr-2 h-4 w-4 text-slate-500" />
+                      {messages.admin.usageStats}
+                    </Link>
+                  </DropdownMenuItem>
+                )}
+                {selectedUseCaseId && (
+                  <DropdownMenuItem asChild>
+                    <Link href={`${orgRootPath}/runs`} onClick={() => setIsMobileNavOpen(false)}>
+                      <ScrollText className="mr-2 h-4 w-4 text-slate-500" />
+                      {messages.admin.logs}
+                    </Link>
+                  </DropdownMenuItem>
+                )}
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  onSelect={(e) => {
+                    e.preventDefault();
+                    setAdminTheme((t) => (t === "dark" ? "light" : "dark"));
+                  }}
+                >
+                  {adminTheme === "dark" ? (
+                    <Sun className="mr-2 h-4 w-4 text-slate-500" />
+                  ) : (
+                    <Moon className="mr-2 h-4 w-4 text-slate-500" />
+                  )}
+                  {adminTheme === "dark" ? messages.admin.useLightTheme : messages.admin.useDarkTheme}
+                </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           )}
@@ -275,16 +323,19 @@ const Content = ({
             </Link>
           )}
 
-          <AdminThemeToggle
-            isDark={adminTheme === "dark"}
-            onToggle={() =>
-              setAdminTheme((currentTheme) =>
-                currentTheme === "dark" ? "light" : "dark"
-              )
-            }
-          />
+          <div className="hidden lg:flex">
+            <AdminThemeToggle
+              isDark={adminTheme === "dark"}
+              onToggle={() =>
+                setAdminTheme((currentTheme) =>
+                  currentTheme === "dark" ? "light" : "dark"
+                )
+              }
+            />
+          </div>
 
-          <DropdownMenu>
+          <div className="hidden lg:block">
+            <DropdownMenu>
             <DropdownMenuTrigger className="admin-settings-trigger mr-1 rounded-full px-3 py-2 text-slate-700 transition hover:bg-gray-100 hover:text-slate-900">
               <SettingsIcon />
             </DropdownMenuTrigger>
@@ -330,6 +381,7 @@ const Content = ({
 
             </DropdownMenuContent>
           </DropdownMenu>
+          </div>
         </div>
       </TitleBar>
 
