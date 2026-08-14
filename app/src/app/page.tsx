@@ -216,7 +216,7 @@ const HomePage = () => {
           </div>
 
           <footer className="mt-10 rounded-2xl border border-gray-200 bg-gray-900 px-6 py-8 text-white">
-            <div className="grid gap-8 md:grid-cols-3">
+            <div className="grid gap-8">
               <div>
                 <h3 className="text-sm font-semibold uppercase tracking-[0.18em] text-gray-300">
                   {messages.marketing.footerContactTitle}
@@ -227,33 +227,6 @@ const HomePage = () => {
                 <p className="mt-2 text-sm leading-6 text-gray-300">
                   {messages.marketing.footerCompanyDescription}
                 </p>
-              </div>
-
-              <div>
-                <h4 className="text-sm font-semibold text-white">{messages.marketing.footerAddressTitle}</h4>
-                <p className="mt-3 text-sm leading-6 text-gray-300">
-                  {messages.marketing.footerAddressLines.map((line: string) => (
-                    <span key={line}>
-                      {line}
-                      <br />
-                    </span>
-                  ))}
-                </p>
-              </div>
-
-              <div>
-                <h4 className="text-sm font-semibold text-white">{messages.marketing.footerContactSubtitle}</h4>
-                <div className="mt-3 space-y-2 text-sm text-gray-300">
-                  <p>
-                    {messages.marketing.footerEmailLabel}: info@yritys.fi
-                  </p>
-                  <p>
-                    {messages.marketing.footerPhoneLabel}: 010 123 4567
-                  </p>
-                  <p>
-                    {messages.marketing.footerBusinessIdLabel}: 1234567-8
-                  </p>
-                </div>
               </div>
             </div>
           </footer>

@@ -618,7 +618,7 @@ const baseFi = {
     openSourceDescription:
       "ReCycler-palvelu perustuu avoimen lähdekoodin ReCycler-projektiin.",
     footerContactTitle: "Yhteystiedot",
-    footerCompanyName: "Yritys Oy",
+    footerCompanyName: "ReCycler Labs",
     footerCompanyDescription:
       "ReCycler-palvelun käyttöönotto, pilotointi ja jatkuva kehitys organisaatioille.",
     footerAddressTitle: "Osoite",
@@ -1253,7 +1253,7 @@ const baseEn = {
     openSourceDescription:
       "The ReCycler service is based on the open-source ReCycler project.",
     footerContactTitle: "Contact",
-    footerCompanyName: "Company Ltd",
+    footerCompanyName: "ReCycler Labs",
     footerCompanyDescription:
       "ReCycler onboarding, piloting, and continuous development for organizations.",
     footerAddressTitle: "Address",
