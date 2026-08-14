@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { auth0 } from "./lib/auth0";
 
 const BASIC_AUTH_COOKIE = "recycler_basic_auth_ok";
+const AUTH0_SESSION_COOKIES = new Set(["__session", "appSession"]);
 
 function isRecyclerRoute(pathname: string) {
   return pathname === "/recycler" || pathname.startsWith("/recycler/");
@@ -33,6 +34,22 @@ function hasBasicAuthSession(request: NextRequest) {
   return request.cookies.get(BASIC_AUTH_COOKIE)?.value === "1";
 }
 
+function clearStaleAuthCookies(request: NextRequest, response: NextResponse) {
+  for (const { name } of request.cookies.getAll()) {
+    if (AUTH0_SESSION_COOKIES.has(name) || name.startsWith("__txn_")) {
+      response.cookies.set(name, "", {
+        httpOnly: true,
+        sameSite: "lax",
+        secure:
+          request.nextUrl.protocol === "https:" ||
+          request.headers.get("x-forwarded-proto") === "https",
+        path: "/",
+        maxAge: 0,
+      });
+    }
+  }
+}
+
 
 
 export async function middleware(request: NextRequest) {
@@ -46,7 +63,33 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  return await auth0.middleware(request);
+  try {
+    return await auth0.middleware(request);
+  } catch (error) {
+    if ((error as { code?: string })?.code !== "ERR_JWE_DECRYPTION_FAILED") {
+      throw error;
+    }
+
+    if (pathname === "/auth/profile") {
+      const response = NextResponse.json({ user: null }, { status: 401 });
+      clearStaleAuthCookies(request, response);
+      return response;
+    }
+
+    const response = pathname.startsWith("/auth/")
+      ? NextResponse.redirect(new URL("/", request.url))
+      : NextResponse.redirect(
+          new URL(
+            `/auth/login?returnTo=${encodeURIComponent(
+              `${pathname}${request.nextUrl.search}`
+            )}`,
+            request.url
+          )
+        );
+
+    clearStaleAuthCookies(request, response);
+    return response;
+  }
 }
 
 export const config = {

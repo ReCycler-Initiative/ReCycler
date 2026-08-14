@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start",
+    "start": "node scripts/start-standalone.mjs",
     "lint": "next lint",
     "migrate": "npm run knex -- migrate:latest",
     "seed": "npm run knex -- seed:run",

@@ -5,13 +5,17 @@ const BASIC_AUTH_PASSWORD = process.env.RECYCLER_BASIC_AUTH_PASSWORD;
 const BASIC_AUTH_COOKIE = "recycler_basic_auth_ok";
 
 export async function POST(request: NextRequest) {
+  const isSecureRequest =
+    request.nextUrl.protocol === "https:" ||
+    request.headers.get("x-forwarded-proto") === "https";
+
   // If no credentials are configured, allow anyone through.
   if (!BASIC_AUTH_USERNAME || !BASIC_AUTH_PASSWORD) {
     const response = NextResponse.json({ ok: true });
     response.cookies.set(BASIC_AUTH_COOKIE, "1", {
       httpOnly: true,
       sameSite: "lax",
-      secure: process.env.NODE_ENV === "production",
+      secure: isSecureRequest,
       path: "/",
     });
     return response;
@@ -31,7 +35,7 @@ export async function POST(request: NextRequest) {
     response.cookies.set(BASIC_AUTH_COOKIE, "1", {
       httpOnly: true,
       sameSite: "lax",
-      secure: process.env.NODE_ENV === "production",
+      secure: isSecureRequest,
       path: "/",
     });
     return response;

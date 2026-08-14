@@ -5,12 +5,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 import logo from "../recycler-logo.png";
 
 export default function RecyclerLoginPage() {
-  const router = useRouter();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -21,16 +19,22 @@ export default function RecyclerLoginPage() {
     setLoading(true);
     setError("");
 
-    const res = await fetch("/api/recycler-auth", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ username, password }),
-    });
+    try {
+      const res = await fetch("/api/recycler-auth", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password }),
+      });
 
-    if (res.ok) {
-      router.push("/recycler");
-    } else {
+      if (res.ok) {
+        window.location.assign("/recycler");
+        return;
+      }
+
       setError("Väärä käyttäjätunnus tai salasana.");
+      setLoading(false);
+    } catch {
+      setError("Kirjautuminen ei onnistunut. Yritä hetken kuluttua uudelleen.");
       setLoading(false);
     }
   };
