@@ -596,13 +596,13 @@ const baseFi = {
       "ReCycler auttaa rakentamaan palveluita, joissa ihmiset löytävät oikeat paikat, palvelupisteet tai keräyskohteet helposti.",
     highlights: [
       "Asiakaslähtöinen palvelu tekee asioinnista nopeampaa, selkeämpää ja helpompaa.",
-      "Käyttäjä löytää oikean palvelun helpommin ja saa heti vastauksia tekoälyavustajalta.",
+      "Käyttäjä löytää oikean palvelun helpommin ja saa heti vastauksia tekoälyavustajalta, joka tuntee palvelun sisällöt ja ohjeet.",
       "Tietoa voidaan tuoda muista järjestelmistä automaattisesti.",
       "Käyttäjät voidaan tunnistaa organisaation nykyisillä tunnuksilla.",
     ],
     examplesTitle: "Esimerkkejä käytöstä",
     exampleMunicipal:
-      "Esimerkiksi kunta voi toteuttaa palvelun, jossa asukas löytää helposti alueen palvelut kartalta ja vertailee vaihtoehtoja.",
+      "Esimerkiksi jätehuoltoyhtiö voi toteuttaa palvelun, jossa asukas löytää helposti alueen kierrätyspisteet ja saa apua kierrätykseen liittyviin kysymyksiin.",
     exampleBusiness:
       "Yritys voi toteuttaa palvelun, jossa asiakas löytää helposti oikean myymälän tai palvelupisteen.",
     openDemo: "Avaa ReCycler-demo",
@@ -1231,13 +1231,13 @@ const baseEn = {
       "ReCycler helps teams build services where people can easily find the right places, service points, or collection locations.",
     highlights: [
       "A customer-centric service makes transactions faster, clearer, and easier.",
-      "Users find the right service more easily and get immediate answers from an AI assistant.",
+      "Users find the right service more easily and get immediate answers from an assistant that knows the service content and guidance.",
       "Data can be imported automatically from other systems.",
       "Users can sign in with the organization's existing credentials.",
     ],
     examplesTitle: "Examples of use",
     exampleMunicipal:
-      "For example, a municipality can provide a service where residents easily find local services on a map and compare their options.",
+      "For example, a waste management company can provide a service where residents easily find local recycling points and get help with everyday recycling questions.",
     exampleBusiness:
       "A company can provide a service where customers can easily find the right store or service point.",
     openDemo: "Open the ReCycler demo",

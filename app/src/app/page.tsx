@@ -128,9 +128,6 @@ const HomePage = () => {
                   <p className="mt-2 text-sm leading-6 text-gray-600">
                     {messages.marketing.exampleMunicipal}
                   </p>
-                  <p className="mt-4 border-t border-gray-200 pt-4 text-sm leading-6 text-gray-600">
-                    {messages.marketing.exampleBusiness}
-                  </p>
                 </div>
 
                 <div className="mt-8 flex flex-col gap-3 sm:flex-row">
@@ -181,22 +178,6 @@ const HomePage = () => {
             </div>
 
           </div>}
-
-          {/* INFO SECTION */}
-          <div className="mt-8 grid gap-4">
-            <section className="rounded-2xl border border-gray-200 bg-white p-6">
-              <h3 className="text-sm font-semibold text-gray-900">
-                {messages.marketing.technologyTitle}
-              </h3>
-              <p className="mt-2 text-sm text-gray-600">
-                {messages.marketing.technologyDescription}
-              </p>
-              <div className="mt-3 text-xs text-gray-500">
-                {messages.marketing.technologyStack}
-              </div>
-            </section>
-          </div>
-
           <footer className="mt-10 rounded-2xl border border-gray-200 bg-gray-900 px-6 py-8 text-white">
             <div className="grid gap-8">
               <div>
