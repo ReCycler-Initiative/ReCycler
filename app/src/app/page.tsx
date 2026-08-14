@@ -183,7 +183,7 @@ const HomePage = () => {
           </div>}
 
           {/* INFO SECTION */}
-          <div className="mt-8 grid gap-4 lg:grid-cols-2">
+          <div className="mt-8 grid gap-4">
             <section className="rounded-2xl border border-gray-200 bg-white p-6">
               <h3 className="text-sm font-semibold text-gray-900">
                 {messages.marketing.technologyTitle}
@@ -193,24 +193,6 @@ const HomePage = () => {
               </p>
               <div className="mt-3 text-xs text-gray-500">
                 {messages.marketing.technologyStack}
-              </div>
-            </section>
-
-            <section className="rounded-2xl border border-gray-200 bg-white p-6">
-              <h3 className="text-sm font-semibold text-gray-900">
-                {messages.marketing.openSourceTitle}
-              </h3>
-              <p className="mt-2 text-sm text-gray-600">
-                {messages.marketing.openSourceDescription}
-              </p>
-              <div className="mt-3">
-                <a
-                  href="https://github.com/ReCycler-Initiative/ReCycler"
-                  className="text-sm font-medium text-gray-900 underline underline-offset-4 hover:text-gray-700"
-                >
-                  {messages.common.openProjectGithub}{" "}
-                  <ExternalLink className="ml-1 inline" size={16} />
-                </a>
               </div>
             </section>
           </div>
