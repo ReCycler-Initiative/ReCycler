@@ -23,12 +23,12 @@ const HomePage = () => {
         <h1 className="text-2xl font-medium mb-4 font-sans">
           {messages.recyclerHome.title}
         </h1>
-        <p className="mb-12 font-sans">
-          {messages.recyclerHome.description}
-        </p>
+        <p className="mb-12 font-sans">{messages.recyclerHome.description}</p>
         <div className="flex flex-col gap-4 items-center">
           <Button className="w-full max-w-96" asChild size="lg">
-            <Link href="/recycler/materials">{messages.recyclerHome.startRecycling}</Link>
+            <Link href="/recycler/materials">
+              {messages.recyclerHome.startRecycling}
+            </Link>
           </Button>
           <Button className="w-full max-w-96" asChild variant="secondary">
             <Link className="no-underline" href="/recycler/results">
@@ -39,21 +39,7 @@ const HomePage = () => {
       </Container>
       {/* Footer */}
       <footer className="w-full mt-16 bg-gray-200 py-4 text-center text-xs">
-        <p className="mb-2">
-          {messages.recyclerHome.footerIntro}{" "}
-          <a
-            href="https://github.com/ReCycler-Initiative/ReCycler"
-            className="text-blue-500 underline"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Github-sivuilta <ExternalLink className="ml-1 inline" size={16} />
-          </a>
-          .{" "}
-        </p>
-        <p>
-          {messages.recyclerHome.footerLicense}
-        </p>
+        <p>{messages.recyclerHome.footerIntro}</p>
       </footer>
     </>
   );
