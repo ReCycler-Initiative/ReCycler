@@ -586,9 +586,7 @@ const baseFi = {
     startRecycling: "Lähde kierrättämään",
     showNearest: "Näytä lähimmät kierrätyspisteet",
     footerIntro:
-      "ReCycler on GitHub-projekti. Lähdekoodi ja lisenssitiedot löytyvät projektin",
-    footerLicense:
-      "Projekti on lisensoitu Apache 2.0 -lisenssillä. Käytetty data on peräisin Kierrätys.info-palvelun rajapinnasta.",
+      "Käytetty data on peräisin Kierrätys.info-palvelun rajapinnasta."
   },
   marketing: {
     heroTitle: "Sijaintipohjaisten palveluiden alusta",
@@ -1274,9 +1272,7 @@ const baseEn = {
     startRecycling: "Start recycling",
     showNearest: "Show nearest recycling points",
     footerIntro:
-      "ReCycler is a GitHub project. Source code and license details are available on the project's",
-    footerLicense:
-      "The project is licensed under Apache 2.0. The data used in the project comes from the Kierratys.info API.",
+      "The data used in the project comes from the Kierratys.info API."
   },
   editor: {
     cancel: "Cancel",

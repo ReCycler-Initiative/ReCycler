@@ -50,16 +50,7 @@ const HomePage = () => {
       {/* Footer */}
       <footer className="w-full mt-16 bg-gray-200 py-4 text-center">
         <p className="text-xs">
-          {messages.recyclerHome.footerIntro}{" "}
-          <a
-            href="https://github.com/ReCycler-Initiative/ReCycler"
-            className="text-blue-500 underline"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            GitHub
-          </a>
-          . {messages.recyclerHome.footerLicense}
+          {messages.recyclerHome.footerIntro}
         </p>
       </footer>
     </>
