@@ -6,8 +6,10 @@ _With ReCycler, it’s easier than you think!_
 
 ReCycler is a modern, flexible platform built to digitize and improve circular economy and recycling workflows. Building upon the data foundation of the existing kierrätys.info (provided by KIVO ry), the ReCycler platform leverages the kierrätys.info API (https://api.kierratys.info/) to obtain basic information about recycling collection spots. Additionally, the service utilizes [Mapbox's](http://www.mapbox.com) mapping and location-based services. The platform is designed to handle multiple recycling and material management use cases efficiently and seamlessly.
 
-## Demo
-You can test the multi-organization and multi–use case demonstration version of ReCycler at: http://www.recyclerapp.fi. Please note that the development version may differ from the source code published on GitHub.
+# Demo
+The demonstration version of ReCycler is available at: http://www.recyclerapp.fi.
+
+> **Note:** Access to the online demo environment requires authentication. If you or your organization would like to request a tailored demonstration or trial access, please contact us directly.
 
 ### Multi-organization and multi–use case support - "ReCycler Platform"
 
