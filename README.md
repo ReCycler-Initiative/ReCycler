@@ -4,46 +4,49 @@
 
 _With ReCycler, it’s easier than you think!_
 
-ReCycler is an open-source platform aimed at creating a more modern and user-centric recycling service, building upon the data foundation of the existing kierrätys.info. The ReCycler platform leverages the kierrätys.info API (https://api.kierratys.info/) to obtain basic information about recycling collection spots. Additionally, the service utilizes [Mapbox's](http://www.mapbox.com) mapping and location-based services. The idea of the platform is to provide solutions to various use cases efficiently and seamlessly.
+ReCycler is a modern, flexible platform built to digitize and improve circular economy and recycling workflows. Building upon the data foundation of the existing kierrätys.info (provided by KIVO ry), the ReCycler platform leverages the kierrätys.info API (https://api.kierratys.info/) to obtain basic information about recycling collection spots. Additionally, the service utilizes [Mapbox's](http://www.mapbox.com) mapping and location-based services. The platform is designed to handle multiple recycling and material management use cases efficiently and seamlessly.
 
 ## Demo
-You can test the development version of ReCycler at: http://www.recyclerapp.fi. Please note that the development version may not be the same as the version published on GitHub.
+You can test the multi-organization and multi–use case demonstration version of ReCycler at: http://www.recyclerapp.fi. Please note that the development version may differ from the source code published on GitHub.
 
-### Multi-organization and multi–use case support - "ReCycler Platform" (Development)
+### Multi-organization and multi–use case support - "ReCycler Platform"
 
-ReCycler Platform is designed to support multiple organizations and a wide range of use cases, each with their own requirements and operating models. The platform is not built for a specific domain or single use case, but as a generic foundation that can be configured and extended for virtually any purpose.
+ReCycler Platform is designed to support multiple organizations and a wide range of use cases, each with their own requirements and operating models. The platform is not built for a single domain or use case, but as a generic foundation that can be configured and extended for virtually any circular economy purpose.
 
-The current development demo (www.recyclerapp.fi) showcases recycling collection points as one example use case, but the underlying platform is not limited to this domain. Core development focuses on building reusable tools and capabilities that enable the creation, configuration, and management of use cases independently of their content or context.
+The demo (www.recyclerapp.fi) showcases recycling collection points using data from KIVO ry as a primary use case, but the underlying platform capability extends beyond this domain. 
 
-The development of these capabilities is ongoing during H2/2026. This includes the implementation of comprehensive user management and administrative tools that allow organizations to:
-
+Core capabilities include generic management tools that allow organizations to:
 
 - Define organization- and use case–specific configurations
-- Add and maintain target objects (e.g, collection spots) and their metadata (attributes)
+- Add and maintain target objects (e.g., collection spots) and their metadata (attributes)
 - Establish connections to new data sources using data connectors
-- Manage users, roles, and access rights securely
-- Auth0 is utilized as the identity and access management (IAM) solution
+- Manage users, roles, and access rights securely (utilizing Auth0 for IAM)
 
-A demo of the multi-organization and multi–use case development version will be released once the required user interface components supporting these generic management capabilities have reached a sufficient level of maturity.
+#### Multilingual Support (FI / EN)
 
-#### AI-assisted guidance UI (Development)
+ReCycler natively supports **multilingual user interfaces and interactions in both Finnish and English**:
 
-The development version of ReCycler includes an AI-powered assistance feature integrated into the user interface. This functionality is designed to help users identify the appropriate service type and location based on their specific need.
+- **UI Localization:** Switch seamlessly between Finnish (`fi`) and English (`en`) interface languages.
+- **Multilingual AI Guidance:** The AI assistant processes inputs, queries, and instructions in both Finnish and English, ensuring accessible guidance for all user groups.
+
+#### AI-assisted guidance UI
+
+The demo version of ReCycler includes an AI-powered assistance feature integrated into the user interface. This functionality is designed to help users identify the appropriate service type and location based on their specific need.
 
 The AI support is capable of:
 
-- Processing text input provided by the user
+- Processing text input provided by the user (Finnish / English)
 - Interpreting spoken input via speech recognition
-- Analyzing images (e.g. photos of items)
+- Analyzing images (e.g., photos of items or waste materials)
 - Understanding the user’s intent and mapping it to the appropriate service type and destination
 - Recommending the most suitable collection point or facility
-- Providing relevant handling instructions
+- Providing relevant handling instructions in the user's preferred language
 - Highlighting nearby locations related to the selected service
 
-The goal of the AI integration is to reduce uncertainty and make responsible action easier. By focusing on user intent and service matching rather than only material classification, the system supports a broader range of circular economy use cases.
+## Contributions & Project Status
+At this stage, the ReCycler core repository is maintained internally and we are not accepting external code contributions or pull requests from third parties. 
 
-## How to contribute
-We welcome contributions from developers, designers, and anyone passionate about sustainable practices. Please follow the guidelines outlined in our [contributing.md](contributing.md) file.
+For feature inquiries or custom deployment requests, please contact the maintainers directly.
 
 ## Architecture documentation
 
@@ -55,25 +58,27 @@ Architecture documents are maintained under [docs/architecture](docs/architectur
 
 ## Installation
 To install the ReCycler application, please take a look at the detailed instructions in the [app](/app/README.md) folders.
+
 ## About licenses, authors and data sources
-Usage of Mapbox is subject to their [Terms of Service](https://www.mapbox.com/legal/tos) and [Attribution Guidelines](https://docs.mapbox.com/help/getting-started/attribution/).
-ReCycler is open-source and distributed under the [AGPL-3.0 license](LICENSE.md). Please feel free to use, modify, and distribute the software according to the terms of the license. This project was originally developed by © [Jussi Niilahti](https://www.linkedin.com/in/jussi-niilahti) and [Pirkka Huhtala](https://www.linkedin.com/in/pirkka-huhtala/).
 
-The recycling collection spots data used in this project is sourced from the [Kierrätys.info service (API)](https://kierratys.info/tietoa-sivustosta).  
-All copyrights related to the Kierrätys.info service and its data are held by KIVO ry (The Association for Finnish Local and Regional Authorities in Waste Management).  
-Use of the data is subject to the terms and conditions of the Kierrätys.info service.
+ReCycler is developed and owned by © [Jussi Niilahti](https://www.linkedin.com/in/jussi-niilahti) and [Pirkka Huhtala](https://www.linkedin.com/in/pirkka-huhtala/).
 
-The map interface in ReCycler uses Mapbox services for rendering and geospatial data.
+The platform is distributed under a **dual-licensing model** (AGPL-3.0 / Commercial License). The core maintainers retain full copyright and ownership of the codebase, including the exclusive right to issue commercial licenses.
 
-Map data and map service © [Mapbox](https://www.mapbox.com/) and its data providers.  
-Usage of Mapbox is subject to their [Terms of Service](https://www.mapbox.com/legal/tos) and [Attribution Guidelines](https://docs.mapbox.com/help/getting-started/attribution/).
+### Data Sources & Copyrights
+- **Kierrätys.info Data:** The recycling collection spot data used in the project demo is sourced from the [Kierrätys.info service (API)](https://kierratys.info/tietoa-sivustosta). All copyrights related to the Kierrätys.info service and its data are held by **KIVO ry** (The Association for Finnish Local and Regional Authorities in Waste Management). Use of the data is subject to the terms and conditions of the Kierrätys.info service.
+- **Mapbox:** The map interface in ReCycler uses Mapbox services for rendering and geospatial data. Map data and map service © [Mapbox](https://www.mapbox.com/) and its data providers. Usage of Mapbox is subject to their [Terms of Service](https://www.mapbox.com/legal/tos) and [Attribution Guidelines](https://docs.mapbox.com/help/getting-started/attribution/).
 
 ## Contact
-For any inquiries or suggestions, please reach out to us through GitHub. You can contact us by creating an issue in the repository, participating in discussions, or submitting pull requests. We value and welcome your contributions and feedback.
+For general questions or commercial inquiries, feel free to reach out via GitHub Issues or contact the maintainers directly.
 
-## ReCycler Platform screenshots (currently in Finnish)
+## ReCycler Platform screenshots (examples)
 
-### 2026-03-12 (Development version)
+### 2026-08-18
+
+#### Admin user interface:
+
+<img src="images/recycler-gui-august2026-admin.png" alt="ReCycler Admin UI (2026-08-18)" width="60%" />
 
 #### Map user interface:
 
@@ -87,20 +92,26 @@ For any inquiries or suggestions, please reach out to us through GitHub. You can
 
 <img src="images/Ai-text-recognition-2026-03-12.png" alt="AI text recognition (2026-03-12)" width="60%" />
 
+---
 
 ## Licensing & Commercial Usage
 
-ReCycler is available under a dual-licensing model:
+ReCycler is available under a **dual-licensing model**:
 
-1. Open Source (GNU AGPLv3): Free for non-commercial, educational, and open-source derivative works under the terms of the [AGPL-3.0 License](./LICENSE). Any derivative work or service hosted over a network (SaaS) must make its source code publicly available under the same AGPLv3 terms.
-2. Commercial License: Required for enterprise use, proprietary software integration, or commercial deployments where AGPLv3 copyleft restrictions (such as mandatory source code disclosure) cannot be applied.
+1. **Open Source (GNU AGPLv3):** Free for non-commercial use, educational projects, academic research, and open-source derivative works under the terms of the [AGPL-3.0 License](LICENSE.md). Any modified version or service hosted over a network (SaaS) must make its source code publicly available under the same AGPLv3 terms.
+2. **Commercial License:** Required for enterprise deployments, proprietary software integration, or commercial SaaS offerings where AGPLv3 copyleft constraints (such as mandatory source code disclosure) cannot be applied.
 
-### Which license fits your needs?
+### License Decision Guide
 
-- Non-commercial / Personal use: Open Source (AGPLv3)
-- Educational & Academic Research: Open Source (AGPLv3)
-- Open-source projects sharing code: Open Source (AGPLv3)
-- Proprietary & Closed-source commercial products: Commercial License Required
-- Commercial SaaS without releasing source code: Commercial License Required
+| Use Case | Applicable License |
+| :--- | :--- |
+| **Personal / Non-commercial projects** | Open Source (AGPLv3) |
+| **Educational & Academic Research** | Open Source (AGPLv3) |
+| **Open-source projects (sharing derivative code)** | Open Source (AGPLv3) |
+| **Proprietary / Closed-source commercial products** | **Commercial License Required** |
+| **Commercial SaaS without releasing source code** | **Commercial License Required** |
 
-For commercial licensing options, enterprise SLAs, or custom deployment terms, please contact: https://www.linkedin.com/in/jussi-niilahti
+### Commercial Licensing & Support
+
+For commercial licensing options, enterprise SLAs, custom deployments, or dual-licensing inquiries, please contact:
+- **Jussi Niilahti:** [LinkedIn Profile](https://www.linkedin.com/in/jussi-niilahti)
