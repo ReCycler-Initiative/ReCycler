@@ -72,7 +72,7 @@ The platform is distributed under a **dual-licensing model** (AGPL-3.0 / Commerc
 ## Contact
 For general questions or commercial inquiries, feel free to reach out via GitHub Issues or contact the maintainers directly.
 
-## ReCycler Platform screenshots (examples)
+## ReCycler Platform screenshots (FI examples)
 
 ### 2026-08-18
 
