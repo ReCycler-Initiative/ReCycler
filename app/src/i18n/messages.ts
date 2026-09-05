@@ -77,6 +77,7 @@ const baseFi = {
   },
   admin: {
     useCaseLabel: "Käyttötapaus",
+    trash: "Roskakori",
     toggleTheme: "Vaihda teema",
     useDarkTheme: "Käytä tummaa teemaa",
     useLightTheme: "Käytä vaaleaa teemaa",
@@ -489,6 +490,9 @@ const baseFi = {
     chooseLogo: "Valitse logo",
     removeLogo: "Poista logo",
     logoInvalid: "Valitse PNG-kuva, jonka koko on enintään 1 Mt.",
+    deleteUseCase: "Siirrä käyttötapaus roskakoriin",
+    deleteUseCaseConfirm:
+      "Siirretäänkö käyttötapaus roskakoriin? Tiedot säilyvät palautettavina 30 päivän ajan.",
     mapCenterLngLabel: "Keskipiste pituusaste (lng)",
     mapCenterLatLabel: "Keskipiste leveysaste (lat)",
     mapZoomLabel: "Aloituszoomi",
@@ -551,6 +555,19 @@ const baseFi = {
       "Kirjoita manuaalisen valinnan välilehden nimi.",
     filterCtaPlaceholder:
       "Kirjoita painikkeen teksti, jolla käyttäjä jatkaa suodatuksen jälkeen.",
+  },
+  adminTrashPage: {
+    title: "Roskakori",
+    description:
+      "Poistetut käyttötapaukset säilyvät täällä 30 päivän ajan, jonka aikana ne voidaan palauttaa ennalleen.",
+    emptyTitle: "Roskakori on tyhjä",
+    emptyDescription:
+      "Poistettuja käyttötapauksia ei ole tällä hetkellä odottamassa palautusta tai pysyvää poistoa.",
+    restoreUseCase: "Palauta käyttötapaus",
+    restoreFailed: "Käyttötapauksen palautus epäonnistui.",
+    deletedAt: "Poistettu",
+    scheduledPurgeAt: "Pysyvä poisto",
+    openActiveUseCase: "Avaa aktiivinen käyttötapaus",
   },
   adminGeneralInfo: {
     title: "Organisaation tiedot",
@@ -1285,6 +1302,9 @@ const baseEn = {
     chooseLogo: "Choose logo",
     removeLogo: "Remove logo",
     logoInvalid: "Choose a PNG image no larger than 1 MB.",
+    deleteUseCase: "Move use case to trash",
+    deleteUseCaseConfirm:
+      "Move this use case to the trash? Its data will remain recoverable for 30 days.",
     mapCenterLngLabel: "Center longitude (lng)",
     mapCenterLatLabel: "Center latitude (lat)",
     mapZoomLabel: "Initial zoom",
@@ -1347,6 +1367,19 @@ const baseEn = {
       "Write the manual selection tab label.",
     filterCtaPlaceholder:
       "Write the button text users use to continue after filtering.",
+  },
+  adminTrashPage: {
+    title: "Trash",
+    description:
+      "Deleted use cases stay here for 30 days and can be restored during that period.",
+    emptyTitle: "Trash is empty",
+    emptyDescription:
+      "There are no deleted use cases waiting for restoration or permanent removal.",
+    restoreUseCase: "Restore use case",
+    restoreFailed: "Failed to restore the use case.",
+    deletedAt: "Deleted",
+    scheduledPurgeAt: "Permanent deletion",
+    openActiveUseCase: "Open active use case",
   },
   adminGeneralInfo: {
     title: "Organization details",

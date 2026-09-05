@@ -39,6 +39,7 @@ import {
   ScrollText,
   SettingsIcon,
   Sun,
+  Trash2,
 } from "lucide-react";
 import Link from "next/link";
 import { useParams, usePathname, useRouter } from "next/navigation";
@@ -63,7 +64,7 @@ const Content = ({
 }: {
   children: React.ReactNode;
   organization: any;
-  selectedUseCaseId: string;
+  selectedUseCaseId?: string;
 }) => {
   const messages = useMessages();
   const { id } = useParams<{ id: string }>();
@@ -130,7 +131,14 @@ const Content = ({
     queryFn: () => getUseCases(id),
   });
 
-  const orgRootPath = `/admin/organizations/${id}/use_cases/${selectedUseCaseId}`;
+  const fallbackUseCaseId =
+    selectedUseCaseId && useCasesQuery.data?.some((useCase) => useCase.id === selectedUseCaseId)
+      ? selectedUseCaseId
+      : useCasesQuery.data?.[0]?.id;
+  const selectedUseCasePath = fallbackUseCaseId
+    ? `/admin/organizations/${id}/use_cases/${fallbackUseCaseId}`
+    : null;
+  const trashPath = `/admin/organizations/${id}/use_cases/trash`;
   const selectedUseCase = useCasesQuery.data?.find(
     (useCase) => useCase.id === selectedUseCaseId
   );
@@ -152,30 +160,33 @@ const Content = ({
         : "text-gray-700 hover:bg-gray-100"
     );
 
-  const navLinks: NavLink[] = [
-    {
-      exact: true,
-      href: `${orgRootPath}`,
-      label: organization.name,
-      icon: AppWindow,
-    },
-    {
-      href: `${orgRootPath}/location-types`,
-      label: messages.admin.fields,
-      icon: Blocks,
-    },
-    {
-      href: `${orgRootPath}/datasources`,
-      label: messages.admin.datasources,
-      icon: Database,
-    },
-    {
-      href: `${orgRootPath}/locations`,
-      label: messages.admin.locations,
-      icon: MapPin,
-    },
-    { href: `${orgRootPath}/ai`, label: messages.admin.ai, icon: Bot },
-  ];
+  const navLinks: NavLink[] = selectedUseCasePath
+    ? [
+        {
+          exact: true,
+          href: selectedUseCasePath,
+          label: organization.name,
+          icon: AppWindow,
+        },
+        {
+          href: `${selectedUseCasePath}/location-types`,
+          label: messages.admin.fields,
+          icon: Blocks,
+        },
+        {
+          href: `${selectedUseCasePath}/datasources`,
+          label: messages.admin.datasources,
+          icon: Database,
+        },
+        {
+          href: `${selectedUseCasePath}/locations`,
+          label: messages.admin.locations,
+          icon: MapPin,
+        },
+        { href: `${selectedUseCasePath}/ai`, label: messages.admin.ai, icon: Bot },
+        { href: trashPath, label: messages.admin.trash, icon: Trash2 },
+      ]
+    : [{ exact: true, href: trashPath, label: messages.admin.trash, icon: Trash2 }];
 
   return (
     <div
@@ -237,15 +248,25 @@ const Content = ({
                   </DropdownMenuItem>
                 )}
                 <DropdownMenuSeparator />
-                <DropdownMenuItem asChild>
-                  <Link href={`${orgRootPath}/general_info`} onClick={() => setIsMobileNavOpen(false)}>
-                    <AppWindow className="mr-2 h-4 w-4 text-slate-500" />
-                    {messages.admin.organizationDetails}
-                  </Link>
-                </DropdownMenuItem>
+                {selectedUseCasePath && (
+                  <DropdownMenuItem asChild>
+                    <Link href={`${selectedUseCasePath}/general_info`} onClick={() => setIsMobileNavOpen(false)}>
+                      <AppWindow className="mr-2 h-4 w-4 text-slate-500" />
+                      {messages.admin.organizationDetails}
+                    </Link>
+                  </DropdownMenuItem>
+                )}
+                {selectedUseCasePath && (
+                  <DropdownMenuItem asChild>
+                    <Link href={trashPath} onClick={() => setIsMobileNavOpen(false)}>
+                      <Trash2 className="mr-2 h-4 w-4 text-slate-500" />
+                      {messages.admin.trash}
+                    </Link>
+                  </DropdownMenuItem>
+                )}
                 {selectedUseCaseId && (
                   <DropdownMenuItem asChild>
-                    <Link href={`${orgRootPath}/edit`} onClick={() => setIsMobileNavOpen(false)}>
+                    <Link href={`${selectedUseCasePath}/edit`} onClick={() => setIsMobileNavOpen(false)}>
                       <BriefcaseBusiness className="mr-2 h-4 w-4 text-slate-500" />
                       {messages.admin.useCaseDetails}
                     </Link>
@@ -253,7 +274,7 @@ const Content = ({
                 )}
                 {selectedUseCaseId && (
                   <DropdownMenuItem asChild>
-                    <Link href={`${orgRootPath}/usage`} onClick={() => setIsMobileNavOpen(false)}>
+                    <Link href={`${selectedUseCasePath}/usage`} onClick={() => setIsMobileNavOpen(false)}>
                       <ChartColumn className="mr-2 h-4 w-4 text-slate-500" />
                       {messages.admin.usageStats}
                     </Link>
@@ -261,7 +282,7 @@ const Content = ({
                 )}
                 {selectedUseCaseId && (
                   <DropdownMenuItem asChild>
-                    <Link href={`${orgRootPath}/runs`} onClick={() => setIsMobileNavOpen(false)}>
+                    <Link href={`${selectedUseCasePath}/runs`} onClick={() => setIsMobileNavOpen(false)}>
                       <ScrollText className="mr-2 h-4 w-4 text-slate-500" />
                       {messages.admin.logs}
                     </Link>
@@ -269,7 +290,7 @@ const Content = ({
                 )}
                 {selectedUseCaseId && (
                   <DropdownMenuItem asChild>
-                    <Link href={`${orgRootPath}/api`} onClick={() => setIsMobileNavOpen(false)}>
+                    <Link href={`${selectedUseCasePath}/api`} onClick={() => setIsMobileNavOpen(false)}>
                       <Code2 className="mr-2 h-4 w-4 text-slate-500" />
                       {messages.admin.apiDocumentation}
                     </Link>
@@ -376,16 +397,18 @@ const Content = ({
                 adminTheme === "dark" && "admin-settings-menu--dark"
               )}
             >
-              <DropdownMenuItem asChild>
-                <Link href={`${orgRootPath}/general_info`}>
-                  <AppWindow className="mr-2 h-4 w-4 text-slate-500" />
-                  {messages.admin.organizationDetails}
-                </Link>
-              </DropdownMenuItem>
+              {selectedUseCasePath && (
+                <DropdownMenuItem asChild>
+                  <Link href={`${selectedUseCasePath}/general_info`}>
+                    <AppWindow className="mr-2 h-4 w-4 text-slate-500" />
+                    {messages.admin.organizationDetails}
+                  </Link>
+                </DropdownMenuItem>
+              )}
 
               {selectedUseCaseId && (
                 <DropdownMenuItem asChild>
-                  <Link href={`${orgRootPath}/edit`}>
+                  <Link href={`${selectedUseCasePath}/edit`}>
                     <BriefcaseBusiness className="mr-2 h-4 w-4 text-slate-500" />
                     {messages.admin.useCaseDetails}
                   </Link>
@@ -394,7 +417,7 @@ const Content = ({
 
               {selectedUseCaseId && (
                 <DropdownMenuItem asChild>
-                  <Link href={`${orgRootPath}/usage`}>
+                  <Link href={`${selectedUseCasePath}/usage`}>
                     <ChartColumn className="mr-2 h-4 w-4 text-slate-500" />
                     {messages.admin.usageStats}
                   </Link>
@@ -403,7 +426,7 @@ const Content = ({
 
               {selectedUseCaseId && (
                 <DropdownMenuItem asChild>
-                  <Link href={`${orgRootPath}/runs`}>
+                  <Link href={`${selectedUseCasePath}/runs`}>
                     <ScrollText className="mr-2 h-4 w-4 text-slate-500" />
                     {messages.admin.logs}
                   </Link>
@@ -412,12 +435,19 @@ const Content = ({
 
               {selectedUseCaseId && (
                 <DropdownMenuItem asChild>
-                  <Link href={`${orgRootPath}/api`}>
+                  <Link href={`${selectedUseCasePath}/api`}>
                     <Code2 className="mr-2 h-4 w-4 text-slate-500" />
                     {messages.admin.apiDocumentation}
                   </Link>
                 </DropdownMenuItem>
               )}
+
+              <DropdownMenuItem asChild>
+                <Link href={trashPath}>
+                  <Trash2 className="mr-2 h-4 w-4 text-slate-500" />
+                  {messages.admin.trash}
+                </Link>
+              </DropdownMenuItem>
 
             </DropdownMenuContent>
             </DropdownMenu>

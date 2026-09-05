@@ -175,7 +175,11 @@ const UseCaseInfoPage = () => {
                     }
 
                     await deleteUseCase(id, useCaseId);
-                    router.push(`/admin/organizations/${id}`);
+                    await Promise.all([
+                      queryClient.invalidateQueries({ queryKey: ["use_cases", id] }),
+                      queryClient.invalidateQueries({ queryKey: ["deleted_use_cases", id] }),
+                    ]);
+                    router.push(`/admin/organizations/${id}/use_cases/trash`);
                   }}
                 >
                   {messages.adminUseCaseEditor.deleteUseCase}

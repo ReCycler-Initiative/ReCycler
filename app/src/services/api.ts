@@ -155,6 +155,13 @@ export const getUseCases = (
     .get(`/api/organizations/${organizationId}/use_cases`)
     .then((response) => response.data);
 
+export const getDeletedUseCases = (
+  organizationId: string
+): Promise<Array<z.infer<typeof UseCase>>> =>
+  axios
+    .get(`/api/organizations/${organizationId}/use_cases/trash`)
+    .then((response) => z.array(UseCase).parse(response.data));
+
 export const getUseCaseById = (
   organizationId: string,
   useCaseId: string
@@ -182,6 +189,14 @@ export const deleteUseCase = async (
     `/api/organizations/${organizationId}/use_cases/${useCaseId}`
   );
 };
+
+export const restoreUseCase = (
+  organizationId: string,
+  useCaseId: string
+): Promise<z.infer<typeof UseCase>> =>
+  axios
+    .post(`/api/organizations/${organizationId}/use_cases/${useCaseId}/restore`)
+    .then((response) => UseCase.parse(response.data));
 
 export const createUseCase = (
   organizationId: string,
