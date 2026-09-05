@@ -16,6 +16,7 @@ function isPublicRoute(pathname: string) {
     pathname.startsWith("/organizations/") ||
     pathname === "/api/materials" ||
     pathname === "/api/collection_spots" ||
+    pathname.startsWith("/api/v1/export/") ||
     pathname.startsWith("/api/chat") ||
     pathname === "/recycler-login" ||
     pathname.startsWith("/api/recycler-auth") ||

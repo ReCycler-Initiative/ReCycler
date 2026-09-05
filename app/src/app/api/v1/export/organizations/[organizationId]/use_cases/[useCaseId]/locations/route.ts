@@ -1,4 +1,4 @@
-import { checkOrganizationAuthorization } from "@/lib/authorization";
+import { checkExportAuthorization } from "@/lib/export-authorization";
 import db from "@/services/db";
 import { DbLocation } from "@/types";
 import { NextRequest, NextResponse } from "next/server";
@@ -9,7 +9,7 @@ export async function GET(
   { params }: { params: Promise<{ organizationId: string; useCaseId: string }> }
 ) {
   const { organizationId, useCaseId } = await params;
-  const authorization = await checkOrganizationAuthorization(
+  const authorization = await checkExportAuthorization(
     request,
     organizationId
   );

@@ -6,6 +6,7 @@ import {
   Bot,
   ChartColumn,
   Database,
+  Code2,
   MapPin,
   ScrollText,
   Sparkles,
@@ -50,6 +51,12 @@ const UseCaseHomePage = () => {
       icon: ChartColumn,
       label: messages.admin.usageStats,
       description: messages.admin.usageStatsIntro,
+    },
+    {
+      href: `${rootPath}/api`,
+      icon: Code2,
+      label: messages.admin.apiDocumentation,
+      description: messages.admin.apiPage.description,
     },
     {
       href: `${rootPath}/runs`,

@@ -31,6 +31,7 @@ import {
   ChartColumn,
   Blocks,
   Bot,
+  Code2,
   Database,
   ExternalLink,
   MapPin,
@@ -170,6 +171,11 @@ const Content = ({
       icon: MapPin,
     },
     { href: `${orgRootPath}/ai`, label: messages.admin.ai, icon: Bot },
+    {
+      href: `${orgRootPath}/api`,
+      label: messages.admin.apiDocumentation,
+      icon: Code2,
+    },
   ];
 
   return (
@@ -241,6 +247,14 @@ const Content = ({
                     <Link href={`${orgRootPath}/runs`} onClick={() => setIsMobileNavOpen(false)}>
                       <ScrollText className="mr-2 h-4 w-4 text-slate-500" />
                       {messages.admin.logs}
+                    </Link>
+                  </DropdownMenuItem>
+                )}
+                {selectedUseCaseId && (
+                  <DropdownMenuItem asChild>
+                    <Link href={`${orgRootPath}/api`} onClick={() => setIsMobileNavOpen(false)}>
+                      <Code2 className="mr-2 h-4 w-4 text-slate-500" />
+                      {messages.admin.apiDocumentation}
                     </Link>
                   </DropdownMenuItem>
                 )}
@@ -375,6 +389,15 @@ const Content = ({
                   <Link href={`${orgRootPath}/runs`}>
                     <ScrollText className="mr-2 h-4 w-4 text-slate-500" />
                     {messages.admin.logs}
+                  </Link>
+                </DropdownMenuItem>
+              )}
+
+              {selectedUseCaseId && (
+                <DropdownMenuItem asChild>
+                  <Link href={`${orgRootPath}/api`}>
+                    <Code2 className="mr-2 h-4 w-4 text-slate-500" />
+                    {messages.admin.apiDocumentation}
                   </Link>
                 </DropdownMenuItem>
               )}

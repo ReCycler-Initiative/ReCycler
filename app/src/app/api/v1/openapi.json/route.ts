@@ -20,9 +20,11 @@ Read-only API for exporting recycling locations from ReCycler in GeoJSON format.
 
 ## Authentication
 
-This API uses the current browser's Auth0 session. Open this documentation page while signed in to ReCycler, then select **Try it out**, enter the organization and use case IDs, and select **Execute**. Swagger sends the existing session cookie automatically.
+This API supports two authentication methods. For browser testing, open this documentation page while signed in to ReCycler; Swagger sends the existing session cookie automatically. For another application, request an Auth0 Machine-to-Machine access token with the \
+\`client_credentials\` grant and send it as a Bearer token.
 
-No API key or Bearer token is currently supported. A request returns data only when the signed-in user belongs to the requested organization.
+Both methods return data only when the identity is authorized for the requested organization. The M2M client must have the \
+\`read:locations\` permission and be mapped to the ReCycler organization by the server configuration.
 
 ## Finding IDs
 
@@ -44,7 +46,7 @@ Open the organization's use case in ReCycler administration. The browser address
           description:
             "Returns all recycling locations for one use case as a GeoJSON FeatureCollection. Use **Try it out** and enter the IDs from the ReCycler administration URL. The signed-in user must be a member of the requested organization.",
           tags: ["Locations"],
-          security: [{ sessionCookie: [] }],
+          security: [{ sessionCookie: [] }, { bearerAuth: [] }],
           parameters: [
             {
               name: "organizationId",
@@ -99,10 +101,12 @@ Open the organization's use case in ReCycler administration. The browser address
               },
             },
             "401": {
-              description: "Authentication is required. Sign in to ReCycler and retry the request.",
+              description:
+                "Authentication is required. Sign in to ReCycler for browser testing, or send a valid Auth0 M2M Bearer token.",
             },
             "403": {
-              description: "The signed-in user is not a member of the requested organization.",
+              description:
+                "The authenticated user or M2M client is not authorized for the requested organization.",
             },
             "500": {
               description: "The organization access check or data retrieval failed.",
@@ -119,6 +123,13 @@ Open the organization's use case in ReCycler administration. The browser address
           name: "appSession",
           description:
             "Authentication is handled by the ReCycler Auth0 browser session. Sign in before using Try it out; do not enter a value here.",
+        },
+        bearerAuth: {
+          type: "http",
+          scheme: "bearer",
+          bearerFormat: "JWT",
+          description:
+            "For server-to-server use. Obtain an Auth0 Machine-to-Machine token with the client_credentials grant and the read:locations permission.",
         },
       },
       schemas: {

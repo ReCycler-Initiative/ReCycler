@@ -87,6 +87,7 @@ const baseFi = {
     ai: "Tekoäly",
     usageStats: "Käyttötilastot",
     logs: "Lokit",
+    apiDocumentation: "API-dokumentaatio",
     useCaseHomeTitle: "Määritä käyttötapaus ja sen data",
     useCaseHomeBadge: "Käyttötapauksen aloitusnäkymä",
     useCaseHomeDescription:
@@ -110,6 +111,42 @@ const baseFi = {
     usageStatsTitle: "Käyttötilastot",
     usageStatsIntro:
       "Tähän näkymään voidaan koota käyttötapauksen käyttödata, hakujen määrät ja tekoälyn käytön seuranta.",
+    apiPage: {
+      title: "API-dokumentaatio",
+      description:
+        "Lataa tämän käyttötapauksen kierrätyspisteet ulkoiseen järjestelmään GeoJSON-muodossa.",
+      endpointTitle: "Vientirajapinta",
+      endpointDescription:
+        "Rajapinta palauttaa tämän käyttötapauksen kohteet ja niiden kenttätiedot GeoJSON-muodossa.",
+      swaggerButton: "Avaa Swagger",
+      copyButton: "Kopioi osoite",
+      copied: "Osoite kopioitu",
+      howToTitle: "Rajapinnan käyttötavat",
+      howToSteps: [
+        "Selain ja Swagger: kirjaudu ReCycleriin, avaa Swagger, valitse Try it out, syötä tunnisteet ja valitse Execute.",
+        "Postman tai toinen applikaatio: hae Auth0:lta client_credentials-virralla Bearer-token ja lähetä se Authorization-otsakkeessa.",
+        "Käytä tässä sivussa näkyviä organizationId- ja useCaseId-tunnisteita. Ne löytyvät myös hallintasivun osoitteesta.",
+        "Vastaus palautuu GeoJSON-muodossa. Käyttöoikeus rajaa datan kyseiseen organisaatioon ja käyttötapaukseen.",
+      ],
+      authenticationNote:
+        "Rajapinta tukee selaimen Auth0-istuntoa sekä Auth0 Machine-to-Machine -Bearer-tokenia. Tokenin pitää sisältää read:locations-oikeus, ja sen client pitää olla yhdistetty tähän organisaatioon.",
+      currentAuthTitle: "Toimii nyt: selain ja Auth0",
+      currentAuthBody:
+        "Kirjaudu ReCycleriin tällä selaimella. Swagger käyttää kirjautuneen selaimen istuntoa automaattisesti, ja data palautetaan vain organisaatioista, joihin sinulla on käyttöoikeus.",
+      futureAuthTitle: "Palvelinten välinen käyttö",
+      futureAuthBody:
+        "ERP, raportointipalvelu tai Postman voi hakea datan ilman selainkirjautumista Auth0:n myöntämällä Bearer-tokenilla. Pääsy rajataan tokenin clientin ja organisaation välisen käyttöoikeuden perusteella.",
+      postmanTitle: "Testaus Postmanilla",
+      postmanBody:
+        "Postman on yksi työkalu, jolla rajapintaa voi testata. Kun dataa haetaan ReCyclerin ulkopuolisesta ohjelmasta tai järjestelmästä, kyseinen ohjelma hakee Auth0:lta access tokenin omilla sovellustunnuksillaan ja lähettää sen Authorization-otsakkeessa. Auth0:n ja ReCyclerin palvelinasetusten pitää olla määritetty ennen käyttöä. Selainkirjautumista tai appSession-evästettä ei tarvita.",
+      tokenRequestTitle: "1. Hae access token Auth0:lta",
+      apiRequestTitle: "2. Kutsu ReCycler API:a tokenilla",
+      secretWarning:
+        "Client secret kuuluu vain palvelimen salaisuuksiin. Älä tallenna sitä selaimeen tai tälle sivulle.",
+      idsTitle: "Tämän käyttötapauksen tunnisteet",
+      organizationId: "Organisaation tunniste",
+      useCaseId: "Käyttötapauksen tunniste",
+    },
     usageStatsCards: [
       {
         title: "Suosituimmat haut",
@@ -855,6 +892,7 @@ const baseEn = {
     ai: "AI",
     usageStats: "Usage statistics",
     logs: "Logs",
+    apiDocumentation: "API documentation",
     useCaseHomeTitle: "Configure the use case and its data",
     useCaseHomeBadge: "Use case overview",
     useCaseHomeDescription:
@@ -878,6 +916,42 @@ const baseEn = {
     usageStatsTitle: "Usage statistics",
     usageStatsIntro:
       "This view can later collect usage data for the use case, including searches, traffic, and AI assistance patterns.",
+    apiPage: {
+      title: "API documentation",
+      description:
+        "Export this use case's recycling locations to an external system in GeoJSON format.",
+      endpointTitle: "Export API",
+      endpointDescription:
+        "The API returns this use case's locations and their field data in GeoJSON format.",
+      swaggerButton: "Open Swagger",
+      copyButton: "Copy URL",
+      copied: "URL copied",
+      howToTitle: "Ways to use the API",
+      howToSteps: [
+        "Browser and Swagger: sign in to ReCycler, open Swagger, select Try it out, enter the IDs, and select Execute.",
+        "Postman or another application: request a Bearer token from Auth0 using the client_credentials flow and send it in the Authorization header.",
+        "Use the organizationId and useCaseId shown on this page. They are also available in the administration URL.",
+        "The response is returned in GeoJSON format. Authorization limits the data to the organization and use case.",
+      ],
+      authenticationNote:
+        "The API supports both the browser Auth0 session and an Auth0 Machine-to-Machine Bearer token. The token must include read:locations, and its client must be mapped to this organization.",
+      currentAuthTitle: "Available now: browser and Auth0",
+      currentAuthBody:
+        "Sign in to ReCycler in this browser. Swagger uses the signed-in browser session automatically, and data is returned only for organizations you can access.",
+      futureAuthTitle: "Server-to-server access",
+      futureAuthBody:
+        "An ERP, reporting service, or Postman can request data without a browser login by using an Auth0-issued Bearer token. Access is restricted through the token client's organization mapping.",
+      postmanTitle: "Testing with Postman",
+      postmanBody:
+        "Postman is one tool for testing the server-to-server API. Request a Bearer token from Auth0 with the client_credentials flow and send it in the Authorization header. Auth0 and ReCycler server settings must be configured first. No browser login or appSession cookie is needed.",
+      tokenRequestTitle: "1. Get an access token from Auth0",
+      apiRequestTitle: "2. Call the ReCycler API with the token",
+      secretWarning:
+        "The client secret belongs only in server-side secrets. Do not store it in browser code or on this page.",
+      idsTitle: "IDs for this use case",
+      organizationId: "Organization ID",
+      useCaseId: "Use case ID",
+    },
     usageStatsCards: [
       {
         title: "Top searches",
