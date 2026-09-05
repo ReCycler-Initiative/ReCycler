@@ -4,6 +4,7 @@ export function mapDbRowToUseCase(row: any) {
   return {
     ...row,
     map_settings: row.map_settings ?? null,
+    logo_url: row.logo_url ?? null,
     content: {
       intro: {
         title: parseStoredLocalizedText(row.intro_title || ""),

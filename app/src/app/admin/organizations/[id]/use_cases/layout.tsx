@@ -47,6 +47,7 @@ import { PageLoadingSpinner } from "@/components/page-loading-spinner";
 import { useMessages } from "@/i18n/locale-provider";
 import { LucideIcon } from "lucide-react";
 import { CreateUseCaseDialog } from "@/components/dialogs/create-use-case-dialog";
+import Image from "next/image";
 
 type NavLink = {
   exact?: boolean;
@@ -130,6 +131,9 @@ const Content = ({
   });
 
   const orgRootPath = `/admin/organizations/${id}/use_cases/${selectedUseCaseId}`;
+  const selectedUseCase = useCasesQuery.data?.find(
+    (useCase) => useCase.id === selectedUseCaseId
+  );
 
   const isActiveSection = (segment: string, exact?: boolean) => {
     if (exact) {
@@ -178,7 +182,25 @@ const Content = ({
       className="admin-shell flex flex-col h-full bg-white text-slate-950"
       data-admin-theme={adminTheme}
     >
-      <TitleBar logo={null} toHomeHref="/">
+      <TitleBar
+        logo={
+          selectedUseCase?.logo_url ? (
+            <Image
+              src={selectedUseCase.logo_url}
+              alt={selectedUseCase.name}
+              width={150}
+              height={40}
+              className="h-10 w-auto max-w-[150px] object-contain object-left"
+              unoptimized
+            />
+          ) : (
+            <span className="ml-2 whitespace-nowrap font-bold">
+              {selectedUseCase?.name ?? organization.name}
+            </span>
+          )
+        }
+        toHomeHref="/"
+      >
         <div className="flex h-full min-w-0 flex-1 items-center gap-x-2 lg:gap-x-4 overflow-hidden">
           {!isDesktopNav && (
             <DropdownMenu open={isMobileNavOpen} onOpenChange={setIsMobileNavOpen}>

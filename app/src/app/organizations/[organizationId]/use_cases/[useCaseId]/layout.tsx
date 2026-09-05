@@ -9,6 +9,7 @@ import { getUseCaseById } from "@/services/api";
 import { useQuery } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
+import Image from "next/image";
 
 const OrganizationLayout = ({ children }: { children: React.ReactNode }) => {
   const messages = useMessages();
@@ -48,9 +49,20 @@ const OrganizationLayout = ({ children }: { children: React.ReactNode }) => {
     <>
       <TitleBar
         logo={
-          <span className="font-bold ml-2 whitespace-nowrap">
-            {useCaseQuery.data?.name}
-          </span>
+          useCaseQuery.data?.logo_url ? (
+            <Image
+              src={useCaseQuery.data.logo_url}
+              alt={useCaseQuery.data.name}
+              width={150}
+              height={40}
+              className="h-10 w-auto max-w-[150px] object-contain object-left"
+              unoptimized
+            />
+          ) : (
+            <span className="font-bold ml-2 whitespace-nowrap">
+              {useCaseQuery.data?.name}
+            </span>
+          )
         }
         toHomeHref={`/organizations/${params.organizationId}/use_cases/${params.useCaseId}`}
       >

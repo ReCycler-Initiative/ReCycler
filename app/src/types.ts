@@ -163,6 +163,7 @@ export const NewOrganization = z.object({
 
 export const NewUseCase = z.object({
   description: z.string().max(2000),
+  logo_url: z.string().max(1400000).nullable().optional(),
   map_settings: z
     .object({
       initial_center: z.tuple([
@@ -293,6 +294,7 @@ export type UseCaseMapSettings = NonNullable<z.infer<typeof NewUseCase>["map_set
 export const UseCase = NewUseCase.merge(
   z.object({
     id: z.string().uuid(),
+    logo_url: z.string().max(1400000).nullable().optional(),
     created_at: z.coerce.date().optional(),
     content: z.object({
       intro: z.object({

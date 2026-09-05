@@ -18,12 +18,16 @@ import { useParams } from "next/navigation";
 import { z } from "zod";
 import { PageTemplate } from "@/components/admin/page-template";
 import { PageIntro } from "@/components/admin/page-intro";
+import Image from "next/image";
+import { useRef, useState } from "react";
 
 const UseCaseInfoPage = () => {
   const { locale } = useLocale();
   const messages = useMessages();
   const queryClient = useQueryClient();
   const { id, useCaseId } = useParams<{ id: string; useCaseId: string }>();
+  const logoInputRef = useRef<HTMLInputElement | null>(null);
+  const [logoError, setLogoError] = useState(false);
 
   const editor = useEditor<z.infer<typeof UseCase>, z.infer<typeof UseCase>>({
     defaultValues: {
@@ -87,6 +91,65 @@ const UseCaseInfoPage = () => {
                 label={messages.adminUseCaseEditor.descriptionLabel}
                 name="description"
               />
+              <div className="space-y-2 rounded-lg border border-gray-200 p-4">
+                <label className="text-sm font-medium text-slate-900">
+                  {messages.adminUseCaseEditor.logoLabel}
+                </label>
+                <p className="text-sm text-muted-foreground">
+                  {messages.adminUseCaseEditor.logoHelp}
+                </p>
+                {editor.form.watch("logo_url") && (
+                  <Image
+                    src={editor.form.watch("logo_url")!}
+                    alt={messages.adminUseCaseEditor.logoLabel}
+                    width={150}
+                    height={40}
+                    className="h-10 w-auto max-w-[150px] object-contain object-left"
+                    unoptimized
+                  />
+                )}
+                <div className="flex flex-wrap gap-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => logoInputRef.current?.click()}
+                  >
+                    {messages.adminUseCaseEditor.chooseLogo}
+                  </Button>
+                  {editor.form.watch("logo_url") && (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      onClick={() => editor.form.setValue("logo_url", null, { shouldDirty: true })}
+                    >
+                      {messages.adminUseCaseEditor.removeLogo}
+                    </Button>
+                  )}
+                </div>
+                <input
+                  ref={logoInputRef}
+                  type="file"
+                  accept="image/png"
+                  className="hidden"
+                  onChange={(event) => {
+                    const file = event.target.files?.[0];
+                    event.target.value = "";
+                    if (!file || file.type !== "image/png" || file.size > 1024 * 1024) {
+                      setLogoError(true);
+                      return;
+                    }
+                    setLogoError(false);
+                    const reader = new FileReader();
+                    reader.onload = () => {
+                      if (typeof reader.result === "string") {
+                        editor.form.setValue("logo_url", reader.result, { shouldDirty: true });
+                      }
+                    };
+                    reader.readAsDataURL(file);
+                  }}
+                />
+                {logoError && <p className="text-sm text-red-600">{messages.adminUseCaseEditor.logoInvalid}</p>}
+              </div>
             </div>
           </TabsContent>
 
