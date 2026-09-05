@@ -171,11 +171,6 @@ const Content = ({
       icon: MapPin,
     },
     { href: `${orgRootPath}/ai`, label: messages.admin.ai, icon: Bot },
-    {
-      href: `${orgRootPath}/api`,
-      label: messages.admin.apiDocumentation,
-      icon: Code2,
-    },
   ];
 
   return (
