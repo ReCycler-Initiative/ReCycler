@@ -114,19 +114,23 @@ const UseCaseInfoPage = () => {
                     <FormInput
                       label={messages.adminUseCaseEditor.titleLabel}
                       name="content.intro.title.fi"
+                      placeholder={messages.adminUseCaseEditor.introTitlePlaceholder}
                     />
                     <FormTextArea
                       label={messages.adminUseCaseEditor.bodyLabel}
                       name="content.intro.text.fi"
+                      placeholder={messages.adminUseCaseEditor.introBodyPlaceholder}
                       textareaClassName="min-h-40 resize-y"
                     />
                     <FormInput
                       label={messages.adminUseCaseEditor.ctaLabel}
                       name="content.intro.cta.fi"
+                      placeholder={messages.adminUseCaseEditor.introCtaPlaceholder}
                     />
                     <FormInput
                       label={messages.adminUseCaseEditor.skipTextLabel}
                       name="content.intro.skip.fi"
+                      placeholder={messages.adminUseCaseEditor.introSkipPlaceholder}
                     />
                   </TabsContent>
 
@@ -134,19 +138,23 @@ const UseCaseInfoPage = () => {
                     <FormInput
                       label={messages.adminUseCaseEditor.titleLabel}
                       name="content.intro.title.en"
+                      placeholder={messages.adminUseCaseEditor.introTitlePlaceholder}
                     />
                     <FormTextArea
                       label={messages.adminUseCaseEditor.bodyLabel}
                       name="content.intro.text.en"
+                      placeholder={messages.adminUseCaseEditor.introBodyPlaceholder}
                       textareaClassName="min-h-40 resize-y"
                     />
                     <FormInput
                       label={messages.adminUseCaseEditor.ctaLabel}
                       name="content.intro.cta.en"
+                      placeholder={messages.adminUseCaseEditor.introCtaPlaceholder}
                     />
                     <FormInput
                       label={messages.adminUseCaseEditor.skipTextLabel}
                       name="content.intro.skip.en"
+                      placeholder={messages.adminUseCaseEditor.introSkipPlaceholder}
                     />
                   </TabsContent>
                 </Tabs>
@@ -173,23 +181,28 @@ const UseCaseInfoPage = () => {
                     <FormInput
                       label={messages.adminUseCaseEditor.titleLabel}
                       name="content.filters.title.fi"
+                      placeholder={messages.adminUseCaseEditor.filterTitlePlaceholder}
                     />
                     <FormTextArea
                       label={messages.adminUseCaseEditor.bodyLabel}
                       name="content.filters.text.fi"
+                      placeholder={messages.adminUseCaseEditor.filterBodyPlaceholder}
                       textareaClassName="min-h-40 resize-y"
                     />
                     <FormInput
                       label={messages.adminUseCaseEditor.aiTabTextLabel}
                       name="content.filters.tab_ai.fi"
+                      placeholder={messages.adminUseCaseEditor.aiTabTextPlaceholder}
                     />
                     <FormInput
                       label={messages.adminUseCaseEditor.manualTabTextLabel}
                       name="content.filters.tab_manual.fi"
+                      placeholder={messages.adminUseCaseEditor.manualTabTextPlaceholder}
                     />
                     <FormInput
                       label={messages.adminUseCaseEditor.ctaLabel}
                       name="content.filters.cta.fi"
+                      placeholder={messages.adminUseCaseEditor.filterCtaPlaceholder}
                     />
                   </TabsContent>
 
@@ -197,23 +210,28 @@ const UseCaseInfoPage = () => {
                     <FormInput
                       label={messages.adminUseCaseEditor.titleLabel}
                       name="content.filters.title.en"
+                      placeholder={messages.adminUseCaseEditor.filterTitlePlaceholder}
                     />
                     <FormTextArea
                       label={messages.adminUseCaseEditor.bodyLabel}
                       name="content.filters.text.en"
+                      placeholder={messages.adminUseCaseEditor.filterBodyPlaceholder}
                       textareaClassName="min-h-40 resize-y"
                     />
                     <FormInput
                       label={messages.adminUseCaseEditor.aiTabTextLabel}
                       name="content.filters.tab_ai.en"
+                      placeholder={messages.adminUseCaseEditor.aiTabTextPlaceholder}
                     />
                     <FormInput
                       label={messages.adminUseCaseEditor.manualTabTextLabel}
                       name="content.filters.tab_manual.en"
+                      placeholder={messages.adminUseCaseEditor.manualTabTextPlaceholder}
                     />
                     <FormInput
                       label={messages.adminUseCaseEditor.ctaLabel}
                       name="content.filters.cta.en"
+                      placeholder={messages.adminUseCaseEditor.filterCtaPlaceholder}
                     />
                   </TabsContent>
                 </Tabs>

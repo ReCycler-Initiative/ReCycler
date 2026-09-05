@@ -522,6 +522,23 @@ const baseFi = {
     skipTextLabel: "Ohita teksti",
     aiTabTextLabel: "AI-välilehti teksti",
     manualTabTextLabel: "Manuaali-välilehti teksti",
+    introTitlePlaceholder:
+      "Kirjoita etusivun otsikko, joka kertoo käyttäjälle mitä hän voi tehdä.",
+    introBodyPlaceholder:
+      "Kuvaa lyhyesti, mitä käyttäjä löytää tästä käyttötapauksesta.",
+    introCtaPlaceholder: "Kirjoita aloituspainikkeen teksti, esim. Aloita haku.",
+    introSkipPlaceholder:
+      "Kirjoita tekstimuoto ohitustoiminnolle, esim. Ohita esittely.",
+    filterTitlePlaceholder:
+      "Kirjoita suodatinsivun otsikko, esim. Rajaa hakua.",
+    filterBodyPlaceholder:
+      "Kerro käyttäjälle lyhyesti, miten suodattimia käytetään.",
+    aiTabTextPlaceholder:
+      "Kirjoita AI-välilehden nimi, esim. Hae tekoälyllä.",
+    manualTabTextPlaceholder:
+      "Kirjoita manuaalisen valinnan välilehden nimi.",
+    filterCtaPlaceholder:
+      "Kirjoita painikkeen teksti, jolla käyttäjä jatkaa suodatuksen jälkeen.",
   },
   adminGeneralInfo: {
     title: "Organisaation tiedot",
@@ -1289,6 +1306,23 @@ const baseEn = {
     skipTextLabel: "Skip text",
     aiTabTextLabel: "AI tab text",
     manualTabTextLabel: "Manual tab text",
+    introTitlePlaceholder:
+      "Write a front-page title that tells users what they can do.",
+    introBodyPlaceholder:
+      "Briefly describe what the user can find in this use case.",
+    introCtaPlaceholder: "Write the start button text, e.g. Start search.",
+    introSkipPlaceholder:
+      "Write the skip action text, e.g. Skip introduction.",
+    filterTitlePlaceholder:
+      "Write the filter page title, e.g. Refine your search.",
+    filterBodyPlaceholder:
+      "Briefly explain how users should use the filters.",
+    aiTabTextPlaceholder:
+      "Write the AI tab label, e.g. Search with AI.",
+    manualTabTextPlaceholder:
+      "Write the manual selection tab label.",
+    filterCtaPlaceholder:
+      "Write the button text users use to continue after filtering.",
   },
   adminGeneralInfo: {
     title: "Organization details",
