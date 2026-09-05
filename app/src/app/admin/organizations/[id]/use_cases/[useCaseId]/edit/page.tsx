@@ -83,10 +83,21 @@ const UseCaseInfoPage = () => {
 
           <TabsContent value="info">
             <div className="space-y-3">
+              <div className="rounded-lg border border-slate-200 bg-slate-50 p-4">
+                <h3 className="text-base font-semibold text-slate-900">
+                  {messages.adminUseCaseEditor.identitySection}
+                </h3>
+                <p className="mt-1 text-sm leading-6 text-slate-600">
+                  {messages.adminUseCaseEditor.identityHelp}
+                </p>
+              </div>
               <FormInput
                 label={messages.adminUseCaseEditor.nameLabel}
                 name="name"
               />
+              <p className="-mt-1 text-sm text-muted-foreground">
+                {messages.adminUseCaseEditor.nameHelp}
+              </p>
               <FormTextArea
                 label={messages.adminUseCaseEditor.descriptionLabel}
                 name="description"
@@ -130,7 +141,10 @@ const UseCaseInfoPage = () => {
                   ref={logoInputRef}
                   type="file"
                   accept="image/png"
-                  className="hidden"
+                  className="sr-only"
+                  tabIndex={-1}
+                  aria-hidden="true"
+                  style={{ display: "none" }}
                   onChange={(event) => {
                     const file = event.target.files?.[0];
                     event.target.value = "";
