@@ -1,37 +1,37 @@
-# ReCycler Export API: Auth0-ohje
+# ReCycler Export API: Auth0 Setup Guide
 
-## Tavoite
+## Goal
 
-ReCyclerin kierrätyspistedata voidaan hakea kahdella tavalla:
+ReCycler recycling location data can be accessed in two ways:
 
-- Selain ja Auth0-istunto: Swagger-testausta varten.
-- Toinen applikaatio ja Auth0 Machine-to-Machine -access token: Postmania, ERP:ia tai raportointijarjestelmaa varten.
+- Browser and Auth0 session: for testing through Swagger.
+- An external program or system and an Auth0 Machine-to-Machine access token: for Postman, an ERP system, a reporting service, or another integration.
 
-Selainkirjautumista ei tarvita, kun ReCyclerin ulkopuolinen ohjelma tai jarjestelma hakee Auth0:lta access tokenin omilla sovellustunnuksillaan. Tekninen OAuth 2.0 -menetelma on `client_credentials`.
+A browser login is not needed when an external program requests an access token from Auth0 using its own application credentials. The technical OAuth 2.0 method is `client_credentials`.
 
-## Rajapinta
+## API endpoint
 
 ```text
 GET /api/v1/export/organizations/{organizationId}/use_cases/{useCaseId}/locations
 ```
 
-Rajapinta palauttaa kayttotapauksen kohteet GeoJSON `FeatureCollection` -muodossa.
+The endpoint returns the locations for a use case as a GeoJSON `FeatureCollection`.
 
-Selainkaytossa Swagger loytyy osoitteesta:
+For browser testing, Swagger is available at:
 
 ```text
 https://YOUR_RECYCLER_DOMAIN/api/docs
 ```
 
-## Auth0-konfigurointi
+## Auth0 configuration
 
-### 1. Luo API
+### 1. Create the API
 
-Auth0 Dashboardissa:
+In the Auth0 Dashboard:
 
-1. Avaa **Applications -> APIs**.
-2. Valitse **Create API**.
-3. Syota esimerkiksi:
+1. Open **Applications -> APIs**.
+2. Select **Create API**.
+3. Use values such as:
 
 ```text
 Name: ReCycler Export API
@@ -39,42 +39,42 @@ Identifier: https://api.recycler.example
 Signing Algorithm: RS256
 ```
 
-`Identifier` on API:n audience-arvo. Saman arvon pitaa olla kaytossa Auth0:ssa, ReCyclerin palvelimella ja token-pyynnoissa.
+The `Identifier` is the API audience. The same value must be used in Auth0, in the ReCycler server configuration, and when requesting the token.
 
-### 2. Lisaa permission
+### 2. Add the permission
 
-Lisaa API:lle seuraava permission:
+Add this permission to the API:
 
 ```text
 read:locations
 ```
 
-Kuvaus:
+Description:
 
 ```text
 Read recycling locations from the authorized organization
 ```
 
-Anna integraatiolle vain tama lukuoikeus.
+Give the integration read access only.
 
-### 3. Luo Machine-to-Machine Application
+### 3. Create a Machine-to-Machine Application
 
-Auth0 Dashboardissa:
+In the Auth0 Dashboard:
 
-1. Avaa **Applications -> Applications**.
-2. Valitse **Create Application**.
-3. Valitse tyypiksi **Machine to Machine Applications**.
-4. Anna sovellukselle nimi, esimerkiksi:
+1. Open **Applications -> Applications**.
+2. Select **Create Application**.
+3. Select **Machine to Machine Applications** as the application type.
+4. Give the application a name, for example:
 
 ```text
 ReCycler Export Integration - Organization Name
 ```
 
-5. Valitse kaytettavaksi API:ksi **ReCycler Export API**.
-6. Anna sovellukselle vain permission `read:locations`.
-7. Tallenna asetukset.
+5. Select **ReCycler Export API** as the API.
+6. Grant the application only the `read:locations` permission.
+7. Save the settings.
 
-Tarvittavat tiedot ovat:
+The required values are:
 
 ```text
 Auth0 Domain
@@ -83,33 +83,33 @@ Client Secret
 Audience
 ```
 
-`Client Secret` pitaa sailyttaa vain toisen applikaation palvelimella tai salaisuuksienhallinnassa. Sita ei saa laittaa selaimen koodiin, Git-repositorioon tai `NEXT_PUBLIC_`-muuttujaan.
+The `Client Secret` must be stored only on the external application's server or in a secrets manager. It must not be placed in browser code, Git, or a `NEXT_PUBLIC_` variable.
 
-## ReCycler-organisaation yhdistaminen
+## Map the Auth0 client to a ReCycler organization
 
-Auth0 `client_id` yhdistetaan ReCycler-organisaatioon ReCyclerin palvelimen ymparistomuuttujalla.
+The Auth0 `client_id` must be mapped to a ReCycler organization in the ReCycler server configuration.
 
 ```env
 AUTH0_M2M_CLIENT_ORGANIZATIONS={"AUTH0_CLIENT_ID":"RECYCLER_ORGANIZATION_UUID"}
 ```
 
-Esimerkki:
+Example:
 
 ```env
 AUTH0_M2M_CLIENT_ORGANIZATIONS={"abc123clientid":"dd10636b-7746-44a4-9ce3-ce05ea5fa19f"}
 ```
 
-Useampi integraatio voidaan yhdistaa samaan organisaatioon:
+Multiple integrations can be mapped to the same organization:
 
 ```env
 AUTH0_M2M_CLIENT_ORGANIZATIONS={"erp-client-id":"organization-uuid","reporting-client-id":"organization-uuid"}
 ```
 
-URL:ssa annettu `organizationId` ei yksin anna kayttooikeutta. ReCycler tarkistaa, etta tokenin client on yhdistetty samaan organisaatioon.
+The `organizationId` in the URL does not grant access by itself. ReCycler verifies that the token's client is mapped to the same organization.
 
-## ReCyclerin palvelinasetukset
+## ReCycler server configuration
 
-Aseta ReCyclerin palvelimen `.env`-tiedostoon:
+Set these values in the ReCycler server `.env` file:
 
 ```env
 AUTH0_DOMAIN=your-tenant.eu.auth0.com
@@ -117,11 +117,11 @@ AUTH0_AUDIENCE=https://api.recycler.example
 AUTH0_M2M_CLIENT_ORGANIZATIONS={"AUTH0_CLIENT_ID":"RECYCLER_ORGANIZATION_UUID"}
 ```
 
-`AUTH0_DOMAIN` voi olla joko muodossa `your-tenant.eu.auth0.com` tai `https://your-tenant.eu.auth0.com`.
+`AUTH0_DOMAIN` can be either `your-tenant.eu.auth0.com` or `https://your-tenant.eu.auth0.com`.
 
-## Access tokenin hakeminen
+## Request an access token
 
-Toinen applikaatio hakee tokenin Auth0:lta:
+The external program requests an access token from Auth0:
 
 ```http
 POST https://YOUR_AUTH0_DOMAIN/oauth/token
@@ -137,7 +137,7 @@ Content-Type: application/json
 }
 ```
 
-Auth0 palauttaa esimerkiksi:
+Auth0 returns a response such as:
 
 ```json
 {
@@ -147,9 +147,9 @@ Auth0 palauttaa esimerkiksi:
 }
 ```
 
-Tokenia ei tarvitse tallentaa pysyvasti. Toinen applikaatio voi hakea uuden tokenin sen vanhennuttua.
+The token does not need to be stored permanently. The external program can request a new token when the current one expires.
 
-## ReCycler API:n kutsuminen
+## Call the ReCycler API
 
 ```http
 GET https://YOUR_RECYCLER_DOMAIN/api/v1/export/organizations/{organizationId}/use_cases/{useCaseId}/locations
@@ -157,7 +157,7 @@ Authorization: Bearer YOUR_ACCESS_TOKEN
 Accept: application/json
 ```
 
-Esimerkki:
+Example:
 
 ```bash
 curl \\
@@ -168,7 +168,9 @@ curl \\
 
 ## Postman
 
-### Token-pyynto
+Postman is only a tool for testing the same API. It does not require a separate ReCycler integration.
+
+### Token request
 
 ```text
 Method: POST
@@ -192,7 +194,7 @@ Body -> raw -> JSON:
 }
 ```
 
-### Data-pyynto
+### Data request
 
 ```text
 Method: GET
@@ -206,7 +208,7 @@ Type: Bearer Token
 Token: {{access_token}}
 ```
 
-Suositellut Postman-ymparistomuuttujat:
+Recommended Postman environment variables:
 
 ```text
 auth0_domain
@@ -219,16 +221,17 @@ use_case_id
 access_token
 ```
 
-## Kayttooikeusrajaukset
+## Access control
 
-Tokenin pitaa:
+The token must:
 
-- olla Auth0:n allekirjoittama ja voimassa oleva
-- olla tarkoitettu ReCycler API:n audiencelle
-- sisaltaa permission `read:locations`
-- kuulua clientille, joka on yhdistetty pyydettyyn ReCycler-organisaatioon
+- be issued and signed by Auth0
+- be valid and unexpired
+- be intended for the ReCycler API audience
+- contain the `read:locations` permission
+- belong to a client mapped to the requested ReCycler organization
 
-Esimerkki:
+Example:
 
 ```text
 Auth0 client: integration-a
@@ -236,62 +239,62 @@ ReCycler organization: organization-a
 Permission: read:locations
 ```
 
-Tama pyynto onnistuu:
+This request is allowed:
 
 ```text
 integration-a + organization-a
 ```
 
-Tama pyynto estetaan:
+This request is denied:
 
 ```text
 integration-a + organization-b
 ```
 
-Virhevastaukset:
+Error responses:
 
 ```text
 401 Unauthorized
 ```
 
-Token puuttuu, on virheellinen tai vanhentunut.
+The token is missing, invalid, or expired.
 
 ```text
 403 Forbidden
 ```
 
-Token on kelvollinen, mutta silla ei ole tarvittavaa permissionia tai se ei kuulu pyydettyyn organisaatioon.
+The token is valid, but it does not have the required permission or is not mapped to the requested organization.
 
 ```text
 404 Not Found
 ```
 
-Kayttotapausta ei loydy kyseisesta organisaatiosta.
+The use case does not belong to the requested organization or cannot be found.
 
-## Selainkaytto ja Swagger
+## Browser access and Swagger
 
-Selainkaytto toimii edelleen Auth0-istunnolla:
+Browser access continues to use the Auth0 session:
 
 ```text
 https://YOUR_RECYCLER_DOMAIN/api/docs
 ```
 
-Kirjaudu selaimella ReCycleriin, avaa Swagger ja valitse:
+Sign in to ReCycler in the browser, open Swagger, and select:
 
 ```text
-Try it out -> syota organizationId ja useCaseId -> Execute
+Try it out -> enter organizationId and useCaseId -> Execute
 ```
 
-Selainkaytto ja M2M-kaytto ovat rinnakkaisia:
+The two access methods are equivalent from the API's perspective:
 
 ```text
-Swagger: selain + Auth0-sessio
-Postman / ERP: Auth0 client_credentials + Bearer-token
+Swagger: browser + Auth0 session
+Postman / ERP / external program: Auth0 client credentials + Bearer token
 ```
 
-## Auth0-kollegalle toimitettavat tiedot
+## Information needed after Auth0 setup
 
-Toimita Auth0-konfiguroinnin jalkeen ReCyclerin yllapidolle:
+Provide the following values to the ReCycler administrator or integration developer:
 
 ```text
 Auth0 Domain
@@ -301,4 +304,4 @@ ReCycler organization_id
 ReCycler use_case_id
 ```
 
-Client Secretia ei tarvitse toimittaa ReCyclerille. Se kuuluu vain toisen applikaation palvelimelle.
+The Client Secret does not need to be provided to ReCycler. It belongs only on the external application's server.
