@@ -67,6 +67,9 @@ const baseFi = {
     useCaseSectionTitle: "Käyttötapaus",
     nameLabel: "Nimi",
     descriptionLabel: "Kuvaus",
+    deleteUseCase: "Siirrä käyttötapaus roskakoriin",
+    deleteUseCaseConfirm:
+      "Siirretäänkö käyttötapaus roskakoriin? Tiedot säilyvät palautettavina 30 päivän ajan.",
     nameRequired: "Nimi on pakollinen",
     descriptionRequired: "Kuvaus on pakollinen",
     organizationCreated: "Organisaatio {name} luotiin onnistuneesti",
@@ -898,6 +901,9 @@ const baseEn = {
     useCaseSectionTitle: "Use case",
     nameLabel: "Name",
     descriptionLabel: "Description",
+    deleteUseCase: "Move use case to trash",
+    deleteUseCaseConfirm:
+      "Move this use case to the trash? Its data will remain recoverable for 30 days.",
     nameRequired: "Name is required",
     descriptionRequired: "Description is required",
     organizationCreated: "Organization {name} was created successfully",

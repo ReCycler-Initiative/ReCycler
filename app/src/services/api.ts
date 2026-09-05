@@ -174,6 +174,15 @@ export const updateUseCase = (
     )
     .then((response) => UseCase.parse(response.data));
 
+export const deleteUseCase = async (
+  organizationId: string,
+  useCaseId: string
+): Promise<void> => {
+  await axios.delete(
+    `/api/organizations/${organizationId}/use_cases/${useCaseId}`
+  );
+};
+
 export const createUseCase = (
   organizationId: string,
   data: z.infer<typeof NewUseCase>

@@ -30,7 +30,7 @@ export async function GET(
   }
 
   const result = await db.raw(
-    `SELECT * FROM recycler.use_cases f WHERE organization_id = ?`,
+    `SELECT * FROM recycler.use_cases f WHERE organization_id = ? AND deleted_at IS NULL`,
     [organizationId]
   );
 

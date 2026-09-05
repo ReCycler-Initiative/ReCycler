@@ -295,6 +295,7 @@ export const UseCase = NewUseCase.merge(
   z.object({
     id: z.string().uuid(),
     logo_url: z.string().max(1400000).nullable().optional(),
+    deleted_at: z.coerce.date().nullable().optional(),
     created_at: z.coerce.date().optional(),
     content: z.object({
       intro: z.object({

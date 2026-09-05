@@ -11,10 +11,10 @@ import {
   DEFAULT_USE_CASE_MAP_SETTINGS,
   resolveUseCaseMapSettings,
 } from "@/lib/map-settings";
-import { getUseCaseById, updateUseCase } from "@/services/api";
+import { deleteUseCase, getUseCaseById, updateUseCase } from "@/services/api";
 import { UseCase } from "@/types";
 import { useQueryClient } from "@tanstack/react-query";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { z } from "zod";
 import { PageTemplate } from "@/components/admin/page-template";
 import { PageIntro } from "@/components/admin/page-intro";
@@ -26,6 +26,7 @@ const UseCaseInfoPage = () => {
   const messages = useMessages();
   const queryClient = useQueryClient();
   const { id, useCaseId } = useParams<{ id: string; useCaseId: string }>();
+  const router = useRouter();
   const logoInputRef = useRef<HTMLInputElement | null>(null);
   const [logoError, setLogoError] = useState(false);
 
@@ -163,6 +164,22 @@ const UseCaseInfoPage = () => {
                   }}
                 />
                 {logoError && <p className="text-sm text-red-600">{messages.adminUseCaseEditor.logoInvalid}</p>}
+              </div>
+              <div className="border-t border-slate-200 pt-5">
+                <Button
+                  type="button"
+                  variant="destructive"
+                  onClick={async () => {
+                    if (!window.confirm(messages.adminUseCaseEditor.deleteUseCaseConfirm)) {
+                      return;
+                    }
+
+                    await deleteUseCase(id, useCaseId);
+                    router.push(`/admin/organizations/${id}`);
+                  }}
+                >
+                  {messages.adminUseCaseEditor.deleteUseCase}
+                </Button>
               </div>
             </div>
           </TabsContent>

@@ -20,21 +20,17 @@ export async function GET(
   try {
     const { organizationId, useCaseId } = await params;
 
-    // // Check authorization
-    // const authResult = await checkOrganizationAuthorization(
-    //   request,
-    //   organizationId
-    // );
-
-    // if (!authResult.authorized) {
-    //   return authResult.response!;
-    // }
+    const authResult = await checkOrganizationAuthorization(request, organizationId);
+    if (!authResult.authorized) {
+      return authResult.response!;
+    }
 
     const useCase = await db
       .select("*")
       .from("recycler.use_cases")
       .where("id", useCaseId)
       .andWhere("organization_id", organizationId)
+      .whereNull("deleted_at")
       .first();
 
     if (!useCase) {
@@ -81,6 +77,7 @@ export async function PUT(
     const updatedUseCase = await db("recycler.use_cases")
       .where("id", useCaseId)
       .andWhere("organization_id", organizationId)
+      .whereNull("deleted_at")
       .update({
         name: body.name,
         description: body.description,
@@ -98,7 +95,7 @@ export async function PUT(
         updated_at: new Date(),
       })
       .returning("*")
-      .then((rows) => rows[0]);
+      .then((rows: any[]) => rows[0]);
 
     if (!updatedUseCase) {
       return NextResponse.json(
@@ -120,4 +117,27 @@ export async function PUT(
       { status: 500 }
     );
   }
+}
+
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: Promise<TGetUseCaseRequest> }
+) {
+  const { organizationId, useCaseId } = await params;
+  const authResult = await checkOrganizationAuthorization(request, organizationId);
+
+  if (!authResult.authorized) {
+    return authResult.response!;
+  }
+
+  const updated = await db("recycler.use_cases")
+    .where({ id: useCaseId, organization_id: organizationId })
+    .whereNull("deleted_at")
+    .update({ deleted_at: new Date(), updated_at: new Date() });
+
+  if (!updated) {
+    return NextResponse.json({ error: "Use case not found" }, { status: 404 });
+  }
+
+  return NextResponse.json({ deleted: true, deletion_scheduled: "30 days" });
 }
