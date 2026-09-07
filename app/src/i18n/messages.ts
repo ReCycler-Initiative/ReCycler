@@ -77,6 +77,8 @@ const baseFi = {
   },
   admin: {
     useCaseLabel: "Käyttötapaus",
+    organizationLabel: "Organisaatio",
+    overview: "Yleiskuva",
     trash: "Roskakori",
     toggleTheme: "Vaihda teema",
     useDarkTheme: "Käytä tummaa teemaa",
@@ -567,7 +569,6 @@ const baseFi = {
     restoreFailed: "Käyttötapauksen palautus epäonnistui.",
     deletedAt: "Poistettu",
     scheduledPurgeAt: "Pysyvä poisto",
-    openActiveUseCase: "Avaa aktiivinen käyttötapaus",
   },
   adminGeneralInfo: {
     title: "Organisaation tiedot",
@@ -928,6 +929,8 @@ const baseEn = {
   },
   admin: {
     useCaseLabel: "Use case",
+    organizationLabel: "Organization",
+    overview: "Overview",
     toggleTheme: "Toggle theme",
     useDarkTheme: "Use dark theme",
     useLightTheme: "Use light theme",
@@ -1379,7 +1382,6 @@ const baseEn = {
     restoreFailed: "Failed to restore the use case.",
     deletedAt: "Deleted",
     scheduledPurgeAt: "Permanent deletion",
-    openActiveUseCase: "Open active use case",
   },
   adminGeneralInfo: {
     title: "Organization details",

@@ -5,10 +5,9 @@ import { PageTemplate } from "@/components/admin/page-template";
 import { PageLoadingSpinner } from "@/components/page-loading-spinner";
 import { Button } from "@/components/ui/button";
 import { useLocale, useMessages } from "@/i18n/locale-provider";
-import { getDeletedUseCases, getUseCases, restoreUseCase } from "@/services/api";
+import { getDeletedUseCases, restoreUseCase } from "@/services/api";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { RotateCcw, Trash2 } from "lucide-react";
-import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 
 const TRASH_RETENTION_DAYS = 30;
@@ -26,10 +25,6 @@ export default function UseCaseTrashPage() {
   const router = useRouter();
   const { id } = useParams<{ id: string }>();
 
-  const activeUseCasesQuery = useQuery({
-    queryKey: ["use_cases", id],
-    queryFn: () => getUseCases(id),
-  });
   const deletedUseCasesQuery = useQuery({
     queryKey: ["deleted_use_cases", id],
     queryFn: () => getDeletedUseCases(id),
@@ -46,7 +41,7 @@ export default function UseCaseTrashPage() {
     },
   });
 
-  if (activeUseCasesQuery.isLoading || deletedUseCasesQuery.isLoading) {
+  if (deletedUseCasesQuery.isLoading) {
     return <PageLoadingSpinner />;
   }
 
@@ -54,7 +49,6 @@ export default function UseCaseTrashPage() {
     dateStyle: "medium",
     timeStyle: "short",
   });
-  const firstActiveUseCase = activeUseCasesQuery.data?.[0];
   const deletedUseCases = deletedUseCasesQuery.data ?? [];
 
   return (
@@ -62,15 +56,6 @@ export default function UseCaseTrashPage() {
       <PageIntro
         title={messages.adminTrashPage.title}
         description={messages.adminTrashPage.description}
-        actions={
-          firstActiveUseCase ? (
-            <Button asChild variant="outline">
-              <Link href={`/admin/organizations/${id}/use_cases/${firstActiveUseCase.id}`}>
-                {messages.adminTrashPage.openActiveUseCase}
-              </Link>
-            </Button>
-          ) : undefined
-        }
         icon={Trash2}
       />
 

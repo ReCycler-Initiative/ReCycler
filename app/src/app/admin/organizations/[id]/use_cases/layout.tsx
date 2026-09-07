@@ -6,6 +6,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
@@ -43,7 +44,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useParams, usePathname, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { PageLoadingSpinner } from "@/components/page-loading-spinner";
 import { useMessages } from "@/i18n/locale-provider";
 import { LucideIcon } from "lucide-react";
@@ -88,7 +89,11 @@ const Content = ({
   });
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
-  const [isDesktopNav, setIsDesktopNav] = useState(false);
+  const [isDesktopViewport, setIsDesktopViewport] = useState(false);
+  const [desktopHeaderFits, setDesktopHeaderFits] = useState(false);
+  const headerContentRef = useRef<HTMLDivElement | null>(null);
+  const navMeasureRef = useRef<HTMLDivElement | null>(null);
+  const controlsMeasureRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     try {
@@ -99,20 +104,23 @@ const Content = ({
   }, [adminTheme]);
 
   useEffect(() => {
+    setIsMobileNavOpen(false);
+  }, [pathname]);
+
+  useEffect(() => {
     const mediaQuery = window.matchMedia("(min-width: 1024px)");
-    const handleViewportChange = (matches: boolean) => {
-      setIsDesktopNav(matches);
+
+    const syncViewport = (matches: boolean) => {
+      setIsDesktopViewport(matches);
       if (matches) {
         setIsMobileNavOpen(false);
       }
     };
 
-    handleViewportChange(mediaQuery.matches);
+    syncViewport(mediaQuery.matches);
 
-    const listener = (event: MediaQueryListEvent) =>
-      handleViewportChange(event.matches);
+    const listener = (event: MediaQueryListEvent) => syncViewport(event.matches);
 
-    // Safari compatibility fallback for older MediaQueryList APIs.
     if (typeof mediaQuery.addEventListener === "function") {
       mediaQuery.addEventListener("change", listener);
       return () => mediaQuery.removeEventListener("change", listener);
@@ -121,10 +129,6 @@ const Content = ({
     mediaQuery.addListener(listener);
     return () => mediaQuery.removeListener(listener);
   }, []);
-
-  useEffect(() => {
-    setIsMobileNavOpen(false);
-  }, [pathname]);
 
   const useCasesQuery = useQuery({
     queryKey: ["use_cases", id],
@@ -160,33 +164,100 @@ const Content = ({
         : "text-gray-700 hover:bg-gray-100"
     );
 
-  const navLinks: NavLink[] = selectedUseCasePath
-    ? [
-        {
-          exact: true,
-          href: selectedUseCasePath,
-          label: organization.name,
-          icon: AppWindow,
-        },
-        {
-          href: `${selectedUseCasePath}/location-types`,
-          label: messages.admin.fields,
-          icon: Blocks,
-        },
-        {
-          href: `${selectedUseCasePath}/datasources`,
-          label: messages.admin.datasources,
-          icon: Database,
-        },
-        {
-          href: `${selectedUseCasePath}/locations`,
-          label: messages.admin.locations,
-          icon: MapPin,
-        },
-        { href: `${selectedUseCasePath}/ai`, label: messages.admin.ai, icon: Bot },
-        { href: trashPath, label: messages.admin.trash, icon: Trash2 },
-      ]
-    : [{ exact: true, href: trashPath, label: messages.admin.trash, icon: Trash2 }];
+  const navLinks: NavLink[] = useMemo(
+    () =>
+      selectedUseCasePath
+        ? [
+            {
+              exact: true,
+              href: selectedUseCasePath,
+              label: messages.admin.overview,
+              icon: AppWindow,
+            },
+            {
+              href: `${selectedUseCasePath}/location-types`,
+              label: messages.admin.fields,
+              icon: Blocks,
+            },
+            {
+              href: `${selectedUseCasePath}/datasources`,
+              label: messages.admin.datasources,
+              icon: Database,
+            },
+            {
+              href: `${selectedUseCasePath}/locations`,
+              label: messages.admin.locations,
+              icon: MapPin,
+            },
+            { href: `${selectedUseCasePath}/ai`, label: messages.admin.ai, icon: Bot },
+          ]
+        : [],
+    [
+      messages.admin.ai,
+      messages.admin.datasources,
+      messages.admin.fields,
+      messages.admin.locations,
+      messages.admin.overview,
+      selectedUseCasePath,
+    ]
+  );
+
+  useEffect(() => {
+    if (!isDesktopViewport) {
+      setDesktopHeaderFits(false);
+      return;
+    }
+
+    const measureLayout = () => {
+      const headerContent = headerContentRef.current;
+      const navMeasure = navMeasureRef.current;
+      const controlsMeasure = controlsMeasureRef.current;
+
+      if (!headerContent || !navMeasure || !controlsMeasure) {
+        return;
+      }
+
+      const availableWidth = headerContent.clientWidth;
+      const requiredWidth = navMeasure.scrollWidth + controlsMeasure.scrollWidth + 24;
+
+      setDesktopHeaderFits(requiredWidth <= availableWidth);
+    };
+
+    measureLayout();
+
+    if (typeof ResizeObserver === "undefined") {
+      window.addEventListener("resize", measureLayout);
+      return () => window.removeEventListener("resize", measureLayout);
+    }
+
+    const observer = new ResizeObserver(measureLayout);
+
+    if (headerContentRef.current) {
+      observer.observe(headerContentRef.current);
+    }
+    if (navMeasureRef.current) {
+      observer.observe(navMeasureRef.current);
+    }
+    if (controlsMeasureRef.current) {
+      observer.observe(controlsMeasureRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, [isDesktopViewport, navLinks, pathname, selectedUseCaseId, useCasesQuery.data]);
+
+  const showDesktopHeader = isDesktopViewport && desktopHeaderFits;
+  const showDropdownHeader = !showDesktopHeader;
+
+  const handleUseCaseSelect = (value: string) => {
+    if (value === "create_new") {
+      setIsCreateDialogOpen(true);
+      setIsMobileNavOpen(false);
+      return;
+    }
+
+    router.push(`/admin/organizations/${id}/use_cases/${value}`);
+    setIsMobileNavOpen(false);
+  };
 
   return (
     <div
@@ -212,10 +283,49 @@ const Content = ({
         }
         toHomeHref="/"
       >
-        <div className="flex h-full min-w-0 flex-1 items-center gap-x-2 lg:gap-x-4 overflow-hidden">
-          {!isDesktopNav && (
+        <div
+          ref={headerContentRef}
+          className="relative flex h-full min-w-0 flex-1 items-center gap-x-2 lg:gap-x-4 overflow-hidden"
+        >
+          {isDesktopViewport && (
+            <div
+              className="pointer-events-none absolute left-0 top-0 -z-10 opacity-0"
+              aria-hidden="true"
+            >
+              <div className="flex items-center">
+                <div ref={navMeasureRef} className="flex h-10 items-center gap-1 pr-2">
+                  {navLinks.map((link) => (
+                    <div key={`${link.href}-measure`} className={navButtonClass(false)}>
+                      {link.icon && <link.icon className="mr-2 h-4 w-4 shrink-0" aria-hidden="true" />}
+                      <span>{link.label}</span>
+                    </div>
+                  ))}
+                </div>
+                <div ref={controlsMeasureRef} className="ml-4 flex items-center gap-x-4">
+                  <div className="mr-1 flex shrink-0 items-center lg:mr-2">
+                    <Label className="admin-usecase-label mr-2 hidden items-center gap-2 font-normal text-gray-700 md:mr-4 md:inline-flex">
+                      <BriefcaseBusiness className="h-4 w-4" aria-hidden="true" />
+                      {messages.admin.useCaseLabel}
+                    </Label>
+                    <div className="admin-usecase-select inline-flex h-10 w-[200px] items-center rounded-md border px-3 text-sm">
+                      {selectedUseCase?.name ?? ""}
+                    </div>
+                  </div>
+                  {selectedUseCaseId && (
+                    <div className={cn(navButtonClass(true), "admin-open-link")}>
+                      {messages.admin.open}
+                    </div>
+                  )}
+                  <div className="h-10 w-10" />
+                  <div className="h-10 w-10" />
+                </div>
+              </div>
+            </div>
+          )}
+
+          {showDropdownHeader && (
             <DropdownMenu open={isMobileNavOpen} onOpenChange={setIsMobileNavOpen}>
-              <DropdownMenuTrigger className="inline-flex lg:hidden items-center justify-center rounded-full px-3 py-2 text-slate-700 transition hover:bg-gray-100 hover:text-slate-900">
+              <DropdownMenuTrigger className="inline-flex items-center justify-center rounded-full px-3 py-2 text-slate-700 transition hover:bg-gray-100 hover:text-slate-900">
                 <Menu className="h-4 w-4" />
               </DropdownMenuTrigger>
               <DropdownMenuContent
@@ -225,12 +335,34 @@ const Content = ({
                 )}
                 align="start"
               >
+                <DropdownMenuLabel className="px-3 py-2 text-xs font-semibold uppercase tracking-wide text-slate-500">
+                  {messages.admin.organizationLabel}
+                </DropdownMenuLabel>
+                <div className="px-3 pb-2 text-sm font-medium text-slate-900">
+                  {organization.name}
+                </div>
+                <DropdownMenuSeparator />
+                <DropdownMenuLabel className="px-3 py-2 text-xs font-semibold uppercase tracking-wide text-slate-500">
+                  {messages.admin.useCaseLabel}
+                </DropdownMenuLabel>
+                {useCasesQuery.data?.map((useCase) => (
+                  <DropdownMenuItem
+                    key={useCase.id}
+                    onSelect={() => handleUseCaseSelect(useCase.id)}
+                  >
+                    <BriefcaseBusiness className="mr-2 h-4 w-4 text-slate-500" />
+                    {useCase.name}
+                  </DropdownMenuItem>
+                ))}
+                <DropdownMenuItem onSelect={() => handleUseCaseSelect("create_new")}>
+                  <BriefcaseBusiness className="mr-2 h-4 w-4 text-slate-500" />
+                  + Uusi käyttötapaus
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
                 {navLinks.map((link) => (
                   <DropdownMenuItem key={link.href} asChild>
                     <Link href={link.href} onClick={() => setIsMobileNavOpen(false)}>
-                      {link.icon && (
-                        <link.icon className="mr-2 h-4 w-4 text-slate-500" />
-                      )}
+                      {link.icon && <link.icon className="mr-2 h-4 w-4 text-slate-500" />}
                       {link.label}
                     </Link>
                   </DropdownMenuItem>
@@ -256,14 +388,6 @@ const Content = ({
                     </Link>
                   </DropdownMenuItem>
                 )}
-                {selectedUseCasePath && (
-                  <DropdownMenuItem asChild>
-                    <Link href={trashPath} onClick={() => setIsMobileNavOpen(false)}>
-                      <Trash2 className="mr-2 h-4 w-4 text-slate-500" />
-                      {messages.admin.trash}
-                    </Link>
-                  </DropdownMenuItem>
-                )}
                 {selectedUseCaseId && (
                   <DropdownMenuItem asChild>
                     <Link href={`${selectedUseCasePath}/edit`} onClick={() => setIsMobileNavOpen(false)}>
@@ -272,6 +396,12 @@ const Content = ({
                     </Link>
                   </DropdownMenuItem>
                 )}
+                <DropdownMenuItem asChild>
+                  <Link href={trashPath} onClick={() => setIsMobileNavOpen(false)}>
+                    <Trash2 className="mr-2 h-4 w-4 text-slate-500" />
+                    {messages.admin.trash}
+                  </Link>
+                </DropdownMenuItem>
                 {selectedUseCaseId && (
                   <DropdownMenuItem asChild>
                     <Link href={`${selectedUseCasePath}/usage`} onClick={() => setIsMobileNavOpen(false)}>
@@ -314,144 +444,132 @@ const Content = ({
             </DropdownMenu>
           )}
 
-          <nav className="ml-2 hidden h-10 min-w-0 flex-1 items-center gap-1 overflow-hidden pr-2 lg:flex">
-            {navLinks.map((link, index) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className={cn(
-                  navButtonClass(isActiveSection(link.href, link.exact)),
-                  index === 0 ? "max-w-[190px] xl:max-w-[260px]" : ""
-                )}
-              >
-                {link.icon && <link.icon className="mr-2 h-4 w-4 shrink-0" aria-hidden="true" />}
-                <span className="truncate">{link.label}</span>
-              </Link>
-            ))}
-          </nav>
-          <div className="mr-1 flex shrink-0 items-center lg:mr-2">
-            <Label className="admin-usecase-label mr-2 hidden items-center gap-2 font-normal text-gray-700 md:mr-4 md:inline-flex">
-              <BriefcaseBusiness className="h-4 w-4" aria-hidden="true" />
-              {messages.admin.useCaseLabel}
-            </Label>
-            <Select
-              value={selectedUseCaseId || ""}
-              onValueChange={(value) => {
-                if (value === "create_new") {
-                  setIsCreateDialogOpen(true);
-                } else {
-                  router.push(
-                    `/admin/organizations/${id}/use_cases/${value}`
-                  );
-                }
-              }}
-            >
-              <SelectTrigger className="admin-usecase-select w-[150px] md:w-[200px]">
-                <SelectValue placeholder="Valitse käyttötapaus" />
-              </SelectTrigger>
-              <SelectContent className="admin-usecase-select-content">
-                {useCasesQuery.data?.map((useCase) => (
-                  <SelectItem key={useCase.id} value={useCase.id}>
-                    {useCase.name}
-                  </SelectItem>
+          {showDesktopHeader && (
+            <>
+              <nav className="ml-2 hidden h-10 min-w-0 flex-1 items-center gap-1 pr-2 lg:flex">
+                {navLinks.map((link) => (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    className={navButtonClass(isActiveSection(link.href, link.exact))}
+                  >
+                    {link.icon && <link.icon className="mr-2 h-4 w-4 shrink-0" aria-hidden="true" />}
+                    <span>{link.label}</span>
+                  </Link>
                 ))}
-                <SelectItem value="create_new" className="font-semibold">
-                  + Uusi käyttötapaus
-                </SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+              </nav>
 
-          {selectedUseCaseId && (
-            <Link
-              href={`/organizations/${id}/use_cases/${selectedUseCaseId}`}
-              className={cn(navButtonClass(true), "admin-open-link hidden lg:inline-flex")}
-              aria-label={messages.admin.openSelectedUseCase}
-              target="_blank"
-              title={messages.admin.openSelectedUseCase}
-            >
-              {messages.admin.open}
-              <ExternalLink className="ml-2" size={16} />
-            </Link>
+              <div className="ml-auto hidden shrink-0 items-center gap-x-2 lg:flex lg:gap-x-4">
+                <div className="mr-1 flex shrink-0 items-center lg:mr-2">
+                  <Label className="admin-usecase-label mr-2 hidden items-center gap-2 font-normal text-gray-700 md:mr-4 md:inline-flex">
+                    <BriefcaseBusiness className="h-4 w-4" aria-hidden="true" />
+                    {messages.admin.useCaseLabel}
+                  </Label>
+                  <Select value={selectedUseCaseId || ""} onValueChange={handleUseCaseSelect}>
+                    <SelectTrigger className="admin-usecase-select w-[150px] md:w-[200px]">
+                      <SelectValue placeholder="Valitse käyttötapaus" />
+                    </SelectTrigger>
+                    <SelectContent className="admin-usecase-select-content">
+                      {useCasesQuery.data?.map((useCase) => (
+                        <SelectItem key={useCase.id} value={useCase.id}>
+                          {useCase.name}
+                        </SelectItem>
+                      ))}
+                      <SelectItem value="create_new" className="font-semibold">
+                        + Uusi käyttötapaus
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {selectedUseCaseId && (
+                  <Link
+                    href={`/organizations/${id}/use_cases/${selectedUseCaseId}`}
+                    className={cn(navButtonClass(true), "admin-open-link")}
+                    aria-label={messages.admin.openSelectedUseCase}
+                    target="_blank"
+                    title={messages.admin.openSelectedUseCase}
+                  >
+                    {messages.admin.open}
+                    <ExternalLink className="ml-2" size={16} />
+                  </Link>
+                )}
+
+                <AdminThemeToggle
+                  isDark={adminTheme === "dark"}
+                  onToggle={() =>
+                    setAdminTheme((currentTheme) =>
+                      currentTheme === "dark" ? "light" : "dark"
+                    )
+                  }
+                />
+
+                <DropdownMenu>
+                  <DropdownMenuTrigger className="admin-settings-trigger mr-1 rounded-full px-3 py-2 text-slate-700 transition hover:bg-gray-100 hover:text-slate-900">
+                    <SettingsIcon />
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent
+                    className={cn(
+                      "admin-settings-menu",
+                      adminTheme === "dark" && "admin-settings-menu--dark"
+                    )}
+                  >
+                    {selectedUseCasePath && (
+                      <DropdownMenuItem asChild>
+                        <Link href={`${selectedUseCasePath}/general_info`}>
+                          <AppWindow className="mr-2 h-4 w-4 text-slate-500" />
+                          {messages.admin.organizationDetails}
+                        </Link>
+                      </DropdownMenuItem>
+                    )}
+
+                    {selectedUseCaseId && (
+                      <DropdownMenuItem asChild>
+                        <Link href={`${selectedUseCasePath}/edit`}>
+                          <BriefcaseBusiness className="mr-2 h-4 w-4 text-slate-500" />
+                          {messages.admin.useCaseDetails}
+                        </Link>
+                      </DropdownMenuItem>
+                    )}
+
+                    <DropdownMenuItem asChild>
+                      <Link href={trashPath}>
+                        <Trash2 className="mr-2 h-4 w-4 text-slate-500" />
+                        {messages.admin.trash}
+                      </Link>
+                    </DropdownMenuItem>
+
+                    {selectedUseCaseId && (
+                      <DropdownMenuItem asChild>
+                        <Link href={`${selectedUseCasePath}/usage`}>
+                          <ChartColumn className="mr-2 h-4 w-4 text-slate-500" />
+                          {messages.admin.usageStats}
+                        </Link>
+                      </DropdownMenuItem>
+                    )}
+
+                    {selectedUseCaseId && (
+                      <DropdownMenuItem asChild>
+                        <Link href={`${selectedUseCasePath}/runs`}>
+                          <ScrollText className="mr-2 h-4 w-4 text-slate-500" />
+                          {messages.admin.logs}
+                        </Link>
+                      </DropdownMenuItem>
+                    )}
+
+                    {selectedUseCaseId && (
+                      <DropdownMenuItem asChild>
+                        <Link href={`${selectedUseCasePath}/api`}>
+                          <Code2 className="mr-2 h-4 w-4 text-slate-500" />
+                          {messages.admin.apiDocumentation}
+                        </Link>
+                      </DropdownMenuItem>
+                    )}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
+            </>
           )}
-
-          <div className="hidden lg:flex">
-            <AdminThemeToggle
-              isDark={adminTheme === "dark"}
-              onToggle={() =>
-                setAdminTheme((currentTheme) =>
-                  currentTheme === "dark" ? "light" : "dark"
-                )
-              }
-            />
-          </div>
-
-          <div className="hidden lg:block">
-            <DropdownMenu>
-            <DropdownMenuTrigger className="admin-settings-trigger mr-1 rounded-full px-3 py-2 text-slate-700 transition hover:bg-gray-100 hover:text-slate-900">
-              <SettingsIcon />
-            </DropdownMenuTrigger>
-            <DropdownMenuContent
-              className={cn(
-                "admin-settings-menu",
-                adminTheme === "dark" && "admin-settings-menu--dark"
-              )}
-            >
-              {selectedUseCasePath && (
-                <DropdownMenuItem asChild>
-                  <Link href={`${selectedUseCasePath}/general_info`}>
-                    <AppWindow className="mr-2 h-4 w-4 text-slate-500" />
-                    {messages.admin.organizationDetails}
-                  </Link>
-                </DropdownMenuItem>
-              )}
-
-              {selectedUseCaseId && (
-                <DropdownMenuItem asChild>
-                  <Link href={`${selectedUseCasePath}/edit`}>
-                    <BriefcaseBusiness className="mr-2 h-4 w-4 text-slate-500" />
-                    {messages.admin.useCaseDetails}
-                  </Link>
-                </DropdownMenuItem>
-              )}
-
-              {selectedUseCaseId && (
-                <DropdownMenuItem asChild>
-                  <Link href={`${selectedUseCasePath}/usage`}>
-                    <ChartColumn className="mr-2 h-4 w-4 text-slate-500" />
-                    {messages.admin.usageStats}
-                  </Link>
-                </DropdownMenuItem>
-              )}
-
-              {selectedUseCaseId && (
-                <DropdownMenuItem asChild>
-                  <Link href={`${selectedUseCasePath}/runs`}>
-                    <ScrollText className="mr-2 h-4 w-4 text-slate-500" />
-                    {messages.admin.logs}
-                  </Link>
-                </DropdownMenuItem>
-              )}
-
-              {selectedUseCaseId && (
-                <DropdownMenuItem asChild>
-                  <Link href={`${selectedUseCasePath}/api`}>
-                    <Code2 className="mr-2 h-4 w-4 text-slate-500" />
-                    {messages.admin.apiDocumentation}
-                  </Link>
-                </DropdownMenuItem>
-              )}
-
-              <DropdownMenuItem asChild>
-                <Link href={trashPath}>
-                  <Trash2 className="mr-2 h-4 w-4 text-slate-500" />
-                  {messages.admin.trash}
-                </Link>
-              </DropdownMenuItem>
-
-            </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
         </div>
       </TitleBar>
 
