@@ -335,8 +335,8 @@ export const Materials = ({
         );
       })}
       <Dialog open={!!content} onOpenChange={() => setContent(null)}>
-        <DialogContent className="max-h-[80vh] overflow-y-auto">
-          <div>{content}</div>
+        <DialogContent>
+          <div className="max-h-[80vh] overflow-y-auto">{content}</div>
         </DialogContent>
       </Dialog>
     </div>
