@@ -67,7 +67,7 @@ const Button = ({
       )}
       ref={ref}
       data-loading={isLoading}
-      disabled={isLoading || props.disabled}
+      disabled={isLoading || props.disabled || false}
       type={props.type || "button"}
       {...props}
     >
