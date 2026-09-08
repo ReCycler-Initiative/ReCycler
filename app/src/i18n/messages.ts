@@ -486,9 +486,11 @@ const baseFi = {
     identitySection: "Ylänavigaation nimi tai logo",
     identityHelp:
       "Valitse, näytetäänkö ylänavigaatiossa käyttötapauksen nimi vai oma logo. Nimi näkyy oletuksena.",
-    nameHelp: "Tätä nimeä käytetään ylänavigaatiossa, jos omaa logoa ei ole lisätty.",
+    nameHelp:
+      "Tätä nimeä käytetään ylänavigaatiossa, jos omaa logoa ei ole lisätty.",
     logoLabel: "Oma logo (valinnainen)",
-    logoHelp: "Kun lisäät logon, se korvaa nimen ylänavigaatiossa. PNG-kuva, enintään 1 Mt.",
+    logoHelp:
+      "Kun lisäät logon, se korvaa nimen ylänavigaatiossa. PNG-kuva, enintään 1 Mt.",
     chooseLogo: "Valitse logo",
     removeLogo: "Poista logo",
     logoInvalid: "Valitse PNG-kuva, jonka koko on enintään 1 Mt.",
@@ -544,17 +546,16 @@ const baseFi = {
       "Kirjoita etusivun otsikko, joka kertoo käyttäjälle mitä hän voi tehdä.",
     introBodyPlaceholder:
       "Kuvaa lyhyesti, mitä käyttäjä löytää tästä käyttötapauksesta.",
-    introCtaPlaceholder: "Kirjoita aloituspainikkeen teksti, esim. Aloita haku.",
+    introCtaPlaceholder:
+      "Kirjoita aloituspainikkeen teksti, esim. Aloita haku.",
     introSkipPlaceholder:
       "Kirjoita tekstimuoto ohitustoiminnolle, esim. Ohita esittely.",
     filterTitlePlaceholder:
       "Kirjoita suodatinsivun otsikko, esim. Rajaa hakua.",
     filterBodyPlaceholder:
       "Kerro käyttäjälle lyhyesti, miten suodattimia käytetään.",
-    aiTabTextPlaceholder:
-      "Kirjoita AI-välilehden nimi, esim. Hae tekoälyllä.",
-    manualTabTextPlaceholder:
-      "Kirjoita manuaalisen valinnan välilehden nimi.",
+    aiTabTextPlaceholder: "Kirjoita AI-välilehden nimi, esim. Hae tekoälyllä.",
+    manualTabTextPlaceholder: "Kirjoita manuaalisen valinnan välilehden nimi.",
     filterCtaPlaceholder:
       "Kirjoita painikkeen teksti, jolla käyttäjä jatkaa suodatuksen jälkeen.",
   },
@@ -623,6 +624,7 @@ const baseFi = {
     selectedEmpty: "Kerro chatissa mitä kierrätät - valinnat ilmestyvät tähän.",
     removeMaterialAria: "Poista materiaali",
     removeMaterialTitle: "Poista",
+    materialsInfo: "Materiaali-info",
   },
   pricingChat: {
     initialAssistantMessage:
@@ -670,7 +672,7 @@ const baseFi = {
     startRecycling: "Lähde kierrättämään",
     showNearest: "Näytä lähimmät kierrätyspisteet",
     footerIntro:
-      "Käytetty data on peräisin Kierrätys.info-palvelun rajapinnasta."
+      "Käytetty data on peräisin Kierrätys.info-palvelun rajapinnasta.",
   },
   marketing: {
     heroTitle: "Sijaintipohjaisten palveluiden alusta",
@@ -851,6 +853,7 @@ const baseEn = {
       "Tell the chat what you are recycling and your selections will appear here.",
     removeMaterialAria: "Remove material",
     removeMaterialTitle: "Remove",
+    materialsInfo: "Material info",
   },
   onboarding: {
     searchTitle: "Search by address or place",
@@ -1299,9 +1302,11 @@ const baseEn = {
     identitySection: "Top bar name or logo",
     identityHelp:
       "Choose whether the top bar shows the use case name or your own logo. The name is shown by default.",
-    nameHelp: "This name is shown in the top bar when no custom logo has been added.",
+    nameHelp:
+      "This name is shown in the top bar when no custom logo has been added.",
     logoLabel: "Custom logo (optional)",
-    logoHelp: "When you add a logo, it replaces the name in the top bar. PNG image, maximum 1 MB.",
+    logoHelp:
+      "When you add a logo, it replaces the name in the top bar. PNG image, maximum 1 MB.",
     chooseLogo: "Choose logo",
     removeLogo: "Remove logo",
     logoInvalid: "Choose a PNG image no larger than 1 MB.",
@@ -1358,16 +1363,12 @@ const baseEn = {
     introBodyPlaceholder:
       "Briefly describe what the user can find in this use case.",
     introCtaPlaceholder: "Write the start button text, e.g. Start search.",
-    introSkipPlaceholder:
-      "Write the skip action text, e.g. Skip introduction.",
+    introSkipPlaceholder: "Write the skip action text, e.g. Skip introduction.",
     filterTitlePlaceholder:
       "Write the filter page title, e.g. Refine your search.",
-    filterBodyPlaceholder:
-      "Briefly explain how users should use the filters.",
-    aiTabTextPlaceholder:
-      "Write the AI tab label, e.g. Search with AI.",
-    manualTabTextPlaceholder:
-      "Write the manual selection tab label.",
+    filterBodyPlaceholder: "Briefly explain how users should use the filters.",
+    aiTabTextPlaceholder: "Write the AI tab label, e.g. Search with AI.",
+    manualTabTextPlaceholder: "Write the manual selection tab label.",
     filterCtaPlaceholder:
       "Write the button text users use to continue after filtering.",
   },
@@ -1439,7 +1440,7 @@ const baseEn = {
     startRecycling: "Start recycling",
     showNearest: "Show nearest recycling points",
     footerIntro:
-      "The data used in the project comes from the Kierratys.info API."
+      "The data used in the project comes from the Kierratys.info API.",
   },
   editor: {
     cancel: "Cancel",

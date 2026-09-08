@@ -26,6 +26,7 @@ import Wood from "./icons/Wood";
 import LoadingSpinner from "./loading-spinner";
 import MarkdownBlock from "./markdown-block";
 import { Dialog, DialogContent } from "./ui/dialog";
+import { DialogTitle } from "@radix-ui/react-dialog";
 
 // HEX → rgba
 export const hexToRgba = (hex: string, alpha: number): string => {
@@ -341,6 +342,9 @@ export const Materials = ({
         onOpenChange={() => setMaterialForInfo(undefined)}
       >
         <DialogContent className="max-w-3xl px-0">
+          <DialogTitle className="sr-only">
+            {messages.materials.loadingMaterials}
+          </DialogTitle>
           <div className="h-[800px] max-h-[80vh] overflow-y-auto px-4 lg:px-6">
             <div className="mb-6">{materialForInfo?.icon}</div>
             {materialForInfo?.content}
