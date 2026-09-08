@@ -120,7 +120,7 @@ export const MaterialsPageContent = ({
 
   return (
     <Container className={`max-w-2xl ${embedded ? "pt-4" : "pt-7 lg:pt-14"}`}>
-      <h1 className="text-xl font-medium mb-4 font-sans">
+      <h1 className="text-xl font-medium mb-4 font-sans text-center">
         {resolvedTitle}
       </h1>
       {description && (
