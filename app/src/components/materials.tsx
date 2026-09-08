@@ -338,7 +338,7 @@ export const Materials = ({
       })}
       <Dialog
         open={!!materialForInfo}
-        onOpenChange={() => setMaterialForInfo(null)}
+        onOpenChange={() => setMaterialForInfo(undefined)}
       >
         <DialogContent className="max-w-3xl px-0">
           <div className="h-[800px] max-h-[80vh] overflow-y-auto px-4 lg:px-6">
