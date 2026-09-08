@@ -2,10 +2,7 @@
 
 import { cn } from "@/utils/shadcn";
 import { useQuery } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
 import ReactMarkdown, { Components } from "react-markdown";
-import { PageLoadingSpinner } from "./page-loading-spinner";
-import LoadingSpinner from "./loading-spinner";
 import { LoadingState } from "./loading-state";
 
 const markdownComponents: Components = {
@@ -75,8 +72,10 @@ const markdownComponents: Components = {
   ),
   td: ({ node, ...props }) => <td className="px-4 py-2 align-top" {...props} />,
 
-  img: ({ node, ...props }) => (
-    <img className="my-6 rounded-lg max-w-full h-auto" {...props} />
+  img: ({ node, alt, ...props }) => (
+    // Markdown images come from content files with unknown dimensions, so keep native img here.
+    // eslint-disable-next-line @next/next/no-img-element
+    <img className="my-6 h-auto max-w-full rounded-lg" alt={alt ?? ""} {...props} />
   ),
 
   strong: ({ node, children, ...props }) => {

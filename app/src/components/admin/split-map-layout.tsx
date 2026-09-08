@@ -29,34 +29,34 @@ export const SplitMapLayout = ({
   return (
     <div className={cn("flex flex-1 flex-col", className)}>
       {/* Mobile toggle buttons */}
-      <div className="flex gap-1 p-2 lg:hidden border-b border-gray-200 bg-white">
+      <div className="grid grid-cols-3 gap-1 border-b border-gray-200 bg-white p-2 lg:hidden">
         <Button
           variant={effectiveMobileView === "list" ? "default" : "outline"}
           size="sm"
           onClick={() => setMobileView("list")}
-          className="flex-1"
+          className="min-w-0 px-2"
         >
-          <List className="h-4 w-4 mr-2" />
-          Lista
+          <List className="mr-1 h-4 w-4 shrink-0 sm:mr-2" />
+          <span className="truncate">Lista</span>
         </Button>
         <Button
           variant={effectiveMobileView === "map" ? "default" : "outline"}
           size="sm"
           onClick={() => setMobileView("map")}
-          className="flex-1"
+          className="min-w-0 px-2"
         >
-          <Map className="h-4 w-4 mr-2" />
-          Kartta
+          <Map className="mr-1 h-4 w-4 shrink-0 sm:mr-2" />
+          <span className="truncate">Kartta</span>
         </Button>
         {rightPanel && (
           <Button
             variant={effectiveMobileView === "edit" ? "default" : "outline"}
             size="sm"
             onClick={() => setMobileView("edit")}
-            className="flex-1"
+            className="min-w-0 px-2"
           >
-            <Pencil className="h-4 w-4 mr-2" />
-            Muokkaa
+            <Pencil className="mr-1 h-4 w-4 shrink-0 sm:mr-2" />
+            <span className="truncate">Muokkaa</span>
           </Button>
         )}
       </div>
