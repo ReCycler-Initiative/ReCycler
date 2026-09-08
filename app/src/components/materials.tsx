@@ -3,7 +3,7 @@ import { normalizeMaterialText } from "@/lib/material-translations";
 import { getMaterials } from "@/services/api";
 import { useQuery } from "@tanstack/react-query";
 import { InfoIcon, RecycleIcon } from "lucide-react";
-import { ReactNode } from "react";
+import { ReactNode, useState } from "react";
 import BioWaste from "./icons/BioWaste";
 import Construction from "./icons/Building";
 import CarBattery from "./icons/CarBattery";
@@ -25,6 +25,7 @@ import WasteBin from "./icons/WasteBin";
 import Wood from "./icons/Wood";
 import LoadingSpinner from "./loading-spinner";
 import MarkdownBlock from "./markdown-block";
+import { Dialog, DialogContent } from "./ui/dialog";
 
 // HEX → rgba
 export const hexToRgba = (hex: string, alpha: number): string => {
@@ -38,7 +39,7 @@ export const hexToRgba = (hex: string, alpha: number): string => {
 };
 
 export const iconMap: {
-  content?: ReactNode;
+  content: ReactNode;
   code: number;
   baseHex?: string;
   icon?: ReactNode;
@@ -294,6 +295,7 @@ export const Materials = ({
 }) => {
   const { locale } = useLocale();
   const messages = useMessages();
+  const [content, setContent] = useState<ReactNode | null>(null);
   const { data: materials, isFetching } = useQuery({
     queryKey: ["materials", locale],
     queryFn: () => getMaterials(locale),
@@ -321,7 +323,7 @@ export const Materials = ({
             checked={checked}
             label={m.name}
             icon={match?.icon}
-            onInfo={() => {}}
+            onInfo={() => setContent(match?.content)}
             onToggle={() => {
               onSelectionChange(
                 checked
@@ -332,6 +334,11 @@ export const Materials = ({
           />
         );
       })}
+      <Dialog open={!!content} onOpenChange={() => setContent(null)}>
+        <DialogContent className="max-h-[80vh] overflow-y-auto">
+          {content}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
