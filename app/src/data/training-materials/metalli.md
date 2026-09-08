@@ -1,20 +1,26 @@
-Metallipakkaukset
+# Metallipakkaukset
 
 Metallipakkaukset ovat kierrätettäviä, ja ne voidaan hyödyntää uusien metallituotteiden valmistuksessa. Oikein kierrätettynä metalli säästää luonnonvaroja ja vähentää jätteen määrää. Metallipakkausten kierrätyspisteet löytyvät ReCycler-palvelusta.
 
-Lajitteluohje:
+**Lajitteluohje:**
 
 Noudata aina alueellisia ohjeita ja kierrätyspisteiden käytäntöjä.
 
-KYLLÄ:
+**KYLLÄ:**
+
 - säilyketölkit
 - alumiinitölkit ja -foliot
 - metallikannet ja korkit
 - aerosolipullot (tyhjät)
 
-EI:
+**EI:**
+
 - sähkölaitteet ja paristot
 - metalliesineet, kuten työkalut
 - vaarallisten aineiden jäämät
 
-Metallipakkaukset murskataan ja lajitellaan kierrätyslaitoksissa. Etsi lähin kierrätyspiste ReCycler-palvelusta valitsemalla "Metallipakkaukset".
+Metallipakkaukset murskataan ja lajitellaan kierrätyslaitoksissa.
+
+**Kierrätyspisteen löytäminen:**
+
+Etsi lähin kierrätyspiste ReCycler-palvelusta valitsemalla **"Metallipakkaukset"**.

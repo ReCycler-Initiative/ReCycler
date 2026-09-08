@@ -1,19 +1,25 @@
-Lasipakkaukset
+# Lasipakkaukset
 
 Lasipakkaukset ovat kierrätettäviä ja niistä saadaan raaka-ainetta uusien tuotteiden valmistukseen. Kierrätä lasipullot ja -purkit asianmukaisesti, jotta arvokkaat materiaalit saadaan talteen. Lasipakkauksille tarkoitetut keräyspisteet löytyvät ReCycler-palvelusta.
 
-Lajitteluohje:
+**Lajitteluohje:**
 
 Noudata aina alueellisia ohjeita ja kierrätyspisteiden käytäntöjä.
 
-KYLLÄ:
+**KYLLÄ:**
+
 - lasipullot
 - lasipurkit
 
-EI:
+**EI:**
+
 - juomalasit, uunivuoat
 - lamput ja valaisimet
 - ikkunalasi, peililasi
 - posliini, keramiikka
 
-Poista korkit ja kannet. Pantilliset pullot palautetaan kauppoihin. Lasipakkaukset kuljetetaan kierrätyslaitoksiin, joissa ne murskataan ja lajitellaan. Etsi lähin kierrätyspiste ReCycler-palvelusta valitsemalla "Lasipakkaukset".
+Poista korkit ja kannet. Pantilliset pullot palautetaan kauppoihin. Lasipakkaukset kuljetetaan kierrätyslaitoksiin, joissa ne murskataan ja lajitellaan.
+
+**Kierrätyspisteen löytäminen:**
+
+Etsi lähin kierrätyspiste ReCycler-palvelusta valitsemalla **"Lasipakkaukset"**.

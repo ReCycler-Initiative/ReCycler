@@ -1,14 +1,15 @@
-Biojäte
+# Biojäte
 
 Biojäte koostuu eloperäisistä, maatuvista jätteistä, kuten ruoantähteistä, kuorista ja kasvinosista. Oikein lajiteltuna biojätteestä voidaan valmistaa kompostia tai biokaasua, mikä vähentää kaatopaikkakuormitusta ja tuottaa uusiutuvaa energiaa.
 
 ReCycler-palvelussa esitetyt kierrätyspisteet on tarkoitettu erityisesti kotitalouksien jätteille.
 
-Lajitteluohje:
+**Lajitteluohje:**
 
 Noudata aina alueellisia ja keräyspistekohtaisia ohjeita! Seuraavat lajitteluohjeet ovat yleisluonteisia ja noudattavat vallitsevaa käytäntöä.
 
-KYLLÄ:
+**KYLLÄ:**
+
 - hedelmien ja vihannesten kuoret
 - ruoantähteet ja pilaantunut ruoka (myös liha ja kala)
 - kahvinporot ja suodatinpussit
@@ -17,7 +18,8 @@ KYLLÄ:
 - talouspaperi ja lautasliinat (likaiset)
 - biohajoavat biojätepussit
 
-EI:
+**EI:**
+
 - muovipakkaukset → kuuluvat muovinkeräykseen tai sekajätteeseen
 - metalliesineet → kuuluvat metallinkeräykseen
 - lasi → kuuluu lasinkeräykseen
@@ -26,10 +28,10 @@ EI:
 
 Biojätettä ei saa laittaa tavallisessa muovipussissa biojäteastiaan, ellei pussi ole biohajoava. Oikea lajittelu ehkäisee hajuhaittoja, vähentää metaanipäästöjä ja mahdollistaa jätteiden hyötykäytön esimerkiksi lannoitteena tai energianlähteenä.
 
-Käsittely ja kierrätys:
+**Käsittely ja kierrätys:**
 
 Biojäte kuljetetaan käsittelylaitokseen, jossa siitä tuotetaan kompostia tai biokaasua. Komposti käytetään maanparannusaineena ja biokaasu muunnetaan sähkön ja lämmön tuotantoon. Kompostoimalla kotona voit hyödyntää biojätteet puutarhassa ja vähentää jätteiden kuljetustarvetta.
 
-Kierrätyspisteen löytäminen:
+**Kierrätyspisteen löytäminen:**
 
-Jos sinulla on biojätettä, varmista alueellasi käytössä oleva biojätteen keräysjärjestelmä. ReCycler-palvelusta löydät biojätteen keräyspisteet valitsemalla kategorian "Biojäte".
+Jos sinulla on biojätettä, varmista alueellasi käytössä oleva biojätteen keräysjärjestelmä. ReCycler-palvelusta löydät biojätteen keräyspisteet valitsemalla kategorian **"Biojäte"**.

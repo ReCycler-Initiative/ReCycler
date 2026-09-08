@@ -1,31 +1,33 @@
-Pahvi
+# Pahvi
 
 Pahvin kierrätys on tärkeää, sillä kierrätetty pahvi voidaan käyttää uusien tuotteiden, kuten pakkausmateriaalien ja hylsykartongin, valmistuksessa. Tuo kaikki käytetty pahvi oikeisiin keräyspisteisiin, jotta se voidaan hyödyntää tehokkaasti.
 
 ReCycler-palvelussa esitetyt kierrätyspisteet on tarkoitettu erityisesti kotitalouksien jätteille.
 
-Lajitteluohje:
+**Lajitteluohje:**
 
 Noudata aina alueellisia ja keräyspistekohtaisia ohjeita! Seuraavat lajitteluohjeet ovat yleisluonteisia ja noudattavat vallitsevaa käytäntöä.
 
-KYLLÄ:
+**KYLLÄ:**
+
 - Pahvilaatikot
 - Ruskeat pakkauspahvit
 - Aaltopahvi
 - Kartonkiset postituspakkaukset
 - Puhdas ja kuiva pahvi ilman muovia tai teippiä
 
-EI:
+**EI:**
+
 - Likainen pahvi → sekajätteeseen
 - Muovipinnoitetut tai foliopintaiset pahvit → sekajätteeseen
 - Märkä pahvi → sekajätteeseen
 
 Pahvit voi usein myös palauttaa takaisin myymälöihin tai keräyspisteisiin, jotka hyväksyvät pahvijätettä. Keräyspisteistä pahvi kuljetetaan käsittelylaitoksille, joissa se lajitellaan, puhdistetaan ja valmistellaan kierrätystä varten.
 
-Käsittely ja kierrätys:
+**Käsittely ja kierrätys:**
 
 Pahvin kierrätysprosessissa se muokataan uudeksi raaka-aineeksi, jota voidaan hyödyntää esimerkiksi uusien pakkausmateriaalien valmistuksessa. Kierrättäminen säästää luonnonvaroja ja vähentää jätteen määrää, samalla pienentäen ympäristövaikutuksia.
 
-Kierrätyspisteen löytäminen:
+**Kierrätyspisteen löytäminen:**
 
-Jos sinulla on pahvia kierrätettäväksi, etsi lähin kierrätyspiste ReCycler-palvelusta valitsemalla kategoria "Pahvi" ja tarkista alueellasi olevat vastaanottopisteet.
+Jos sinulla on pahvia kierrätettäväksi, etsi lähin kierrätyspiste ReCycler-palvelusta valitsemalla kategoria **"Pahvi"** ja tarkista alueellasi olevat vastaanottopisteet.

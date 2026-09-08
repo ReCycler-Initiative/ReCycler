@@ -1,15 +1,19 @@
+# Puu
+
 Puun kierrättäminen säästää luonnonvaroja ja vähentää kaatopaikoille päätyvän jätteen määrää. Kierrätyksessä voidaan hyödyntää muun muassa puulevyjä, huonekaluja, puutarhajätteitä ja muuta puumateriaalia.
 
-Lajitteluohje:
+**Lajitteluohje:**
 
 Noudata aina alueellisia ja keräyspistekohtaisia ohjeita! Seuraavat lajitteluohjeet ovat yleisluonteisia ja noudattavat vallitsevaa käytäntöä.
 
-KYLLÄ:
+**KYLLÄ:**
+
 - Puulevyt, huonekalut ja rakennusjätteet
 - Puutarhajäte (oksat, lehdet, ruohonleikkuujätteet)
 - Puinen pakkausmateriaali (esim. vanhat laatikot, laatikkokannet)
 
-EI:
+**EI:**
+
 - Maalatut tai lakatut puuesineet → sekajätteeseen
 - Kyllästetyt tai kemikaaleilla käsitellyt puutavarat → sekajätteeseen
 - Muovia tai metallia sisältävät puu- ja rakennusmateriaalit → sekajätteeseen

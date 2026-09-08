@@ -1,14 +1,15 @@
-Ajoneuvoakut (lyijy)
+# Ajoneuvoakut (lyijy)
 
 Useat akut sisältävät vaarallisia aineita. Tuo akut oikeaan keräykseen! Talteen saatujen akkujen materiaalit kierrätetään uusien tuotteiden raaka-aineeksi tai hyödynnetään energiana.
 
 ReCyclerissä esitetyt vastaanottopisteet on tarkoitettu kotitalouksien jätteille.
 
-Lajitteluohje:
+**Lajitteluohje:**
 
 Noudata aina alueellisia ja keräyspistekohtaisia ohjeita! Tässä esitetyt lajitteluohjeet ovat yleisluonteisia ja vallitsevan käytännön mukaisia.
 
-KYLLÄ:
+**KYLLÄ:**
+
 - ajoneuvoakut
 - henkilö-, paketti- ja kuorma-autojen akut
 - mopojen ja moottoripyörien akut
@@ -23,11 +24,14 @@ KYLLÄ:
 - siivouskoneiden akut
 - veneakut
 
-EI:
+**EI:**
+
 - kannettavia akkuja ja paristoja → paristojen keräykseen
 - litiumakut
 
 Akut voi myös usein palauttaa samaan liikkeeseen, mistä ne on ostettu, tai saman alan liikkeeseen. Akut kuljetetaan keräyspisteistä käsittelylaitoksille.
+
+**Käsittely ja kierrätys:**
 
 Käsittelylaitoksessa akut puretaan hyödynnettäviksi materiaaleiksi.
 
@@ -35,4 +39,6 @@ Lyijystä saadaan lähes 100 prosenttia hyödynnettyä, ja sitä käytetään mm
 
 Lyijyakut tunnistaa akussa olevasta Pb-merkinnästä. Lyijyhappoakun keskeinen komponentti on lyijy, joka on raskasmetalli. Käytetyn akun jättäminen luontoon vahingoittaa ympäristöä.
 
-Mikäli sinulla on ajoneuvoakku, valitse ReCycler-palvelussa "Ajoneuvoakut (lyijy)" ja näytä kierrätyspisteet.
+**Kierrätyspisteen löytäminen:**
+
+Mikäli sinulla on ajoneuvoakku, valitse ReCycler-palvelussa **"Ajoneuvoakut (lyijy)"** ja näytä kierrätyspisteet.

@@ -1,14 +1,15 @@
-Lamput
+# Lamput
 
 Lamput sisältävät erilaisia materiaaleja, kuten lasia, metalleja ja joissakin tapauksissa vaarallisia aineita, kuten elohopeaa. Tämän vuoksi lamput on tärkeää toimittaa oikeisiin keräyspisteisiin. Kierrättämällä lamput saadaan talteen arvokkaita raaka-aineita ja vältetään ympäristövahingot.
 
 ReCycler-palvelussa esitetyt kierrätyspisteet on tarkoitettu erityisesti kotitalouksien jätteille.
 
-Lajitteluohje:
+**Lajitteluohje:**
 
 Noudata aina alueellisia ja keräyspistekohtaisia ohjeita! Seuraavat lajitteluohjeet ovat yleisluonteisia ja noudattavat vallitsevaa käytäntöä.
 
-KYLLÄ:
+**KYLLÄ:**
+
 - hehkulamput
 - halogeenilamput
 - energiansäästölamput (sisältävät elohopeaa)
@@ -16,17 +17,18 @@ KYLLÄ:
 - pienoisloistelamput (esim. kierrekantaiset energiansäästölamput)
 - polttimot (kodin valaisimet)
 
-EI:
+**EI:**
+
 - rikkinäiset lasiesineet → kuuluvat sekajätteeseen
 - valaisimet ja lamppujen rungot → kuuluvat sähkölaitteiden keräykseen
 - akut ja paristot → kuuluvat paristojen keräykseen
 
 Lamppuja ei saa heittää sekajätteeseen, sillä monet lamput sisältävät aineita, jotka voivat olla haitallisia ympäristölle. Energialamput ja loisteputket voivat sisältää elohopeaa, joka on vaarallista joutuessaan luontoon. Lamput voi usein palauttaa takaisin myymälöihin tai keräyspisteisiin, joissa on erillinen lamppujen keräysastia.
 
-Käsittely ja kierrätys:
+**Käsittely ja kierrätys:**
 
 Kierrätettäessä lamput murskataan ja lajitellaan. Lasiosat, metallit ja muut materiaalit erotellaan ja toimitetaan jatkokäsittelyyn. Energialamppujen sisältämä elohopea kerätään talteen ja käsitellään turvallisesti. Lasimateriaalit voidaan käyttää uudelleen esimerkiksi uusien lamppujen valmistuksessa.
 
-Kierrätyspisteen löytäminen:
+**Kierrätyspisteen löytäminen:**
 
-Jos sinulla on lamppuja kierrätettäväksi, etsi lähin kierrätyspiste ReCycler-palvelusta valitsemalla kategoria "Lamput" ja tarkista alueellasi olevat vastaanottopisteet.
+Jos sinulla on lamppuja kierrätettäväksi, etsi lähin kierrätyspiste ReCycler-palvelusta valitsemalla kategoria **"Lamput"** ja tarkista alueellasi olevat vastaanottopisteet.

@@ -1,12 +1,13 @@
-Sekajäte
+# Sekajäte
 
 Sekajäte, tunnetaan myös nimillä kuivajäte, polttojäte, poltettava jäte tai polttokelpoinen jäte, koostuu materiaaleista, joita ei voida kierrättää tai jotka eivät kuulu muihin jätejakeisiin. On tärkeää lajitella jätteet huolellisesti, jotta sekajätteeseen päätyy mahdollisimman vähän kierrätettäviä tai vaarallisia aineita.
 
-Lajitteluohje:
+**Lajitteluohje:**
 
-Noudata aina alueellisia ja keräyspistekohtaisia ohjeita! 
+Noudata aina alueellisia ja keräyspistekohtaisia ohjeita!
 
-KYLLÄ:
+**KYLLÄ:**
+
 - likaantuneet paperit, pahvit ja muovipakkaukset (jos muovipakkausten keräystä ei ole saatavilla)
 - hehku- ja halogeenilamput
 - sulakkeet
@@ -26,24 +27,30 @@ KYLLÄ:
 - tavallinen ja mineraalipohjainen kissanhiekka
 - lemmikkieläinten jätökset
 
-EI:
+**EI:**
+
 - vaaralliset jätteet
 - sähkölaitteet
 - kierrätykseen lajiteltavissa olevat materiaalit
 
-Muista:
+**Muista:**
+
 Jätteen hävittäminen polttamalla on kotioloissa kielletty. Kotitulisijoissa, kuten uuneissa ja takoissa, lämpötila ei nouse riittävän korkeaksi, mikä johtaa epätäydelliseen palamiseen ja haitallisten päästöjen muodostumiseen. Muovin polttaminen voi myös vaurioittaa hormistoa tai tukkia sen.
 
-Keräys ja kuljetus:
+**Keräys ja kuljetus:**
+
 Sekajätettä kerätään yleensä kiinteistökohtaisesti. Harvempaan asutuilla alueilla keräys voi olla järjestetty aluekeräyspisteillä tai usean kiinteistön yhteisillä astioilla ns. kimppakeräyksenä. Sekajäte kuljetetaan energiahyödynnettäväksi jätevoimalaitoksiin.
 
-Käsittely:
+**Käsittely:**
+
 Jätevoimalaitoksessa sekajäte poltetaan noin tuhannen asteen lämpötilassa. Palamisesta syntynyt höyry pyörittää turbiinia, ja laitokset tuottavat sähköä sekä kaukolämpöä. Savukaasut puhdistetaan nykyaikaisilla menetelmillä. Syntyneestä kuonasta erotellaan metalleja, ja osa kuonasta hyödynnetään maanrakentamisessa, esimerkiksi kaatopaikkojen katemateriaalina.
 
-Hyödyntäminen:
+**Hyödyntäminen:**
+
 Sekajätteellä tuotettua lämpöenergiaa hyödynnetään esimerkiksi kaupunkien kaukolämpöverkossa ja teollisuuden prosesseissa. Lisäksi jätevoimalaitokset tuottavat sähköä valtakunnan verkkoon. Jätteen energiahyödyntäminen korvaa fossiilisia polttoaineita ja auttaa torjumaan ilmastonmuutosta.
 
-Lisätietoa:
+**Lisätietoa:**
+
 Tehokkaalla syntypaikkalajittelulla varmistetaan, että sekajätteeseen jää mahdollisimman vähän kierrätettäviä tai vaarallisia jätteitä. Sekajätteen energiasisältö on pääosin uusiutuvaa, ja sen hyödyntäminen vähentää kasvihuonekaasupäästöjä. Energiahyödyntäminen täydentää materiaalien kierrätystä eurooppalaisen jätehuoltokäytännön mukaisesti. Maissa, joissa yhdyskuntajätteiden energiahyödyntämisen aste on korkea, myös materiaalikierrätyksen taso on yleensä korkea.
 
 Sekajätettä vastaanottavat lajitteluasemat löytyvät ReCycler-palvelusta.

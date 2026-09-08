@@ -1,4 +1,4 @@
-Muu jäte
+# Muu jäte
 
 Kaikki jäte ei aina sovi selkeästi tiettyyn kierrätyskategoriaan. Tällaiset jätteet luokitellaan usein sekajätteeksi tai erityisjätteeksi riippuen niiden ominaisuuksista ja käsittelytarpeista. On tärkeää noudattaa paikallisia lajitteluohjeita ja hyödyntää oikeita jätteenkäsittelyratkaisuja ympäristövaikutusten minimoimiseksi.
 
@@ -7,12 +7,14 @@ Lajitteluohje:
 Noudata aina paikallisia ohjeita ja varmista, että toimitat jätteen oikeaan paikkaan käsiteltäväksi.
 
 KYLLÄ:
+
 - Yhdyskuntajäte, joka ei ole kierrätettävissä
 - Vaaraton rakennusjäte (esim. kipsilevy, keramiikka)
 - Epäpuhtaat tai vahingoittuneet pakkaukset, joita ei voi kierrättää
 - Tekstiilit, jotka eivät sovi kierrätykseen
 
 EI:
+
 - Vaaralliset jätteet → toimita vaarallisten jätteiden vastaanottopaikkaan
 - Kierrätettävät jätteet, kuten metalli, lasi tai paperi → oikeisiin kierrätyskategorioihin
 - Biojäte → biojätteen keräykseen

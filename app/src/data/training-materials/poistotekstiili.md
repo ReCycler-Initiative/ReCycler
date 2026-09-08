@@ -1,28 +1,33 @@
-Poistotekstiili
+# Poistotekstiili
 
 Poistotekstiilit ovat rikkinäisiä, loppuun kuluneita tai muuten käyttökelvottomia tekstiilejä, joita ei voi enää käyttää uudelleen. Poistotekstiilin kierrätys on tärkeää, jotta arvokkaat materiaalit saadaan hyödynnettyä uusiksi tuotteiksi, kuten kierrätyskuiduksi, eristeiksi tai uusiksi tekstiileiksi. Poistotekstiiliä vastaanottavat lajitteluasemat löytyvät ReCycler-palvelusta.
 
-Lajitteluohje:
+**Lajitteluohje:**
 
 Noudata aina alueellisia ohjeita ja lajitteluasemien käytäntöjä.
 
-KYLLÄ:
+**KYLLÄ:**
+
 - rikkinäiset ja loppuun kuluneet vaatteet
 - käyttökelvottomat kodintekstiilit, kuten verhot, pyyhkeet ja lakanat
 - puhtaat ja kuivat tekstiilit ilman kovia osia, kuten nappeja tai vetoketjuja
 - farkut, villapaidat ja muut kangasmateriaalit, jotka soveltuvat kierrätykseen
 
-EI:
+**EI:**
+
 - märät, homeiset tai likaiset tekstiilit
 - alusvaatteet, sukat ja sukkahousut
 - matot, tyynyt, peitot ja pehmusteet
 - pehmolelut ja muut täytetyt tekstiilituotteet
 
-Muista:
+**Muista:**
+
 Poistotekstiili tulee pakata tiiviisti muovipussiin, jotta se pysyy kuivana ja puhtaana kierrätystä varten. Vain puhtaat ja kuivat tekstiilit voidaan hyödyntää kierrätysmateriaalina.
 
-Keräys ja kuljetus:
+**Keräys ja kuljetus:**
+
 Poistotekstiiliä kerätään alueellisesti lajitteluasemilla tai erillisissä keräyspisteissä. Tarkista oman alueesi keräyspaikat ReCycler-palvelusta tai paikallisen jätehuoltoyhtiön verkkosivuilta.
 
-Käsittely:
-Poistotekstiilit lajitellaan ja käsitellään mekaanisesti tai kemiallisesti. K
+**Käsittely:**
+
+Poistotekstiilit lajitellaan ja käsitellään mekaanisesti tai kemiallisesti.

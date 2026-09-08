@@ -1,12 +1,13 @@
-Sähkölaitteet (SER)
+# Sähkölaitteet (SER)
 
 Sähkö- ja elektroniikkalaitteet (SER) sisältävät materiaaleja, kuten metalleja ja muoveja, joita voidaan kierrättää uusien tuotteiden raaka-aineiksi. On tärkeää palauttaa käytöstä poistuneet sähkölaitteet asianmukaisiin kierrätyspisteisiin, jotta ympäristölle haitalliset aineet käsitellään oikein ja arvokkaat materiaalit saadaan talteen. Sähkölaitteita vastaanottavat lajitteluasemat löytyvät ReCycler-palvelusta.
 
-Lajitteluohje:
+**Lajitteluohje:**
 
 Noudata alueellisia ohjeita ja lajitteluasemien käytäntöjä.
 
-KYLLÄ:
+**KYLLÄ:**
+
 - kodinkoneet, kuten jääkaapit, liedet ja pesukoneet
 - viihde-elektroniikka, kuten televisiot, stereot ja pelikonsolit
 - pienet sähkölaitteet, kuten sähkövatkaimet, kahvinkeittimet ja hiustenkuivaajat
@@ -15,7 +16,8 @@ KYLLÄ:
 - sähkötyökalut, kuten porakoneet ja sahat
 - paristot ja akut (jos erillistä keräystä ei ole saatavilla)
 
-EI:
+**EI:**
+
 - hehkulamput ja halogeenilamput (sekajäte)
 - tavallinen kotitalousjäte
 - vaaralliset jätteet, kuten öljyt ja kemikaalit
@@ -23,8 +25,10 @@ EI:
 
 Sähkölaitteet on palautettava ehjinä aina kun mahdollista, jotta ne voidaan purkaa ja kierrättää turvallisesti. Poista mahdolliset akut ja paristot ennen laitteen palauttamista, ellei niitä ole integroitu laitteeseen.
 
-Keräys ja kierrätys:
+**Keräys ja kierrätys:**
+
 SER-jäte kuljetetaan kierrätyslaitoksiin, joissa laitteet puretaan osiin. Kierrätyksessä erotellaan metallit, muovit ja muut käyttökelpoiset materiaalit, jotka ohjataan uusiokäyttöön. Ympäristölle haitalliset aineet, kuten elohopea ja lyijy, käsitellään erityisillä menetelmillä.
 
-Lisätietoa:
+**Lisätietoa:**
+
 SER-jätteen kierrätys auttaa säästämään luonnonvaroja ja vähentämään kasvihuonekaasupäästöjä. Kierrättämällä sähkölaitteet oikein varmistetaan, että haitalliset aineet eivät päädy ympäristöön. Etsi lähin SER-keräyspiste ReCycler-palvelusta.

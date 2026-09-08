@@ -1,21 +1,23 @@
-Paperi
+# Paperi
 
 Paperin kierrättäminen on oleellinen osa luonnonvarojen säästämistä. Kierrätetty paperi voidaan käyttää uudelleen esimerkiksi sanomalehtipaperin, pehmopaperin ja pakkausmateriaalien valmistukseen. Tuo käytetty paperi oikeisiin keräyspisteisiin, jotta se voidaan hyödyntää tehokkaasti.
 
 ReCycler-palvelussa esitetyt kierrätyspisteet on tarkoitettu erityisesti kotitalouksien jätteille.
 
-Lajitteluohje:
+**Lajitteluohje:**
 
 Noudata aina alueellisia ja keräyspistekohtaisia ohjeita! Seuraavat lajitteluohjeet ovat yleisluonteisia ja noudattavat vallitsevaa käytäntöä.
 
-KYLLÄ:
+**KYLLÄ:**
+
 - Sanomalehdet ja aikakauslehdet
 - Mainospostit ja esitteet
 - Kirjekuoret (myös ikkunalliset)
 - Muistiinpanopaperi ja tulosteet
 - Vihkot ja kirjojen paperiosat (kannet poistettu)
 
-EI:
+**EI:**
+
 - Märkä tai likainen paperi → sekajätteeseen
 - Kartonki → kartongin kierrätykseen
 - Alumiinipintaiset tai muovilla päällystetyt paperit → sekajätteeseen
@@ -23,10 +25,10 @@ EI:
 
 Paperijäte tulee pitää kuivana ja puhtaana ennen kierrätystä. Keräyspisteistä paperi kuljetetaan käsittelylaitoksille, joissa se lajitellaan, puhdistetaan ja käsitellään uusiksi tuotteiksi.
 
-Käsittely ja kierrätys:
+**Käsittely ja kierrätys:**
 
 Paperin kierrätysprosessissa materiaali muutetaan selluksi, jota voidaan hyödyntää esimerkiksi sanomalehtien, pehmopaperien tai pakkausmateriaalien valmistuksessa. Kierrättäminen säästää puuraaka-ainetta ja vähentää jätteen määrää.
 
-Kierrätyspisteen löytäminen:
+**Kierrätyspisteen löytäminen:**
 
-Jos sinulla on paperijätettä kierrätettäväksi, etsi lähin kierrätyspiste ReCycler-palvelusta valitsemalla kategoria "Paperi" ja tarkista alueellasi olevat vastaanottopisteet.
+Jos sinulla on paperijätettä kierrätettäväksi, etsi lähin kierrätyspiste ReCycler-palvelusta valitsemalla kategoria **"Paperi"** ja tarkista alueellasi olevat vastaanottopisteet.

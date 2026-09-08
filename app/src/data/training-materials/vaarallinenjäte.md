@@ -1,4 +1,4 @@
-Vaarallinen jäte
+# Vaarallinen jäte
 
 Vaarallinen jäte sisältää aineita, jotka voivat olla haitallisia ihmisille, ympäristölle tai eläimille. Tämän vuoksi ne tulee lajitella huolellisesti ja toimittaa asianmukaisiin vaarallisen jätteen keräyspisteisiin. Vaarallista jätettä vastaanottavat lajitteluasemat löytyvät ReCycler-palvelusta.
 
@@ -7,6 +7,7 @@ Lajitteluohje:
 Noudata aina alueellisia ohjeita ja lajitteluasemien käytäntöjä.
 
 KYLLÄ:
+
 - maalit, lakat, liimat ja liuottimet
 - torjunta-aineet ja kemikaalit
 - öljyt ja öljynsuodattimet
@@ -18,6 +19,7 @@ KYLLÄ:
 - asbesti ja muut terveydelle haitalliset rakennusmateriaalit
 
 EI:
+
 - kotitalousjätteet
 - kierrätettävät jätteet, kuten lasi, metalli tai kartonki
 - tavalliset sähkölaitteet (SER-jäte)
