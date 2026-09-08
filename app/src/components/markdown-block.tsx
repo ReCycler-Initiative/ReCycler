@@ -1,5 +1,6 @@
 "use client";
 
+import { cn } from "@/utils/shadcn";
 import { useEffect, useState } from "react";
 import ReactMarkdown, { Components } from "react-markdown";
 
@@ -74,9 +75,22 @@ const markdownComponents: Components = {
     <img className="my-6 rounded-lg max-w-full h-auto" {...props} />
   ),
 
-  strong: ({ node, ...props }) => (
-    <strong className="font-semibold" {...props} />
-  ),
+  strong: ({ node, children, ...props }) => {
+    const text = String(children);
+
+    const className =
+      text.toLowerCase().includes("kyllä") || text.toLowerCase().includes("yes")
+        ? "text-green-600"
+        : text.toLowerCase().includes("ei") || text.toLowerCase().includes("no")
+          ? "text-red-600"
+          : "";
+
+    return (
+      <strong className={cn("font-semibold", className)} {...props}>
+        {children}
+      </strong>
+    );
+  },
   em: ({ node, ...props }) => <em className="italic" {...props} />,
 
   pre: ({ node, ...props }) => <>{props.children}</>,
