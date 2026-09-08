@@ -19,7 +19,7 @@ const HomePage = () => {
           src={hero}
       </div>
          */}
-      <Container className="flex-1 max-w-4xl">
+      <Container className="flex-1 max-w-4xl text-center">
         <h1 className="text-2xl font-medium mb-4 font-sans">
           {messages.recyclerHome.title}
         </h1>
