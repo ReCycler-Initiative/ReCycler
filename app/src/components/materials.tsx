@@ -120,7 +120,7 @@ export const iconMap: {
     code: 114,
     baseHex: "#000000",
     icon: <WasteBin />,
-    content: <MarkdownBlock filePath="sekajäte.md" />,
+    content: <MarkdownBlock filePath="muujäte.md" />,
   },
   {
     code: 104,
@@ -335,8 +335,10 @@ export const Materials = ({
         );
       })}
       <Dialog open={!!content} onOpenChange={() => setContent(null)}>
-        <DialogContent>
-          <div className="max-h-[80vh] overflow-y-auto">{content}</div>
+        <DialogContent className="max-w-3xl px-0">
+          <div className="h-[800px] max-h-[80vh] overflow-y-auto px-4 lg:px-6">
+            {content}
+          </div>
         </DialogContent>
       </Dialog>
     </div>

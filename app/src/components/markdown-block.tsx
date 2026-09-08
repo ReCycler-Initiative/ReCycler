@@ -1,8 +1,12 @@
 "use client";
 
 import { cn } from "@/utils/shadcn";
+import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import ReactMarkdown, { Components } from "react-markdown";
+import { PageLoadingSpinner } from "./page-loading-spinner";
+import LoadingSpinner from "./loading-spinner";
+import { LoadingState } from "./loading-state";
 
 const markdownComponents: Components = {
   h1: ({ node, ...props }) => (
@@ -97,15 +101,22 @@ const markdownComponents: Components = {
 };
 
 export default function MarkdownBlock({ filePath }: { filePath: string }) {
-  const [content, setContent] = useState("");
-
-  useEffect(() => {
-    fetch("/content/" + filePath)
-      .then((res) => res.text())
-      .then(setContent);
-  }, [filePath]);
+  const { data, error, isLoading } = useQuery<string>({
+    queryKey: ["markdown", filePath],
+    queryFn: async () => {
+      const res = await fetch("/content/" + filePath);
+      if (!res.ok) {
+        throw new Error("Failed to fetch markdown content");
+      }
+      return res.text();
+    },
+  });
 
   return (
-    <ReactMarkdown components={markdownComponents}>{content}</ReactMarkdown>
+    <LoadingState error={!!error} isLoading={isLoading}>
+      <ReactMarkdown components={markdownComponents}>
+        {data ?? ""}
+      </ReactMarkdown>
+    </LoadingState>
   );
 }
