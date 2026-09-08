@@ -76,7 +76,6 @@ export async function POST(req: NextRequest) {
       history = [],
       imageBase64,
       imageMimeType,
-      organizationId,
       useCaseId,
       locale: rawLocale,
       currentSelectedCodes = [],
