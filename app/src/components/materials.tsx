@@ -102,7 +102,7 @@ export const iconMap: {
     code: 109,
     baseHex: "#d9001e",
     icon: <ElectricWaste />,
-    content: <MarkdownBlock filePath="energiajäte.md" />,
+    content: <MarkdownBlock filePath="Sähkölaitteet(SER).md" />,
   },
   {
     code: 100,
@@ -126,7 +126,7 @@ export const iconMap: {
     code: 104,
     baseHex: "#176eb1",
     icon: <CardBoard />,
-    content: <MarkdownBlock filePath="kartonki.md" />,
+    content: <MarkdownBlock filePath="pahvi.md" />,
   },
   {
     code: 103,
@@ -138,7 +138,7 @@ export const iconMap: {
     code: 120,
     baseHex: "#6b9030",
     icon: <Textile />,
-    content: <MarkdownBlock filePath="tekstiili.md" />,
+    content: <MarkdownBlock filePath="poistotekstiili.md" />,
   },
   {
     code: 117,

@@ -1,4 +1,4 @@
-# Muovijäte
+# Muovi
 
 Muovien kierrätys on tärkeä osa jätteiden käsittelyä, sillä se mahdollistaa arvokkaiden raaka-aineiden uudelleenkäytön ja vähentää fossiilisten raaka-aineiden tarvetta. Suomessa muovipakkausjätettä kerätään erityisesti kotitalouksilta erilliskeräyksen avulla, ja keräyspisteitä löytyy ympäri maata.
 

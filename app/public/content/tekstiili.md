@@ -1,4 +1,4 @@
-# Tekstiilit
+# Tekstiili
 
 Tekstiilijätteiden asianmukainen lajittelu ja kierrätys ovat tärkeitä ympäristön suojelemiseksi ja luonnonvarojen säästämiseksi. Käyttökelpoiset, ehjät ja puhtaat vaatteet sekä kodintekstiilit kannattaa myydä tai lahjoittaa uudelleenkäyttöön. Rikkinäiset tai loppuun kuluneet tekstiilit voidaan kierrättää poistotekstiilinä, mikäli alueellasi on siihen keräysmahdollisuus. Muussa tapauksessa ne kuuluvat sekajätteeseen.
 

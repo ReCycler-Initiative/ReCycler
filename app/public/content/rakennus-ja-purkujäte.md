@@ -1,4 +1,4 @@
-# Rakennus- ja purkujätteet
+# Rakennus- ja purkujäte
 
 Rakennus- ja purkujätteet sisältävät monenlaisia materiaaleja, jotka voidaan hyödyntää uudelleen tai kierrättää. Lajittelemalla jätteet oikein työmaalla varmistetaan arvokkaiden materiaalien talteenotto ja ympäristöystävällinen käsittely. Rakennus- ja purkujätteen keräyspisteet löytyvät ReCycler-palvelusta.
 

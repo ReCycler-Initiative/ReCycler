@@ -1,4 +1,4 @@
-# Paristot ja pienakut
+# Kannettavat akut ja paristot
 
 Paristot ja pienakut sisältävät usein vaarallisia aineita, jotka voivat haitata ympäristöä, jos niitä ei käsitellä asianmukaisesti. Tuo kaikki käytetyt paristot ja pienakut oikeisiin keräyspisteisiin! Talteen saadut materiaalit voidaan kierrättää uusien tuotteiden raaka-aineiksi tai hyödyntää energiana.
 

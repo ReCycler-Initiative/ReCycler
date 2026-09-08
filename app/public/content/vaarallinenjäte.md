@@ -2,11 +2,11 @@
 
 Vaarallinen jäte sisältää aineita, jotka voivat olla haitallisia ihmisille, ympäristölle tai eläimille. Tämän vuoksi ne tulee lajitella huolellisesti ja toimittaa asianmukaisiin vaarallisen jätteen keräyspisteisiin. Vaarallista jätettä vastaanottavat lajitteluasemat löytyvät ReCycler-palvelusta.
 
-Lajitteluohje:
+**Lajitteluohje:**
 
 Noudata aina alueellisia ohjeita ja lajitteluasemien käytäntöjä.
 
-KYLLÄ:
+**KYLLÄ:**
 
 - maalit, lakat, liimat ja liuottimet
 - torjunta-aineet ja kemikaalit
@@ -18,24 +18,29 @@ KYLLÄ:
 - myrkyt ja desinfiointiaineet
 - asbesti ja muut terveydelle haitalliset rakennusmateriaalit
 
-EI:
+**EI:**
 
 - kotitalousjätteet
 - kierrätettävät jätteet, kuten lasi, metalli tai kartonki
 - tavalliset sähkölaitteet (SER-jäte)
 - biojäte tai sekajäte
 
-Muista:
+**Muista:**
+
 Vaaralliset jätteet tulee pakata tiiviisti alkuperäiseen pakkaukseen tai merkittyyn astiaan, jotta ne eivät aiheuta vaaraa kuljetuksessa ja käsittelyssä. Älä sekoita eri vaarallisia aineita keskenään.
 
-Keräys ja kuljetus:
+**Keräys ja kuljetus:**
+
 Vaarallista jätettä otetaan vastaan erillisissä vaarallisen jätteen keräyspisteissä ja lajitteluasemilla. Joillakin alueilla on myös kiertäviä keräyspalveluita, joista saa lisätietoa paikalliselta jätehuoltoyhtiöltä.
 
-Käsittely:
+**Käsittely:**
+
 Vaaralliset jätteet käsitellään erityisissä laitoksissa, joissa ne neutraloidaan, poltetaan turvallisesti tai kierrätetään osaksi uusia raaka-aineita. Esimerkiksi metallit ja öljyt voidaan ottaa talteen ja hyödyntää uudelleen.
 
-Hyödyntäminen:
+**Hyödyntäminen:**
+
 Osa vaarallisista jätteistä voidaan kierrättää turvallisesti uusien tuotteiden raaka-aineiksi, kun taas osa hävitetään kontrolloiduissa olosuhteissa, jotta ne eivät aiheuta haittaa ympäristölle.
 
-Lisätietoa:
+**Lisätietoa:**
+
 Vaarallisen jätteen käsittelyvaatimukset voivat vaihdella alueittain. Tarkista paikalliset ohjeet ja keräyspisteet oman jätehuoltoyhtiösi verkkosivuilta tai ReCycler-palvelusta.

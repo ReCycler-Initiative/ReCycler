@@ -1,4 +1,4 @@
-# Lasipakkaukset
+# Lasi
 
 Lasipakkaukset ovat kierrätettäviä ja niistä saadaan raaka-ainetta uusien tuotteiden valmistukseen. Kierrätä lasipullot ja -purkit asianmukaisesti, jotta arvokkaat materiaalit saadaan talteen. Lasipakkauksille tarkoitetut keräyspisteet löytyvät ReCycler-palvelusta.
 

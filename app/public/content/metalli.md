@@ -1,4 +1,4 @@
-# Metallipakkaukset
+# Metalli
 
 Metallipakkaukset ovat kierrätettäviä, ja ne voidaan hyödyntää uusien metallituotteiden valmistuksessa. Oikein kierrätettynä metalli säästää luonnonvaroja ja vähentää jätteen määrää. Metallipakkausten kierrätyspisteet löytyvät ReCycler-palvelusta.
 
