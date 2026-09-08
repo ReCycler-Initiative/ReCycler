@@ -1,4 +1,4 @@
-# End-of-life textiles
+# Discarded textile
 
 End-of-life textiles are broken, worn-out, or otherwise unusable textiles that can no longer be reused. Recycling end-of-life textiles is important so that valuable materials can be recovered for new products, such as recycled fiber, insulation, or new textiles. Sorting stations that accept end-of-life textiles can be found in the ReCycler service.
 

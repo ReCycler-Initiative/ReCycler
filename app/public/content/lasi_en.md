@@ -1,4 +1,4 @@
-# Glass packaging
+# Glass
 
 Glass packaging is recyclable and provides raw material for making new products. Recycle glass bottles and jars properly so that valuable materials can be recovered. Collection points for glass packaging can be found in the ReCycler service.
 

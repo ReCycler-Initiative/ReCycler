@@ -1,4 +1,4 @@
-# Cardboard
+# Carton
 
 It is important to recycle cardboard packaging, as it provides valuable raw material for making new products. Recycled cardboard can be used, for example, to make paper, core board, or new packaging. Take all used cardboard packaging to the proper collection points.
 

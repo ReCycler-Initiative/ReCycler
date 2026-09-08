@@ -1,4 +1,4 @@
-# Electrical and electronic equipment (WEEE)
+# Electronics (WEEE)
 
 Electrical and electronic equipment (WEEE) contains materials such as metals and plastics that can be recycled into raw materials for new products. It is important to return discarded electrical devices to proper recycling points so that environmentally harmful substances are handled correctly and valuable materials can be recovered. Sorting stations that accept electrical equipment can be found in the ReCycler service.
 

@@ -1,4 +1,4 @@
-# Batteries and small rechargeable batteries
+# Portable batteries
 
 Batteries and small rechargeable batteries often contain hazardous substances that can harm the environment if they are not handled properly. Take all used batteries and small rechargeable batteries to the correct collection points. The recovered materials can be recycled into raw materials for new products or used for energy recovery.
 

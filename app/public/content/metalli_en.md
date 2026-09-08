@@ -1,4 +1,4 @@
-# Metal packaging
+# Metal
 
 Metal packaging is recyclable and can be used in the manufacture of new metal products. When recycled properly, metal saves natural resources and reduces the amount of waste. Collection points for metal packaging can be found in the ReCycler service.
 

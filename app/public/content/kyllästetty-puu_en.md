@@ -1,4 +1,4 @@
-# Treated wood
+# Pressure-treated wood
 
 Treated wood often contains chemicals that can harm the environment if it is not handled properly. That is why it is important to take all used treated wood to the correct collection points. This ensures that the hazardous substances in the wood can be managed safely.
 

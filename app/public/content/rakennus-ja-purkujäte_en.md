@@ -1,4 +1,4 @@
-# Construction and demolition waste
+# Construction waste
 
 Construction and demolition waste includes many kinds of materials that can be reused or recycled. Sorting waste correctly at the site helps ensure that valuable materials are recovered and handled in an environmentally responsible way. Collection points for construction and demolition waste can be found in the ReCycler service.
 
