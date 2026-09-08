@@ -272,7 +272,7 @@ export const CustomCheckbox = ({
   checked: boolean;
   icon?: ReactNode;
   label: string;
-  onInfo: () => void;
+  onInfo?: () => void;
   onToggle: () => void;
 }) => {
   const backgroundColor = baseHex
@@ -301,12 +301,14 @@ export const CustomCheckbox = ({
         />
         <span className="text-sm">{label}</span>
       </label>
-      <button
-        className="absolute top-0 right-0 p-1.5 text-gray-200 hover:text-gray-300 cursor-pointer active:bg-black/10 rounded-r"
-        onClick={onInfo}
-      >
-        <InfoIcon size="20" />
-      </button>
+      {onInfo && (
+        <button
+          className="absolute top-0 right-0 p-1.5 text-gray-200 hover:text-gray-300 cursor-pointer active:bg-black/10 rounded-r"
+          onClick={onInfo}
+        >
+          <InfoIcon size="20" />
+        </button>
+      )}
     </div>
   );
 };
