@@ -21,7 +21,11 @@ import { getNameIconEntry, hexToRgba, iconMap } from "./materials";
 import { Button } from "./ui/button";
 import { Textarea } from "./ui/textarea";
 
-type Message = { role: "user" | "assistant"; content: string; imagePreview?: string };
+type Message = {
+  role: "user" | "assistant";
+  content: string;
+  imagePreview?: string;
+};
 type CartMaterial = Material & { baseHex?: string; icon?: React.ReactNode };
 type PendingImage = { base64: string; mimeType: string; previewUrl: string };
 
@@ -68,6 +72,14 @@ export const AiMaterialPrompt = ({
   const selectedCodesRef = useRef(selectedCodes);
   const selectedFieldValuesRef = useRef(selectedFieldValues);
 
+  const [speechSupported, setSpeechSupported] = useState(false);
+
+  useEffect(() => {
+    setSpeechSupported(
+      "SpeechRecognition" in window || "webkitSpeechRecognition" in window
+    );
+  }, []);
+
   const { data: materials } = useQuery({
     queryKey: ["materials", locale],
     queryFn: () => getMaterials(locale),
@@ -102,19 +114,21 @@ export const AiMaterialPrompt = ({
       const selectedIndices = selectedFieldValues[field.id] ?? [];
       const choices = field.options?.choices ?? [];
       const selectedChoices = selectedIndices.flatMap((index) => {
-          const rawValue = choices[index];
-          if (!rawValue) return [];
+        const rawValue = choices[index];
+        if (!rawValue) return [];
 
-          const visual = getNameIconEntry(rawValue);
+        const visual = getNameIconEntry(rawValue);
 
-          return [{
+        return [
+          {
             index,
             rawValue,
             label: localizeMaterialNameCandidate(rawValue, locale),
             baseHex: visual?.baseHex,
             icon: visual?.icon,
-          }];
-        });
+          },
+        ];
+      });
 
       return {
         fieldId: field.id,
@@ -153,9 +167,10 @@ export const AiMaterialPrompt = ({
   const removeFieldSelection = (fieldId: string, indexToRemove: number) => {
     if (!onSelectedFieldValuesChange) return;
 
-    const nextValues = selectedFieldValues[fieldId]?.filter(
-      (index) => index !== indexToRemove
-    ) ?? [];
+    const nextValues =
+      selectedFieldValues[fieldId]?.filter(
+        (index) => index !== indexToRemove
+      ) ?? [];
 
     onSelectedFieldValuesChange({
       ...selectedFieldValues,
@@ -191,7 +206,10 @@ export const AiMaterialPrompt = ({
         if (selectedCodesRef.current.length === 0) {
           onSelectedCodesChange(res.suggestedCodes);
         }
-        if (onSelectedFieldValuesChange && Object.keys(res.suggestedFieldValues ?? {}).length > 0) {
+        if (
+          onSelectedFieldValuesChange &&
+          Object.keys(res.suggestedFieldValues ?? {}).length > 0
+        ) {
           onSelectedFieldValuesChange(res.suggestedFieldValues);
         }
         setPreparationTips(res.preparationTips);
@@ -293,7 +311,7 @@ export const AiMaterialPrompt = ({
     }
 
     const recognition = new SR();
-  recognition.lang = locale === "en" ? "en-US" : "fi-FI";
+    recognition.lang = locale === "en" ? "en-US" : "fi-FI";
     recognition.continuous = false;
     recognition.interimResults = true;
     recognitionRef.current = recognition;
@@ -328,7 +346,11 @@ export const AiMaterialPrompt = ({
     canvas.height = video.videoHeight;
     canvas.getContext("2d")!.drawImage(video, 0, 0);
     const dataUrl = canvas.toDataURL("image/jpeg", 0.85);
-    setPendingImage({ base64: dataUrl.split(",")[1], mimeType: "image/jpeg", previewUrl: dataUrl });
+    setPendingImage({
+      base64: dataUrl.split(",")[1],
+      mimeType: "image/jpeg",
+      previewUrl: dataUrl,
+    });
     stopCamera();
   };
 
@@ -403,7 +425,12 @@ export const AiMaterialPrompt = ({
             <Button size="lg" onClick={capturePhoto}>
               {dictionary.materials.takePhoto}
             </Button>
-            <Button size="lg" variant="outline" onClick={stopCamera} className="bg-white text-black">
+            <Button
+              size="lg"
+              variant="outline"
+              onClick={stopCamera}
+              className="bg-white text-black"
+            >
               {dictionary.materials.cancel}
             </Button>
           </div>
@@ -514,14 +541,18 @@ export const AiMaterialPrompt = ({
                   : "text-gray-500 hover:text-black"
               }`}
               onClick={toggleListening}
-              disabled={loading || typeof window === "undefined" || !("SpeechRecognition" in window || "webkitSpeechRecognition" in window)}
+              disabled={loading || speechSupported}
               title={
                 isListening
                   ? dictionary.materials.stopListening
                   : dictionary.materials.speakMessage
               }
             >
-              {isListening ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
+              {isListening ? (
+                <MicOff className="h-4 w-4" />
+              ) : (
+                <Mic className="h-4 w-4" />
+              )}
             </Button>
           </div>
           <Button
@@ -538,7 +569,13 @@ export const AiMaterialPrompt = ({
       {/* Valitut materiaalit */}
       <div className="rounded-lg border border-gray-200 bg-gray-50 p-4 flex flex-col gap-3">
         <p className="text-sm font-medium text-gray-700">
-          {dictionary.materials.selected} ({cartMaterials.length + selectedFieldEntries.reduce((sum, field) => sum + field.values.length, 0)})
+          {dictionary.materials.selected} (
+          {cartMaterials.length +
+            selectedFieldEntries.reduce(
+              (sum, field) => sum + field.values.length,
+              0
+            )}
+          )
         </p>
 
         {cartMaterials.length === 0 && selectedFieldEntries.length === 0 ? (
@@ -587,7 +624,9 @@ export const AiMaterialPrompt = ({
                   >
                     <button
                       type="button"
-                      onClick={() => removeFieldSelection(field.fieldId, value.index)}
+                      onClick={() =>
+                        removeFieldSelection(field.fieldId, value.index)
+                      }
                       className="absolute right-1 top-1 rounded-full bg-black/45 p-1 text-white transition hover:bg-black/70"
                       aria-label={`${dictionary.materials.removeMaterialAria} ${value.label}`}
                       title={`${dictionary.materials.removeMaterialTitle} ${value.label}`}
@@ -612,7 +651,9 @@ export const AiMaterialPrompt = ({
                 key={t.materialName}
                 className="text-xs text-gray-600 flex gap-1.5"
               >
-                <span className="font-semibold shrink-0">{t.materialName}:</span>
+                <span className="font-semibold shrink-0">
+                  {t.materialName}:
+                </span>
                 <span>{t.tip}</span>
               </li>
             ))}
