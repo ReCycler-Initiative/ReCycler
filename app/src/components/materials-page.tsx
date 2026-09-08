@@ -14,12 +14,10 @@ const EMPTY_SELECTED_CODES: number[] = [];
 const EMPTY_SELECTED_FIELD_VALUES: FieldSelections = {};
 
 const sameNumberArray = (left: number[], right: number[]) =>
-  left.length === right.length && left.every((value, index) => value === right[index]);
+  left.length === right.length &&
+  left.every((value, index) => value === right[index]);
 
-const sameFieldSelections = (
-  left: FieldSelections,
-  right: FieldSelections
-) => {
+const sameFieldSelections = (left: FieldSelections, right: FieldSelections) => {
   const leftKeys = Object.keys(left);
   const rightKeys = Object.keys(right);
 
@@ -27,7 +25,9 @@ const sameFieldSelections = (
     return false;
   }
 
-  return leftKeys.every((key) => sameNumberArray(left[key] ?? [], right[key] ?? []));
+  return leftKeys.every((key) =>
+    sameNumberArray(left[key] ?? [], right[key] ?? [])
+  );
 };
 
 export const MaterialsPageContent = ({
@@ -60,12 +60,10 @@ export const MaterialsPageContent = ({
   onResultsHrefChange?: (href: string) => void;
 }) => {
   const messages = useMessages();
-  const [selectedCodes, setSelectedCodes] = useState<number[]>(
-    initialSelectedCodes
-  );
-  const [selectedFieldValues, setSelectedFieldValues] = useState<FieldSelections>(
-    initialSelectedFieldValues
-  );
+  const [selectedCodes, setSelectedCodes] =
+    useState<number[]>(initialSelectedCodes);
+  const [selectedFieldValues, setSelectedFieldValues] =
+    useState<FieldSelections>(initialSelectedFieldValues);
   const resolvedResultsBasePath =
     resultsBasePath ??
     (organizationId && useCaseId
@@ -86,7 +84,10 @@ export const MaterialsPageContent = ({
 
   useEffect(() => {
     setSelectedFieldValues((currentSelectedFieldValues) =>
-      sameFieldSelections(currentSelectedFieldValues, initialSelectedFieldValues)
+      sameFieldSelections(
+        currentSelectedFieldValues,
+        initialSelectedFieldValues
+      )
         ? currentSelectedFieldValues
         : initialSelectedFieldValues
     );
@@ -103,7 +104,9 @@ export const MaterialsPageContent = ({
       }
     }
     const query = params.toString();
-    return query ? `${resolvedResultsBasePath}?${query}` : resolvedResultsBasePath;
+    return query
+      ? `${resolvedResultsBasePath}?${query}`
+      : resolvedResultsBasePath;
   };
 
   const resultsHref = buildResultsHref();
@@ -114,7 +117,10 @@ export const MaterialsPageContent = ({
 
   const totalSelected =
     selectedCodes.length +
-    Object.values(selectedFieldValues).reduce((sum, vals) => sum + vals.length, 0);
+    Object.values(selectedFieldValues).reduce(
+      (sum, vals) => sum + vals.length,
+      0
+    );
 
   const showFieldMaterials = !!(organizationId && useCaseId);
 
@@ -123,9 +129,7 @@ export const MaterialsPageContent = ({
       <h1 className="text-xl font-medium mb-4 font-sans text-center">
         {resolvedTitle}
       </h1>
-      {description && (
-        <p className="mb-4 font-sans">{description}</p>
-      )}
+      {description && <p className="mb-4 font-sans">{description}</p>}
       <Tabs defaultValue="ai">
         <TabsList className="w-full mb-6">
           <TabsTrigger value="ai" className="flex-1">
@@ -136,7 +140,11 @@ export const MaterialsPageContent = ({
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="ai" forceMount className="data-[state=inactive]:hidden">
+        <TabsContent
+          value="ai"
+          forceMount
+          className="data-[state=inactive]:hidden"
+        >
           <AiMaterialPrompt
             selectedCodes={selectedCodes}
             onSelectedCodesChange={setSelectedCodes}
