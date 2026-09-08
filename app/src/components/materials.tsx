@@ -41,6 +41,7 @@ export const hexToRgba = (hex: string, alpha: number): string => {
 
 type MaterialSelection = {
   content: ReactNode;
+  contentEn: ReactNode;
   code: number;
   baseHex?: string;
   icon?: ReactNode;
@@ -52,126 +53,147 @@ export const iconMap: MaterialSelection[] = [
     baseHex: "#d9001e",
     icon: <CarBattery />,
     content: <MarkdownBlock filePath="Ajoneuvoakut(lyijy).md" />,
+    contentEn: <MarkdownBlock filePath="Ajoneuvoakut(lyijy)_en.md" />,
   },
   {
     code: 102,
     baseHex: "#000000",
     icon: <EnergyWaste />,
     content: <MarkdownBlock filePath="energiajäte.md" />,
+    contentEn: <MarkdownBlock filePath="energiajäte_en.md" />,
   },
   {
     code: 110,
     baseHex: "#d9001e",
     icon: <SmallBattery />,
     content: <MarkdownBlock filePath="Paristot-ja-pienakut.md" />,
+    contentEn: <MarkdownBlock filePath="Paristot-ja-pienakut_en.md" />,
   },
   {
     code: 105,
     baseHex: "#176eb1",
     icon: <Carton />,
     content: <MarkdownBlock filePath="kartonki.md" />,
+    contentEn: <MarkdownBlock filePath="kartonki_en.md" />,
   },
   {
     code: 118,
     baseHex: "#d9001e",
     icon: <Wood />,
     content: <MarkdownBlock filePath="kyllästetty-puu.md" />,
+    contentEn: <MarkdownBlock filePath="kyllästetty-puu_en.md" />,
   },
   {
     code: 116,
     baseHex: "#d9001e",
     icon: <Lamp />,
     content: <MarkdownBlock filePath="lamput.md" />,
+    contentEn: <MarkdownBlock filePath="lamput_en.md" />,
   },
   {
     code: 107,
     baseHex: "#21a07b",
     icon: <Glass />,
     content: <MarkdownBlock filePath="lasi.md" />,
+    contentEn: <MarkdownBlock filePath="lasi_en.md" />,
   },
   {
     code: 106,
     baseHex: "#485b66",
     icon: <Metal />,
     content: <MarkdownBlock filePath="metalli.md" />,
+    contentEn: <MarkdownBlock filePath="metalli_en.md" />,
   },
   {
     code: 111,
     baseHex: "#820f71",
     icon: <Plastic />,
     content: <MarkdownBlock filePath="muovi.md" />,
+    contentEn: <MarkdownBlock filePath="muovi_en.md" />,
   },
   {
     code: 109,
     baseHex: "#d9001e",
     icon: <ElectricWaste />,
     content: <MarkdownBlock filePath="Sähkölaitteet(SER).md" />,
+    contentEn: <MarkdownBlock filePath="Sähkölaitteet(SER)_en.md" />,
   },
   {
     code: 100,
     baseHex: "#000000",
     icon: <WasteBin />,
     content: <MarkdownBlock filePath="sekajäte.md" />,
+    contentEn: <MarkdownBlock filePath="sekajäte_en.md" />,
   },
   {
     code: 112,
     baseHex: "#139339",
     icon: <BioWaste />,
     content: <MarkdownBlock filePath="biojäte.md" />,
+    contentEn: <MarkdownBlock filePath="biojäte_en.md" />,
   },
   {
     code: 114,
     baseHex: "#000000",
     icon: <WasteBin />,
     content: <MarkdownBlock filePath="muujäte.md" />,
+    contentEn: <MarkdownBlock filePath="muujäte_en.md" />,
   },
   {
     code: 104,
     baseHex: "#176eb1",
     icon: <CardBoard />,
     content: <MarkdownBlock filePath="pahvi.md" />,
+    contentEn: <MarkdownBlock filePath="pahvi_en.md" />,
   },
   {
     code: 103,
     baseHex: "#176eb1",
     icon: <Paper />,
     content: <MarkdownBlock filePath="paperi.md" />,
+    contentEn: <MarkdownBlock filePath="paperi_en.md" />,
   },
   {
     code: 120,
     baseHex: "#6b9030",
     icon: <Textile />,
     content: <MarkdownBlock filePath="poistotekstiili.md" />,
+    contentEn: <MarkdownBlock filePath="poistotekstiili_en.md" />,
   },
   {
     code: 117,
     baseHex: "#d9001e",
     icon: <Wood />,
     content: <MarkdownBlock filePath="puu.md" />,
+    contentEn: <MarkdownBlock filePath="puu_en.md" />,
   },
   {
     code: 101,
     baseHex: "#139339",
     icon: <Garden />,
     content: <MarkdownBlock filePath="puutarhajäte.md" />,
+    contentEn: <MarkdownBlock filePath="puutarhajäte_en.md" />,
   },
   {
     code: 119,
     baseHex: "#0c3a6f",
     icon: <Construction />,
     content: <MarkdownBlock filePath="rakennus-ja-purkujäte.md" />,
+    contentEn: <MarkdownBlock filePath="rakennus-ja-purkujäte_en.md" />,
   },
   {
     code: 113,
     baseHex: "#6b9030",
     icon: <TextileReuse />,
     content: <MarkdownBlock filePath="tekstiili.md" />,
+    contentEn: <MarkdownBlock filePath="tekstiili_en.md" />,
   },
   {
     code: 108,
     baseHex: "#d9001e",
     icon: <Dangerous />,
     content: <MarkdownBlock filePath="vaarallinenjäte.md" />,
+    contentEn: <MarkdownBlock filePath="vaarallinenjäte_en.md" />,
   },
 ];
 
@@ -347,7 +369,9 @@ export const Materials = ({
           </DialogTitle>
           <div className="h-[800px] max-h-[80vh] overflow-y-auto px-4 lg:px-6">
             <div className="mb-6">{materialForInfo?.icon}</div>
-            {materialForInfo?.content}
+            {locale === "fi"
+              ? materialForInfo?.content
+              : materialForInfo?.contentEn}
           </div>
         </DialogContent>
       </Dialog>
