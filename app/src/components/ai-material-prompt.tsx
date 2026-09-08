@@ -1,7 +1,8 @@
 "use client";
 
-import { chat, getFields, getMaterials } from "@/services/api";
+import { useLocale, useMessages } from "@/i18n/locale-provider";
 import { localizeMaterialNameCandidate } from "@/lib/material-translations";
+import { chat, getFields, getMaterials } from "@/services/api";
 import { Material } from "@/types";
 import { useQuery } from "@tanstack/react-query";
 import {
@@ -16,7 +17,6 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import { FormEvent, useEffect, useRef, useState } from "react";
-import { useLocale, useMessages } from "@/i18n/locale-provider";
 import { getNameIconEntry, hexToRgba, iconMap } from "./materials";
 import { Button } from "./ui/button";
 import { Textarea } from "./ui/textarea";

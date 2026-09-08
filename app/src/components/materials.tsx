@@ -38,12 +38,14 @@ export const hexToRgba = (hex: string, alpha: number): string => {
   return `rgba(${r},${g},${b},${alpha})`;
 };
 
-export const iconMap: {
+type MaterialSelection = {
   content: ReactNode;
   code: number;
   baseHex?: string;
   icon?: ReactNode;
-}[] = [
+};
+
+export const iconMap: MaterialSelection[] = [
   {
     code: 115,
     baseHex: "#d9001e",
@@ -295,7 +297,7 @@ export const Materials = ({
 }) => {
   const { locale } = useLocale();
   const messages = useMessages();
-  const [content, setContent] = useState<ReactNode | null>(null);
+  const [materialForInfo, setMaterialForInfo] = useState<MaterialSelection>();
   const { data: materials, isFetching } = useQuery({
     queryKey: ["materials", locale],
     queryFn: () => getMaterials(locale),
@@ -323,7 +325,7 @@ export const Materials = ({
             checked={checked}
             label={m.name}
             icon={match?.icon}
-            onInfo={() => setContent(match?.content)}
+            onInfo={() => setMaterialForInfo(match)}
             onToggle={() => {
               onSelectionChange(
                 checked
@@ -334,10 +336,14 @@ export const Materials = ({
           />
         );
       })}
-      <Dialog open={!!content} onOpenChange={() => setContent(null)}>
+      <Dialog
+        open={!!materialForInfo}
+        onOpenChange={() => setMaterialForInfo(null)}
+      >
         <DialogContent className="max-w-3xl px-0">
           <div className="h-[800px] max-h-[80vh] overflow-y-auto px-4 lg:px-6">
-            {content}
+            <div className="mb-6">{materialForInfo?.icon}</div>
+            {materialForInfo?.content}
           </div>
         </DialogContent>
       </Dialog>
