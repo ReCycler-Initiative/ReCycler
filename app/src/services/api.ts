@@ -41,6 +41,7 @@ export const chat = async ({
   locale,
   currentSelectedCodes,
   currentSelectedFieldValues,
+  usageSessionId,
 }: {
   message: string;
   history: { role: "user" | "assistant"; content: string }[];
@@ -51,6 +52,7 @@ export const chat = async ({
   locale?: Locale;
   currentSelectedCodes?: number[];
   currentSelectedFieldValues?: Record<string, number[]>;
+  usageSessionId?: string;
 }): Promise<ChatResponse> =>
   axios
     .post("/api/chat", {
@@ -63,6 +65,7 @@ export const chat = async ({
       locale,
       currentSelectedCodes,
       currentSelectedFieldValues,
+      usageSessionId,
     })
     .then((response) => response.data);
 

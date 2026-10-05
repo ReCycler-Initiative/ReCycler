@@ -33,6 +33,7 @@ import {
 import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { getFields } from "@/services/api";
+import { trackUsageEvent } from "@/lib/usage-analytics";
 import { UseCaseMapSettings } from "@/types";
 import Map, {
   CircleLayer,
@@ -597,8 +598,17 @@ export default function LocationsMap({ geoJson, mapSettings }: LocationsMapProps
     if (previousSearchParamsKey.current !== searchParamsKey) {
       setShowMaterials(false);
       previousSearchParamsKey.current = searchParamsKey;
+      if (params.useCaseId) {
+        trackUsageEvent(params.useCaseId, "filters_applied", {
+          materialCodes: selectedMaterials,
+          fieldSelections: Object.entries(selectedFieldFilters).map(([fieldId, indices]) => ({ fieldId, indices })),
+          selectedFilterCount:
+            selectedMaterials.length +
+            Object.values(selectedFieldFilters).reduce((sum, values) => sum + values.length, 0),
+        });
+      }
     }
-  }, [searchParamsKey]);
+  }, [params.useCaseId, searchParamsKey, selectedFieldFilters, selectedMaterials]);
 
   const geolocateControlRef = useRef<TGeolocateControl>(null);
 
@@ -629,11 +639,20 @@ export default function LocationsMap({ geoJson, mapSettings }: LocationsMapProps
       geolocateControlRef.current?.trigger();
     }
     setMapLoaded(true);
+    if (params.useCaseId) {
+      trackUsageEvent(params.useCaseId, "map_view", {
+        materialCodes: selectedMaterials,
+        fieldSelections: Object.entries(selectedFieldFilters).map(([fieldId, indices]) => ({ fieldId, indices })),
+        selectedFilterCount:
+          selectedMaterials.length +
+          Object.values(selectedFieldFilters).reduce((sum, values) => sum + values.length, 0),
+      });
+    }
 
     if (typeof window !== "undefined") {
       window.dispatchEvent(new Event("map-loaded"));
     }
-  }, [resolvedMapSettings.enable_geolocation]);
+  }, [params.useCaseId, resolvedMapSettings.enable_geolocation, selectedFieldFilters, selectedMaterials]);
 
   // Camera: do a single initial ease to user position, then let GeolocateControl own the camera
   const handleGeolocateChange = useCallback((position: GeolocationPosition) => {

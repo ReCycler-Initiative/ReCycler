@@ -9,6 +9,7 @@ import {
 import { Material } from "@/types";
 import { NextRequest, NextResponse } from "next/server";
 import OpenAI from "openai";
+import { classifyChatTopic, recordChatUsage } from "@/lib/usage-analytics-server";
 
 type MultiSelectField = {
   id: string;
@@ -80,9 +81,17 @@ export async function POST(req: NextRequest) {
       locale: rawLocale,
       currentSelectedCodes = [],
       currentSelectedFieldValues = {},
+      usageSessionId,
     } = await req.json();
     const locale = resolveLocale(rawLocale);
     dictionary = getMessages(locale);
+    await recordChatUsage(
+      useCaseId,
+      usageSessionId,
+      classifyChatTopic(typeof message === "string" ? message : "", Boolean(imageBase64)),
+      Boolean(imageBase64),
+      Array.isArray(currentSelectedCodes) ? currentSelectedCodes.length : 0
+    );
 
     const materials: Material[] = await db("recycler.materials").orderBy(
       "name"

@@ -18,6 +18,7 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import { FormEvent, useEffect, useRef, useState } from "react";
+import { getUsageSessionId } from "@/lib/usage-analytics";
 import { getNameIconEntry, hexToRgba, iconMap } from "./materials";
 import { Button } from "./ui/button";
 import { Textarea } from "./ui/textarea";
@@ -383,6 +384,7 @@ export const AiMaterialPrompt = ({
         locale,
         currentSelectedCodes: selectedCodesRef.current,
         currentSelectedFieldValues: selectedFieldValuesRef.current,
+        usageSessionId: getUsageSessionId(),
       });
       setMessages([...newMessages, { role: "assistant", content: res.reply }]);
       onSelectedCodesChange(res.suggestedCodes);
