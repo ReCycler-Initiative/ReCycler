@@ -16,6 +16,23 @@ const baseFi = {
     recommended: "Suositeltu",
     openProjectGithub: "Tutustu projektiin GitHubissa",
   },
+  aiTransparency: {
+    title: "Tekoälyä käyttävä toiminto",
+    summary: "Tämä toiminto käyttää tekoälyä.",
+    materialsBody:
+      "Tässä näkymässä käytetään tekoälyä vastausten ja materiaaliehdotusten muodostamiseen. Vastaukset voivat sisältää virheitä, joten tarkista olennainen tieto ennen päätöksiä.",
+    materialsDetail:
+      "Lähettämäsi viestit ja kuvat käsitellään vastauksen muodostamiseksi. Älä syötä arkaluonteisia henkilötietoja tai muuta luottamuksellista sisältöä.",
+    chatBody:
+      "Tämä chat käyttää tekoälyä vastauksen tuottamiseen. Sisältö voi olla epätarkkaa tai puutteellista, joten varmista tärkeät tiedot ennen niiden käyttöä.",
+    chatDetail:
+      "Lähettämäsi viestit käsitellään vastauksen muodostamiseksi, ja keskusteluhistoria voidaan tallentaa yhteydenoton tueksi. Älä kirjoita mukaan arkaluonteisia henkilötietoja tai salassa pidettäviä tietoja.",
+    adminBody:
+      "Tällä sivulla hallitaan aineistoa, jota tekoäly voi käyttää käyttötapauksen vastausten tukena. Varmista, että aineisto on ajantasaista, oikeellista ja soveltuu tähän käyttötarkoitukseen.",
+    adminDetail:
+      "Ladatut opetusmateriaalit voidaan käyttää AI-vastausten muodostamiseen. Älä lataa salassa pidettäviä tai tarpeettomia henkilötietoja sisältäviä tiedostoja.",
+    legalReference: "Perustuu EU AI Actiin (EU 2024/1689), art. 50.",
+  },
   languageSwitcher: { label: "Kieli", fi: "FI", en: "EN" },
   auth: {
     signIn: "Kirjaudu sisään",
@@ -815,6 +832,23 @@ const baseFi = {
 
 const baseEn = {
   ...baseFi,
+  aiTransparency: {
+    title: "This feature uses AI",
+    summary: "This feature uses AI.",
+    materialsBody:
+      "This view uses AI to generate replies and material suggestions. Responses may contain errors, so verify important information before acting on it.",
+    materialsDetail:
+      "Your messages and images are processed to generate a reply. Do not enter sensitive personal data or other confidential content.",
+    chatBody:
+      "This chat uses AI to generate replies. The content may be inaccurate or incomplete, so confirm important details before relying on it.",
+    chatDetail:
+      "Your messages are processed to generate a reply, and the conversation history may be stored to support follow-up contact. Do not include sensitive personal data or confidential information.",
+    adminBody:
+      "This page manages material that the AI can use to support use-case responses. Make sure the material is up to date, accurate, and appropriate for this purpose.",
+    adminDetail:
+      "Uploaded training materials may be used to generate AI responses. Do not upload confidential files or files containing unnecessary personal data.",
+    legalReference: "Based on the EU AI Act (EU 2024/1689), Art. 50.",
+  },
   common: {
     recommended: "Recommended",
     openProjectGithub: "Explore the project on GitHub",

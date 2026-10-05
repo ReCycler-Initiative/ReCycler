@@ -1,5 +1,6 @@
 "use client";
 
+import { AiTransparencyNotice } from "@/components/ai-transparency-notice";
 import { PageTemplate } from "@/components/admin/page-template";
 import { PageIntro } from "@/components/admin/page-intro";
 import { Button } from "@/components/ui/button";
@@ -211,6 +212,13 @@ export default function AiPage() {
             </div>
           )}
         </section>
+        <AiTransparencyNotice
+          title={messages.aiTransparency.title}
+          summary={messages.aiTransparency.summary}
+          body={messages.aiTransparency.adminBody}
+          detail={messages.aiTransparency.adminDetail}
+          legalReference={messages.aiTransparency.legalReference}
+        />
       </div>
     </PageTemplate>
   );

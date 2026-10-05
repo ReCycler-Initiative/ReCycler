@@ -1,5 +1,6 @@
 "use client";
 
+import { AiTransparencyNotice } from "@/components/ai-transparency-notice";
 import { useLocale, useMessages } from "@/i18n/locale-provider";
 import { localizeMaterialNameCandidate } from "@/lib/material-translations";
 import { chat, getFields, getMaterials } from "@/services/api";
@@ -667,6 +668,14 @@ export const AiMaterialPrompt = ({
           </Link>
         </Button>
       </div>
+
+      <AiTransparencyNotice
+        title={dictionary.aiTransparency.title}
+        summary={dictionary.aiTransparency.summary}
+        body={dictionary.aiTransparency.materialsBody}
+        detail={dictionary.aiTransparency.materialsDetail}
+        legalReference={dictionary.aiTransparency.legalReference}
+      />
     </div>
   );
 };

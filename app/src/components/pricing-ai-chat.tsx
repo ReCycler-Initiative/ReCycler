@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import axios from "axios";
 import { SendHorizonal } from "lucide-react";
+import { AiTransparencyNotice } from "@/components/ai-transparency-notice";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -276,6 +277,14 @@ export const PricingAiChat = () => {
               </div>
             )}
           </div>
+
+          <AiTransparencyNotice
+            title={dictionary.aiTransparency.title}
+            summary={dictionary.aiTransparency.summary}
+            body={dictionary.aiTransparency.chatBody}
+            detail={dictionary.aiTransparency.chatDetail}
+            legalReference={dictionary.aiTransparency.legalReference}
+          />
         </div>
       </DialogContent>
     </Dialog>
