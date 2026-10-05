@@ -53,6 +53,8 @@ This document explains how the codebase is organized and what the most important
   - Get/update one use case.
 - [app/src/app/api/organizations/[organizationId]/use_cases/[useCaseId]/locations/route.ts](../../app/src/app/api/organizations/[organizationId]/use_cases/[useCaseId]/locations/route.ts)
   - Location CRUD list/create endpoint.
+- [app/src/app/api/usage-events/route.ts](../../app/src/app/api/usage-events/route.ts)
+  - Validates public map-event ingestion and serves organization-authorized use-case usage reports.
 
 ### 3.3 Shared UI components
 
@@ -83,6 +85,14 @@ This document explains how the codebase is organized and what the most important
   - Maps DB rows into API use-case DTO shape.
 - [app/src/lib/map-settings.ts](../../app/src/lib/map-settings.ts)
   - Use-case-level map settings defaults and sanitization.
+- [app/src/lib/usage-analytics.ts](../../app/src/lib/usage-analytics.ts)
+  - Creates a tab-scoped session ID and sends privacy-minimized map events.
+- [app/src/lib/usage-analytics-server.ts](../../app/src/lib/usage-analytics-server.ts)
+  - Classifies chat topics and records chat usage without persisting prompt text.
+- [app/src/app/admin/organizations/[id]/use_cases/[useCaseId]/usage/page.tsx](../../app/src/app/admin/organizations/[id]/use_cases/[useCaseId]/usage/page.tsx)
+  - Use-case usage dashboard with time-range controls and activity/selection charts.
+- [app/migrations/20261005120000_add_use_case_usage_events.ts](../../app/migrations/20261005120000_add_use_case_usage_events.ts)
+  - Creates the use-case-scoped usage event table and reporting indexes.
 
 ### 3.5 Internationalization
 
@@ -121,6 +131,13 @@ This document explains how the codebase is organized and what the most important
 2. Data is stored through use-case API route and validated by schema in [app/src/types.ts](../../app/src/types.ts).
 3. End-user and admin maps read settings and resolve defaults through [app/src/lib/map-settings.ts](../../app/src/lib/map-settings.ts).
 
+## 4.4 Use-case usage analytics flow
+
+1. The end-user map records map loads and configured filter selections; the AI chat records only a coarse topic category and non-content metadata.
+2. Map events are validated and inserted into `recycler.usage_events` by `POST /api/usage-events`; chat events are recorded server-side by the chat route.
+3. The usage dashboard requests an aggregated report from `GET /api/usage-events`. The API checks organization membership and verifies use-case ownership before returning report data.
+4. See [usage_analytics.md](./usage_analytics.md) for the event schema, privacy boundaries, security limitations, and retention behavior.
+
 ## 5. Where to make common changes
 
 - Add or change domain data shape:
@@ -131,6 +148,8 @@ This document explains how the codebase is organized and what the most important
   - Create route under [app/src/app/admin/organizations/[id]/use_cases/[useCaseId]/](../../app/src/app/admin/organizations/[id]/use_cases/[useCaseId]/) and compose with [app/src/components/editor-template.tsx](../../app/src/components/editor-template.tsx).
 - Add user-facing map behavior:
   - Update [app/src/components/map/locations-map.tsx](../../app/src/components/map/locations-map.tsx) and shared rules in [app/src/lib/map-settings.ts](../../app/src/lib/map-settings.ts) if behavior must be reusable.
+- Change analytics tracking, report metrics, or event retention:
+  - Update [usage_analytics.md](./usage_analytics.md) alongside the event route, tracking helper, migration, or dashboard.
 
 ## 6. Documentation update checklist
 

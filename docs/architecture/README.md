@@ -9,6 +9,8 @@ This folder contains architectural documentation for the ReCycler platform.
   - Describes where to implement common changes.
 - [Organization registration and user management](./organization_registration_and_user_management.md)
   - Roles, organization model, onboarding, and Auth0-related identity model.
+- [Use-case usage analytics](./usage_analytics.md)
+  - Event collection, storage, reporting, privacy boundaries, and operational limitations.
 - [High-level solution diagram](./solution_architecture.drawio)
   - Editable Draw.io diagram for system-level architecture.
 
@@ -16,6 +18,7 @@ This folder contains architectural documentation for the ReCycler platform.
 
 - Start from [codebase_structure.md](./codebase_structure.md) when you need to understand where things are implemented.
 - Use [organization_registration_and_user_management.md](./organization_registration_and_user_management.md) when working with user/organization/role flows.
+- Use [usage_analytics.md](./usage_analytics.md) when changing usage-event collection, analytics reporting, or its privacy and retention rules.
 - Keep documentation and implementation aligned in the same pull request when architecture-level behavior changes.
 
 ## Maintenance rule
@@ -27,3 +30,4 @@ When you add or significantly change one of these areas, update architecture doc
 - Core domain model (organization, use case, location, field, datasource)
 - API contracts and validation
 - Shared map behavior and use-case-level map settings
+- Usage-event collection, reporting, privacy, and retention

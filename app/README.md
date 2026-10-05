@@ -47,6 +47,10 @@ Run migrations
 npm run migrate
 ```
 
+### Use-case usage analytics
+
+The use-case administration Usage statistics page collects map views, configured map-filter selections, and coarse AI chat topic counts after the usage-events migration has been applied. Run `npm run migrate` whenever deploying schema changes. Analytics does not store chat text, images, or free-form search terms; see [the usage analytics architecture](../docs/architecture/usage_analytics.md) for the event model, privacy boundaries, access checks, and current retention limitations. New deployments start with empty usage statistics; existing analytics are not backfilled.
+
 Run seeds
 
 ```bash
