@@ -40,6 +40,7 @@ export async function GET(
       LEFT JOIN recycler.location_fields lf ON lf.location_id = l.id
       LEFT JOIN recycler.fields f ON f.id = lf.field_id
       WHERE l.use_case_id = ?::uuid
+        AND l.geom IS NOT NULL
       ORDER BY l.name, f.order NULLS LAST;
     `,
     [useCaseId]
