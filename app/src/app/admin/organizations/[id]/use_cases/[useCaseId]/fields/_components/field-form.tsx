@@ -194,6 +194,7 @@ const InfoTextPopover = ({
   containerRef: React.RefObject<HTMLDivElement | null>;
   onTextChange: (text: string) => void;
 }) => {
+  const messages = useMessages();
   const [open, setOpen] = useState(false);
   const [localText, setLocalText] = useState(currentText);
 
@@ -208,7 +209,11 @@ const InfoTextPopover = ({
           type="button"
           variant="ghost"
           size="icon"
-          title={currentText ? "Muokkaa lisätietoa" : "Lisää lisätieto"}
+          title={
+            currentText
+              ? messages.adminFieldsPage.choiceInfoEdit
+              : messages.adminFieldsPage.choiceInfoAdd
+          }
           className={
             currentText
               ? "shrink-0 text-primary"
@@ -224,12 +229,12 @@ const InfoTextPopover = ({
         container={containerRef.current}
         onInteractOutside={(e) => e.preventDefault()}
       >
-        <Label>Lisätieto (Markdown)</Label>
+        <Label>{messages.adminFieldsPage.choiceInfoLabel}</Label>
         <Textarea
           value={localText}
           onChange={(e) => setLocalText(e.target.value)}
           rows={6}
-          placeholder="Näytetään käyttäjälle info-painikkeesta"
+          placeholder={messages.adminFieldsPage.choiceInfoPlaceholder}
         />
         <div className="flex gap-2">
           {currentText && (
@@ -243,7 +248,7 @@ const InfoTextPopover = ({
                 setOpen(false);
               }}
             >
-              Poista
+              {messages.adminFieldsPage.choiceInfoRemove}
             </Button>
           )}
           <Button
@@ -256,7 +261,7 @@ const InfoTextPopover = ({
               setOpen(false);
             }}
           >
-            Valmis
+            {messages.adminFieldsPage.choiceInfoDone}
           </Button>
         </div>
       </PopoverContent>
