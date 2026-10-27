@@ -990,7 +990,7 @@ export default function LocationsMap({ geoJson, mapSettings }: LocationsMapProps
           )}
         </Map>
 
-        {!mapLoaded && (
+        {(!mapLoaded || !geoJson) && (
           <div className="fixed flex inset-0 items-center justify-center flex-col gap-6 text-black">
             <Loader2Icon className="animate-spin" />
             {messages.pageLoading.loadingMapLocations}
