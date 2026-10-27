@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import Link from "next/link";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createLocation, getFields, getLocation, getLocationTypes, updateLocation } from "@/services/api";
 import { useLocale, useMessages } from "@/i18n/locale-provider";
@@ -175,8 +176,12 @@ export const LocationEditPanel = (props: LocationEditPanelProps) => {
     enabled: props.mode === "add",
   });
 
-  const locationTypeName =
-    props.mode === "edit" ? data?.properties.location_type_name : locationTypes?.[0]?.name;
+  const locationType =
+    props.mode === "edit"
+      ? data?.properties.location_type_id && data.properties.location_type_name
+        ? { id: data.properties.location_type_id, name: data.properties.location_type_name }
+        : undefined
+      : locationTypes?.[0];
 
   const [name, setName] = useState("");
   const [longitude, setLongitude] = useState(
@@ -525,14 +530,19 @@ export const LocationEditPanel = (props: LocationEditPanelProps) => {
         )}
         {isReady && (
           <div className="p-4 space-y-5">
-            {(locationTypeName || (props.mode === "edit" && data?.properties.source_type)) && (
+            {(locationType || (props.mode === "edit" && data?.properties.source_type)) && (
               <div className="rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 space-y-3">
-                {locationTypeName && (
+                {locationType && (
                   <div>
                     <p className="text-xs font-medium text-muted-foreground">
                       {messages.adminLocationPanel.locationType}
                     </p>
-                    <p className="mt-1 text-sm text-foreground">{locationTypeName}</p>
+                    <Link
+                      href={`/admin/organizations/${organizationId}/use_cases/${useCaseId}/location-types/${locationType.id}/edit`}
+                      className="mt-1 block text-sm text-foreground underline underline-offset-2 hover:text-muted-foreground"
+                    >
+                      {locationType.name}
+                    </Link>
                   </div>
                 )}
                 {props.mode === "edit" && data?.properties.source_type && (

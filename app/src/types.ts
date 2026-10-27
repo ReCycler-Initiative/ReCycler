@@ -145,6 +145,7 @@ export const LocationDetail = z.object({
     datasource_name: z.string().optional(),
     id: z.string().uuid(),
     name: z.string(),
+    location_type_id: z.string().uuid().optional(),
     location_type_name: z.string().optional(),
     fields: z.array(LocationDetailField),
     source_type: z.enum(["manual", "datasource"]).optional(),
