@@ -283,6 +283,7 @@ const baseFi = {
   },
   adminLocationPanel: {
     addLocation: "Lisää kohde",
+    choiceInfoAria: "Näytä lisätieto",
     loading: "Ladataan...",
     editLocation: "Muokkaa kohdetta",
     moreActions: "Lisää toimintoja",
@@ -1185,6 +1186,7 @@ const baseEn = {
   adminLocationPanel: {
     ...baseFi.adminLocationPanel,
     addLocation: "Add location",
+    choiceInfoAria: "Show info",
     loading: "Loading...",
     editLocation: "Edit location",
     moreActions: "More actions",

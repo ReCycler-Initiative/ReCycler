@@ -10,6 +10,7 @@ import {
   searchMapboxAddresses,
 } from "@/lib/mapbox-geocoding";
 import { localizeMaterialNameCandidate } from "@/lib/material-translations";
+import { MarkdownContent } from "@/components/markdown-block";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -80,6 +81,7 @@ import {
   ChevronDown,
   ChevronRight,
   Crosshair,
+  InfoIcon,
   Loader2,
   LocateFixed,
   MoreHorizontal,
@@ -201,6 +203,7 @@ export const LocationEditPanel = (props: LocationEditPanelProps) => {
   } | null>(null);
   const [addressDetailsOpen, setAddressDetailsOpen] = useState(true);
   const [expandedFieldIds, setExpandedFieldIds] = useState<Record<string, boolean>>({});
+  const [infoChoice, setInfoChoice] = useState<{ choice: string; text: string } | null>(null);
 
   const toggleFieldSection = (fieldId: string) => {
     setExpandedFieldIds((prev) => ({
@@ -1031,6 +1034,7 @@ export const LocationEditPanel = (props: LocationEditPanelProps) => {
             {(fieldsDefinitions ?? []).map((field) => {
               const existingField = data?.properties.fields.find((f) => f.id === field.id);
               const choices = existingField?.options?.choices ?? field.options?.choices ?? [];
+              const choiceInfo = existingField?.options?.choiceInfo ?? field.options?.choiceInfo ?? {};
               const placeholder = existingField?.options?.placeholder ?? field.options?.placeholder ?? "";
               const required = existingField?.required ?? field.required;
               const selectedCount = (fieldValues[field.id] ?? []).filter(Boolean).length;
@@ -1096,6 +1100,17 @@ export const LocationEditPanel = (props: LocationEditPanelProps) => {
                                   >
                                     {localizeMaterialNameCandidate(choice, locale)}
                                   </label>
+                                  {choiceInfo[choice] && (
+                                    <button
+                                      type="button"
+                                      className="text-muted-foreground hover:text-foreground"
+                                      aria-label={messages.adminLocationPanel.choiceInfoAria}
+                                      title={messages.adminLocationPanel.choiceInfoAria}
+                                      onClick={() => setInfoChoice({ choice, text: choiceInfo[choice] })}
+                                    >
+                                      <InfoIcon className="h-4 w-4" />
+                                    </button>
+                                  )}
                                 </div>
                               );
                             })}
@@ -1291,6 +1306,18 @@ export const LocationEditPanel = (props: LocationEditPanelProps) => {
     </div>
 
     {/* Geocode confirmation dialog */}
+      <Dialog open={!!infoChoice} onOpenChange={(open) => { if (!open) setInfoChoice(null); }}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>
+              {infoChoice && localizeMaterialNameCandidate(infoChoice.choice, locale)}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="max-h-[70vh] overflow-y-auto">
+            <MarkdownContent content={infoChoice?.text ?? ""} />
+          </div>
+        </DialogContent>
+      </Dialog>
       <Dialog open={!!pendingGeocode} onOpenChange={(open) => { if (!open) setPendingGeocode(null); }}>
         <DialogContent>
           <DialogHeader>
