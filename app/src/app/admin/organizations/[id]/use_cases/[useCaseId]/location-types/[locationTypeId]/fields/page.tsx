@@ -12,6 +12,7 @@ import { z } from "zod";
 import {
   FieldFormContent,
   fieldFormDefaultValues,
+  toApiData,
   useFieldForm,
 } from "../../_components/field-form";
 import { LocationTypeFormValues } from "../../_components/location-type-form";
@@ -23,7 +24,7 @@ type FieldItem = z.infer<typeof FieldSchema>;
 export default function FieldsPage() {
   const messages = useMessages();
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [editingField, setEditingField] = useState<FieldItem | null>(null);
+  const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const form = useFormContext<LocationTypeFormValues>();
   const fieldsArray = useFieldArray({
     name: "fields",
@@ -34,11 +35,13 @@ export default function FieldsPage() {
 
   const openNew = () => {
     fieldForm.reset(fieldFormDefaultValues);
-    setEditingField(null);
+    setEditingIndex(null);
     setDialogOpen(true);
   };
 
-  const openEdit = (field: FieldItem) => {
+  const openEdit = (index: number) => {
+    // Read actual form values: fieldsArray.fields[].id is overwritten by react-hook-form's generated key
+    const field: FieldItem = form.getValues(`fields.${index}`);
     fieldForm.reset({
       choiceColors: field.options?.choiceColors ?? {},
       choiceInfo: field.options?.choiceInfo ?? {},
@@ -52,7 +55,7 @@ export default function FieldsPage() {
       required: field.required ?? false,
       use_case_id: "use_case_id" in field ? field.use_case_id : null,
     });
-    setEditingField(field);
+    setEditingIndex(index);
     setDialogOpen(true);
   };
 
@@ -60,12 +63,7 @@ export default function FieldsPage() {
     const newIndex = direction === "up" ? index - 1 : index + 1;
     if (newIndex < 0 || newIndex >= fieldsArray.fields.length) return;
 
-    const updatedFields = [...fieldsArray.fields];
-    const [movedField] = updatedFields.splice(index, 1);
-    updatedFields.splice(newIndex, 0, movedField);
-
-    fieldsArray.update(index, updatedFields[index]);
-    fieldsArray.update(newIndex, updatedFields[newIndex]);
+    fieldsArray.swap(index, newIndex);
   };
 
   return (
@@ -154,7 +152,7 @@ export default function FieldsPage() {
                         <Button
                           variant="ghost"
                           size="icon"
-                          onClick={() => openEdit(field)}
+                          onClick={() => openEdit(index)}
                           aria-label={messages.adminFieldsPage.editFieldAria}
                         >
                           <Pencil className="h-4 w-4" />
@@ -192,7 +190,7 @@ export default function FieldsPage() {
         <DialogContent className="field-editor-dialog sm:max-w-lg max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>
-              {editingField
+              {editingIndex !== null
                 ? messages.adminFieldsPage.editTitle
                 : messages.adminFieldsPage.newTitle}
             </DialogTitle>
@@ -201,18 +199,13 @@ export default function FieldsPage() {
             form={fieldForm}
             onCancel={() => setDialogOpen(false)}
             onSubmit={(values) => {
-              const existing = editingField
-                ? fieldsArray.fields.findIndex(
-                    (f) => "id" in editingField && f.id === editingField.id
-                  )
-                : -1;
-              if (existing !== -1) {
-                if ("order" in values) {
-                  fieldsArray.update(existing, values);
-                }
+              const apiField = toApiData(values);
+              if (editingIndex !== null) {
+                const original = form.getValues(`fields.${editingIndex}`);
+                fieldsArray.update(editingIndex, { ...original, ...apiField });
               } else {
                 fieldsArray.append({
-                  ...values,
+                  ...apiField,
                   order: fieldsArray.fields.length,
                 });
               }

@@ -39,7 +39,7 @@ export default function LocationTypeEditor({
         useCaseId,
         toApiData(formValues)
       );
-      editor.form.reset({ name: data.name });
+      editor.form.reset(data);
       return formValues;
     },
     toApiData: (v) => v,
