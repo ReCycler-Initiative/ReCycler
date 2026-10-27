@@ -29,7 +29,7 @@ export async function GET(
       o.*,
       COALESCE(
         json_agg(
-          f.* ORDER BY f.created_at
+          f.* ORDER BY f.order NULLS LAST, f.created_at
         ) FILTER (WHERE f.id IS NOT NULL),
         '[]'
       ) as fields

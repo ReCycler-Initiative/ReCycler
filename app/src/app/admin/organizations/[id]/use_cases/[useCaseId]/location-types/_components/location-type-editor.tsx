@@ -47,6 +47,10 @@ export default function LocationTypeEditor({
       queryClient.invalidateQueries({
         queryKey: ["locationTypes", organizationId, useCaseId],
       });
+      // Field order and definitions are cached for the location editor
+      queryClient.invalidateQueries({
+        queryKey: ["fields", organizationId, useCaseId],
+      });
       onSuccess?.(organizationId, useCaseId);
     },
   });
