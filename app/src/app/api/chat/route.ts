@@ -15,6 +15,7 @@ type MultiSelectField = {
   id: string;
   name: string;
   choices: string[];
+  choiceInfo: Record<string, string>;
 };
 
 async function loadMultiSelectFields(useCaseId: string): Promise<MultiSelectField[]> {
@@ -28,6 +29,7 @@ async function loadMultiSelectFields(useCaseId: string): Promise<MultiSelectFiel
     id: r.id,
     name: r.name,
     choices: r.options?.choices ?? [],
+    choiceInfo: r.options?.choiceInfo ?? {},
   }));
 }
 
@@ -112,9 +114,16 @@ export async function POST(req: NextRequest) {
 
     const fieldsBlock = multiSelectFields.length > 0
       ? "\n\nKäyttötapauksen valintakentät (käytä näitä arvoja täsmälleen fieldSelections-vastauksessa):\n" +
-        multiSelectFields.map((f) =>
-          `- Kenttä "${f.name}" (id: ${f.id}):\n  Vaihtoehdot: ${f.choices.join(", ")}`
-        ).join("\n")
+        multiSelectFields.map((f) => {
+          const infoLines = f.choices
+            .map((choice) => [choice, f.choiceInfo[choice]?.trim()] as const)
+            .filter(([, info]) => info)
+            .map(([choice, info]) => `    - ${choice}: ${info!.replace(/\n/g, "\n      ")}`);
+          const infoBlock = infoLines.length > 0
+            ? `\n  ${locale === "en" ? "Choice details" : "Vaihtoehtojen lisätiedot"}:\n${infoLines.join("\n")}`
+            : "";
+          return `- Kenttä "${f.name}" (id: ${f.id}):\n  Vaihtoehdot: ${f.choices.join(", ")}${infoBlock}`;
+        }).join("\n")
       : "";
 
     const currentSelectedMaterialNames = materials
@@ -147,6 +156,18 @@ export async function POST(req: NextRequest) {
 
     const fieldsInstruction = multiSelectFields.length > 0
       ? `\n- fieldSelections on kumulatiivinen: sisällytä kaikki valinnat mitä käyttäjä on maininnut. Jos käyttäjä sanoo ettei jokin kuulu, poista se. Käytä täsmälleen yllä listattuja kenttien id-arvoja ja vaihtoehtoja.`
+      : "";
+
+    const hasChoiceInfo = multiSelectFields.some((f) =>
+      Object.values(f.choiceInfo).some((info) => info?.trim())
+    );
+
+    const choiceInfoInstruction = hasChoiceInfo
+      ? `\n- ${
+          locale === "en"
+            ? "Use the choice details listed above when answering the user's questions about those choices, and add a preparationTips entry (materialName = the choice EXACTLY as listed) for each selected choice that has details, based on those details."
+            : "Hyödynnä yllä listattuja vaihtoehtojen lisätietoja vastatessasi käyttäjän kysymyksiin niistä, ja lisää preparationTips-listaan vihje (materialName = vaihtoehto TÄSMÄLLEEN kuten listattu) jokaiselle valitulle vaihtoehdolle jolla on lisätietoja, lisätietojen perusteella."
+        }`
       : "";
 
     const fieldSelectionsFormat = multiSelectFields.length > 0
@@ -192,7 +213,7 @@ ${locale === "en" ? "Important:" : "Tärkeää:"}
 - ${locale === "en" ? "If the user greets you, ask them to describe their need." : "Jos käyttäjä tervehtii, pyydä häntä kertomaan tarpeestaan"}
 - ${locale === "en" ? "Treat the current selections listed above as the starting state before processing the latest user message." : "Käsittele yllä listatut nykyiset valinnat lähtötilana ennen uusimman käyttäjäviestin tulkintaa"}
 - ${locale === "en" ? "materialNames is cumulative and should include all categories mentioned in the conversation." : "materialNames on kumulatiivinen: sisällytä kaikki kategoriat mitä käyttäjä on maininnut tässä keskustelussa"}
-- ${locale === "en" ? "If the user says something should no longer be included, remove it from materialNames." : "Jos käyttäjä sanoo ettei jokin tavara kuulukaan mukaan, poista se materialNames-listasta"}${fieldsInstruction}
+- ${locale === "en" ? "If the user says something should no longer be included, remove it from materialNames." : "Jos käyttäjä sanoo ettei jokin tavara kuulukaan mukaan, poista se materialNames-listasta"}${fieldsInstruction}${choiceInfoInstruction}
 - ${locale === "en" ? "preparationTips must contain one tip for each materialNames category." : "preparationTips sisältää vihjeen jokaiselle materialNames-kategorialle"}
 - ${locale === "en" ? "If the user sends an image, identify the materials in it and explain which categories they belong to." : "Jos käyttäjä lähettää kuvan, tunnista kuvasta materiaalit ja neuvoo mihin kategorioihin ne kuuluvat"}
 - ${locale === "en" ? "If the image is unclear or you cannot identify it, ask clarifying questions." : "Jos kuva on epäselvä tai et pysty tunnistamaan sisältöä, kysy tarkentavia kysymyksiä"}
