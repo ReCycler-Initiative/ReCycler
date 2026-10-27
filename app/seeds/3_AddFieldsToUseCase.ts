@@ -5,10 +5,22 @@ const USE_CASE_ID = "88dca1e6-b1f4-4151-ae9d-9c59eb6cb04f";
 export async function seed(knex: Knex): Promise<void> {
   await knex("recycler.fields").where({ use_case_id: USE_CASE_ID }).delete();
 
+  // Fields belong to an object (location type); reuse the existing one or create a default.
+  let object = await knex("recycler.objects")
+    .where({ use_case_id: USE_CASE_ID })
+    .first("id");
+  if (!object) {
+    [object] = await knex("recycler.objects")
+      .insert({ name: "Default Object", use_case_id: USE_CASE_ID })
+      .returning("id");
+  }
+  const OBJECT_ID = object.id;
+
   await knex("recycler.fields").insert([
     {
       id: knex.raw("uuid_generate_v4()"),
       use_case_id: USE_CASE_ID,
+      object_id: OBJECT_ID,
       name: "Materiaalit",
       field_type: "multi_select",
       options: JSON.stringify({
@@ -66,6 +78,7 @@ export async function seed(knex: Knex): Promise<void> {
     {
       id: knex.raw("uuid_generate_v4()"),
       use_case_id: USE_CASE_ID,
+      object_id: OBJECT_ID,
       name: "Aukioloajat",
       field_type: "text_input",
       options: JSON.stringify({
@@ -79,6 +92,7 @@ export async function seed(knex: Knex): Promise<void> {
     {
       id: knex.raw("uuid_generate_v4()"),
       use_case_id: USE_CASE_ID,
+      object_id: OBJECT_ID,
       name: "Lisätiedot",
       field_type: "text_input",
       options: JSON.stringify({
