@@ -538,7 +538,9 @@ export const LocationEditPanel = (props: LocationEditPanelProps) => {
                       {messages.adminLocationPanel.locationType}
                     </p>
                     <Link
-                      href={`/admin/organizations/${organizationId}/use_cases/${useCaseId}/location-types/${locationType.id}/edit`}
+                      href={`/admin/organizations/${organizationId}/use_cases/${useCaseId}/location-types/${locationType.id}/edit?${new URLSearchParams({
+                        returnTo: `/admin/organizations/${organizationId}/use_cases/${useCaseId}/locations${locationId ? `?location=${locationId}` : ""}`,
+                      })}`}
                       className="mt-1 block text-sm text-foreground underline underline-offset-2 hover:text-muted-foreground"
                     >
                       {locationType.name}

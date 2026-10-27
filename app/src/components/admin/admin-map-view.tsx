@@ -295,7 +295,7 @@ export const AdminMapView = ({
 
   // Fly to selected location only when selectedId actually changes
   useEffect(() => {
-    if (!selectedId || !mapRef.current) return;
+    if (!selectedId || !mapRef.current || !mapLoaded) return;
     if (selectedId === prevSelectedId.current) return;
     prevSelectedId.current = selectedId;
 
@@ -307,7 +307,7 @@ export const AdminMapView = ({
         duration: 500,
       });
     }
-  }, [selectedId]);
+  }, [selectedId, mapLoaded]);
 
   // Fly to draft marker only on first placement
   useEffect(() => {

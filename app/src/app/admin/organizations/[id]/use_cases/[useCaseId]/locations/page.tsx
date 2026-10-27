@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useParams } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
 import { AdminList } from "@/components/admin/admin-list";
 import {
   AdminMapView,
@@ -32,7 +32,9 @@ const LocationsPage = () => {
   const messages = useMessages();
   const params = useParams<{ id: string; useCaseId: string }>();
   const organizationId = params.id;
-  const [selectedId, setSelectedId] = useState<string | null>(null);
+  // Set when returning from another admin page, e.g. the location type editor
+  const initialLocationId = useSearchParams().get("location");
+  const [selectedId, setSelectedId] = useState<string | null>(initialLocationId);
   const queryClient = useQueryClient();
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
@@ -46,7 +48,7 @@ const LocationsPage = () => {
   const [polygonNodes, setPolygonNodes] = useState<[number, number][]>([]);
   const [polygonParts, setPolygonParts] = useState<[number, number][][]>([]);
 
-  const [editId, setEditId] = useState<string | null>(null);
+  const [editId, setEditId] = useState<string | null>(initialLocationId);
   const [relocateMode, setRelocateMode] = useState(false);
   const [pickedLngLat, setPickedLngLat] = useState<{
     longitude: number;
@@ -136,6 +138,13 @@ const LocationsPage = () => {
   useEffect(() => {
     setCurrentPage((page) => Math.min(page, totalPages));
   }, [totalPages]);
+
+  // Show the page of the initially selected location once locations load
+  useEffect(() => {
+    if (!initialLocationId) return;
+    const index = locations.findIndex((location) => location.id === initialLocationId);
+    if (index >= 0) setCurrentPage(Math.floor(index / ITEMS_PER_PAGE) + 1);
+  }, [initialLocationId, locations]);
 
   const selectLocation = (id: string) => {
     if (addMode) {

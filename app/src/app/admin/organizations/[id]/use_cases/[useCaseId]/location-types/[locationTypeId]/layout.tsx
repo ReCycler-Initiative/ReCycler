@@ -8,7 +8,7 @@ import { createLocationType, getLocationType, updateLocationType } from "@/servi
 import { useMessages } from "@/i18n/locale-provider";
 import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
-import { useParams, usePathname, useRouter } from "next/navigation";
+import { useParams, usePathname, useRouter, useSearchParams } from "next/navigation";
 import { ReactNode } from "react";
 import LocationTypeEditor from "../_components/location-type-editor";
 import { toApiData } from "../_components/location-type-form";
@@ -29,22 +29,29 @@ const LocationTypeLayout = ({ children }: { children: ReactNode }) => {
   const pathname = usePathname();
   const baseLocationTypesPath = `/admin/organizations/${organizationId}/use_cases/${useCaseId}/location-types`;
   const basePath = `${baseLocationTypesPath}/${locationTypeId}`;
+  // Where the back button leads, e.g. the location the user came from.
+  // Only same-site admin paths are accepted.
+  const returnToParam = useSearchParams().get("returnTo");
+  const returnTo =
+    returnToParam?.startsWith("/admin/") ? returnToParam : null;
+  const tabQuery = returnTo ? `?${new URLSearchParams({ returnTo })}` : "";
 
   const tabs = [
     {
       value: "edit",
       label: messages.adminLocationTypesPage.edit,
-      href: `${basePath}/edit`,
+      href: `${basePath}/edit${tabQuery}`,
     },
     {
       value: "fields",
       label: messages.adminLocationTypesPage.fields,
-      href: `${basePath}/fields`,
+      href: `${basePath}/fields${tabQuery}`,
     },
   ];
 
   const activeTab =
-    tabs.find((tab) => pathname.startsWith(tab.href))?.value ?? tabs[0].value;
+    tabs.find((tab) => pathname.startsWith(`${basePath}/${tab.value}`))?.value ??
+    tabs[0].value;
 
   const { data, isLoading } = useQuery({
     queryKey: [organizationId, useCaseId, locationTypeId],
@@ -62,7 +69,7 @@ const LocationTypeLayout = ({ children }: { children: ReactNode }) => {
       <PageIntro
         title={messages.adminLocationTypesPage.title}
         description={messages.adminLocationTypesPage.description}
-        onBack={() => router.push(baseLocationTypesPath)}
+        onBack={() => router.push(returnTo ?? baseLocationTypesPath)}
       />
       <LocationTypeEditor
         defaultValues={data && "id" in data ? data : { name: "", fields: [] }}
