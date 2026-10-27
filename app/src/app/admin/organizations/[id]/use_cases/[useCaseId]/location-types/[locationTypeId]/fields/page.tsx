@@ -41,6 +41,7 @@ export default function FieldsPage() {
   const openEdit = (field: FieldItem) => {
     fieldForm.reset({
       choiceColors: field.options?.choiceColors ?? {},
+      choiceInfo: field.options?.choiceInfo ?? {},
       choices: (field.options?.choices ?? []).map((v) => ({ value: v })),
       field_type: field.field_type,
       helpText: field.options?.helpText ?? "",

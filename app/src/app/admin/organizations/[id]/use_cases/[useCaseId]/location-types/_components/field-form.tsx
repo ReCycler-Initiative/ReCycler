@@ -11,6 +11,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
   SelectContent,
@@ -19,7 +20,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Plus, Trash2 } from "lucide-react";
+import { InfoIcon, Plus, Trash2 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { HexColorPicker } from "react-colorful";
 import { useFieldArray, useForm, useWatch } from "react-hook-form";
@@ -37,6 +38,7 @@ const FieldFormSchema = z.object({
   required: z.boolean(),
   choices: z.array(z.object({ value: z.string() })),
   choiceColors: z.record(z.string()),
+  choiceInfo: z.record(z.string()),
   placeholder: z.string(),
   helpText: z.string(),
   order: z.number().nullable(),
@@ -51,6 +53,7 @@ export type FieldFormDefaultValues = {
   required?: boolean;
   choices?: string[];
   choiceColors?: Record<string, string>;
+  choiceInfo?: Record<string, string>;
   placeholder?: string;
   helpText?: string;
 };
@@ -66,6 +69,9 @@ export const toApiData = (values: FieldFormValues) => ({
           ...(Object.keys(values.choiceColors).length
             ? { choiceColors: values.choiceColors }
             : {}),
+          ...(Object.keys(values.choiceInfo).length
+            ? { choiceInfo: values.choiceInfo }
+            : {}),
           ...(values.placeholder ? { placeholder: values.placeholder } : {}),
           ...(values.helpText ? { helpText: values.helpText } : {}),
         }
@@ -77,6 +83,7 @@ export const toApiData = (values: FieldFormValues) => ({
 
 export const fieldFormDefaultValues: FieldFormValues = {
   choiceColors: {},
+  choiceInfo: {},
   choices: [],
   field_type: "text_input",
   helpText: "",
@@ -97,6 +104,7 @@ export const useFieldForm = (defaults?: FieldFormDefaultValues) =>
       required: defaults?.required ?? false,
       choices: (defaults?.choices ?? []).map((v) => ({ value: v })),
       choiceColors: defaults?.choiceColors ?? {},
+      choiceInfo: defaults?.choiceInfo ?? {},
       placeholder: defaults?.placeholder ?? "",
       helpText: defaults?.helpText ?? "",
     },
@@ -183,6 +191,85 @@ const ColorPickerPopover = ({
   );
 };
 
+const InfoTextPopover = ({
+  currentText,
+  containerRef,
+  onTextChange,
+}: {
+  currentText: string;
+  containerRef: React.RefObject<HTMLDivElement | null>;
+  onTextChange: (text: string) => void;
+}) => {
+  const [open, setOpen] = useState(false);
+  const [localText, setLocalText] = useState(currentText);
+
+  useEffect(() => {
+    setLocalText(currentText);
+  }, [currentText, open]);
+
+  return (
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon"
+          title={currentText ? "Muokkaa lisätietoa" : "Lisää lisätieto"}
+          className={
+            currentText
+              ? "shrink-0 text-primary"
+              : "shrink-0 text-muted-foreground"
+          }
+        >
+          <InfoIcon className="h-4 w-4" />
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent
+        className="field-editor-popover w-80 p-3 space-y-3"
+        align="end"
+        container={containerRef.current}
+        onInteractOutside={(e) => e.preventDefault()}
+      >
+        <Label>Lisätieto (Markdown)</Label>
+        <Textarea
+          value={localText}
+          onChange={(e) => setLocalText(e.target.value)}
+          rows={6}
+          placeholder="Näytetään käyttäjälle info-painikkeesta"
+        />
+        <div className="flex gap-2">
+          {currentText && (
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              className="text-muted-foreground"
+              onClick={() => {
+                onTextChange("");
+                setOpen(false);
+              }}
+            >
+              Poista
+            </Button>
+          )}
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            className="ml-auto"
+            onClick={() => {
+              onTextChange(localText.trim());
+              setOpen(false);
+            }}
+          >
+            Valmis
+          </Button>
+        </div>
+      </PopoverContent>
+    </Popover>
+  );
+};
+
 export const FieldFormFields = ({
   form,
 }: {
@@ -193,6 +280,7 @@ export const FieldFormFields = ({
   const fieldType = useWatch({ control, name: "field_type" });
   const required = useWatch({ control, name: "required" });
   const choiceColors = useWatch({ control, name: "choiceColors" }) ?? {};
+  const choiceInfo = useWatch({ control, name: "choiceInfo" }) ?? {};
   const choices = useWatch({ control, name: "choices" }) ?? [];
   const popoverContainerRef = useRef<HTMLDivElement>(null);
 
@@ -271,6 +359,7 @@ export const FieldFormFields = ({
             {choiceFields.map((field, index) => {
               const choiceValue = choices[index]?.value ?? "";
               const currentColor = choiceColors[choiceValue] ?? "";
+              const currentInfo = choiceInfo[choiceValue] ?? "";
 
               return (
                 <div key={field.id} className="flex gap-2 items-center">
@@ -304,6 +393,17 @@ export const FieldFormFields = ({
                         : undefined
                     }
                   />
+                  <InfoTextPopover
+                    currentText={currentInfo}
+                    containerRef={popoverContainerRef}
+                    onTextChange={(text) => {
+                      if (!choiceValue) return;
+                      const next = { ...(getValues("choiceInfo") ?? {}) };
+                      if (text) next[choiceValue] = text;
+                      else delete next[choiceValue];
+                      setValue("choiceInfo", next, { shouldDirty: true });
+                    }}
+                  />
                   <Button
                     type="button"
                     variant="ghost"
@@ -315,6 +415,9 @@ export const FieldFormFields = ({
                         const next = { ...choiceColors };
                         delete next[key];
                         setValue("choiceColors", next, { shouldDirty: true });
+                        const nextInfo = { ...choiceInfo };
+                        delete nextInfo[key];
+                        setValue("choiceInfo", nextInfo, { shouldDirty: true });
                       }
                       remove(index);
                     }}

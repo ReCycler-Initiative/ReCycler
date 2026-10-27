@@ -162,12 +162,15 @@ export const MaterialsPageContent = ({
         <TabsContent value="manual">
           <div className={embedded ? "mb-6" : "mb-28 lg:mb-6"}>
             {showFieldMaterials ? (
-              <FieldMaterials
-                organizationId={organizationId}
-                useCaseId={useCaseId}
-                selectedValues={selectedFieldValues}
-                onSelectionChange={setSelectedFieldValues}
-              />
+
+              <>
+                <FieldMaterials
+                  organizationId={organizationId}
+                  useCaseId={useCaseId}
+                  selectedValues={selectedFieldValues}
+                  onSelectionChange={setSelectedFieldValues}
+                />
+              </>
             ) : (
               <Materials
                 selectedCodes={selectedCodes}

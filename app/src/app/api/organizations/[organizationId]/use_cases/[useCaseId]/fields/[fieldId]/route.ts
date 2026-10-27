@@ -14,6 +14,7 @@ const UpdateFieldBody = z.object({
       placeholder: z.string().optional(),
       helpText: z.string().optional(),
       choiceColors: z.record(z.string()).optional(),
+      choiceInfo: z.record(z.string()).optional(),
     })
     .nullable()
     .optional(),

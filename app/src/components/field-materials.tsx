@@ -6,6 +6,9 @@ import { CustomCheckbox, getNameIconEntry } from "@/components/materials";
 import LoadingSpinner from "@/components/loading-spinner";
 import { useLocale, useMessages } from "@/i18n/locale-provider";
 import { localizeMaterialNameCandidate } from "@/lib/material-translations";
+import { MarkdownContent } from "@/components/markdown-block";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import { useState } from "react";
 
 export type FieldSelections = Record<string, number[]>;
 
@@ -22,6 +25,7 @@ export const FieldMaterials = ({
 }) => {
   const { locale } = useLocale();
   const messages = useMessages();
+  const [infoChoice, setInfoChoice] = useState<{ choice: string; text: string }>();
   const { data: fields, isFetching } = useQuery({
     queryKey: ["fields", organizationId, useCaseId],
     queryFn: () => getFields(organizationId, useCaseId),
@@ -57,6 +61,7 @@ export const FieldMaterials = ({
                 const iconEntry = getNameIconEntry(choice);
                 const color = field.options?.choiceColors?.[choice] ?? iconEntry?.baseHex;
                 const checked = fieldSelected.includes(choiceIndex);
+                const info = field.options?.choiceInfo?.[choice];
                 return (
                   <CustomCheckbox
                     key={choice}
@@ -64,6 +69,7 @@ export const FieldMaterials = ({
                     checked={checked}
                     label={localizeMaterialNameCandidate(choice, locale)}
                     icon={iconEntry?.icon}
+                    onInfo={info ? () => setInfoChoice({ choice, text: info }) : undefined}
                     onToggle={() => {
                       const next = checked
                         ? fieldSelected.filter((i) => i !== choiceIndex)
@@ -77,6 +83,19 @@ export const FieldMaterials = ({
           </div>
         );
       })}
+      <Dialog open={!!infoChoice} onOpenChange={() => setInfoChoice(undefined)}>
+        <DialogContent className="max-w-3xl px-0">
+          <DialogTitle className="px-4 lg:px-6">
+            {infoChoice && localizeMaterialNameCandidate(infoChoice.choice, locale)}
+          </DialogTitle>
+          <div className="max-h-[80vh] overflow-y-auto px-4 lg:px-6">
+            {infoChoice && (
+              <div className="mb-6">{getNameIconEntry(infoChoice.choice)?.icon}</div>
+            )}
+            <MarkdownContent content={infoChoice?.text ?? ""} />
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
