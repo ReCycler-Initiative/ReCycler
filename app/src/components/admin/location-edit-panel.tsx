@@ -10,7 +10,7 @@ import {
   searchMapboxAddresses,
 } from "@/lib/mapbox-geocoding";
 import { localizeMaterialNameCandidate } from "@/lib/material-translations";
-import { MarkdownContent } from "@/components/markdown-block";
+import { ChoiceInfo, ChoiceInfoDialog } from "@/components/choice-info-dialog";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -203,7 +203,7 @@ export const LocationEditPanel = (props: LocationEditPanelProps) => {
   } | null>(null);
   const [addressDetailsOpen, setAddressDetailsOpen] = useState(true);
   const [expandedFieldIds, setExpandedFieldIds] = useState<Record<string, boolean>>({});
-  const [infoChoice, setInfoChoice] = useState<{ choice: string; text: string } | null>(null);
+  const [infoChoice, setInfoChoice] = useState<ChoiceInfo | null>(null);
 
   const toggleFieldSection = (fieldId: string) => {
     setExpandedFieldIds((prev) => ({
@@ -1306,18 +1306,7 @@ export const LocationEditPanel = (props: LocationEditPanelProps) => {
     </div>
 
     {/* Geocode confirmation dialog */}
-      <Dialog open={!!infoChoice} onOpenChange={(open) => { if (!open) setInfoChoice(null); }}>
-        <DialogContent className="max-w-2xl">
-          <DialogHeader>
-            <DialogTitle>
-              {infoChoice && localizeMaterialNameCandidate(infoChoice.choice, locale)}
-            </DialogTitle>
-          </DialogHeader>
-          <div className="max-h-[70vh] overflow-y-auto">
-            <MarkdownContent content={infoChoice?.text ?? ""} />
-          </div>
-        </DialogContent>
-      </Dialog>
+      <ChoiceInfoDialog info={infoChoice} onClose={() => setInfoChoice(null)} />
       <Dialog open={!!pendingGeocode} onOpenChange={(open) => { if (!open) setPendingGeocode(null); }}>
         <DialogContent>
           <DialogHeader>
