@@ -21,9 +21,15 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { LocationTypeChips } from "@/components/location-type-chips";
 import { Plus, X } from "lucide-react";
 import { useMessages } from "@/i18n/locale-provider";
-import { deleteLocation, getLocations, getUseCaseById } from "@/services/api";
+import {
+  deleteLocation,
+  getLocations,
+  getLocationTypes,
+  getUseCaseById,
+} from "@/services/api";
 import { toast } from "sonner";
 
 const ITEMS_PER_PAGE = 15;
@@ -37,6 +43,7 @@ const LocationsPage = () => {
   const [selectedId, setSelectedId] = useState<string | null>(initialLocationId);
   const queryClient = useQueryClient();
   const [searchQuery, setSearchQuery] = useState("");
+  const [hiddenTypeIds, setHiddenTypeIds] = useState<string[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
 
   const [addMode, setAddMode] = useState(false);
@@ -73,6 +80,12 @@ const LocationsPage = () => {
     queryFn: () => getUseCaseById(organizationId, params.useCaseId),
   });
 
+  const locationTypesQuery = useQuery({
+    queryKey: ["locationTypes", organizationId, params.useCaseId],
+    queryFn: () => getLocationTypes(organizationId, params.useCaseId),
+  });
+  const locationTypes = locationTypesQuery.data ?? [];
+
   const deleteMutation = useMutation({
     mutationFn: (locationId: string) =>
       deleteLocation(organizationId, params.useCaseId, locationId),
@@ -90,13 +103,19 @@ const LocationsPage = () => {
   });
 
   // Transform GeoJSON data to LocationMarker format
-  const locations: (LocationMarker & { title: string })[] = useMemo(
+  const locations: (LocationMarker & {
+    title: string;
+    typeId?: string;
+    typeName?: string;
+  })[] = useMemo(
     () =>
       data?.features
         .map((feature) => ({
           id: feature.properties.id,
           name: feature.properties.name,
           title: feature.properties.name,
+          typeId: feature.properties.location_type_id,
+          typeName: feature.properties.location_type_name,
           longitude: feature.geometry.coordinates[0],
           latitude: feature.geometry.coordinates[1],
         }))
@@ -112,14 +131,34 @@ const LocationsPage = () => {
     [data]
   );
 
+  // Untyped locations stay visible; only explicitly hidden types are filtered out
+  const typeFilteredLocations = useMemo(
+    () =>
+      locations.filter(
+        (location) => !location.typeId || !hiddenTypeIds.includes(location.typeId)
+      ),
+    [locations, hiddenTypeIds]
+  );
+
+  const typeFilteredGeoJson = useMemo(() => {
+    if (!data || hiddenTypeIds.length === 0) return data ?? null;
+    return {
+      ...data,
+      features: data.features.filter((feature) => {
+        const typeId = feature.properties.location_type_id;
+        return !typeId || !hiddenTypeIds.includes(typeId);
+      }),
+    };
+  }, [data, hiddenTypeIds]);
+
   const filteredLocations = useMemo(() => {
     const normalizedQuery = searchQuery.trim().toLocaleLowerCase("fi");
-    if (!normalizedQuery) return locations;
+    if (!normalizedQuery) return typeFilteredLocations;
 
-    return locations.filter((location) =>
+    return typeFilteredLocations.filter((location) =>
       location.title.toLocaleLowerCase("fi").includes(normalizedQuery)
     );
-  }, [locations, searchQuery]);
+  }, [typeFilteredLocations, searchQuery]);
 
   const totalPages = Math.max(
     1,
@@ -133,7 +172,7 @@ const LocationsPage = () => {
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchQuery]);
+  }, [searchQuery, hiddenTypeIds]);
 
   useEffect(() => {
     setCurrentPage((page) => Math.min(page, totalPages));
@@ -167,13 +206,13 @@ const LocationsPage = () => {
 
   // When relocating, replace the edited location's coords with pickedLngLat on the map
   const displayLocations = useMemo(() => {
-    if (!pickedLngLat || !editId) return locations;
-    return locations.map((l) =>
+    if (!pickedLngLat || !editId) return typeFilteredLocations;
+    return typeFilteredLocations.map((l) =>
       l.id === editId
         ? { ...l, longitude: pickedLngLat.longitude, latitude: pickedLngLat.latitude }
         : l
     );
-  }, [locations, pickedLngLat, editId]);
+  }, [typeFilteredLocations, pickedLngLat, editId]);
 
   // Ghost marker = original position of the location being relocated
   const ghostMarker = useMemo(() => {
@@ -231,7 +270,7 @@ const LocationsPage = () => {
           map={
             <AdminMapView
               locations={displayLocations}
-              geoJson={data ?? null}
+              geoJson={typeFilteredGeoJson}
               mapSettings={useCaseQuery.data?.map_settings ?? null}
               selectedId={selectedId}
               onMarkerClick={selectLocation}
@@ -345,6 +384,28 @@ const LocationsPage = () => {
                 placeholder={messages.adminLocations.searchPlaceholder}
                 aria-label={messages.adminLocations.searchAriaLabel}
               />
+              {locationTypes.length > 1 && (
+                <div className="space-y-2">
+                  <div className="text-xs text-muted-foreground">
+                    {messages.adminLocations.typeFilter}
+                  </div>
+                  <LocationTypeChips
+                    types={locationTypes}
+                    isActive={(typeId) => !hiddenTypeIds.includes(typeId)}
+                    onToggle={(typeId) =>
+                      setHiddenTypeIds((current) => {
+                        if (current.includes(typeId)) {
+                          return current.filter((id) => id !== typeId);
+                        }
+                        // At least one type must stay visible
+                        return current.length + 1 >= locationTypes.length
+                          ? current
+                          : [...current, typeId];
+                      })
+                    }
+                  />
+                </div>
+              )}
               <div className="flex items-center justify-between text-xs text-muted-foreground">
                 <span>
                   {filteredLocations.length === 0
@@ -359,6 +420,7 @@ const LocationsPage = () => {
               items={paginatedLocations.map((location) => ({
                 id: location.id,
                 title: location.title,
+                description: locationTypes.length > 1 ? location.typeName : undefined,
                 actions: undefined,
               }))}
               emptyMessage={

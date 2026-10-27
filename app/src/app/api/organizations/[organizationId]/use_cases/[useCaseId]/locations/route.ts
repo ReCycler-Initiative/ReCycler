@@ -31,11 +31,12 @@ export async function GET(
         ST_AsGeoJSON(l.source_geom)::jsonb AS location_source_geom,
         l.id AS location_id,
         l.name AS location_name,
+        lt.id AS location_type_id,
         lt.name AS location_type_name
       FROM recycler.locations l
       LEFT JOIN LATERAL (
         -- Locations aren't linked to a type directly: use the type whose fields hold its values
-        SELECT o.name
+        SELECT o.id, o.name
         FROM recycler.objects o
         LEFT JOIN recycler.fields tf ON tf.object_id = o.id
         LEFT JOIN recycler.location_fields tlf
@@ -62,6 +63,7 @@ export async function GET(
     {
       id: string;
       name: string;
+      typeId: string | null;
       typeName: string | null;
       geom: unknown;
       sourceGeom: unknown;
@@ -74,6 +76,7 @@ export async function GET(
       locationMap.set(row.location_id, {
         id: row.location_id,
         name: row.location_name,
+        typeId: row.location_type_id ?? null,
         typeName: row.location_type_name ?? null,
         geom: row.location_geom,
         sourceGeom: row.location_source_geom,
@@ -91,6 +94,7 @@ export async function GET(
     properties: {
       id: loc.id,
       name: loc.name,
+      location_type_id: loc.typeId ?? undefined,
       location_type_name: loc.typeName ?? undefined,
       fields: loc.fields.map((f) => ({
         id: f.field_id,

@@ -12,8 +12,9 @@ import { useEffect, useMemo, useState } from "react";
 
 const EMPTY_SELECTED_CODES: number[] = [];
 const EMPTY_SELECTED_FIELD_VALUES: FieldSelections = {};
+const EMPTY_SELECTED_TYPE_IDS: string[] = [];
 
-const sameNumberArray = (left: number[], right: number[]) =>
+const sameNumberArray = <T,>(left: T[], right: T[]) =>
   left.length === right.length &&
   left.every((value, index) => value === right[index]);
 
@@ -33,6 +34,7 @@ const sameFieldSelections = (left: FieldSelections, right: FieldSelections) => {
 export const MaterialsPageContent = ({
   initialSelectedCodes = EMPTY_SELECTED_CODES,
   initialSelectedFieldValues = EMPTY_SELECTED_FIELD_VALUES,
+  initialSelectedTypeIds = EMPTY_SELECTED_TYPE_IDS,
   organizationId,
   useCaseId,
   resultsBasePath,
@@ -47,6 +49,7 @@ export const MaterialsPageContent = ({
 }: {
   initialSelectedCodes?: number[];
   initialSelectedFieldValues?: FieldSelections;
+  initialSelectedTypeIds?: string[];
   organizationId?: string;
   useCaseId?: string;
   resultsBasePath?: string;
@@ -64,6 +67,8 @@ export const MaterialsPageContent = ({
     useState<number[]>(initialSelectedCodes);
   const [selectedFieldValues, setSelectedFieldValues] =
     useState<FieldSelections>(initialSelectedFieldValues);
+  const [selectedTypeIds, setSelectedTypeIds] =
+    useState<string[]>(initialSelectedTypeIds);
   const resolvedResultsBasePath =
     resultsBasePath ??
     (organizationId && useCaseId
@@ -93,6 +98,14 @@ export const MaterialsPageContent = ({
     );
   }, [initialSelectedFieldValues]);
 
+  useEffect(() => {
+    setSelectedTypeIds((currentSelectedTypeIds) =>
+      sameNumberArray(currentSelectedTypeIds, initialSelectedTypeIds)
+        ? currentSelectedTypeIds
+        : initialSelectedTypeIds
+    );
+  }, [initialSelectedTypeIds]);
+
   const buildResultsHref = () => {
     const params = new URLSearchParams();
     if (selectedCodes.length) {
@@ -102,6 +115,9 @@ export const MaterialsPageContent = ({
       if (values.length) {
         params.set(`field_${fieldId}`, values.join(","));
       }
+    }
+    if (selectedTypeIds.length) {
+      params.set("types", selectedTypeIds.join(","));
     }
     const query = params.toString();
     return query
@@ -150,6 +166,7 @@ export const MaterialsPageContent = ({
             onSelectedCodesChange={setSelectedCodes}
             selectedFieldValues={selectedFieldValues}
             onSelectedFieldValuesChange={setSelectedFieldValues}
+            selectedTypeIds={selectedTypeIds}
             organizationId={organizationId}
             useCaseId={useCaseId}
             ctaText={resolvedCtaText}
@@ -169,6 +186,8 @@ export const MaterialsPageContent = ({
                   useCaseId={useCaseId}
                   selectedValues={selectedFieldValues}
                   onSelectionChange={setSelectedFieldValues}
+                  selectedTypeIds={selectedTypeIds}
+                  onTypeSelectionChange={setSelectedTypeIds}
                 />
               </>
             ) : (

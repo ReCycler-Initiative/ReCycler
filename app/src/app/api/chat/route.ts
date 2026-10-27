@@ -14,20 +14,23 @@ import { classifyChatTopic, recordChatUsage } from "@/lib/usage-analytics-server
 type MultiSelectField = {
   id: string;
   name: string;
+  typeName: string | null;
   choices: string[];
   choiceInfo: Record<string, string>;
 };
 
 async function loadMultiSelectFields(useCaseId: string): Promise<MultiSelectField[]> {
-  const rows: { id: string; name: string; options: any }[] = await db
-    .select("id", "name", "options")
-    .from("recycler.fields")
-    .where("use_case_id", useCaseId)
-    .where("field_type", "multi_select")
-    .orderByRaw("\"order\" ASC NULLS LAST, created_at ASC");
+  const rows: { id: string; name: string; options: any; type_name: string | null }[] = await db
+    .select("f.id", "f.name", "f.options", "o.name as type_name")
+    .from("recycler.fields as f")
+    .leftJoin("recycler.objects as o", "o.id", "f.object_id")
+    .where("f.use_case_id", useCaseId)
+    .where("f.field_type", "multi_select")
+    .orderByRaw("f.\"order\" ASC NULLS LAST, f.created_at ASC");
   return rows.map((r) => ({
     id: r.id,
     name: r.name,
+    typeName: r.type_name,
     choices: r.options?.choices ?? [],
     choiceInfo: r.options?.choiceInfo ?? {},
   }));
@@ -122,7 +125,8 @@ export async function POST(req: NextRequest) {
           const infoBlock = infoLines.length > 0
             ? `\n  ${locale === "en" ? "Choice details" : "Vaihtoehtojen lisätiedot"}:\n${infoLines.join("\n")}`
             : "";
-          return `- Kenttä "${f.name}" (id: ${f.id}):\n  Vaihtoehdot: ${f.choices.join(", ")}${infoBlock}`;
+          const typeLabel = f.typeName ? `, ${locale === "en" ? "location type" : "kohdetyyppi"} "${f.typeName}"` : "";
+          return `- Kenttä "${f.name}" (id: ${f.id}${typeLabel}):\n  Vaihtoehdot: ${f.choices.join(", ")}${infoBlock}`;
         }).join("\n")
       : "";
 
@@ -155,7 +159,11 @@ export async function POST(req: NextRequest) {
         : "";
 
     const fieldsInstruction = multiSelectFields.length > 0
-      ? `\n- fieldSelections on kumulatiivinen: sisällytä kaikki valinnat mitä käyttäjä on maininnut. Jos käyttäjä sanoo ettei jokin kuulu, poista se. Käytä täsmälleen yllä listattuja kenttien id-arvoja ja vaihtoehtoja.`
+      ? `\n- fieldSelections on kumulatiivinen: sisällytä kaikki valinnat mitä käyttäjä on maininnut. Jos käyttäjä sanoo ettei jokin kuulu, poista se. Käytä täsmälleen yllä listattuja kenttien id-arvoja ja vaihtoehtoja.${
+          new Set(multiSelectFields.map((f) => f.typeName).filter(Boolean)).size > 1
+            ? " Kentät kuuluvat eri kohdetyypeille: jos käyttäjän mainitsema asia löytyy useamman kohdetyypin kentästä, valitse se jokaisesta, jotta kartalla näkyvät kaikki sopivat kohteet."
+            : ""
+        }`
       : "";
 
     const hasChoiceInfo = multiSelectFields.some((f) =>

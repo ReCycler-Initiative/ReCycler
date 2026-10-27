@@ -65,6 +65,7 @@ export const Field = z.object({
 export const FieldRecord = Field.extend({
   id: z.string().uuid(),
   use_case_id: z.string().uuid(),
+  object_id: z.string().uuid().nullable().optional(),
 });
 
 export const LocationType = z.object({
@@ -99,6 +100,7 @@ export const DbLocation = z.object({
   location_source_geom: Geometry.nullable().optional(),
   location_id: z.string().uuid(),
   location_name: z.string(),
+  location_type_id: z.string().uuid().nullable().optional(),
   location_type_name: z.string().nullable().optional(),
 });
 
@@ -106,6 +108,7 @@ export const LocationProperties = z.object({
   datasource_name: z.string().optional(),
   id: z.string().uuid(),
   name: z.string(),
+  location_type_id: z.string().uuid().optional(),
   location_type_name: z.string().optional(),
   fields: z.array(
     Field.extend({
