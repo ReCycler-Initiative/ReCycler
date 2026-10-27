@@ -78,6 +78,7 @@ import {
   ChevronRight,
   Crosshair,
   InfoIcon,
+  Loader2,
   MoreHorizontal,
   Trash2,
   X,
@@ -161,7 +162,7 @@ export const LocationEditPanel = (props: LocationEditPanelProps) => {
     enabled: props.mode === "edit",
   });
 
-  const { data: fieldsDefinitions } = useQuery({
+  const { data: fieldsDefinitions, isLoading: isFieldsLoading } = useQuery({
     queryKey: ["fields", organizationId, useCaseId],
     queryFn: () => getFields(organizationId, useCaseId),
     staleTime: Infinity,
@@ -412,9 +413,9 @@ export const LocationEditPanel = (props: LocationEditPanelProps) => {
     initialFormState !== null && currentFormState !== null && initialFormState !== currentFormState
   );
 
-  const isLoading_ = props.mode === "edit" && isLoading;
+  const isLoading_ = (props.mode === "edit" && isLoading) || isFieldsLoading;
   const isError_ = props.mode === "edit" && isError;
-  const isReady = props.mode === "add" || (!isLoading_ && !isError_ && !!data);
+  const isReady = !isLoading_ && (props.mode === "add" || (!isError_ && !!data));
 
   const parsedLongitude = Number.parseFloat(longitude);
   const parsedLatitude = Number.parseFloat(latitude);
@@ -502,8 +503,9 @@ export const LocationEditPanel = (props: LocationEditPanelProps) => {
       {/* Body */}
       <div className="flex-1 overflow-y-auto">
         {isLoading_ && (
-          <div className="flex items-center justify-center h-32">
-            <p className="text-sm text-muted-foreground">{messages.adminLocationPanel.loading}</p>
+          <div className="flex items-center justify-center gap-2 h-32 text-muted-foreground">
+            <Loader2 className="h-4 w-4 animate-spin" />
+            <p className="text-sm">{messages.adminLocationPanel.loading}</p>
           </div>
         )}
         {isError_ && (
