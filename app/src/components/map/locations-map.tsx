@@ -835,6 +835,11 @@ export default function LocationsMap({ geoJson, mapSettings }: LocationsMapProps
                     return (
                       <>
                   <div className="p-3 border-b">
+                    {details.feature.properties?.location_type_name && (
+                      <p className="text-xs font-medium text-muted-foreground mb-0.5">
+                        {details.feature.properties.location_type_name}
+                      </p>
+                    )}
                     <h2 className="text-base font-semibold mb-1">
                       {details.feature.properties?.name}
                     </h2>

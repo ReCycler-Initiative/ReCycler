@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { createLocation, getFields, getLocation, updateLocation } from "@/services/api";
+import { createLocation, getFields, getLocation, getLocationTypes, updateLocation } from "@/services/api";
 import { useLocale, useMessages } from "@/i18n/locale-provider";
 import { localizeMaterialNameCandidate } from "@/lib/material-translations";
 import { ChoiceInfo, ChoiceInfoDialog } from "@/components/choice-info-dialog";
@@ -167,6 +167,16 @@ export const LocationEditPanel = (props: LocationEditPanelProps) => {
     queryFn: () => getFields(organizationId, useCaseId),
     staleTime: Infinity,
   });
+
+  // New locations get the use case's first location type
+  const { data: locationTypes } = useQuery({
+    queryKey: ["location-types", organizationId, useCaseId],
+    queryFn: () => getLocationTypes(organizationId, useCaseId),
+    enabled: props.mode === "add",
+  });
+
+  const locationTypeName =
+    props.mode === "edit" ? data?.properties.location_type_name : locationTypes?.[0]?.name;
 
   const [name, setName] = useState("");
   const [longitude, setLongitude] = useState(
@@ -515,16 +525,28 @@ export const LocationEditPanel = (props: LocationEditPanelProps) => {
         )}
         {isReady && (
           <div className="p-4 space-y-5">
-            {props.mode === "edit" && data?.properties.source_type && (
-              <div className="rounded-lg border border-gray-200 bg-gray-50 px-3 py-2">
-                <p className="text-xs font-medium text-muted-foreground">
-                  {messages.adminLocationPanel.source}
-                </p>
-                <p className="mt-1 text-sm text-foreground">
-                  {data.properties.source_type === "datasource"
-                    ? (data.properties.datasource_name ?? messages.admin.datasources)
-                    : messages.adminLocationPanel.sourceManual}
-                </p>
+            {(locationTypeName || (props.mode === "edit" && data?.properties.source_type)) && (
+              <div className="rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 space-y-3">
+                {locationTypeName && (
+                  <div>
+                    <p className="text-xs font-medium text-muted-foreground">
+                      {messages.adminLocationPanel.locationType}
+                    </p>
+                    <p className="mt-1 text-sm text-foreground">{locationTypeName}</p>
+                  </div>
+                )}
+                {props.mode === "edit" && data?.properties.source_type && (
+                  <div>
+                    <p className="text-xs font-medium text-muted-foreground">
+                      {messages.adminLocationPanel.source}
+                    </p>
+                    <p className="mt-1 text-sm text-foreground">
+                      {data.properties.source_type === "datasource"
+                        ? (data.properties.datasource_name ?? messages.admin.datasources)
+                        : messages.adminLocationPanel.sourceManual}
+                    </p>
+                  </div>
+                )}
               </div>
             )}
 

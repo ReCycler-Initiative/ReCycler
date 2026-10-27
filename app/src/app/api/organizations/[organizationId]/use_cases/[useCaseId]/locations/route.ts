@@ -30,8 +30,21 @@ export async function GET(
         ST_AsGeoJSON(l.geom)::jsonb AS location_geom,
         ST_AsGeoJSON(l.source_geom)::jsonb AS location_source_geom,
         l.id AS location_id,
-        l.name AS location_name
+        l.name AS location_name,
+        lt.name AS location_type_name
       FROM recycler.locations l
+      LEFT JOIN LATERAL (
+        -- Locations aren't linked to a type directly: use the type whose fields hold its values
+        SELECT o.name
+        FROM recycler.objects o
+        LEFT JOIN recycler.fields tf ON tf.object_id = o.id
+        LEFT JOIN recycler.location_fields tlf
+          ON tlf.field_id = tf.id AND tlf.location_id = l.id
+        WHERE o.use_case_id = l.use_case_id
+        GROUP BY o.id
+        ORDER BY count(tlf.field_id) DESC, o.created_at NULLS LAST
+        LIMIT 1
+      ) lt ON true
       LEFT JOIN recycler.location_fields lf ON lf.location_id = l.id
       LEFT JOIN recycler.fields f ON f.id = lf.field_id
       WHERE l.use_case_id = ?::uuid
@@ -49,6 +62,7 @@ export async function GET(
     {
       id: string;
       name: string;
+      typeName: string | null;
       geom: unknown;
       sourceGeom: unknown;
       fields: typeof rows;
@@ -60,6 +74,7 @@ export async function GET(
       locationMap.set(row.location_id, {
         id: row.location_id,
         name: row.location_name,
+        typeName: row.location_type_name ?? null,
         geom: row.location_geom,
         sourceGeom: row.location_source_geom,
         fields: [],
@@ -76,6 +91,7 @@ export async function GET(
     properties: {
       id: loc.id,
       name: loc.name,
+      location_type_name: loc.typeName ?? undefined,
       fields: loc.fields.map((f) => ({
         id: f.field_id,
         name: f.field_name,

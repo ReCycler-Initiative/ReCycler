@@ -33,6 +33,7 @@ export async function GET(
           l.id,
           l.name,
           ds.name AS datasource_name,
+          lt.name AS location_type_name,
           CASE
             WHEN l.datasource_id IS NULL THEN 'manual'
             ELSE 'datasource'
@@ -49,6 +50,18 @@ export async function GET(
         FROM recycler.locations l
         INNER JOIN recycler.use_cases uc ON l.use_case_id = uc.id
         LEFT JOIN recycler.datasources ds ON l.datasource_id = ds.id
+        LEFT JOIN LATERAL (
+          -- Locations aren't linked to a type directly: use the type whose fields hold its values
+          SELECT o.name
+          FROM recycler.objects o
+          LEFT JOIN recycler.fields tf ON tf.object_id = o.id
+          LEFT JOIN recycler.location_fields tlf
+            ON tlf.field_id = tf.id AND tlf.location_id = l.id
+          WHERE o.use_case_id = l.use_case_id
+          GROUP BY o.id
+          ORDER BY count(tlf.field_id) DESC, o.created_at NULLS LAST
+          LIMIT 1
+        ) lt ON true
         LEFT JOIN recycler.fields f ON f.use_case_id = uc.id
         LEFT JOIN recycler.location_fields lf
           ON lf.location_id = l.id AND lf.field_id = f.id
@@ -85,6 +98,7 @@ export async function GET(
       datasource_name: first.datasource_name ?? undefined,
       id: first.id,
       name: first.name,
+      location_type_name: first.location_type_name ?? undefined,
       fields,
       source_type: first.source_type ?? undefined,
       source_geometry: first.source_geom ?? undefined,
