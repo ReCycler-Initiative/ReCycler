@@ -4,13 +4,9 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createLocation, getFields, getLocation, updateLocation } from "@/services/api";
 import { useLocale, useMessages } from "@/i18n/locale-provider";
-import {
-  MapboxAddressResult,
-  reverseGeocodeMapbox,
-  searchMapboxAddresses,
-} from "@/lib/mapbox-geocoding";
 import { localizeMaterialNameCandidate } from "@/lib/material-translations";
 import { ChoiceInfo, ChoiceInfoDialog } from "@/components/choice-info-dialog";
+import { AddressFieldInput, formatAddressValues } from "@/components/admin/address-field-input";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -82,20 +78,11 @@ import {
   ChevronRight,
   Crosshair,
   InfoIcon,
-  Loader2,
-  LocateFixed,
   MoreHorizontal,
   Trash2,
   X,
 } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
-import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -187,21 +174,7 @@ export const LocationEditPanel = (props: LocationEditPanelProps) => {
   const [latitude, setLatitude] = useState(
     props.mode === "add" ? String(props.lngLat?.latitude ?? "") : ""
   );
-  const [addressQuery, setAddressQuery] = useState("");
-  const [address, setAddress] = useState("");
-  const [postalCode, setPostalCode] = useState("");
-  const [postOffice, setPostOffice] = useState("");
-  const [addressResults, setAddressResults] = useState<MapboxAddressResult[]>([]);
-  const [addressLookupMessage, setAddressLookupMessage] = useState<string | null>(null);
-  const [isSearchingAddress, setIsSearchingAddress] = useState(false);
-  const [isResolvingAddress, setIsResolvingAddress] = useState(false);
   const [fieldValues, setFieldValues] = useState<Record<string, string[]>>({});
-  const [isGeocodingAddress, setIsGeocodingAddress] = useState(false);
-  const [pendingGeocode, setPendingGeocode] = useState<{
-    fieldId: string;
-    values: [string, string, string];
-  } | null>(null);
-  const [addressDetailsOpen, setAddressDetailsOpen] = useState(true);
   const [expandedFieldIds, setExpandedFieldIds] = useState<Record<string, boolean>>({});
   const [infoChoice, setInfoChoice] = useState<ChoiceInfo | null>(null);
 
@@ -210,112 +183,6 @@ export const LocationEditPanel = (props: LocationEditPanelProps) => {
       ...prev,
       [fieldId]: !prev[fieldId],
     }));
-  };
-
-  const geocodeFromCoordinates = async (fieldId: string, lng: number, lat: number) => {
-    const token = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
-    if (!token) return;
-    setIsGeocodingAddress(true);
-    try {
-      const r = await fetch(
-        `https://api.mapbox.com/geocoding/v5/mapbox.places/${lng},${lat}.json?types=address&language=fi&access_token=${token}`
-      );
-      const json = await r.json();
-      const feature = json.features?.[0];
-      if (!feature) {
-        toast.error("Osoitetta ei löytynyt");
-        return;
-      }
-      const street = feature.address
-        ? `${feature.text} ${feature.address}`
-        : (feature.text ?? "");
-      const postalCode =
-        feature.context?.find((c: { id: string; text: string }) => c.id.startsWith("postcode"))?.text ?? "";
-      const city =
-        feature.context?.find((c: { id: string; text: string }) => c.id.startsWith("place"))?.text ?? "";
-      setPendingGeocode({ fieldId, values: [street, postalCode, city] });
-    } catch {
-      toast.error("Osoitteen haku epäonnistui");
-    } finally {
-      setIsGeocodingAddress(false);
-    }
-  };
-
-  const applyAddressResult = (
-    result: MapboxAddressResult,
-    updateCoordinates = true
-  ) => {
-    setAddress(result.address);
-    setPostalCode(result.postalCode);
-    setPostOffice(result.postOffice);
-    setAddressQuery(result.label || result.address);
-    setAddressResults([]);
-    setAddressLookupMessage(null);
-
-    if (updateCoordinates) {
-      setLongitude(String(result.longitude));
-      setLatitude(String(result.latitude));
-      onCoordinatesChange?.({
-        longitude: result.longitude,
-        latitude: result.latitude,
-      });
-    }
-  };
-
-  const selectAddressResult = (result: MapboxAddressResult) => {
-    applyAddressResult(result, true);
-  };
-
-  const resolveAddressFromCoordinates = async () => {
-    const lng = Number.parseFloat(longitude);
-    const lat = Number.parseFloat(latitude);
-
-    if (Number.isNaN(lng) || Number.isNaN(lat)) {
-      setAddressLookupMessage(messages.adminLocationPanel.addressLookupFailed);
-      return;
-    }
-
-    setIsResolvingAddress(true);
-    setAddressLookupMessage(null);
-    setAddressResults([]);
-
-    try {
-      const result = await reverseGeocodeMapbox(lng, lat, locale);
-      if (!result) {
-        setAddressLookupMessage(messages.adminLocationPanel.noAddressFound);
-        return;
-      }
-
-      applyAddressResult(result, false);
-    } catch {
-      setAddressLookupMessage(messages.adminLocationPanel.addressLookupFailed);
-    } finally {
-      setIsResolvingAddress(false);
-    }
-  };
-
-  const handleAddressSearch = async () => {
-    if (!addressQuery.trim()) {
-      setAddressResults([]);
-      setAddressLookupMessage(null);
-      return;
-    }
-
-    setIsSearchingAddress(true);
-    setAddressLookupMessage(null);
-
-    try {
-      const results = await searchMapboxAddresses(addressQuery, locale);
-      setAddressResults(results);
-      if (results.length === 0) {
-        setAddressLookupMessage(messages.adminLocationPanel.noAddressFound);
-      }
-    } catch {
-      setAddressResults([]);
-      setAddressLookupMessage(messages.adminLocationPanel.addressLookupFailed);
-    } finally {
-      setIsSearchingAddress(false);
-    }
   };
 
   // Snapshot coords when relocate activates so cancel can restore them
@@ -336,25 +203,10 @@ export const LocationEditPanel = (props: LocationEditPanelProps) => {
   }, [onCoordinatesChange, pickedLngLat]);
 
   useEffect(() => {
-    if (
-      isResolvingAddress ||
-      isSearchingAddress ||
-      addressResults.length > 0 ||
-      addressLookupMessage
-    ) {
-      setAddressDetailsOpen(true);
-    }
-  }, [addressLookupMessage, addressResults.length, isResolvingAddress, isSearchingAddress]);
-
-  useEffect(() => {
     if (props.mode !== "edit" || !data) return;
     setName(data.properties.name);
     setLongitude(String(data.geometry.coordinates[0]));
     setLatitude(String(data.geometry.coordinates[1]));
-    setAddress(data.properties.address ?? "");
-    setPostalCode(data.properties.postal_code ?? "");
-    setPostOffice(data.properties.post_office ?? "");
-    setAddressQuery(data.properties.address ?? "");
     const initial: Record<string, string[]> = {};
     for (const f of data.properties.fields) {
       initial[f.id] = f.value;
@@ -425,7 +277,6 @@ export const LocationEditPanel = (props: LocationEditPanelProps) => {
         const source_geometry = buildSourceGeometry();
 
         const created = await createLocation(organizationId, useCaseId, {
-          address: address.trim() || undefined,
           fieldValues: Object.entries(fieldValues).map(([fieldId, values]) => ({
             fieldId,
             values,
@@ -433,8 +284,6 @@ export const LocationEditPanel = (props: LocationEditPanelProps) => {
           name: name.trim(),
           latitude: parseFloat(latitude),
           longitude: parseFloat(longitude),
-          post_office: postOffice.trim() || undefined,
-          postal_code: postalCode.trim() || undefined,
           source_geometry,
         });
         return created;
@@ -442,21 +291,15 @@ export const LocationEditPanel = (props: LocationEditPanelProps) => {
       // Edit mode
       const editSourceGeometry = buildSourceGeometry();
       const editPayload: {
-        address?: string;
         name: string;
         latitude: number;
         longitude: number;
-        post_office?: string;
-        postal_code?: string;
         source_geometry?: any;
         fieldValues?: { fieldId: string; values: string[] }[];
       } = {
-        address: address.trim() || undefined,
         name: name.trim(),
         latitude: parseFloat(latitude),
         longitude: parseFloat(longitude),
-        post_office: postOffice.trim() || undefined,
-        postal_code: postalCode.trim() || undefined,
       };
 
       // Only include source_geometry if it's defined (not null/undefined)
@@ -546,9 +389,6 @@ export const LocationEditPanel = (props: LocationEditPanelProps) => {
       name: data.properties.name ?? "",
       longitude: String(data.geometry.coordinates[0]),
       latitude: String(data.geometry.coordinates[1]),
-      address: data.properties.address ?? "",
-      postalCode: data.properties.postal_code ?? "",
-      postOffice: data.properties.post_office ?? "",
       fieldValues: normalizeFieldValues(
         Object.fromEntries(data.properties.fields.map((field) => [field.id, field.value]))
       ),
@@ -564,12 +404,9 @@ export const LocationEditPanel = (props: LocationEditPanelProps) => {
       name,
       longitude,
       latitude,
-      address,
-      postalCode,
-      postOffice,
       fieldValues: normalizeFieldValues(fieldValues),
     });
-  }, [address, fieldValues, latitude, longitude, name, postalCode, postOffice, props.mode]);
+  }, [fieldValues, latitude, longitude, name, props.mode]);
 
   const isDirty = props.mode === "add" || (
     initialFormState !== null && currentFormState !== null && initialFormState !== currentFormState
@@ -578,6 +415,13 @@ export const LocationEditPanel = (props: LocationEditPanelProps) => {
   const isLoading_ = props.mode === "edit" && isLoading;
   const isError_ = props.mode === "edit" && isError;
   const isReady = props.mode === "add" || (!isLoading_ && !isError_ && !!data);
+
+  const parsedLongitude = Number.parseFloat(longitude);
+  const parsedLatitude = Number.parseFloat(latitude);
+  const coordinates =
+    Number.isNaN(parsedLongitude) || Number.isNaN(parsedLatitude)
+      ? null
+      : { longitude: parsedLongitude, latitude: parsedLatitude };
 
   const relocateSaveDisabled =
     mutation.isPending ||
@@ -904,133 +748,6 @@ export const LocationEditPanel = (props: LocationEditPanelProps) => {
               ) : null}
             </div>
 
-            <div className="rounded-lg border border-gray-200 bg-gray-50/60">
-              <button
-                type="button"
-                onClick={() => setAddressDetailsOpen((prev) => !prev)}
-                className="flex w-full items-center justify-between gap-3 px-3 py-2 text-left"
-                aria-expanded={addressDetailsOpen}
-              >
-                <div>
-                  <p className="text-sm font-medium">{messages.adminLocationPanel.addressDetails}</p>
-                  <p className="text-xs text-muted-foreground">
-                    {address || postalCode || postOffice
-                      ? [address, postalCode, postOffice].filter(Boolean).join(", ")
-                      : messages.adminLocationPanel.addressDetailsEmpty}
-                  </p>
-                </div>
-                {addressDetailsOpen ? (
-                  <ChevronDown className="h-4 w-4 shrink-0 text-muted-foreground" />
-                ) : (
-                  <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground" />
-                )}
-              </button>
-
-              {addressDetailsOpen && (
-                <div className="space-y-4 border-t border-gray-200 bg-white px-3 py-3">
-                  <div className="space-y-2">
-                    <Label htmlFor="panel-address-search">{messages.adminLocationPanel.addressSearch}</Label>
-                    <div className="flex gap-2">
-                      <Input
-                        id="panel-address-search"
-                        value={addressQuery}
-                        onChange={(e) => setAddressQuery(e.target.value)}
-                        onKeyDown={(event) => {
-                          if (event.key === "Enter") {
-                            event.preventDefault();
-                            void handleAddressSearch();
-                          }
-                        }}
-                        placeholder={messages.adminLocationPanel.addressSearchPlaceholder}
-                      />
-                      <Button
-                        type="button"
-                        variant="outline"
-                        disabled={isSearchingAddress || !addressQuery.trim()}
-                        onClick={() => void handleAddressSearch()}
-                      >
-                        {isSearchingAddress ? (
-                          <Loader2 className="h-4 w-4 animate-spin" />
-                        ) : (
-                          messages.adminLocationPanel.addressSearch
-                        )}
-                      </Button>
-                    </div>
-
-                    <Button
-                      type="button"
-                      variant="outline"
-                      className="w-full"
-                      disabled={isResolvingAddress}
-                      onClick={() => void resolveAddressFromCoordinates()}
-                    >
-                      {isResolvingAddress ? (
-                        <span className="flex items-center gap-2">
-                          <Loader2 className="h-4 w-4 animate-spin" />
-                          {messages.adminLocationPanel.resolvingAddress}
-                        </span>
-                      ) : (
-                        messages.adminLocationPanel.suggestAddressFromCoordinates
-                      )}
-                    </Button>
-
-                    {isSearchingAddress && (
-                      <p className="text-xs text-muted-foreground">
-                        {messages.adminLocationPanel.searchingAddress}
-                      </p>
-                    )}
-
-                    {addressLookupMessage && (
-                      <p className="text-xs text-muted-foreground">{addressLookupMessage}</p>
-                    )}
-
-                    {addressResults.length > 0 && (
-                      <div className="rounded-md border border-gray-200 bg-white">
-                        {addressResults.map((result) => (
-                          <button
-                            key={`${result.longitude}:${result.latitude}:${result.label}`}
-                            type="button"
-                            onClick={() => selectAddressResult(result)}
-                            className="block w-full border-b border-gray-100 px-3 py-2 text-left text-sm last:border-b-0 hover:bg-gray-50"
-                          >
-                            {result.label || result.address}
-                          </button>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="space-y-1.5">
-                    <Label htmlFor="panel-address">{messages.adminLocationPanel.address}</Label>
-                    <Input
-                      id="panel-address"
-                      value={address}
-                      onChange={(e) => setAddress(e.target.value)}
-                    />
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-2">
-                    <div className="space-y-1.5">
-                      <Label htmlFor="panel-postal-code">{messages.adminLocationPanel.postalCode}</Label>
-                      <Input
-                        id="panel-postal-code"
-                        value={postalCode}
-                        onChange={(e) => setPostalCode(e.target.value)}
-                      />
-                    </div>
-                    <div className="space-y-1.5">
-                      <Label htmlFor="panel-post-office">{messages.adminLocationPanel.postOffice}</Label>
-                      <Input
-                        id="panel-post-office"
-                        value={postOffice}
-                        onChange={(e) => setPostOffice(e.target.value)}
-                      />
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
-
             {(fieldsDefinitions ?? []).map((field) => {
               const existingField = data?.properties.fields.find((f) => f.id === field.id);
               const choices = existingField?.options?.choices ?? field.options?.choices ?? [];
@@ -1059,7 +776,10 @@ export const LocationEditPanel = (props: LocationEditPanelProps) => {
                           {required && <span className="text-destructive ml-1">*</span>}
                         </p>
                         <p className="text-xs text-muted-foreground">
-                          {selectedCount > 0
+                          {field.field_type === "address"
+                            ? formatAddressValues(fieldValues[field.id] ?? []) ||
+                              messages.adminLocationPanel.addressDetailsEmpty
+                            : selectedCount > 0
                             ? messages.adminLocationPanel.selectedCount.replace("{count}", String(selectedCount))
                             : messages.adminLocationPanel.noSelections}
                         </p>
@@ -1118,58 +838,22 @@ export const LocationEditPanel = (props: LocationEditPanelProps) => {
                         )}
 
                         {field.field_type === "address" && (
-                          <div className="space-y-2">
-                            <div className="flex gap-2">
-                              <Input
-                                className="flex-1"
-                                value={(fieldValues[field.id] ?? [])[0] ?? ""}
-                                placeholder="Katuosoite"
-                                onChange={(e) =>
-                                  setFieldValues((prev) => {
-                                    const cur = prev[field.id] ?? ["", "", ""];
-                                    return { ...prev, [field.id]: [e.target.value, cur[1] ?? "", cur[2] ?? ""] };
-                                  })
-                                }
-                              />
-                              <Button
-                                type="button"
-                                variant="outline"
-                                size="icon"
-                                className="shrink-0"
-                                title="Hae osoite koordinaateista"
-                                disabled={isGeocodingAddress || isNaN(parseFloat(longitude)) || isNaN(parseFloat(latitude))}
-                                onClick={() => {
-                                  geocodeFromCoordinates(field.id, parseFloat(longitude), parseFloat(latitude));
-                                }}
-                              >
-                                {isGeocodingAddress
-                                  ? <Loader2 className="h-4 w-4 animate-spin" />
-                                  : <LocateFixed className="h-4 w-4" />}
-                              </Button>
-                            </div>
-                            <div className="grid grid-cols-2 gap-2">
-                              <Input
-                                value={(fieldValues[field.id] ?? [])[1] ?? ""}
-                                placeholder="Postinumero"
-                                onChange={(e) =>
-                                  setFieldValues((prev) => {
-                                    const cur = prev[field.id] ?? ["", "", ""];
-                                    return { ...prev, [field.id]: [cur[0] ?? "", e.target.value, cur[2] ?? ""] };
-                                  })
-                                }
-                              />
-                              <Input
-                                value={(fieldValues[field.id] ?? [])[2] ?? ""}
-                                placeholder="Postitoimipaikka"
-                                onChange={(e) =>
-                                  setFieldValues((prev) => {
-                                    const cur = prev[field.id] ?? ["", "", ""];
-                                    return { ...prev, [field.id]: [cur[0] ?? "", cur[1] ?? "", e.target.value] };
-                                  })
-                                }
-                              />
-                            </div>
-                          </div>
+                          <AddressFieldInput
+                            values={fieldValues[field.id] ?? []}
+                            onChange={(values) =>
+                              setFieldValues((prev) => ({ ...prev, [field.id]: values }))
+                            }
+                            coordinates={coordinates}
+                            onLocate={
+                              locationTypeMode === "point"
+                                ? (lngLat) => {
+                                    setLongitude(String(lngLat.longitude));
+                                    setLatitude(String(lngLat.latitude));
+                                    onCoordinatesChange?.(lngLat);
+                                  }
+                                : undefined
+                            }
+                          />
                         )}
 
                         {field.field_type === "opening_hours" && (() => {
@@ -1305,40 +989,7 @@ export const LocationEditPanel = (props: LocationEditPanelProps) => {
       )}
     </div>
 
-    {/* Geocode confirmation dialog */}
       <ChoiceInfoDialog info={infoChoice} onClose={() => setInfoChoice(null)} />
-      <Dialog open={!!pendingGeocode} onOpenChange={(open) => { if (!open) setPendingGeocode(null); }}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>{messages.adminLocationPanel.updateAddressConfirmTitle}</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-3 text-sm">
-            <p className="text-muted-foreground">
-              {messages.adminLocationPanel.updateAddressConfirmDescription}
-            </p>
-            <div className="rounded-md border border-gray-200 bg-gray-50 p-3 space-y-1">
-              <p className="font-medium">{pendingGeocode?.values[0]}</p>
-              <p className="text-muted-foreground">
-                {pendingGeocode?.values[1]}{pendingGeocode?.values[1] && pendingGeocode?.values[2] ? " " : ""}{pendingGeocode?.values[2]}
-              </p>
-            </div>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setPendingGeocode(null)}>
-              {messages.editor.cancel}
-            </Button>
-            <Button
-              onClick={() => {
-                if (!pendingGeocode) return;
-                setFieldValues((prev) => ({ ...prev, [pendingGeocode.fieldId]: pendingGeocode.values }));
-                setPendingGeocode(null);
-              }}
-            >
-              {messages.adminLocationPanel.updateAddress}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
     </>
   );
 };

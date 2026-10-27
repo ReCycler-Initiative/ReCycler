@@ -81,9 +81,6 @@ Open the organization's use case in ReCycler administration. The browser address
                         properties: {
                           id: "2b2be7e4-9412-4bdc-b4a1-93fe29b6f0d0",
                           name: "Keskustan kierrätyspiste",
-                          address: "Esimerkkikatu 1",
-                          postal_code: "00100",
-                          post_office: "Helsinki",
                           fields: [
                             {
                               id: "c9fa6bcd-80dc-420b-9ce7-d1d7a1b61449",
@@ -168,9 +165,6 @@ Open the organization's use case in ReCycler administration. The browser address
               properties: {
                 id: { type: "string", format: "uuid" },
                 name: { type: "string" },
-                address: { type: "string" },
-                postal_code: { type: "string" },
-                post_office: { type: "string" },
                 source_geometry: { type: "object", additionalProperties: true },
                 fields: {
                   type: "array",

@@ -95,17 +95,13 @@ export const DbLocation = z.object({
   field_order: z.number().nullable(),
   field_type: FieldType.nullable(),
   field_values: FieldValue.nullable(),
-  location_address: z.string().nullable().optional(),
   location_geom: Point,
   location_source_geom: Geometry.nullable().optional(),
   location_id: z.string().uuid(),
   location_name: z.string(),
-  location_post_office: z.string().nullable().optional(),
-  location_postal_code: z.string().nullable().optional(),
 });
 
 export const LocationProperties = z.object({
-  address: z.string().optional(),
   datasource_name: z.string().optional(),
   id: z.string().uuid(),
   name: z.string(),
@@ -115,8 +111,6 @@ export const LocationProperties = z.object({
       value: FieldValue,
     })
   ),
-  post_office: z.string().optional(),
-  postal_code: z.string().optional(),
   source_type: z.enum(["manual", "datasource"]).optional(),
   source_geometry: Geometry.optional(),
 });
@@ -146,13 +140,10 @@ export const LocationDetail = z.object({
   type: z.literal("Feature"),
   geometry: Point,
   properties: z.object({
-    address: z.string().optional(),
     datasource_name: z.string().optional(),
     id: z.string().uuid(),
     name: z.string(),
     fields: z.array(LocationDetailField),
-    post_office: z.string().optional(),
-    postal_code: z.string().optional(),
     source_type: z.enum(["manual", "datasource"]).optional(),
     source_geometry: Geometry.optional(),
   }),

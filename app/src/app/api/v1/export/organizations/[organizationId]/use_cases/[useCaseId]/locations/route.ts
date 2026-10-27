@@ -29,10 +29,7 @@ export async function GET(
         ST_AsGeoJSON(l.geom)::jsonb AS location_geom,
         ST_AsGeoJSON(l.source_geom)::jsonb AS location_source_geom,
         l.id AS location_id,
-        l.name AS location_name,
-        l.address AS location_address,
-        l.postal_code AS location_postal_code,
-        l.post_office AS location_post_office
+        l.name AS location_name
       FROM recycler.locations l
       INNER JOIN recycler.use_cases uc ON uc.id = l.use_case_id
       LEFT JOIN recycler.location_fields lf ON lf.location_id = l.id
@@ -71,7 +68,6 @@ export async function GET(
       type: "Feature" as const,
       geometry: location.geom,
       properties: {
-        address: location.fields[0]?.location_address ?? undefined,
         id: location.id,
         name: location.name,
         fields: location.fields.map((field) => ({
@@ -81,8 +77,6 @@ export async function GET(
           order: field.field_order,
           value: field.field_values ?? [],
         })),
-        post_office: location.fields[0]?.location_post_office ?? undefined,
-        postal_code: location.fields[0]?.location_postal_code ?? undefined,
         source_geometry: location.sourceGeom ?? undefined,
       },
     })),

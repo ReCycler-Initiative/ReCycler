@@ -2,6 +2,8 @@ const MAPBOX_API_BASE_URL = "https://api.mapbox.com/search/geocode/v6";
 const MAPBOX_SEARCH_TYPES = "address,postcode,place,locality,neighborhood";
 export type MapboxAddressResult = {
 	address: string;
+	/** Street name and number only; empty when the result is not an address. */
+	street: string;
 	postalCode: string;
 	postOffice: string;
 	longitude: number;
@@ -14,6 +16,8 @@ type MapboxFeature = {
 		coordinates?: [number, number];
 	};
 	properties?: {
+		feature_type?: string;
+		name?: string;
 		coordinates?: {
 			longitude?: number;
 			latitude?: number;
@@ -58,6 +62,11 @@ const mapFeatureToAddressResult = (
 		feature.place_formatted ??
 		feature.name ??
 		"";
+	const street =
+		feature.properties?.feature_type === "address" ||
+		feature.properties?.feature_type === "street"
+			? (feature.properties?.name ?? "")
+			: "";
 	const postalCode = feature.properties?.context?.postcode?.name ?? "";
 	const postOffice =
 		feature.properties?.context?.place?.name ??
@@ -66,6 +75,7 @@ const mapFeatureToAddressResult = (
 
 	return {
 		address,
+		street,
 		postalCode,
 		postOffice,
 		longitude,

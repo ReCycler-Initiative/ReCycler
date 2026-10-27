@@ -86,9 +86,6 @@ export const createLocation = (
     name: string;
     longitude: number;
     latitude: number;
-    address?: string;
-    postal_code?: string;
-    post_office?: string;
     source_geometry?: GeoJSON.Polygon | GeoJSON.MultiPolygon;
     fieldValues?: { fieldId: string; values: string[] }[];
   }
@@ -119,9 +116,6 @@ export const updateLocation = (
     name: string;
     longitude: number;
     latitude: number;
-    address?: string;
-    postal_code?: string;
-    post_office?: string;
     source_geometry?: GeoJSON.Polygon | GeoJSON.MultiPolygon | null;
     fieldValues?: { fieldId: string; values: string[] }[];
   }

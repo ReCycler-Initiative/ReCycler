@@ -831,6 +831,16 @@ export default function LocationsMap({ geoJson, mapSettings }: LocationsMapProps
                       details.feature.properties as Record<string, unknown> | undefined,
                       locale
                     );
+                    // Show the first address field under the name instead of
+                    // in the field list; collection spots have address props.
+                    const headerAddressField = parseFeatureFields(details.feature.properties?.fields)
+                      .filter((f) => f.field_type === "address" && f.value.some(Boolean))
+                      .sort((a, b) => (a.order ?? 999) - (b.order ?? 999))[0];
+                    const [street, postalCode, postOffice] = headerAddressField?.value ?? [
+                      details.feature.properties?.address,
+                      details.feature.properties?.postal_code,
+                      details.feature.properties?.post_office,
+                    ];
 
                     return (
                       <>
@@ -838,13 +848,13 @@ export default function LocationsMap({ geoJson, mapSettings }: LocationsMapProps
                     <h2 className="text-base font-semibold mb-1">
                       {details.feature.properties?.name}
                     </h2>
-                    {(details.feature.properties?.address || details.feature.properties?.postal_code || details.feature.properties?.post_office) && (
+                    {(street || postalCode || postOffice) && (
                       <div className="flex gap-2 justify-between">
                         <address className="text-sm text-gray-900 not-italic flex flex-col leading-5 ">
-                          {details.feature.properties?.address}
+                          {street}
                           <span>
-                            {details.feature.properties?.postal_code}{" "}
-                            {details.feature.properties?.post_office}
+                            {postalCode}{" "}
+                            {postOffice}
                           </span>
                         </address>
                       </div>
@@ -919,7 +929,7 @@ export default function LocationsMap({ geoJson, mapSettings }: LocationsMapProps
                   })()}
                   {parseFeatureFields(details.feature.properties?.fields)
                     .sort((a, b) => (a.order ?? 999) - (b.order ?? 999))
-                    .filter((field) => field.value.length > 0)
+                    .filter((field) => field.value.length > 0 && field.id !== headerAddressField?.id)
                     .map((field) => (
                       <div key={field.id} className="p-3 border-b">
                         <h3 className="text-xs font-medium text-muted-foreground mb-1">{field.name}</h3>
