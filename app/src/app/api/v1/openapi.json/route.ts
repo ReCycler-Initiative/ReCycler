@@ -62,6 +62,13 @@ Open the organization's use case in ReCycler administration. The browser address
               description: "Use case UUID from the ReCycler administration URL.",
               schema: { type: "string", format: "uuid" },
             },
+            {
+              name: "object_id",
+              in: "query",
+              required: false,
+              description: "Return only locations of this location type (UUID).",
+              schema: { type: "string", format: "uuid" },
+            },
           ],
           responses: {
             "200": {
@@ -81,6 +88,8 @@ Open the organization's use case in ReCycler administration. The browser address
                         properties: {
                           id: "2b2be7e4-9412-4bdc-b4a1-93fe29b6f0d0",
                           name: "Keskustan kierrätyspiste",
+                          object_id: "5f0c1f7e-3d7a-4b8e-9a51-2c6f0e4d8b12",
+                          object_name: "Kierrätyspiste",
                           fields: [
                             {
                               id: "c9fa6bcd-80dc-420b-9ce7-d1d7a1b61449",
@@ -165,6 +174,12 @@ Open the organization's use case in ReCycler administration. The browser address
               properties: {
                 id: { type: "string", format: "uuid" },
                 name: { type: "string" },
+                object_id: {
+                  type: "string",
+                  format: "uuid",
+                  description: "Location type ID.",
+                },
+                object_name: { type: "string", description: "Location type name." },
                 source_geometry: { type: "object", additionalProperties: true },
                 fields: {
                   type: "array",

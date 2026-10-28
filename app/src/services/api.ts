@@ -86,6 +86,7 @@ export const createLocation = (
     name: string;
     longitude: number;
     latitude: number;
+    object_id?: string;
     source_geometry?: GeoJSON.Polygon | GeoJSON.MultiPolygon;
     fieldValues?: { fieldId: string; values: string[] }[];
   }
@@ -116,6 +117,7 @@ export const updateLocation = (
     name: string;
     longitude: number;
     latitude: number;
+    object_id?: string;
     source_geometry?: GeoJSON.Polygon | GeoJSON.MultiPolygon | null;
     fieldValues?: { fieldId: string; values: string[] }[];
   }
@@ -421,6 +423,7 @@ type DatasourceBody = {
   lon_source_field?: string | null;
   geometry_source_field?: string | null;
   schedule?: string | null;
+  object_id?: string | null;
 };
 
 const base = (orgId: string, ucId: string) =>

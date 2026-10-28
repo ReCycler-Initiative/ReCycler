@@ -35,6 +35,7 @@ const UpdateDatasourceBody = z.object({
   lon_source_field: z.string().nullable().optional(),
   geometry_source_field: z.string().nullable().optional(),
   schedule: z.string().nullable().optional(),
+  object_id: z.string().uuid().nullable().optional(),
 }).refine(
   (value) => !value.import_non_point_geometries || value.generate_point_from_non_point_geometries,
   {
@@ -52,7 +53,7 @@ const RETURNING_COLS = [
   "import_point_geometries", "import_non_point_geometries",
   "generate_point_from_non_point_geometries",
   "lat_source_field", "lon_source_field",
-  "geometry_source_field", "schedule", "created_at", "updated_at",
+  "geometry_source_field", "schedule", "object_id", "created_at", "updated_at",
 ] as const;
 
 type Params = {
@@ -112,6 +113,17 @@ export async function PUT(request: NextRequest, { params }: Params) {
   }
 
   const { auth_credential, ...rest } = parsed.data;
+
+  if (rest.object_id) {
+    const object = await db("recycler.objects")
+      .select("id")
+      .where({ id: rest.object_id, use_case_id: useCaseId })
+      .first();
+    if (!object) {
+      return NextResponse.json({ error: "Location type not found" }, { status: 400 });
+    }
+  }
+
   const updateData: Record<string, unknown> = {
     ...rest,
     updated_at: new Date(),

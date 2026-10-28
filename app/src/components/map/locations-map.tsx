@@ -405,7 +405,7 @@ const filterFeaturesByFieldValues = (
     if (!untypedFilters.every(matches(fields))) return false;
     if (typedFilters.length === 0) return true;
 
-    const typeId = feature.properties?.location_type_id;
+    const typeId = feature.properties?.object_id;
     const ownFilters = typedFilters.filter(([fieldId]) => fieldTypeIds[fieldId] === typeId);
     return ownFilters.length > 0 && ownFilters.every(matches(fields));
   });
@@ -419,7 +419,7 @@ const filterFeaturesByTypes = (
 ): GeoJSON.FeatureCollection<GeoJSON.Geometry> => {
   if (typeIds.length === 0) return collectionSpots;
   const features = collectionSpots.features?.filter((feature: any) =>
-    typeIds.includes(feature.properties?.location_type_id)
+    typeIds.includes(feature.properties?.object_id)
   );
   return { ...collectionSpots, features };
 };
@@ -882,9 +882,9 @@ export default function LocationsMap({ geoJson, mapSettings }: LocationsMapProps
                     return (
                       <>
                   <div className="p-3 border-b">
-                    {details.feature.properties?.location_type_name && (
+                    {details.feature.properties?.object_name && (
                       <p className="text-xs font-medium text-muted-foreground mb-0.5">
-                        {details.feature.properties.location_type_name}
+                        {details.feature.properties.object_name}
                       </p>
                     )}
                     <h2 className="text-base font-semibold mb-1">

@@ -114,8 +114,8 @@ const LocationsPage = () => {
           id: feature.properties.id,
           name: feature.properties.name,
           title: feature.properties.name,
-          typeId: feature.properties.location_type_id,
-          typeName: feature.properties.location_type_name,
+          typeId: feature.properties.object_id,
+          typeName: feature.properties.object_name,
           longitude: feature.geometry.coordinates[0],
           latitude: feature.geometry.coordinates[1],
         }))
@@ -145,7 +145,7 @@ const LocationsPage = () => {
     return {
       ...data,
       features: data.features.filter((feature) => {
-        const typeId = feature.properties.location_type_id;
+        const typeId = feature.properties.object_id;
         return !typeId || !hiddenTypeIds.includes(typeId);
       }),
     };

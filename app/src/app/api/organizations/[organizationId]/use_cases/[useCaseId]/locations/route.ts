@@ -31,21 +31,10 @@ export async function GET(
         ST_AsGeoJSON(l.source_geom)::jsonb AS location_source_geom,
         l.id AS location_id,
         l.name AS location_name,
-        lt.id AS location_type_id,
-        lt.name AS location_type_name
+        lt.id AS object_id,
+        lt.name AS object_name
       FROM recycler.locations l
-      LEFT JOIN LATERAL (
-        -- Locations aren't linked to a type directly: use the type whose fields hold its values
-        SELECT o.id, o.name
-        FROM recycler.objects o
-        LEFT JOIN recycler.fields tf ON tf.object_id = o.id
-        LEFT JOIN recycler.location_fields tlf
-          ON tlf.field_id = tf.id AND tlf.location_id = l.id
-        WHERE o.use_case_id = l.use_case_id
-        GROUP BY o.id
-        ORDER BY count(tlf.field_id) DESC, o.created_at NULLS LAST
-        LIMIT 1
-      ) lt ON true
+      LEFT JOIN recycler.objects lt ON lt.id = l.object_id
       LEFT JOIN recycler.location_fields lf ON lf.location_id = l.id
       LEFT JOIN recycler.fields f ON f.id = lf.field_id
       WHERE l.use_case_id = ?::uuid
@@ -76,8 +65,8 @@ export async function GET(
       locationMap.set(row.location_id, {
         id: row.location_id,
         name: row.location_name,
-        typeId: row.location_type_id ?? null,
-        typeName: row.location_type_name ?? null,
+        typeId: row.object_id ?? null,
+        typeName: row.object_name ?? null,
         geom: row.location_geom,
         sourceGeom: row.location_source_geom,
         fields: [],
@@ -94,8 +83,8 @@ export async function GET(
     properties: {
       id: loc.id,
       name: loc.name,
-      location_type_id: loc.typeId ?? undefined,
-      location_type_name: loc.typeName ?? undefined,
+      object_id: loc.typeId ?? undefined,
+      object_name: loc.typeName ?? undefined,
       fields: loc.fields.map((f) => ({
         id: f.field_id,
         name: f.field_name,
@@ -122,6 +111,7 @@ const CreateLocationBody = z.object({
   longitude: z.number().finite(),
   latitude: z.number().finite(),
   name: z.string().trim().min(1),
+  object_id: z.string().uuid().optional(),
   source_geometry: GeoJsonGeometry.optional(),
   fieldValues: z
     .array(
@@ -171,31 +161,48 @@ export async function POST(
     longitude,
     latitude,
     name,
+    object_id,
     source_geometry,
     fieldValues,
   } = parsed.data;
+
+  // Use the requested location type, or fall back to the use case's oldest one
+  const object = await db("recycler.objects")
+    .select("id")
+    .where({ use_case_id: useCaseId })
+    .modify((query) => {
+      if (object_id) query.where({ id: object_id });
+    })
+    .orderByRaw("created_at ASC NULLS LAST")
+    .first();
+
+  if (object_id && !object) {
+    return NextResponse.json({ error: "Location type not found" }, { status: 400 });
+  }
+
+  const objectId: string | null = object?.id ?? null;
 
   const row = await db.transaction(async (trx) => {
     let insertResult;
     if (source_geometry) {
       insertResult = await trx.raw(
         `
-          INSERT INTO recycler.locations (name, use_case_id, geom, source_geom)
-          VALUES (?, ?::uuid, ST_SetSRID(ST_Point(?, ?), 4326), ST_SetSRID(ST_GeomFromGeoJSON(?), 4326))
-          RETURNING id, name,
+          INSERT INTO recycler.locations (name, use_case_id, object_id, geom, source_geom)
+          VALUES (?, ?::uuid, ?::uuid, ST_SetSRID(ST_Point(?, ?), 4326), ST_SetSRID(ST_GeomFromGeoJSON(?), 4326))
+          RETURNING id, name, object_id,
             ST_AsGeoJSON(geom)::jsonb as geom,
             ST_AsGeoJSON(source_geom)::jsonb as source_geom
         `,
-        [name, useCaseId, longitude, latitude, JSON.stringify(source_geometry)]
+        [name, useCaseId, objectId, longitude, latitude, JSON.stringify(source_geometry)]
       );
     } else {
       insertResult = await trx.raw(
         `
-          INSERT INTO recycler.locations (name, use_case_id, geom)
-          VALUES (?, ?::uuid, ST_SetSRID(ST_Point(?, ?), 4326))
-          RETURNING id, name, ST_AsGeoJSON(geom)::jsonb as geom
+          INSERT INTO recycler.locations (name, use_case_id, object_id, geom)
+          VALUES (?, ?::uuid, ?::uuid, ST_SetSRID(ST_Point(?, ?), 4326))
+          RETURNING id, name, object_id, ST_AsGeoJSON(geom)::jsonb as geom
         `,
-        [name, useCaseId, longitude, latitude]
+        [name, useCaseId, objectId, longitude, latitude]
       );
     }
 
@@ -221,6 +228,7 @@ export async function POST(
     properties: {
       id: row.id,
       name: row.name,
+      object_id: row.object_id ?? undefined,
       fields: [],
     },
   });

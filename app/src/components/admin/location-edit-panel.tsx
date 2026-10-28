@@ -12,6 +12,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 // ---------------------------------------------------------------------------
 // Geometry helpers
@@ -169,19 +170,18 @@ export const LocationEditPanel = (props: LocationEditPanelProps) => {
     staleTime: Infinity,
   });
 
-  // New locations get the use case's first location type
   const { data: locationTypes } = useQuery({
     queryKey: ["location-types", organizationId, useCaseId],
     queryFn: () => getLocationTypes(organizationId, useCaseId),
-    enabled: props.mode === "add",
   });
 
-  const locationType =
-    props.mode === "edit"
-      ? data?.properties.location_type_id && data.properties.location_type_name
-        ? { id: data.properties.location_type_id, name: data.properties.location_type_name }
-        : undefined
-      : locationTypes?.[0];
+  // New locations default to the use case's first location type
+  const [selectedObjectId, setSelectedObjectId] = useState<string | undefined>();
+  const objectId =
+    selectedObjectId ??
+    (props.mode === "edit" ? data?.properties.object_id : locationTypes?.[0]?.id);
+  const locationType = locationTypes?.find((type) => type.id === objectId);
+  const objectFields = (fieldsDefinitions ?? []).filter((field) => field.object_id === objectId);
 
   const [name, setName] = useState("");
   const [longitude, setLongitude] = useState(
@@ -269,6 +269,11 @@ export const LocationEditPanel = (props: LocationEditPanelProps) => {
 
   const mutation = useMutation({
     mutationFn: async () => {
+      // Values of other location types' fields are dropped
+      const objectFieldValues = objectFields
+        .filter((field) => fieldValues[field.id])
+        .map((field) => ({ fieldId: field.id, values: fieldValues[field.id] }));
+
       // Helper to build source_geometry from nodes and parts
       const buildSourceGeometry = () => {
         if (locationTypeMode !== "polygon") return undefined;
@@ -293,10 +298,8 @@ export const LocationEditPanel = (props: LocationEditPanelProps) => {
         const source_geometry = buildSourceGeometry();
 
         const created = await createLocation(organizationId, useCaseId, {
-          fieldValues: Object.entries(fieldValues).map(([fieldId, values]) => ({
-            fieldId,
-            values,
-          })),
+          fieldValues: objectFieldValues,
+          object_id: objectId,
           name: name.trim(),
           latitude: parseFloat(latitude),
           longitude: parseFloat(longitude),
@@ -310,12 +313,14 @@ export const LocationEditPanel = (props: LocationEditPanelProps) => {
         name: string;
         latitude: number;
         longitude: number;
+        object_id?: string;
         source_geometry?: any;
         fieldValues?: { fieldId: string; values: string[] }[];
       } = {
         name: name.trim(),
         latitude: parseFloat(latitude),
         longitude: parseFloat(longitude),
+        object_id: objectId,
       };
 
       // Only include source_geometry if it's defined (not null/undefined)
@@ -324,12 +329,8 @@ export const LocationEditPanel = (props: LocationEditPanelProps) => {
       }
 
       // Only include fieldValues if there are any
-      const fieldValuesArray = Object.entries(fieldValues).map(([fieldId, values]) => ({
-        fieldId,
-        values,
-      }));
-      if (fieldValuesArray.length > 0) {
-        editPayload.fieldValues = fieldValuesArray;
+      if (objectFieldValues.length > 0) {
+        editPayload.fieldValues = objectFieldValues;
       }
 
       return updateLocation(organizationId, useCaseId, locationId!, editPayload);
@@ -530,21 +531,35 @@ export const LocationEditPanel = (props: LocationEditPanelProps) => {
         )}
         {isReady && (
           <div className="p-4 space-y-5">
-            {(locationType || (props.mode === "edit" && data?.properties.source_type)) && (
+            {(!!locationTypes?.length || (props.mode === "edit" && data?.properties.source_type)) && (
               <div className="rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 space-y-3">
-                {locationType && (
-                  <div>
+                {!!locationTypes?.length && (
+                  <div className="space-y-1">
                     <p className="text-xs font-medium text-muted-foreground">
                       {messages.adminLocationPanel.locationType}
                     </p>
-                    <Link
-                      href={`/admin/organizations/${organizationId}/use_cases/${useCaseId}/location-types/${locationType.id}/edit?${new URLSearchParams({
-                        returnTo: `/admin/organizations/${organizationId}/use_cases/${useCaseId}/locations${locationId ? `?location=${locationId}` : ""}`,
-                      })}`}
-                      className="mt-1 block text-sm text-foreground underline underline-offset-2 hover:text-muted-foreground"
-                    >
-                      {locationType.name}
-                    </Link>
+                    <Select value={objectId ?? ""} onValueChange={setSelectedObjectId}>
+                      <SelectTrigger className="h-8 bg-white text-sm">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {locationTypes.map((type) => (
+                          <SelectItem key={type.id} value={type.id}>
+                            {type.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    {locationType && (
+                      <Link
+                        href={`/admin/organizations/${organizationId}/use_cases/${useCaseId}/location-types/${locationType.id}/edit?${new URLSearchParams({
+                          returnTo: `/admin/organizations/${organizationId}/use_cases/${useCaseId}/locations${locationId ? `?location=${locationId}` : ""}`,
+                        })}`}
+                        className="block text-xs text-muted-foreground underline underline-offset-2 hover:text-foreground"
+                      >
+                        {messages.adminLocationPanel.editLocationType}
+                      </Link>
+                    )}
                   </div>
                 )}
                 {props.mode === "edit" && data?.properties.source_type && (
@@ -784,7 +799,7 @@ export const LocationEditPanel = (props: LocationEditPanelProps) => {
               ) : null}
             </div>
 
-            {(fieldsDefinitions ?? []).map((field) => {
+            {objectFields.map((field) => {
               const existingField = data?.properties.fields.find((f) => f.id === field.id);
               const choices = existingField?.options?.choices ?? field.options?.choices ?? [];
               const choiceInfo = existingField?.options?.choiceInfo ?? field.options?.choiceInfo ?? {};

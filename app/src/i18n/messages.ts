@@ -291,6 +291,7 @@ const baseFi = {
     deleteLocation: "Poista kohde",
     close: "Sulje",
     locationType: "Kohdetyyppi",
+    editLocationType: "Muokkaa kohdetyyppiä",
     source: "Lähde",
     sourceManual: "Manuaalisesti syötetty",
     loadError: "Virhe kohteen lataamisessa",
@@ -431,6 +432,9 @@ const baseFi = {
     noMappings:
       "Ei mäppäyksiä. Testaa yhteys ensin ja lisää sitten mäppäyksiä.",
     targetField: "Kohdekenttä",
+    locationType: "Kohdetyyppi",
+    locationTypeHelp:
+      "Datalähteen kohteet tallennetaan tähän tyyppiin. Kohdekentiksi voi valita vain tämän tyypin kenttiä.",
     authentication: "Tunnistautuminen",
     apiKey: "API-avain / token",
     apiKeyOption: "API-avain",
@@ -1198,6 +1202,7 @@ const baseEn = {
     deleteLocation: "Delete location",
     close: "Close",
     locationType: "Location type",
+    editLocationType: "Edit location type",
     source: "Source",
     sourceManual: "Entered manually",
     loadError: "Failed to load location",
@@ -1340,6 +1345,9 @@ const baseEn = {
     noMappings:
       "No mappings yet. Test the connection first and then add mappings.",
     targetField: "Target field",
+    locationType: "Location type",
+    locationTypeHelp:
+      "Locations from this datasource are saved as this type. Only this type's fields can be chosen as target fields.",
     authentication: "Authentication",
     apiKey: "API key / token",
     apiKeyOption: "API key",

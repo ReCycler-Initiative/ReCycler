@@ -339,10 +339,11 @@ async function fetchJsonPages(
                 ELSE ST_Transform(ST_Force2D(ST_SetSRID(ST_GeomFromGeoJSON(?::text), ?)), 4326)
               END AS source_geom,
               ?::text AS external_id,
-              ?::uuid AS datasource_id
+              ?::uuid AS datasource_id,
+              ?::uuid AS object_id
           ),
           upserted AS (
-            INSERT INTO recycler.locations (id, name, use_case_id, geom, source_geom, external_id, datasource_id)
+            INSERT INTO recycler.locations (id, name, use_case_id, geom, source_geom, external_id, datasource_id, object_id)
             SELECT
               id,
               name,
@@ -353,7 +354,8 @@ async function fetchJsonPages(
               END AS geom,
               source_geom,
               external_id,
-              datasource_id
+              datasource_id,
+              object_id
             FROM incoming
             ON CONFLICT (datasource_id, external_id)
             WHERE datasource_id IS NOT NULL AND external_id IS NOT NULL
@@ -361,9 +363,11 @@ async function fetchJsonPages(
               name = EXCLUDED.name,
               geom = EXCLUDED.geom,
               source_geom = EXCLUDED.source_geom,
+              object_id = EXCLUDED.object_id,
               updated_at = now()
             WHERE
               recycler.locations.name IS DISTINCT FROM EXCLUDED.name
+              OR recycler.locations.object_id IS DISTINCT FROM EXCLUDED.object_id
               OR NOT ST_Equals(recycler.locations.geom, EXCLUDED.geom)
               OR (
                 (recycler.locations.source_geom IS NULL) <> (EXCLUDED.source_geom IS NULL)
@@ -418,6 +422,7 @@ async function fetchJsonPages(
             sourceSrid,
             externalId,
             datasourceId,
+            datasource.object_id ?? null,
           ]
         );
 

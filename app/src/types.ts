@@ -100,16 +100,16 @@ export const DbLocation = z.object({
   location_source_geom: Geometry.nullable().optional(),
   location_id: z.string().uuid(),
   location_name: z.string(),
-  location_type_id: z.string().uuid().nullable().optional(),
-  location_type_name: z.string().nullable().optional(),
+  object_id: z.string().uuid().nullable().optional(),
+  object_name: z.string().nullable().optional(),
 });
 
 export const LocationProperties = z.object({
   datasource_name: z.string().optional(),
   id: z.string().uuid(),
   name: z.string(),
-  location_type_id: z.string().uuid().optional(),
-  location_type_name: z.string().optional(),
+  object_id: z.string().uuid().optional(),
+  object_name: z.string().optional(),
   fields: z.array(
     Field.extend({
       id: z.string().uuid(),
@@ -148,8 +148,8 @@ export const LocationDetail = z.object({
     datasource_name: z.string().optional(),
     id: z.string().uuid(),
     name: z.string(),
-    location_type_id: z.string().uuid().optional(),
-    location_type_name: z.string().optional(),
+    object_id: z.string().uuid().optional(),
+    object_name: z.string().optional(),
     fields: z.array(LocationDetailField),
     source_type: z.enum(["manual", "datasource"]).optional(),
     source_geometry: Geometry.optional(),
@@ -374,6 +374,7 @@ export const Datasource = z.object({
   lon_source_field: z.string().nullable().optional(),
   geometry_source_field: z.string().nullable().optional(),
   schedule: z.string().nullable().optional(),
+  object_id: z.string().uuid().nullable().optional(),
   created_at: z.coerce.date().optional(),
   updated_at: z.coerce.date().optional(),
 });

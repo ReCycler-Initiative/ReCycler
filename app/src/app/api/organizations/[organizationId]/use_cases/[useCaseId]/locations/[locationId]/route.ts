@@ -33,8 +33,8 @@ export async function GET(
           l.id,
           l.name,
           ds.name AS datasource_name,
-          lt.id AS location_type_id,
-          lt.name AS location_type_name,
+          lt.id AS object_id,
+          lt.name AS object_name,
           CASE
             WHEN l.datasource_id IS NULL THEN 'manual'
             ELSE 'datasource'
@@ -51,18 +51,7 @@ export async function GET(
         FROM recycler.locations l
         INNER JOIN recycler.use_cases uc ON l.use_case_id = uc.id
         LEFT JOIN recycler.datasources ds ON l.datasource_id = ds.id
-        LEFT JOIN LATERAL (
-          -- Locations aren't linked to a type directly: use the type whose fields hold its values
-          SELECT o.id, o.name
-          FROM recycler.objects o
-          LEFT JOIN recycler.fields tf ON tf.object_id = o.id
-          LEFT JOIN recycler.location_fields tlf
-            ON tlf.field_id = tf.id AND tlf.location_id = l.id
-          WHERE o.use_case_id = l.use_case_id
-          GROUP BY o.id
-          ORDER BY count(tlf.field_id) DESC, o.created_at NULLS LAST
-          LIMIT 1
-        ) lt ON true
+        LEFT JOIN recycler.objects lt ON lt.id = l.object_id
         LEFT JOIN recycler.fields f ON f.use_case_id = uc.id
         LEFT JOIN recycler.location_fields lf
           ON lf.location_id = l.id AND lf.field_id = f.id
@@ -99,8 +88,8 @@ export async function GET(
       datasource_name: first.datasource_name ?? undefined,
       id: first.id,
       name: first.name,
-      location_type_id: first.location_type_id ?? undefined,
-      location_type_name: first.location_type_name ?? undefined,
+      object_id: first.object_id ?? undefined,
+      object_name: first.object_name ?? undefined,
       fields,
       source_type: first.source_type ?? undefined,
       source_geometry: first.source_geom ?? undefined,
@@ -117,6 +106,7 @@ const UpdateLocationBody = z.object({
   name: z.string().trim().min(1),
   longitude: z.number().finite(),
   latitude: z.number().finite(),
+  object_id: z.string().uuid().optional(),
   source_geometry: GeoJsonGeometry.nullable().optional(),
   fieldValues: z
     .array(
@@ -164,9 +154,20 @@ export async function PUT(
     name,
     longitude,
     latitude,
+    object_id,
     source_geometry,
     fieldValues,
   } = parsed.data;
+
+  if (object_id) {
+    const object = await db("recycler.objects")
+      .select("id")
+      .where({ id: object_id, use_case_id: useCaseId })
+      .first();
+    if (!object) {
+      return NextResponse.json({ error: "Location type not found" }, { status: 400 });
+    }
+  }
 
   const hasSourceGeometryField =
     json !== null && typeof json === "object" && "source_geometry" in json;
@@ -234,6 +235,24 @@ export async function PUT(
 
   if (!updated.rows?.[0]) {
     return NextResponse.json({ error: "Location not found" }, { status: 404 });
+  }
+
+  if (object_id) {
+    await db("recycler.locations")
+      .where({ id: locationId })
+      .update({ object_id });
+
+    // Values of fields that don't belong to the location's type are dropped
+    await db.raw(
+      `
+        DELETE FROM recycler.location_fields lf
+        USING recycler.fields f
+        WHERE lf.field_id = f.id
+          AND lf.location_id = ?::uuid
+          AND f.object_id IS DISTINCT FROM ?::uuid
+      `,
+      [locationId, object_id]
+    );
   }
 
   if (fieldValues && fieldValues.length > 0) {

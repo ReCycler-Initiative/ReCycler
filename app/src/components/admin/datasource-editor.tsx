@@ -29,6 +29,7 @@ import {
   getDatasource,
   getDatasourceMappings,
   getFields,
+  getLocationTypes,
   saveDatasourceMappings,
   testDatasource,
   updateDatasource,
@@ -38,6 +39,7 @@ import {
   DatasourceFieldMapping,
   DatasourceTestResult,
   FieldRecord,
+  LocationTypeRecord,
 } from "@/types";
 import axios from "axios";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -73,6 +75,7 @@ const createDatasourceFormSchema = (messages: any) =>
     lon_source_field: z.string().nullable().optional(),
     geometry_source_field: z.string().nullable().optional(),
     schedule: z.string().nullable().optional(),
+    object_id: z.string().uuid().nullable().optional(),
     mappings: z.array(
       z.object({
         source_field: z.string().min(1),
@@ -126,6 +129,9 @@ export const DataSourceEditor = ({
   const [useCaseFields, setUseCaseFields] = useState<
     z.infer<typeof FieldRecord>[]
   >([]);
+  const [locationTypes, setLocationTypes] = useState<
+    z.infer<typeof LocationTypeRecord>[]
+  >([]);
   const [isSaving, setIsSaving] = useState(false);
   const [createdDatasourceId, setCreatedDatasourceId] = useState<
     string | undefined
@@ -153,6 +159,7 @@ export const DataSourceEditor = ({
       lon_source_field: null,
       geometry_source_field: null,
       schedule: null,
+      object_id: null,
       mappings: [],
     },
   });
@@ -173,6 +180,7 @@ export const DataSourceEditor = ({
   const dataPath = useWatch({ control, name: "data_path" });
   const sourceFormat = useWatch({ control, name: "source_format" });
   const coordinateType = useWatch({ control, name: "coordinate_type" });
+  const objectId = useWatch({ control, name: "object_id" });
   const mappingDisabled = !isEdit && connectionStatus !== "success";
   const lastAutoFetchSignatureRef = useRef<string | null>(null);
 
@@ -182,6 +190,20 @@ export const DataSourceEditor = ({
       .then(setUseCaseFields)
       .catch(() => {});
   }, [organizationId, useCaseId]);
+
+  // Load location types; new datasources default to the first one
+  useEffect(() => {
+    getLocationTypes(organizationId, useCaseId)
+      .then((types) => {
+        setLocationTypes(types);
+        if (!isEdit && types[0] && !getValues("object_id")) {
+          setValue("object_id", types[0].id);
+        }
+      })
+      .catch(() => {});
+  }, [getValues, isEdit, organizationId, setValue, useCaseId]);
+
+  const objectFields = useCaseFields.filter((f) => f.object_id === objectId);
 
   // Load existing datasource in edit mode
   useEffect(() => {
@@ -212,6 +234,7 @@ export const DataSourceEditor = ({
           lon_source_field: ds.lon_source_field ?? null,
           geometry_source_field: ds.geometry_source_field ?? null,
           schedule: ds.schedule ?? null,
+          object_id: ds.object_id ?? null,
           mappings: mappings.map((m) => ({
             source_field: m.source_field,
             field_id: m.field_id,
@@ -776,6 +799,46 @@ export const DataSourceEditor = ({
                 : "mt-5 space-y-3"
             }
           >
+          <FormField
+            control={control}
+            name="object_id"
+            render={({ field }) => (
+              <FormItem className="max-w-xl">
+                <FormLabel>{messages.datasourceEditor.locationType}</FormLabel>
+                <Select
+                  value={field.value ?? ""}
+                  onValueChange={(value) => {
+                    field.onChange(value);
+                    // Mappings must target the selected type's fields
+                    const typeFieldIds = new Set(
+                      useCaseFields.filter((f) => f.object_id === value).map((f) => f.id)
+                    );
+                    getValues("mappings").forEach((mapping, index) => {
+                      if (mapping.field_id && !typeFieldIds.has(mapping.field_id)) {
+                        setValue(`mappings.${index}.field_id`, "", { shouldDirty: true });
+                      }
+                    });
+                  }}
+                >
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    {locationTypes.map((type) => (
+                      <SelectItem key={type.id} value={type.id}>
+                        {type.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <p className="text-xs text-muted-foreground">
+                  {messages.datasourceEditor.locationTypeHelp}
+                </p>
+              </FormItem>
+            )}
+          />
           {mappingRows.length === 0 && (
             <p className="text-sm text-muted-foreground">
               {messages.datasourceEditor.noMappings}
@@ -807,7 +870,7 @@ export const DataSourceEditor = ({
                 name={`mappings.${index}.field_id`}
                 label={messages.datasourceEditor.targetField}
                 className="flex-1"
-                items={useCaseFields.map((f) => ({
+                items={objectFields.map((f) => ({
                   value: f.id,
                   label: f.name,
                 }))}
