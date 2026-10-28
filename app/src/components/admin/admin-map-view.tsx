@@ -199,6 +199,7 @@ export const AdminMapView = ({
   className,
 }: AdminMapViewProps) => {
   const mapRef = useRef<MapRef>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   const [mapLoaded, setMapLoaded] = useState(false);
   const locationsRef = useRef(locations);
   locationsRef.current = locations;
@@ -293,6 +294,16 @@ export const AdminMapView = ({
     };
   }, [addMode, polygonNodes]);
 
+  // Mapbox only tracks window resizes, so follow container size changes
+  // (e.g. the edit panel sliding open/closed) to keep the canvas full width
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container || typeof ResizeObserver === "undefined") return;
+    const observer = new ResizeObserver(() => mapRef.current?.resize());
+    observer.observe(container);
+    return () => observer.disconnect();
+  }, []);
+
   // Fly to selected location only when selectedId actually changes
   useEffect(() => {
     if (!selectedId || !mapRef.current || !mapLoaded) return;
@@ -380,7 +391,7 @@ export const AdminMapView = ({
   );
 
   return (
-    <div className={cn("h-full w-full", className)}>
+    <div ref={containerRef} className={cn("h-full w-full", className)}>
       <Map
         ref={mapRef}
         mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_TOKEN}
