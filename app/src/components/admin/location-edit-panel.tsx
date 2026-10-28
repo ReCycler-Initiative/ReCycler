@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 // ---------------------------------------------------------------------------
 // Geometry helpers
@@ -182,6 +183,23 @@ export const LocationEditPanel = (props: LocationEditPanelProps) => {
     (props.mode === "edit" ? data?.properties.object_id : locationTypes?.[0]?.id);
   const locationType = locationTypes?.find((type) => type.id === objectId);
   const objectFields = (fieldsDefinitions ?? []).filter((field) => field.object_id === objectId);
+
+  // Changing the type drops filled-in values of other types' fields on save, so confirm first
+  const [pendingObjectId, setPendingObjectId] = useState<string | null>(null);
+  const fieldsLostOnTypeChange = (newObjectId: string) =>
+    (fieldsDefinitions ?? []).filter(
+      (field) =>
+        field.object_id !== newObjectId &&
+        (fieldValues[field.id] ?? []).some((value) => value.trim())
+    );
+  const handleObjectChange = (newObjectId: string) => {
+    if (newObjectId === objectId) return;
+    if (fieldsLostOnTypeChange(newObjectId).length > 0) {
+      setPendingObjectId(newObjectId);
+    } else {
+      setSelectedObjectId(newObjectId);
+    }
+  };
 
   const [name, setName] = useState("");
   const [longitude, setLongitude] = useState(
@@ -538,7 +556,7 @@ export const LocationEditPanel = (props: LocationEditPanelProps) => {
                     <p className="text-xs font-medium text-muted-foreground">
                       {messages.adminLocationPanel.locationType}
                     </p>
-                    <Select value={objectId ?? ""} onValueChange={setSelectedObjectId}>
+                    <Select value={objectId ?? ""} onValueChange={handleObjectChange}>
                       <SelectTrigger className="h-8 bg-white text-sm">
                         <SelectValue />
                       </SelectTrigger>
@@ -1041,6 +1059,47 @@ export const LocationEditPanel = (props: LocationEditPanelProps) => {
     </div>
 
       <ChoiceInfoDialog info={infoChoice} onClose={() => setInfoChoice(null)} />
+
+      <Dialog
+        open={!!pendingObjectId}
+        onOpenChange={(open) => {
+          if (!open) setPendingObjectId(null);
+        }}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{messages.adminLocationPanel.changeTypeConfirmTitle}</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3 text-sm">
+            <p className="text-muted-foreground">
+              {messages.adminLocationPanel.changeTypeConfirmDescription.replace(
+                "{type}",
+                locationTypes?.find((type) => type.id === pendingObjectId)?.name ?? ""
+              )}
+            </p>
+            <ul className="rounded-md border border-gray-200 bg-gray-50 p-3 space-y-1 list-disc list-inside">
+              {pendingObjectId &&
+                fieldsLostOnTypeChange(pendingObjectId).map((field) => (
+                  <li key={field.id}>{field.name}</li>
+                ))}
+            </ul>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setPendingObjectId(null)}>
+              {messages.editor.cancel}
+            </Button>
+            <Button
+              onClick={() => {
+                if (!pendingObjectId) return;
+                setSelectedObjectId(pendingObjectId);
+                setPendingObjectId(null);
+              }}
+            >
+              {messages.adminLocationPanel.changeType}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </>
   );
 };

@@ -473,6 +473,22 @@ async function fetchJsonPages(
       }
     }
 
+    // Drop values left over from fields of another location type, e.g. after
+    // the datasource's type was changed
+    if (datasource.object_id) {
+      await db.raw(
+        `
+        DELETE FROM recycler.location_fields lf
+        USING recycler.fields f, recycler.locations l
+        WHERE lf.field_id = f.id
+          AND lf.location_id = l.id
+          AND l.datasource_id = ?::uuid
+          AND f.object_id IS DISTINCT FROM ?::uuid
+        `,
+        [datasourceId, datasource.object_id]
+      );
+    }
+
     if (rowsFailed === 0) {
       const staleLocationsQuery = db("recycler.locations")
         .where({

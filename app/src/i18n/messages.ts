@@ -292,6 +292,10 @@ const baseFi = {
     close: "Sulje",
     locationType: "Kohdetyyppi",
     editLocationType: "Muokkaa kohdetyyppiä",
+    changeTypeConfirmTitle: "Vaihdetaanko kohdetyyppi?",
+    changeTypeConfirmDescription:
+      "Seuraavat kentät eivät kuulu tyyppiin {type}. Niiden arvot poistetaan, kun kohde tallennetaan:",
+    changeType: "Vaihda tyyppi",
     source: "Lähde",
     sourceManual: "Manuaalisesti syötetty",
     loadError: "Virhe kohteen lataamisessa",
@@ -1203,6 +1207,10 @@ const baseEn = {
     close: "Close",
     locationType: "Location type",
     editLocationType: "Edit location type",
+    changeTypeConfirmTitle: "Change the location type?",
+    changeTypeConfirmDescription:
+      "The following fields don't belong to the type {type}. Their values will be removed when the location is saved:",
+    changeType: "Change type",
     source: "Source",
     sourceManual: "Entered manually",
     loadError: "Failed to load location",
