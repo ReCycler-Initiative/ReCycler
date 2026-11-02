@@ -36,6 +36,7 @@ export const AiMaterialPrompt = ({
   onSelectedCodesChange,
   selectedFieldValues = {},
   onSelectedFieldValuesChange,
+  selectedTypeIds = [],
   organizationId,
   useCaseId,
   ctaText = "Näytä kohteet",
@@ -47,6 +48,7 @@ export const AiMaterialPrompt = ({
   onSelectedCodesChange: (codes: number[]) => void;
   selectedFieldValues?: Record<string, number[]>;
   onSelectedFieldValuesChange?: (values: Record<string, number[]>) => void;
+  selectedTypeIds?: string[];
   organizationId?: string;
   useCaseId?: string;
   ctaText?: string;
@@ -148,6 +150,7 @@ export const AiMaterialPrompt = ({
     for (const [fieldId, indices] of Object.entries(selectedFieldValues)) {
       if (indices.length) params.set(`field_${fieldId}`, indices.join(","));
     }
+    if (selectedTypeIds.length) params.set("types", selectedTypeIds.join(","));
     const query = params.toString();
     return query ? `${resultsBaseHref}?${query}` : resultsBaseHref;
   };

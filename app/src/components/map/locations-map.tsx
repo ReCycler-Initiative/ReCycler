@@ -376,10 +376,13 @@ const filterFeaturesBySelectedMaterials = (
   };
 };
 
-// Filter features by field-based selections — indices resolved to string values via fieldChoices
+// Filter features by field-based selections — indices resolved to string values via fieldChoices.
+// Selections on a type's fields only apply to locations of that type; once any typed selection
+// is active, types without selections are hidden. Fields without a type apply to every location.
 const filterFeaturesByFieldValues = (
   fieldFilters: Record<string, number[]>,
   fieldChoices: Record<string, string[]>,
+  fieldTypeIds: Record<string, string | null>,
   collectionSpots: GeoJSON.FeatureCollection<GeoJSON.Geometry>
 ): GeoJSON.FeatureCollection<GeoJSON.Geometry> => {
   const activeFilters = Object.entries(fieldFilters).filter(
@@ -387,17 +390,39 @@ const filterFeaturesByFieldValues = (
   );
   if (activeFilters.length === 0) return collectionSpots;
 
-  const features = collectionSpots.features?.filter((feature: any) => {
-    const fields = parseFeatureFields(feature.properties?.fields);
-    return activeFilters.every(([fieldId, selectedIndices]) => {
+  const untypedFilters = activeFilters.filter(([fieldId]) => !fieldTypeIds[fieldId]);
+  const typedFilters = activeFilters.filter(([fieldId]) => fieldTypeIds[fieldId]);
+
+  const matches = (fields: ReturnType<typeof parseFeatureFields>) =>
+    ([fieldId, selectedIndices]: [string, number[]]) => {
       const field = fields.find((f) => f.id === fieldId);
       if (!field) return false;
       const choices = fieldChoices[fieldId] ?? [];
       const selectedValues = selectedIndices.map((i) => choices[i]).filter(Boolean);
       return selectedValues.some((v) => field.value.includes(v));
-    });
+    };
+
+  const features = collectionSpots.features?.filter((feature: any) => {
+    const fields = parseFeatureFields(feature.properties?.fields);
+    if (!untypedFilters.every(matches(fields))) return false;
+    if (typedFilters.length === 0) return true;
+
+    const typeId = feature.properties?.object_id;
+    const ownFilters = typedFilters.filter(([fieldId]) => fieldTypeIds[fieldId] === typeId);
+    return ownFilters.length > 0 && ownFilters.every(matches(fields));
   });
 
+  return { ...collectionSpots, features };
+};
+
+const filterFeaturesByTypes = (
+  typeIds: string[],
+  collectionSpots: GeoJSON.FeatureCollection<GeoJSON.Geometry>
+): GeoJSON.FeatureCollection<GeoJSON.Geometry> => {
+  if (typeIds.length === 0) return collectionSpots;
+  const features = collectionSpots.features?.filter((feature: any) =>
+    typeIds.includes(feature.properties?.object_id)
+  );
   return { ...collectionSpots, features };
 };
 
@@ -405,12 +430,20 @@ const filterFeaturesByFieldValues = (
 // Also computes is_open property from opening_hours fields for map marker styling
 const applyAllFilters = (
   materials: number[],
+  typeIds: string[],
   fieldFilters: Record<string, number[]>,
   fieldChoices: Record<string, string[]>,
+  fieldTypeIds: Record<string, string | null>,
   geoJson: GeoJSON.FeatureCollection<GeoJSON.Geometry>
 ): GeoJSON.FeatureCollection<GeoJSON.Geometry> => {
   const afterMaterials = filterFeaturesBySelectedMaterials(materials, geoJson);
-  const afterFields = filterFeaturesByFieldValues(fieldFilters, fieldChoices, afterMaterials);
+  const afterTypes = filterFeaturesByTypes(typeIds, afterMaterials);
+  const afterFields = filterFeaturesByFieldValues(
+    fieldFilters,
+    fieldChoices,
+    fieldTypeIds,
+    afterTypes
+  );
 
   // Annotate each feature with is_open based on opening_hours field
   const features = afterFields.features?.map((feature: any) => {
@@ -529,6 +562,11 @@ export default function LocationsMap({ geoJson, mapSettings }: LocationsMapProps
     () => materialsParam.split(",").filter(Boolean).map((code) => +code),
     [materialsParam]
   );
+  const typesParam = searchParams.get("types") ?? "";
+  const selectedTypeIds = useMemo(
+    () => typesParam.split(",").filter(Boolean),
+    [typesParam]
+  );
 
   // Parse field_<fieldId> URL params into a Record (values are indices)
   const selectedFieldFilters = useMemo<Record<string, number[]>>(() => {
@@ -559,6 +597,12 @@ export default function LocationsMap({ geoJson, mapSettings }: LocationsMapProps
     return choices;
   }, [fieldsData]);
 
+  const fieldTypeIds = useMemo(() => {
+    const typeIds: Record<string, string | null> = {};
+    for (const field of fieldsData ?? []) typeIds[field.id] = field.object_id ?? null;
+    return typeIds;
+  }, [fieldsData]);
+
   const [showMaterials, setShowMaterials] = useState(false);
   const [pendingResultsHref, setPendingResultsHref] = useState(currentResultsHref);
   const previousSearchParamsKey = useRef(searchParamsKey);
@@ -570,11 +614,13 @@ export default function LocationsMap({ geoJson, mapSettings }: LocationsMapProps
     if (!geoJson) return null;
     return applyAllFilters(
       selectedMaterials,
+      selectedTypeIds,
       selectedFieldFilters,
       fieldChoices,
+      fieldTypeIds,
       geoJson
     );
-  }, [fieldChoices, geoJson, selectedFieldFilters, selectedMaterials]);
+  }, [fieldChoices, fieldTypeIds, geoJson, selectedFieldFilters, selectedMaterials, selectedTypeIds]);
   const shapeGeoJson = useMemo(() => {
     if (!filteredGeoJson) return null;
     return buildShapeCollection(filteredGeoJson);
@@ -756,6 +802,7 @@ export default function LocationsMap({ geoJson, mapSettings }: LocationsMapProps
           <SelectedMaterialsControl
             amount={
               selectedMaterials.length +
+              selectedTypeIds.length +
               Object.values(selectedFieldFilters).reduce((sum, vals) => sum + vals.length, 0)
             }
             onClick={() => setShowMaterials(true)}
@@ -837,6 +884,11 @@ export default function LocationsMap({ geoJson, mapSettings }: LocationsMapProps
                     return (
                       <>
                   <div className="p-3 border-b">
+                    {details.feature.properties?.object_name && (
+                      <p className="text-xs font-medium text-muted-foreground mb-0.5">
+                        {details.feature.properties.object_name}
+                      </p>
+                    )}
                     <h2 className="text-base font-semibold mb-1">
                       {details.feature.properties?.name}
                     </h2>
@@ -992,7 +1044,7 @@ export default function LocationsMap({ geoJson, mapSettings }: LocationsMapProps
           )}
         </Map>
 
-        {!mapLoaded && (
+        {(!mapLoaded || !geoJson) && (
           <div className="fixed flex inset-0 items-center justify-center flex-col gap-6 text-black">
             <Loader2Icon className="animate-spin" />
             {messages.pageLoading.loadingMapLocations}
@@ -1023,6 +1075,7 @@ export default function LocationsMap({ geoJson, mapSettings }: LocationsMapProps
               <MaterialsPageContent
                 initialSelectedCodes={selectedMaterials}
                 initialSelectedFieldValues={selectedFieldFilters}
+                initialSelectedTypeIds={selectedTypeIds}
                 organizationId={params.organizationId}
                 useCaseId={params.useCaseId}
                 resultsBasePath={pathname}

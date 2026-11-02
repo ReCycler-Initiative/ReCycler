@@ -18,6 +18,12 @@ export async function GET(
     return authorization.response!;
   }
 
+  const objectIdParam = request.nextUrl.searchParams.get("object_id");
+  const objectId = objectIdParam ? z.string().uuid().safeParse(objectIdParam) : null;
+  if (objectId && !objectId.success) {
+    return NextResponse.json({ error: "Invalid object_id" }, { status: 400 });
+  }
+
   const result = await db.raw(
     `
       SELECT
@@ -30,23 +36,32 @@ export async function GET(
         ST_AsGeoJSON(l.source_geom)::jsonb AS location_source_geom,
         l.id AS location_id,
         l.name AS location_name,
-        l.address AS location_address,
-        l.postal_code AS location_postal_code,
-        l.post_office AS location_post_office
+        o.id AS object_id,
+        o.name AS object_name
       FROM recycler.locations l
       INNER JOIN recycler.use_cases uc ON uc.id = l.use_case_id
+      LEFT JOIN recycler.objects o ON o.id = l.object_id
       LEFT JOIN recycler.location_fields lf ON lf.location_id = l.id
       LEFT JOIN recycler.fields f ON f.id = lf.field_id
       WHERE uc.id = ?::uuid AND uc.organization_id = ?::uuid
+        AND (?::uuid IS NULL OR l.object_id = ?::uuid)
       ORDER BY l.name, f.order NULLS LAST;
     `,
-    [useCaseId, organizationId]
+    [useCaseId, organizationId, objectId?.data ?? null, objectId?.data ?? null]
   );
 
   const rows = z.array(DbLocation).parse(result.rows);
   const locations = new Map<
     string,
-    { id: string; name: string; geom: unknown; sourceGeom: unknown; fields: typeof rows }
+    {
+      id: string;
+      name: string;
+      objectId: string | null;
+      objectName: string | null;
+      geom: unknown;
+      sourceGeom: unknown;
+      fields: typeof rows;
+    }
   >();
 
   for (const row of rows) {
@@ -54,6 +69,8 @@ export async function GET(
       locations.set(row.location_id, {
         id: row.location_id,
         name: row.location_name,
+        objectId: row.object_id ?? null,
+        objectName: row.object_name ?? null,
         geom: row.location_geom,
         sourceGeom: row.location_source_geom,
         fields: [],
@@ -71,9 +88,10 @@ export async function GET(
       type: "Feature" as const,
       geometry: location.geom,
       properties: {
-        address: location.fields[0]?.location_address ?? undefined,
         id: location.id,
         name: location.name,
+        object_id: location.objectId ?? undefined,
+        object_name: location.objectName ?? undefined,
         fields: location.fields.map((field) => ({
           id: field.field_id,
           name: field.field_name,
@@ -81,8 +99,6 @@ export async function GET(
           order: field.field_order,
           value: field.field_values ?? [],
         })),
-        post_office: location.fields[0]?.location_post_office ?? undefined,
-        postal_code: location.fields[0]?.location_postal_code ?? undefined,
         source_geometry: location.sourceGeom ?? undefined,
       },
     })),

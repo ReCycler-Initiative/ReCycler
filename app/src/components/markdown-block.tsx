@@ -99,6 +99,10 @@ const markdownComponents: Components = {
   pre: ({ node, ...props }) => <>{props.children}</>,
 };
 
+export const MarkdownContent = ({ content }: { content: string }) => (
+  <ReactMarkdown components={markdownComponents}>{content}</ReactMarkdown>
+);
+
 export default function MarkdownBlock({ filePath }: { filePath: string }) {
   const { data, error, isLoading } = useQuery<string>({
     queryKey: ["markdown", filePath],

@@ -4,8 +4,6 @@ import { NextRequest, NextResponse } from "next/server";
 import { checkOrganizationAuthorization } from "@/lib/authorization";
 import { z } from "zod";
 
-const OptionalLocationString = z.string().trim().max(255).optional().or(z.literal(""));
-
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ organizationId: string, useCaseId: string }> }
@@ -33,10 +31,10 @@ export async function GET(
         ST_AsGeoJSON(l.source_geom)::jsonb AS location_source_geom,
         l.id AS location_id,
         l.name AS location_name,
-        l.address AS location_address,
-        l.postal_code AS location_postal_code,
-        l.post_office AS location_post_office
+        lt.id AS object_id,
+        lt.name AS object_name
       FROM recycler.locations l
+      LEFT JOIN recycler.objects lt ON lt.id = l.object_id
       LEFT JOIN recycler.location_fields lf ON lf.location_id = l.id
       LEFT JOIN recycler.fields f ON f.id = lf.field_id
       WHERE l.use_case_id = ?::uuid
@@ -54,6 +52,8 @@ export async function GET(
     {
       id: string;
       name: string;
+      typeId: string | null;
+      typeName: string | null;
       geom: unknown;
       sourceGeom: unknown;
       fields: typeof rows;
@@ -65,6 +65,8 @@ export async function GET(
       locationMap.set(row.location_id, {
         id: row.location_id,
         name: row.location_name,
+        typeId: row.object_id ?? null,
+        typeName: row.object_name ?? null,
         geom: row.location_geom,
         sourceGeom: row.location_source_geom,
         fields: [],
@@ -79,9 +81,10 @@ export async function GET(
     type: "Feature" as const,
     geometry: loc.geom,
     properties: {
-      address: loc.fields[0]?.location_address ?? undefined,
       id: loc.id,
       name: loc.name,
+      object_id: loc.typeId ?? undefined,
+      object_name: loc.typeName ?? undefined,
       fields: loc.fields.map((f) => ({
         id: f.field_id,
         name: f.field_name,
@@ -89,8 +92,6 @@ export async function GET(
         order: f.field_order,
         value: f.field_values ?? [],
       })),
-      post_office: loc.fields[0]?.location_post_office ?? undefined,
-      postal_code: loc.fields[0]?.location_postal_code ?? undefined,
       source_geometry: loc.sourceGeom ?? undefined,
     },
   }));
@@ -110,9 +111,7 @@ const CreateLocationBody = z.object({
   longitude: z.number().finite(),
   latitude: z.number().finite(),
   name: z.string().trim().min(1),
-  address: OptionalLocationString,
-  postal_code: OptionalLocationString,
-  post_office: OptionalLocationString,
+  object_id: z.string().uuid().optional(),
   source_geometry: GeoJsonGeometry.optional(),
   fieldValues: z
     .array(
@@ -162,34 +161,48 @@ export async function POST(
     longitude,
     latitude,
     name,
-    address,
-    postal_code,
-    post_office,
+    object_id,
     source_geometry,
     fieldValues,
   } = parsed.data;
+
+  // Use the requested location type, or fall back to the use case's oldest one
+  const object = await db("recycler.objects")
+    .select("id")
+    .where({ use_case_id: useCaseId })
+    .modify((query) => {
+      if (object_id) query.where({ id: object_id });
+    })
+    .orderByRaw("created_at ASC NULLS LAST")
+    .first();
+
+  if (object_id && !object) {
+    return NextResponse.json({ error: "Location type not found" }, { status: 400 });
+  }
+
+  const objectId: string | null = object?.id ?? null;
 
   const row = await db.transaction(async (trx) => {
     let insertResult;
     if (source_geometry) {
       insertResult = await trx.raw(
         `
-          INSERT INTO recycler.locations (name, use_case_id, geom, source_geom, address, postal_code, post_office)
-          VALUES (?, ?::uuid, ST_SetSRID(ST_Point(?, ?), 4326), ST_SetSRID(ST_GeomFromGeoJSON(?), 4326), ?, ?, ?)
-          RETURNING id, name, address, postal_code, post_office,
+          INSERT INTO recycler.locations (name, use_case_id, object_id, geom, source_geom)
+          VALUES (?, ?::uuid, ?::uuid, ST_SetSRID(ST_Point(?, ?), 4326), ST_SetSRID(ST_GeomFromGeoJSON(?), 4326))
+          RETURNING id, name, object_id,
             ST_AsGeoJSON(geom)::jsonb as geom,
             ST_AsGeoJSON(source_geom)::jsonb as source_geom
         `,
-        [name, useCaseId, longitude, latitude, JSON.stringify(source_geometry), address || null, postal_code || null, post_office || null]
+        [name, useCaseId, objectId, longitude, latitude, JSON.stringify(source_geometry)]
       );
     } else {
       insertResult = await trx.raw(
         `
-          INSERT INTO recycler.locations (name, use_case_id, geom, address, postal_code, post_office)
-          VALUES (?, ?::uuid, ST_SetSRID(ST_Point(?, ?), 4326), ?, ?, ?)
-          RETURNING id, name, address, postal_code, post_office, ST_AsGeoJSON(geom)::jsonb as geom
+          INSERT INTO recycler.locations (name, use_case_id, object_id, geom)
+          VALUES (?, ?::uuid, ?::uuid, ST_SetSRID(ST_Point(?, ?), 4326))
+          RETURNING id, name, object_id, ST_AsGeoJSON(geom)::jsonb as geom
         `,
-        [name, useCaseId, longitude, latitude, address || null, postal_code || null, post_office || null]
+        [name, useCaseId, objectId, longitude, latitude]
       );
     }
 
@@ -213,12 +226,10 @@ export async function POST(
     type: "Feature" as const,
     geometry: row.geom,
     properties: {
-      address: row.address ?? undefined,
       id: row.id,
       name: row.name,
+      object_id: row.object_id ?? undefined,
       fields: [],
-      post_office: row.post_office ?? undefined,
-      postal_code: row.postal_code ?? undefined,
     },
   });
 }

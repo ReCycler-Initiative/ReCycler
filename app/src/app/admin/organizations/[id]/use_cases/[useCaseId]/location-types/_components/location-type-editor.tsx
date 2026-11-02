@@ -39,13 +39,17 @@ export default function LocationTypeEditor({
         useCaseId,
         toApiData(formValues)
       );
-      editor.form.reset({ name: data.name });
+      editor.form.reset(data);
       return formValues;
     },
     toApiData: (v) => v,
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: ["locationTypes", organizationId, useCaseId],
+      });
+      // Field order and definitions are cached for the location editor
+      queryClient.invalidateQueries({
+        queryKey: ["fields", organizationId, useCaseId],
       });
       onSuccess?.(organizationId, useCaseId);
     },

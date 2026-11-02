@@ -49,6 +49,7 @@ export const FieldValue = z.array(z.string());
 export const FieldOptions = z.object({
   choices: z.array(z.string()).optional(),
   choiceColors: z.record(z.string()).optional(),
+  choiceInfo: z.record(z.string()).optional(),
   placeholder: z.string().optional(),
   helpText: z.string().optional(),
 });
@@ -64,6 +65,7 @@ export const Field = z.object({
 export const FieldRecord = Field.extend({
   id: z.string().uuid(),
   use_case_id: z.string().uuid(),
+  object_id: z.string().uuid().nullable().optional(),
 });
 
 export const LocationType = z.object({
@@ -94,28 +96,26 @@ export const DbLocation = z.object({
   field_order: z.number().nullable(),
   field_type: FieldType.nullable(),
   field_values: FieldValue.nullable(),
-  location_address: z.string().nullable().optional(),
   location_geom: Point,
   location_source_geom: Geometry.nullable().optional(),
   location_id: z.string().uuid(),
   location_name: z.string(),
-  location_post_office: z.string().nullable().optional(),
-  location_postal_code: z.string().nullable().optional(),
+  object_id: z.string().uuid().nullable().optional(),
+  object_name: z.string().nullable().optional(),
 });
 
 export const LocationProperties = z.object({
-  address: z.string().optional(),
   datasource_name: z.string().optional(),
   id: z.string().uuid(),
   name: z.string(),
+  object_id: z.string().uuid().optional(),
+  object_name: z.string().optional(),
   fields: z.array(
     Field.extend({
       id: z.string().uuid(),
       value: FieldValue,
     })
   ),
-  post_office: z.string().optional(),
-  postal_code: z.string().optional(),
   source_type: z.enum(["manual", "datasource"]).optional(),
   source_geometry: Geometry.optional(),
 });
@@ -145,13 +145,12 @@ export const LocationDetail = z.object({
   type: z.literal("Feature"),
   geometry: Point,
   properties: z.object({
-    address: z.string().optional(),
     datasource_name: z.string().optional(),
     id: z.string().uuid(),
     name: z.string(),
+    object_id: z.string().uuid().optional(),
+    object_name: z.string().optional(),
     fields: z.array(LocationDetailField),
-    post_office: z.string().optional(),
-    postal_code: z.string().optional(),
     source_type: z.enum(["manual", "datasource"]).optional(),
     source_geometry: Geometry.optional(),
   }),
@@ -375,6 +374,7 @@ export const Datasource = z.object({
   lon_source_field: z.string().nullable().optional(),
   geometry_source_field: z.string().nullable().optional(),
   schedule: z.string().nullable().optional(),
+  object_id: z.string().uuid().nullable().optional(),
   created_at: z.coerce.date().optional(),
   updated_at: z.coerce.date().optional(),
 });

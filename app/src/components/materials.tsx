@@ -275,6 +275,7 @@ export const CustomCheckbox = ({
   onInfo?: () => void;
   onToggle: () => void;
 }) => {
+  const messages = useMessages();
   const backgroundColor = baseHex
     ? hexToRgba(baseHex, checked ? 1 : 0.85)
     : "transparent";
@@ -304,6 +305,7 @@ export const CustomCheckbox = ({
       {onInfo && (
         <button
           className="absolute top-0 right-0 p-1.5 text-gray-200 hover:text-gray-300 cursor-pointer active:bg-black/10 rounded-r"
+          aria-label={messages.materials.materialsInfo}
           onClick={onInfo}
         >
           <InfoIcon size="20" />

@@ -3,8 +3,6 @@ import { NextRequest, NextResponse } from "next/server";
 import { checkOrganizationAuthorization } from "@/lib/authorization";
 import { z } from "zod";
 
-const OptionalLocationString = z.string().trim().max(255).optional().or(z.literal(""));
-
 export async function GET(
   request: NextRequest,
   {
@@ -34,10 +32,9 @@ export async function GET(
         SELECT
           l.id,
           l.name,
-          l.address,
-          l.postal_code,
-          l.post_office,
           ds.name AS datasource_name,
+          lt.id AS object_id,
+          lt.name AS object_name,
           CASE
             WHEN l.datasource_id IS NULL THEN 'manual'
             ELSE 'datasource'
@@ -54,6 +51,7 @@ export async function GET(
         FROM recycler.locations l
         INNER JOIN recycler.use_cases uc ON l.use_case_id = uc.id
         LEFT JOIN recycler.datasources ds ON l.datasource_id = ds.id
+        LEFT JOIN recycler.objects lt ON lt.id = l.object_id
         LEFT JOIN recycler.fields f ON f.use_case_id = uc.id
         LEFT JOIN recycler.location_fields lf
           ON lf.location_id = l.id AND lf.field_id = f.id
@@ -87,13 +85,12 @@ export async function GET(
     type: "Feature" as const,
     geometry: first.geom,
     properties: {
-      address: first.address ?? undefined,
       datasource_name: first.datasource_name ?? undefined,
       id: first.id,
       name: first.name,
+      object_id: first.object_id ?? undefined,
+      object_name: first.object_name ?? undefined,
       fields,
-      post_office: first.post_office ?? undefined,
-      postal_code: first.postal_code ?? undefined,
       source_type: first.source_type ?? undefined,
       source_geometry: first.source_geom ?? undefined,
     },
@@ -109,9 +106,7 @@ const UpdateLocationBody = z.object({
   name: z.string().trim().min(1),
   longitude: z.number().finite(),
   latitude: z.number().finite(),
-  address: OptionalLocationString,
-  postal_code: OptionalLocationString,
-  post_office: OptionalLocationString,
+  object_id: z.string().uuid().optional(),
   source_geometry: GeoJsonGeometry.nullable().optional(),
   fieldValues: z
     .array(
@@ -159,12 +154,20 @@ export async function PUT(
     name,
     longitude,
     latitude,
-    address,
-    postal_code,
-    post_office,
+    object_id,
     source_geometry,
     fieldValues,
   } = parsed.data;
+
+  if (object_id) {
+    const object = await db("recycler.objects")
+      .select("id")
+      .where({ id: object_id, use_case_id: useCaseId })
+      .first();
+    if (!object) {
+      return NextResponse.json({ error: "Location type not found" }, { status: 400 });
+    }
+  }
 
   const hasSourceGeometryField =
     json !== null && typeof json === "object" && "source_geometry" in json;
@@ -176,10 +179,7 @@ export async function PUT(
           SET
             name = ?,
             geom = ST_SetSRID(ST_Point(?, ?), 4326),
-            source_geom = ST_SetSRID(ST_GeomFromGeoJSON(?), 4326),
-            address = ?,
-            postal_code = ?,
-            post_office = ?
+            source_geom = ST_SetSRID(ST_GeomFromGeoJSON(?), 4326)
           FROM recycler.use_cases uc
           WHERE l.use_case_id = uc.id
             AND uc.organization_id = ?::uuid
@@ -193,10 +193,7 @@ export async function PUT(
             SET
               name = ?,
               geom = ST_SetSRID(ST_Point(?, ?), 4326),
-              source_geom = NULL,
-              address = ?,
-              postal_code = ?,
-              post_office = ?
+              source_geom = NULL
             FROM recycler.use_cases uc
             WHERE l.use_case_id = uc.id
               AND uc.organization_id = ?::uuid
@@ -208,10 +205,7 @@ export async function PUT(
             UPDATE recycler.locations l
             SET
               name = ?,
-              geom = ST_SetSRID(ST_Point(?, ?), 4326),
-              address = ?,
-              postal_code = ?,
-              post_office = ?
+              geom = ST_SetSRID(ST_Point(?, ?), 4326)
             FROM recycler.use_cases uc
             WHERE l.use_case_id = uc.id
               AND uc.organization_id = ?::uuid
@@ -225,9 +219,6 @@ export async function PUT(
           longitude,
           latitude,
           JSON.stringify(source_geometry),
-          address || null,
-          postal_code || null,
-          post_office || null,
           organizationId,
           useCaseId,
           locationId,
@@ -236,9 +227,6 @@ export async function PUT(
           name,
           longitude,
           latitude,
-          address || null,
-          postal_code || null,
-          post_office || null,
           organizationId,
           useCaseId,
           locationId,
@@ -247,6 +235,24 @@ export async function PUT(
 
   if (!updated.rows?.[0]) {
     return NextResponse.json({ error: "Location not found" }, { status: 404 });
+  }
+
+  if (object_id) {
+    await db("recycler.locations")
+      .where({ id: locationId })
+      .update({ object_id });
+
+    // Values of fields that don't belong to the location's type are dropped
+    await db.raw(
+      `
+        DELETE FROM recycler.location_fields lf
+        USING recycler.fields f
+        WHERE lf.field_id = f.id
+          AND lf.location_id = ?::uuid
+          AND f.object_id IS DISTINCT FROM ?::uuid
+      `,
+      [locationId, object_id]
+    );
   }
 
   if (fieldValues && fieldValues.length > 0) {

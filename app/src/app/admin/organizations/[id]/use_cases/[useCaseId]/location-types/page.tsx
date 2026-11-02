@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { useMessages } from "@/i18n/locale-provider";
 import { getLocationTypes } from "@/services/api";
 import { useQuery } from "@tanstack/react-query";
-import { Pencil, Plus } from "lucide-react";
+import { Loader2, Pencil, Plus } from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 
@@ -41,9 +41,10 @@ const LocationTypesPage = () => {
         }
       />
       {isLoading ? (
-        <p className="text-sm text-muted-foreground">
-          {messages.adminLocationTypesListPage.loading}
-        </p>
+        <div className="flex items-center justify-center gap-2 h-32 text-muted-foreground">
+          <Loader2 className="h-4 w-4 animate-spin" />
+          <p className="text-sm">{messages.adminLocationTypesListPage.loading}</p>
+        </div>
       ) : locationTypes.length === 0 ? (
         <p className="text-sm text-muted-foreground">
           {messages.adminLocationTypesListPage.noLocationTypes}
