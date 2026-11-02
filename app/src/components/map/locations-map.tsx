@@ -382,7 +382,9 @@ const filterFeaturesByFieldValues = (
   fieldChoices: Record<string, string[]>,
   collectionSpots: GeoJSON.FeatureCollection<GeoJSON.Geometry>
 ): GeoJSON.FeatureCollection<GeoJSON.Geometry> => {
-  const activeFilters = Object.entries(fieldFilters).filter(([, indices]) => indices.length > 0);
+  const activeFilters = Object.entries(fieldFilters).filter(
+    ([fieldId, indices]) => indices.length > 0 && fieldChoices[fieldId] !== undefined
+  );
   if (activeFilters.length === 0) return collectionSpots;
 
   const features = collectionSpots.features?.filter((feature: any) => {

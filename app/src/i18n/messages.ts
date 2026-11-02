@@ -342,20 +342,25 @@ const baseFi = {
   },
   adminAiPage: {
     title: "Tekoäly",
-    trainingMaterials: "Opetusmateriaalit",
-    description: "Lataa käyttötapaukseen omia tekstitiedostoja (.txt / .md).",
+    trainingMaterials: "Chatin taustatiedot",
+    description:
+      "Lisää käyttötapaukseen liittyviä ohjeita ja tietoja, joita tekoälychat käyttää vastaustensa tukena.",
+    uploadGuidance:
+      "Voit lisätä esimerkiksi lajitteluohjeita, paikallisia sääntöjä, palvelun käyttöohjeita tai usein kysyttyjä kysymyksiä.",
+    privacyNote:
+      "Tiedostot eivät kouluta tai muuta tekoälymallia. Niiden sisältö välitetään tekoälypalvelulle chat-vastausten muodostamista varten. Älä lisää salaisuuksia tai tarpeettomia henkilötietoja.",
     allowedFormats: "Sallitut muodot",
     maxSize: "Max koko",
     chooseFile: "Valitse tiedosto",
     noFileSelected: "Ei tiedostoa valittuna",
     upload: "Lataa",
     uploadFailed: "Lataus epäonnistui.",
-    uploadedMaterials: "Ladatut opetusmateriaalit",
+    uploadedMaterials: "Lisätyt taustatiedot",
     loading: "Ladataan...",
     fetchFailed: "Materiaalien haku epäonnistui.",
-    confirmDelete: 'Poistetaanko opetusmateriaali "{name}"?',
+    confirmDelete: 'Poistetaanko taustatieto "{name}"?',
     delete: "Poista",
-    noUploadedMaterials: "Ei ladattuja materiaaleja.",
+    noUploadedMaterials: "Taustatietoja ei ole vielä lisätty.",
     deleteFailed: "Poisto epäonnistui.",
   },
   datasourceEditor: {
@@ -1239,20 +1244,25 @@ const baseEn = {
   },
   adminAiPage: {
     title: "AI",
-    trainingMaterials: "Training materials",
-    description: "Upload your own text files (.txt / .md) for this use case.",
+    trainingMaterials: "Chat reference files",
+    description:
+      "Add instructions and information about this use case for the AI chat to use when answering.",
+    uploadGuidance:
+      "For example, add recycling instructions, local rules, service guides, or frequently asked questions.",
+    privacyNote:
+      "These files do not train or modify the AI model. Their content is sent to the AI service to generate chat responses. Do not add secrets or unnecessary personal data.",
     allowedFormats: "Allowed formats",
     maxSize: "Max size",
     chooseFile: "Choose file",
     noFileSelected: "No file selected",
     upload: "Upload",
     uploadFailed: "Upload failed.",
-    uploadedMaterials: "Uploaded training materials",
+    uploadedMaterials: "Added reference files",
     loading: "Loading...",
     fetchFailed: "Failed to load materials.",
-    confirmDelete: 'Delete training material "{name}"?',
+    confirmDelete: 'Delete reference file "{name}"?',
     delete: "Delete",
-    noUploadedMaterials: "No uploaded materials.",
+    noUploadedMaterials: "No reference files have been added yet.",
     deleteFailed: "Delete failed.",
   },
   datasourceEditor: {

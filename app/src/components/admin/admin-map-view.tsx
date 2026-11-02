@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useRef, useCallback, useState } from "react";
+import { useEffect, useRef, useCallback, useMemo, useState } from "react";
+import type { GeoJSONSource } from "mapbox-gl";
 import Map, {
   Marker,
   MapRef,
@@ -10,6 +11,8 @@ import Map, {
   Layer,
   FillLayer,
   LineLayer,
+  CircleLayer,
+  SymbolLayer,
 } from "react-map-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { cn } from "@/lib/utils";
@@ -41,6 +44,44 @@ export interface AdminMapViewProps {
   polygonParts?: [number, number][][];
   className?: string;
 }
+
+const adminLocationClusters: CircleLayer = {
+  id: "admin-location-clusters",
+  type: "circle",
+  source: "admin-location-points",
+  filter: ["has", "point_count"],
+  paint: {
+    "circle-color": ["step", ["get", "point_count"], "#f28cb1", 100, "#f1f075", 750, "#51bbd6"],
+    "circle-radius": ["step", ["get", "point_count"], 20, 100, 30, 750, 40],
+    "circle-stroke-width": 2,
+    "circle-stroke-color": "#ffffff",
+  },
+};
+
+const adminClusterCount: SymbolLayer = {
+  id: "admin-cluster-count",
+  type: "symbol",
+  source: "admin-location-points",
+  filter: ["has", "point_count"],
+  layout: {
+    "text-field": ["get", "point_count_abbreviated"],
+    "text-size": 12,
+  },
+  paint: { "text-color": "#1f2937" },
+};
+
+const adminUnclusteredPoints: CircleLayer = {
+  id: "admin-unclustered-points",
+  type: "circle",
+  source: "admin-location-points",
+  filter: ["!has", "point_count"],
+  paint: {
+    "circle-color": "#0f766e",
+    "circle-radius": 6,
+    "circle-stroke-width": 2,
+    "circle-stroke-color": "#ffffff",
+  },
+};
 
 const areaFillLayer: FillLayer = {
   id: "admin-source-areas-fill",
@@ -209,6 +250,23 @@ export const AdminMapView = ({
   const selectedShapeGeoJson = geoJson
     ? buildSelectedShapeCollection(geoJson, selectedId)
     : null;
+  const locationPoints = useMemo<GeoJSON.FeatureCollection<GeoJSON.Point>>(() => ({
+    type: "FeatureCollection",
+    features: locations.flatMap((location) => {
+      if (!Number.isFinite(location.longitude) || !Number.isFinite(location.latitude)) return [];
+      return [{
+        type: "Feature" as const,
+        geometry: {
+          type: "Point" as const,
+          coordinates: [location.longitude, location.latitude] as [number, number],
+        },
+        properties: { id: location.id, name: location.name },
+      }];
+    }),
+  }), [locations]);
+  const selectedLocation = selectedId
+    ? locations.find((location) => location.id === selectedId)
+    : undefined;
   const resolvedMapSettings = resolveUseCaseMapSettings(mapSettings);
 
   // Build a GeoJSON FeatureCollection for the in-progress polygon draw.
@@ -391,6 +449,8 @@ export const AdminMapView = ({
         }}
         mapStyle={process.env.NEXT_PUBLIC_MAPBOX_STYLE_DETAIL as string}
         interactiveLayerIds={[
+          "admin-location-clusters",
+          "admin-unclustered-points",
           "admin-source-shapes-hitbox",
           "admin-source-areas-fill",
           "admin-source-areas-line",
@@ -404,6 +464,31 @@ export const AdminMapView = ({
           // Polygon draw mode: add a node
           if (polygonNodes !== undefined) {
             onPolygonNodeAdd?.([e.lngLat.lng, e.lngLat.lat]);
+            return;
+          }
+
+          const clickedCluster = !addMode && e.features?.find(
+            (feature) => feature.layer?.id === "admin-location-clusters"
+          );
+          if (clickedCluster) {
+            const clusterId = Number(clickedCluster.properties?.cluster_id);
+            const source = mapRef.current?.getMap().getSource("admin-location-points") as GeoJSONSource | undefined;
+            source?.getClusterExpansionZoom(clusterId, (error, zoom) => {
+              if (error || zoom == null) return;
+              mapRef.current?.easeTo({
+                center: [e.lngLat.lng, e.lngLat.lat],
+                zoom,
+                duration: 350,
+              });
+            });
+            return;
+          }
+
+          const clickedPoint = !addMode && e.features?.find(
+            (feature) => feature.layer?.id === "admin-unclustered-points"
+          );
+          if (clickedPoint && typeof clickedPoint.properties?.id === "string") {
+            onMarkerClick?.(clickedPoint.properties.id);
             return;
           }
 
@@ -424,6 +509,21 @@ export const AdminMapView = ({
       >
         <NavigationControl position="top-right" />
         <FullscreenControl position="top-right" />
+
+        {locationPoints.features.length > 0 && (
+          <Source
+            id="admin-location-points"
+            type="geojson"
+            data={locationPoints}
+            cluster
+            clusterMaxZoom={14}
+            clusterRadius={50}
+          >
+            <Layer {...adminLocationClusters} />
+            <Layer {...adminClusterCount} />
+            <Layer {...adminUnclusteredPoints} />
+          </Source>
+        )}
 
         {shapeGeoJson && shapeGeoJson.features.length > 0 && (
           <Source id="admin-collection-shapes" type="geojson" data={shapeGeoJson}>
@@ -523,29 +623,22 @@ export const AdminMapView = ({
           </Marker>
         )}
 
-        {locations.map((location) => (
+        {selectedLocation && (
           <Marker
-            key={location.id}
-            longitude={location.longitude}
-            latitude={location.latitude}
+            key={selectedLocation.id}
+            longitude={selectedLocation.longitude}
+            latitude={selectedLocation.latitude}
             anchor="bottom"
             onClick={(e) => {
               e.originalEvent.stopPropagation();
-              handleMarkerClick(location.id);
+              handleMarkerClick(selectedLocation.id);
             }}
           >
-            <div
-              className={cn(
-                "flex items-center justify-center w-8 h-8 rounded-full cursor-pointer transition-all",
-                selectedId === location.id
-                  ? "bg-primary text-primary-foreground scale-125 shadow-lg"
-                  : "bg-white text-gray-700 border-2 border-gray-300 hover:border-primary hover:scale-110"
-              )}
-            >
+            <div className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg ring-2 ring-white">
               <MapPin className="h-4 w-4" />
             </div>
           </Marker>
-        ))}
+        )}
       </Map>
     </div>
   );
