@@ -47,6 +47,12 @@ Run migrations
 npm run migrate
 ```
 
+### Category And Map Icons
+
+Category icons can be selected for each multiple-choice option in the object-type field editor. Existing recycling categories retain their default icons unless an override is selected. The Map tab of the use-case settings accepts a PNG marker image up to 1 MB; uploaded images are fitted to a fixed marker size, and the default recycling marker can be restored.
+
+Run the focused icon-settings regression checks with `npx tsx --test scripts/icon-settings.test.ts`.
+
 ### Use-case usage analytics
 
 The use-case administration Usage statistics page collects map views, configured map-filter selections, and coarse AI chat topic counts after the usage-events migration has been applied. Run `npm run migrate` whenever deploying schema changes. Analytics does not store chat text, images, or free-form search terms; see [the usage analytics architecture](../docs/architecture/usage_analytics.md) for the event model, privacy boundaries, access checks, and current retention limitations. New deployments start with empty usage statistics; existing analytics are not backfilled.
