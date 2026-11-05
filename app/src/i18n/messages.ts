@@ -879,6 +879,11 @@ const baseFi = {
     nameColumn: "Nimi",
     fieldsColumn: "Kenttiä",
     editLocationTypeAria: "Muokkaa kohdetyyppiä",
+    deleteLocationTypeAria: "Poista kohdetyyppi",
+    deleteConfirm: 'Poistetaanko kohdetyyppi "{name}"?\n\nMyös sen {count} kenttämääritystä poistetaan. Poisto onnistuu vain, jos tyyppi ja sen kentät eivät ole kohteiden tai tietolähteiden käytössä.',
+    deleteSuccess: "Kohdetyyppi poistettu",
+    deleteFailed: "Kohdetyypin poisto epäonnistui",
+    deleteInUse: "Kohdetyyppi on käytössä. Siirrä kohteet ja tietolähteet toiseen tyyppiin ja poista tai siirrä sen kenttäarvot ja kenttäkytkennät ennen poistoa.",
   },
 };
 
@@ -1718,6 +1723,11 @@ const baseEn = {
     nameColumn: "Name",
     fieldsColumn: "Fields",
     editLocationTypeAria: "Edit location type",
+    deleteLocationTypeAria: "Delete object type",
+    deleteConfirm: 'Delete object type "{name}"?\n\nIts {count} field definitions will also be deleted. Deletion is only possible when neither the type nor its fields are used by locations or data sources.',
+    deleteSuccess: "Object type deleted",
+    deleteFailed: "Could not delete object type",
+    deleteInUse: "This object type is in use. Move its locations and data sources to another type and remove or transfer its field values and field mappings before deleting it.",
   },
 };
 

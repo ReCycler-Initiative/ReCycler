@@ -365,6 +365,15 @@ export const updateLocationType = (
     )
     .then((response) => LocationTypeRecord.parse(response.data));
 
+export const deleteLocationType = (
+  organizationId: string,
+  useCaseId: string,
+  locationTypeId: string
+): Promise<void> =>
+  axios
+    .delete(`/api/organizations/${organizationId}/use_cases/${useCaseId}/location-types/${locationTypeId}`)
+    .then(() => undefined);
+
 export const updateField = (
   organizationId: string,
   useCaseId: string,

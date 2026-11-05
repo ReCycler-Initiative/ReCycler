@@ -1,7 +1,40 @@
 import { checkOrganizationAuthorization } from "@/lib/authorization";
 import db from "@/services/db";
+import { deleteUnusedLocationType } from "@/services/location-type-deletion";
 import { LocationType, LocationTypeRecord } from "@/types";
 import { NextRequest, NextResponse } from "next/server";
+import { z } from "zod";
+
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: Promise<{
+    organizationId: string;
+    useCaseId: string;
+    locationTypeId: string;
+  }> }
+) {
+  const parsed = z.object({
+    organizationId: z.string().uuid(),
+    useCaseId: z.string().uuid(),
+    locationTypeId: z.string().uuid(),
+  }).safeParse(await params);
+  if (!parsed.success) {
+    return NextResponse.json({ error: "Invalid identifiers" }, { status: 400 });
+  }
+
+  const { organizationId, useCaseId, locationTypeId } = parsed.data;
+  const authResult = await checkOrganizationAuthorization(request, organizationId);
+  if (!authResult.authorized) return authResult.response!;
+
+  const result = await deleteUnusedLocationType(db, organizationId, useCaseId, locationTypeId);
+  if (result === "not_found") {
+    return NextResponse.json({ error: "Object not found" }, { status: 404 });
+  }
+  if (result === "in_use") {
+    return NextResponse.json({ error: "Object type is in use", code: "LOCATION_TYPE_IN_USE" }, { status: 409 });
+  }
+  return NextResponse.json({ ok: true });
+}
 
 export async function GET(
   request: NextRequest,
