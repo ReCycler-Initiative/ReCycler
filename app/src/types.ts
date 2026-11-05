@@ -50,6 +50,7 @@ export const FieldOptions = z.object({
   choices: z.array(z.string()).optional(),
   choiceColors: z.record(z.string()).optional(),
   choiceInfo: z.record(z.string()).optional(),
+  choiceIcons: z.record(z.string()).optional(),
   placeholder: z.string().optional(),
   helpText: z.string().optional(),
 });

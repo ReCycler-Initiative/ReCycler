@@ -860,6 +860,8 @@ const baseFi = {
     choiceInfoPlaceholder: "Näytetään käyttäjälle info-painikkeesta",
     choiceInfoRemove: "Poista",
     choiceInfoDone: "Valmis",
+    choiceIcon: "Kategorian ikoni",
+    choiceIconDefault: "Oletusikoni",
   },
   adminObjectForm: {
     nameLabel: "Nimi",
@@ -1694,6 +1696,8 @@ const baseEn = {
     choiceInfoPlaceholder: "Shown to the user via the info button",
     choiceInfoRemove: "Remove",
     choiceInfoDone: "Done",
+    choiceIcon: "Category icon",
+    choiceIconDefault: "Default icon",
   },
   adminObjectForm: {
     nameLabel: "Name",

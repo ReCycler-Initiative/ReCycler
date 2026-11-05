@@ -73,6 +73,7 @@ export default function FieldsPage() {
       choices: (field.options?.choices ?? []).map((v) => ({ value: v })),
       choiceColors: field.options?.choiceColors ?? {},
       choiceInfo: field.options?.choiceInfo ?? {},
+      choiceIcons: field.options?.choiceIcons ?? {},
       placeholder: field.options?.placeholder ?? "",
       helpText: field.options?.helpText ?? "",
     });

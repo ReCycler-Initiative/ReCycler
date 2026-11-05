@@ -1,6 +1,7 @@
 "use client";
 
 import { useMessages } from "@/i18n/locale-provider";
+import { CategoryIconPicker } from "@/components/category-icon-picker";
 import { FormFooter, FormShell } from "@/components/editor-template";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -39,6 +40,7 @@ const FieldFormSchema = z.object({
   choices: z.array(z.object({ value: z.string() })),
   choiceColors: z.record(z.string()),
   choiceInfo: z.record(z.string()),
+  choiceIcons: z.record(z.string()),
   placeholder: z.string(),
   helpText: z.string(),
   order: z.number().nullable(),
@@ -54,6 +56,7 @@ export type FieldFormDefaultValues = {
   choices?: string[];
   choiceColors?: Record<string, string>;
   choiceInfo?: Record<string, string>;
+  choiceIcons?: Record<string, string>;
   placeholder?: string;
   helpText?: string;
 };
@@ -72,6 +75,9 @@ export const toApiData = (values: FieldFormValues) => ({
           ...(Object.keys(values.choiceInfo).length
             ? { choiceInfo: values.choiceInfo }
             : {}),
+          ...(Object.keys(values.choiceIcons).length
+            ? { choiceIcons: values.choiceIcons }
+            : {}),
           ...(values.placeholder ? { placeholder: values.placeholder } : {}),
           ...(values.helpText ? { helpText: values.helpText } : {}),
         }
@@ -84,6 +90,7 @@ export const toApiData = (values: FieldFormValues) => ({
 export const fieldFormDefaultValues: FieldFormValues = {
   choiceColors: {},
   choiceInfo: {},
+  choiceIcons: {},
   choices: [],
   field_type: "text_input",
   helpText: "",
@@ -105,6 +112,7 @@ export const useFieldForm = (defaults?: FieldFormDefaultValues) =>
       choices: (defaults?.choices ?? []).map((v) => ({ value: v })),
       choiceColors: defaults?.choiceColors ?? {},
       choiceInfo: defaults?.choiceInfo ?? {},
+      choiceIcons: defaults?.choiceIcons ?? {},
       placeholder: defaults?.placeholder ?? "",
       helpText: defaults?.helpText ?? "",
     },
@@ -286,6 +294,7 @@ export const FieldFormFields = ({
   const required = useWatch({ control, name: "required" });
   const choiceColors = useWatch({ control, name: "choiceColors" }) ?? {};
   const choiceInfo = useWatch({ control, name: "choiceInfo" }) ?? {};
+  const choiceIcons = useWatch({ control, name: "choiceIcons" }) ?? {};
   const choices = useWatch({ control, name: "choices" }) ?? [];
   const popoverContainerRef = useRef<HTMLDivElement>(null);
 
@@ -370,7 +379,31 @@ export const FieldFormFields = ({
                 <div key={field.id} className="flex gap-2 items-center">
                   <Input
                     {...register(`choices.${index}.value`)}
+                    onChange={(event) => {
+                      const nextValue = event.target.value;
+                      for (const name of ["choiceIcons", "choiceColors", "choiceInfo"] as const) {
+                        const next = { ...getValues(name) };
+                        if (choiceValue in next) {
+                          next[nextValue] = next[choiceValue];
+                          delete next[choiceValue];
+                          setValue(name, next, { shouldDirty: true });
+                        }
+                      }
+                      setValue(`choices.${index}.value`, nextValue, { shouldDirty: true });
+                    }}
+                    className="min-w-0 flex-1"
                     placeholder={`Vaihtoehto ${index + 1}`}
+                  />
+                  <CategoryIconPicker
+                    value={choiceIcons[choiceValue]}
+                    disabled={!choiceValue}
+                    containerRef={popoverContainerRef}
+                    onChange={(icon) => {
+                      const next = { ...getValues("choiceIcons") };
+                      if (icon) next[choiceValue] = icon;
+                      else delete next[choiceValue];
+                      setValue("choiceIcons", next, { shouldDirty: true });
+                    }}
                   />
                   <ColorPickerPopover
                     currentColor={currentColor}
@@ -423,6 +456,9 @@ export const FieldFormFields = ({
                         const nextInfo = { ...choiceInfo };
                         delete nextInfo[key];
                         setValue("choiceInfo", nextInfo, { shouldDirty: true });
+                        const nextIcons = { ...choiceIcons };
+                        delete nextIcons[key];
+                        setValue("choiceIcons", nextIcons, { shouldDirty: true });
                       }
                       remove(index);
                     }}

@@ -1,6 +1,7 @@
 "use client";
 
 import { AiTransparencyNotice } from "@/components/ai-transparency-notice";
+import { getCategoryIcon } from "@/components/category-icon";
 import { useLocale, useMessages } from "@/i18n/locale-provider";
 import { localizeMaterialNameCandidate } from "@/lib/material-translations";
 import { chat, getFields, getMaterials } from "@/services/api";
@@ -128,8 +129,8 @@ export const AiMaterialPrompt = ({
             index,
             rawValue,
             label: localizeMaterialNameCandidate(rawValue, locale),
-            baseHex: visual?.baseHex,
-            icon: visual?.icon,
+            baseHex: field.options?.choiceColors?.[rawValue] ?? visual?.baseHex ?? "#475569",
+            icon: getCategoryIcon(field.options?.choiceIcons?.[rawValue]) ?? visual?.icon,
           },
         ];
       });

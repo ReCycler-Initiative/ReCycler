@@ -1,12 +1,13 @@
 "use client";
 
 import { getNameIconEntry } from "@/components/materials";
+import { getCategoryIcon } from "@/components/category-icon";
 import { MarkdownContent } from "@/components/markdown-block";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { useLocale } from "@/i18n/locale-provider";
 import { localizeMaterialNameCandidate } from "@/lib/material-translations";
 
-export type ChoiceInfo = { choice: string; text: string };
+export type ChoiceInfo = { choice: string; text: string; iconId?: string };
 
 export const ChoiceInfoDialog = ({
   info,
@@ -25,7 +26,9 @@ export const ChoiceInfoDialog = ({
         </DialogTitle>
         <div className="max-h-[80vh] overflow-y-auto px-4 lg:px-6">
           {info && (
-            <div className="mb-6">{getNameIconEntry(info.choice)?.icon}</div>
+            <div className="mb-6">
+              {getCategoryIcon(info.iconId) ?? getNameIconEntry(info.choice)?.icon}
+            </div>
           )}
           <MarkdownContent content={info?.text ?? ""} />
         </div>

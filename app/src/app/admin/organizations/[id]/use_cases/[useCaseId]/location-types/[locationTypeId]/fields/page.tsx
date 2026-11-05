@@ -45,6 +45,7 @@ export default function FieldsPage() {
     fieldForm.reset({
       choiceColors: field.options?.choiceColors ?? {},
       choiceInfo: field.options?.choiceInfo ?? {},
+      choiceIcons: field.options?.choiceIcons ?? {},
       choices: (field.options?.choices ?? []).map((v) => ({ value: v })),
       field_type: field.field_type,
       helpText: field.options?.helpText ?? "",

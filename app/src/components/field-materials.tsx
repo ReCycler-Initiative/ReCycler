@@ -7,6 +7,7 @@ import LoadingSpinner from "@/components/loading-spinner";
 import { useLocale, useMessages } from "@/i18n/locale-provider";
 import { localizeMaterialNameCandidate } from "@/lib/material-translations";
 import { ChoiceInfo, ChoiceInfoDialog } from "@/components/choice-info-dialog";
+import { getCategoryIcon } from "@/components/category-icon";
 import { useState } from "react";
 import { LocationTypeChips } from "@/components/location-type-chips";
 import { FieldRecord } from "@/types";
@@ -99,7 +100,7 @@ export const FieldMaterials = ({
         <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
           {choices.map((choice, choiceIndex) => {
             const iconEntry = getNameIconEntry(choice);
-            const color = field.options?.choiceColors?.[choice] ?? iconEntry?.baseHex;
+            const color = field.options?.choiceColors?.[choice] ?? iconEntry?.baseHex ?? "#475569";
             const checked = fieldSelected.includes(choiceIndex);
             const info = field.options?.choiceInfo?.[choice];
             return (
@@ -108,8 +109,10 @@ export const FieldMaterials = ({
                 baseHex={color}
                 checked={checked}
                 label={localizeMaterialNameCandidate(choice, locale)}
-                icon={iconEntry?.icon}
-                onInfo={info ? () => setInfoChoice({ choice, text: info }) : undefined}
+                icon={getCategoryIcon(field.options?.choiceIcons?.[choice]) ?? iconEntry?.icon}
+                onInfo={info ? () => setInfoChoice({
+                  choice, text: info, iconId: field.options?.choiceIcons?.[choice],
+                }) : undefined}
                 onToggle={() => {
                   const next = checked
                     ? fieldSelected.filter((i) => i !== choiceIndex)
