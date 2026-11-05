@@ -1,6 +1,7 @@
 "use client";
 
 import { EditorTemplate, useEditor } from "@/components/editor-template";
+import { MapMarkerEditor } from "@/components/map-marker-editor";
 import FormSwitch from "@/components/form/form-switch";
 import FormInput from "@/components/form/form-input";
 import { FormTextArea } from "@/components/form/form-textarea";
@@ -363,6 +364,13 @@ const UseCaseInfoPage = () => {
                   {messages.adminUseCaseEditor.resetMapDefaults}
                 </Button>
               </div>
+
+              <MapMarkerEditor
+                value={editor.form.watch("map_settings.marker_icon_url")}
+                onChange={(value) => editor.form.setValue(
+                  "map_settings.marker_icon_url", value, { shouldDirty: true }
+                )}
+              />
 
               <div className="grid gap-3 md:grid-cols-2">
                 <FormInput

@@ -166,6 +166,7 @@ export const NewUseCase = z.object({
   logo_url: z.string().max(1400000).nullable().optional(),
   map_settings: z
     .object({
+      marker_icon_url: z.string().max(1400000).optional(),
       initial_center: z.tuple([
         z.coerce.number().min(-180).max(180),
         z.coerce.number().min(-90).max(90),

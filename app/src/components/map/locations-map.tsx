@@ -53,18 +53,27 @@ import Map, {
 } from "react-map-gl";
 
 // Custom icon loader for collection points
-const CollectionPointIcon = () => {
+const CollectionPointIcon = ({ iconUrl }: { iconUrl?: string }) => {
   const { current: map } = useMap();
 
   useEffect(() => {
     if (!map) return;
+    let cancelled = false;
+    let loading = false;
+    if (map.hasImage("collection-point")) map.removeImage("collection-point");
 
-    const loadIcon = () => {
-      // Load icon only once per style
-      if (map.hasImage("collection-point")) return;
-      map.loadImage("/images/collection-point.png", (error, image) => {
-        if (error) throw error;
-        if (!image) return;
+    const loadIcon = (url = iconUrl || "/images/collection-point.png") => {
+      if (cancelled || loading || map.hasImage("collection-point")) return;
+      loading = true;
+      map.loadImage(url, (error, image) => {
+        loading = false;
+        if (cancelled) return;
+        if (error || !image) {
+          if (url !== "/images/collection-point.png") {
+            loadIcon("/images/collection-point.png");
+          }
+          return;
+        }
         if (!map.hasImage("collection-point")) {
           map.addImage("collection-point", image);
         }
@@ -76,9 +85,10 @@ const CollectionPointIcon = () => {
     loadIcon();
     map.on("styleimagemissing", onStyleImageMissing);
     return () => {
+      cancelled = true;
       map.off("styleimagemissing", onStyleImageMissing);
     };
-  }, [map]);
+  }, [map, iconUrl]);
 
   return null;
 };
@@ -860,7 +870,7 @@ export default function LocationsMap({ geoJson, mapSettings }: LocationsMapProps
                   </Source>
                 </>
               )}
-              <CollectionPointIcon />
+              <CollectionPointIcon iconUrl={resolvedMapSettings.marker_icon_url} />
               {details && (
                 <Popup
                   key={new Date().getTime()}

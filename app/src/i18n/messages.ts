@@ -551,6 +551,9 @@ const baseFi = {
     chooseLogo: "Valitse logo",
     removeLogo: "Poista logo",
     logoInvalid: "Valitse PNG-kuva, jonka koko on enintään 1 Mt.",
+    markerIconLabel: "Karttamerkin ikoni",
+    chooseMarkerIcon: "Valitse PNG-kuva",
+    resetMarkerIcon: "Palauta oletusikoni",
     deleteUseCase: "Siirrä käyttötapaus roskakoriin",
     deleteUseCaseConfirm:
       "Siirretäänkö käyttötapaus roskakoriin? Tiedot säilyvät palautettavina 30 päivän ajan.",
@@ -1434,6 +1437,9 @@ const baseEn = {
     chooseLogo: "Choose logo",
     removeLogo: "Remove logo",
     logoInvalid: "Choose a PNG image no larger than 1 MB.",
+    markerIconLabel: "Map marker icon",
+    chooseMarkerIcon: "Choose PNG image",
+    resetMarkerIcon: "Restore default icon",
     deleteUseCase: "Move use case to trash",
     deleteUseCaseConfirm:
       "Move this use case to the trash? Its data will remain recoverable for 30 days.",

@@ -103,6 +103,7 @@ export const resolveUseCaseMapSettings = (
   ];
 
   return {
+    marker_icon_url: mapSettings.marker_icon_url,
     initial_center: sanitizeCoordinate(initialCenter),
     initial_zoom: clamp(initialZoom, 0, 22),
     max_bounds: sanitizedBounds,
